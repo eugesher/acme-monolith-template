@@ -69,8 +69,9 @@ export class ProductStockAddUseCase {
     const writeResult = await this.write(command);
     const { stockOnHand, productStockId, domainEvents } = writeResult;
     const addedEvents = domainEvents.filter((event) => event instanceof ProductStockAddedEvent);
+    const ledgerRecords = addedEvents.map((event) => event.toLedgerRecord(productStockId));
 
-    await this.ledger.recordEvents({ productStockId, events: addedEvents });
+    await this.ledger.recordEvents({ ledgerRecords });
 
     this.logger.info({ productId, quantity, onHand: stockOnHand.quantity }, 'Product restocked');
 

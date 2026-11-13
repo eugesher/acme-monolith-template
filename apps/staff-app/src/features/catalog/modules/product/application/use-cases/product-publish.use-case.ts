@@ -30,9 +30,10 @@ export class ProductPublishUseCase {
     );
     const { product, domainEvents } = writeResult;
     const publishedEvents = domainEvents.filter((event) => event instanceof ProductPublishedEvent);
+    const ledgerRecords = publishedEvents.map((event) => event.toLedgerRecord());
 
     await this.catalogCache.invalidate();
-    await this.ledger.recordEvents({ events: publishedEvents });
+    await this.ledger.recordEvents({ ledgerRecords });
 
     const productView = product.toSnapshot();
 

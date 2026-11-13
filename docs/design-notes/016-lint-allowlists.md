@@ -80,8 +80,15 @@ common module may (a positive case of the common modules spec).
 ### `module-areas.mjs` and `common-modules.mjs` — the two adapter kinds
 
 A core-adapter and a common-adapter have the same shape: they implement an outbound port of their
-module and call a contract outside it. Both may reach the domain and the outbound layer of their
-module, though only feature core-adapters reach the domain.
+module and call a contract outside it. Both may reach the outbound layer of their module and never
+its domain.
+
+**Outbound does not see the domain.** A port speaks types of its own: a command lists the fields its
+adapter reads, and the use case hands it what the model answers, which fits by shape
+(`IOrderProductStockWithdrawCommand.movements`, `IProductLedgerRecordEventsCommand.ledgerRecords`).
+A domain type in a command would let infrastructure, which may not import the domain, hold domain
+objects and call their methods. The features, core modules and common modules specs each refuse the
+edge.
 
 ### `acme-core.mjs` — a core module that writes to a queue or a cache
 

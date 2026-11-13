@@ -52,12 +52,14 @@ because only staff features read the header.
 
 The model records a domain event per change
 (`apps/staff-app/src/features/catalog/modules/product/domain/events`). A use case pulls them after
-the write, picks those that go to the ledger and hands them to `IProductLedgerPort`, whose adapter
-enqueues them on the `ledger-record` queue (see `022-enqueue-after-commit.md` and
+the write, picks those that go to the ledger and hands their records to `IProductLedgerPort`, whose
+adapter enqueues them on the `ledger-record` queue (see `022-enqueue-after-commit.md` and
 `004-append-only-journal.md`). An event that goes to the ledger builds its record itself,
-`ProductPublishedEvent.toLedgerRecord(correlationId)`: the event knows its fields and its aggregate,
-and the adapter only adds the correlation id. The domain may not import the ledger contracts, so the
-event answers `IProductLedgerRecord`, a type of its own with the shape of the record of the lib.
+`ProductPublishedEvent.toLedgerRecord()`: the event knows its fields and its aggregate. The use case
+calls it, not the adapter: infrastructure may not reach the domain, so the port takes the records
+rather than the events (see `016-lint-allowlists.md`). The domain may not import the ledger
+contracts, so the event answers `IProductLedgerRecord`, a type of its own with the shape of the
+record of the lib, and the command of the port lists the same fields.
 
 ## `PATCH` edits fields, `PUT` sets a state
 

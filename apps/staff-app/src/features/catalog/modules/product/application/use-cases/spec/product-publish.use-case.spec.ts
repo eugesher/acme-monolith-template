@@ -16,6 +16,7 @@ describe('ProductPublishUseCase', () => {
   let useCase: ProductPublishUseCase;
 
   beforeEach(() => {
+    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     write = jest.fn().mockResolvedValue({
       product: ProductModel.reconstitute({
         id: '12',
@@ -39,6 +40,10 @@ describe('ProductPublishUseCase', () => {
     );
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   describe('execute', () => {
     it('publishes, enqueues the ledger records and answers the stored product', async () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: 1 });
@@ -48,7 +53,16 @@ describe('ProductPublishUseCase', () => {
         expect.any(Function),
       );
       expect(recordEvents).toHaveBeenCalledWith({
-        events: [expect.any(ProductPublishedEvent)],
+        ledgerRecords: [
+          {
+            operationKey: 'product-published:12:2',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'draft' },
+            occurredAt: '2026-01-05T08:00:00.000Z',
+          },
+        ],
       });
       expect(view).toEqual({
         id: '12',
@@ -72,7 +86,7 @@ describe('ProductPublishUseCase', () => {
 
       await useCase.execute({ productId: '12', expectedVersion: 1 });
 
-      expect(recordEvents).toHaveBeenCalledWith({ events: [] });
+      expect(recordEvents).toHaveBeenCalledWith({ ledgerRecords: [] });
     });
 
     it('invalidates the customer catalog after the write and before the ledger', async () => {

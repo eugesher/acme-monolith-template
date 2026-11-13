@@ -25,12 +25,7 @@ const areaPolicies = (area, sharedFacing) => {
       }),
     ]),
     from(`${prefix}:domain`, [layer('domain'), baseLibs()]),
-    from(`${prefix}:outbound`, [
-      layer('domain'),
-      layer('outbound'),
-      baseLibs(),
-      ...sharedFacing.outbound,
-    ]),
+    from(`${prefix}:outbound`, [layer('outbound'), baseLibs(), ...sharedFacing.outbound]),
     fromFile(`${prefix}:outbound`, persistenceInterfaces, [
       to('acme-core:entities'),
       to('acme-app:common:entities', own('app')),

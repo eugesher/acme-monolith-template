@@ -21,11 +21,9 @@ export class ProductStockLedgerCoreAdapter implements IProductStockLedgerPort {
   ) {}
 
   public async recordEvents(command: IProductStockLedgerRecordEventsCommand): Promise<void> {
-    const { productStockId, events } = command;
+    const { ledgerRecords } = command;
 
-    for (const event of events) {
-      const ledgerRecord = event.toLedgerRecord(productStockId);
-
+    for (const ledgerRecord of ledgerRecords) {
       await this.ledger.handleEnqueue(ledgerRecord);
     }
   }

@@ -1,5 +1,4 @@
 import { ProductLedgerCoreAdapter } from '../product-ledger-core.adapter';
-import type { IProductLedgerRecordEventsCommand } from '../../../outbound';
 
 describe('ProductLedgerCoreAdapter', () => {
   let handleEnqueue: jest.Mock;
@@ -31,27 +30,75 @@ describe('ProductLedgerCoreAdapter', () => {
   });
 
   describe('recordEvents', () => {
-    it('enqueues the record each event builds', async () => {
-      const record = { operationKey: 'product-published:12:6' };
-      const toLedgerRecord = jest.fn().mockReturnValue(record);
-      const event = { toLedgerRecord } as unknown as IProductLedgerRecordEventsCommand['events'][0];
+    it('enqueues every ledger record in order', async () => {
+      await adapter.recordEvents({
+        ledgerRecords: [
+          {
+            operationKey: 'product-published:12:6',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'draft' },
+            occurredAt: '2026-01-05T08:00:00.000Z',
+          },
+          {
+            operationKey: 'product-published:12:7',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'archived' },
+            occurredAt: '2026-01-05T08:00:01.000Z',
+          },
+        ],
+      });
 
-      await adapter.recordEvents({ events: [event] });
-
-      expect(toLedgerRecord).toHaveBeenCalledWith();
-      expect(handleEnqueue).toHaveBeenCalledWith(record);
+      expect(handleEnqueue.mock.calls).toEqual([
+        [
+          {
+            operationKey: 'product-published:12:6',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'draft' },
+            occurredAt: '2026-01-05T08:00:00.000Z',
+          },
+        ],
+        [
+          {
+            operationKey: 'product-published:12:7',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'archived' },
+            occurredAt: '2026-01-05T08:00:01.000Z',
+          },
+        ],
+      ]);
     });
 
     it('stops at a failed enqueue and rejects', async () => {
       handleEnqueue.mockRejectedValueOnce(new Error('redis is down'));
-      const first = {
-        toLedgerRecord: jest.fn().mockReturnValue({ operationKey: 'product-published:12:6' }),
-      } as unknown as IProductLedgerRecordEventsCommand['events'][0];
-      const second = {
-        toLedgerRecord: jest.fn().mockReturnValue({ operationKey: 'product-unpublished:12:7' }),
-      } as unknown as IProductLedgerRecordEventsCommand['events'][0];
 
-      const record = adapter.recordEvents({ events: [first, second] });
+      const record = adapter.recordEvents({
+        ledgerRecords: [
+          {
+            operationKey: 'product-published:12:6',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'draft' },
+            occurredAt: '2026-01-05T08:00:00.000Z',
+          },
+          {
+            operationKey: 'product-published:12:7',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductPublished',
+            payload: { sku: 'SKU-0001', previousStatus: 'archived' },
+            occurredAt: '2026-01-05T08:00:01.000Z',
+          },
+        ],
+      });
 
       await expect(record).rejects.toThrow('redis is down');
       expect(handleEnqueue).toHaveBeenCalledTimes(1);
