@@ -20,8 +20,8 @@ export class TagCreateUseCase {
 
   public async execute(command: ITagCreateCommand): Promise<ITagView> {
     const { name } = command;
-    const tagDraft = TagModel.createDraft({ name });
-    const tagId = await this.insert(tagDraft.name);
+    const tagCandidate = TagModel.initCandidate({ name });
+    const tagId = await this.insert(tagCandidate.name);
     const tagRecord = await this.repository.findInserted(tagId);
     const createdTag = TagModel.reconstitute(tagRecord);
     const tagView = createdTag.toSnapshot();

@@ -5,10 +5,10 @@ import { NoteResolvedException } from '../exceptions/note-resolved.exception';
 import { NoteSubjectInvalidException } from '../exceptions/note-subject-invalid.exception';
 import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
 import type {
-  INoteCandidateInput,
-  INoteDraftOutput,
-  INoteRecordInput,
-  INoteSnapshotOutput,
+  INoteCandidate,
+  INoteCandidateInit,
+  INoteReconstitute,
+  INoteSnapshot,
 } from '../interfaces';
 
 export class NoteModel extends AggregateRootBase<string> {
@@ -42,7 +42,7 @@ export class NoteModel extends AggregateRootBase<string> {
     super(id);
   }
 
-  public static reconstitute(record: INoteRecordInput): NoteModel {
+  public static reconstitute(record: INoteReconstitute): NoteModel {
     const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
       record;
     const validSubjectType = NoteModel.validSubjectType(subjectType);
@@ -63,8 +63,8 @@ export class NoteModel extends AggregateRootBase<string> {
     );
   }
 
-  public static createDraft(candidate: INoteCandidateInput): INoteDraftOutput {
-    const { subjectType, subjectId, body, authorId } = candidate;
+  public static initCandidate(proposal: INoteCandidateInit): INoteCandidate {
+    const { subjectType, subjectId, body, authorId } = proposal;
     const validSubjectType = NoteModel.validSubjectType(subjectType);
     const validSubjectId = NoteModel.validSubjectId(subjectId);
     const validBody = NoteModel.validBody(body);
@@ -99,7 +99,7 @@ export class NoteModel extends AggregateRootBase<string> {
     this.currentVersion += 1;
   }
 
-  public toSnapshot(): INoteSnapshotOutput {
+  public toSnapshot(): INoteSnapshot {
     return {
       id: this.id,
       subjectType: this.subjectType,

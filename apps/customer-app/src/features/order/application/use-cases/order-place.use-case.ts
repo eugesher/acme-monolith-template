@@ -96,22 +96,22 @@ export class OrderPlaceUseCase {
     const stockOnHand = await this.productStock.lock({ productIds: distinctIds });
     const products = await this.repository.findActiveProducts(distinctIds);
 
-    const orderDraft = OrderModel.createDraft({
+    const orderCandidate = OrderModel.initCandidate({
       customerId,
       productIds,
       products,
       stockOnHand,
     });
-    const orderId = await this.repository.insertOrder({ customerId: orderDraft.customerId });
+    const orderId = await this.repository.insertOrder({ customerId: orderCandidate.customerId });
 
-    const orderProducts = orderDraft.productIds.map((productId) => ({ orderId, productId }));
+    const orderProducts = orderCandidate.productIds.map((productId) => ({ orderId, productId }));
     await this.repository.insertOrderProducts(orderProducts);
 
     const orderRecord = await this.repository.findPlaced(orderId);
 
     const placed = OrderModel.reconstitute(orderRecord);
     const orderView = placed.toSnapshot();
-    const movements = placed.getMovements();
+    const movements = placed.getProductStockMovements();
 
     await this.productStock.withdraw({ movements });
     await this.idempotency.complete({ customerId, key: idempotencyKey, response: orderView });

@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { NoteCreateUseCase } from '../note-create.use-case';
-import type { INoteDraftOutput } from '../../../domain';
+import type { INoteCandidate } from '../../../domain';
 
 describe('NoteCreateUseCase', () => {
   let insert: jest.Mock;
@@ -36,7 +36,7 @@ describe('NoteCreateUseCase', () => {
         body: ' Check the supplier ',
         authorId: 'admin-1',
       });
-      const [note] = insert.mock.calls[0] as [INoteDraftOutput];
+      const [note] = insert.mock.calls[0] as [INoteCandidate];
 
       expect(note.subjectId).toBe('42');
       expect(note.body).toBe('Check the supplier');

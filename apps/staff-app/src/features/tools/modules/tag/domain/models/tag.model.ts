@@ -2,10 +2,10 @@ import { AggregateRootBase } from '@acme-libs/toolkit';
 
 import { TagNameInvalidException } from '../exceptions/tag-name-invalid.exception';
 import type {
-  ITagCandidateInput,
-  ITagDraftOutput,
-  ITagRecordInput,
-  ITagSnapshotOutput,
+  ITagCandidate,
+  ITagCandidateInit,
+  ITagReconstitute,
+  ITagSnapshot,
 } from '../interfaces';
 
 export class TagModel extends AggregateRootBase<string> {
@@ -24,15 +24,15 @@ export class TagModel extends AggregateRootBase<string> {
     super(id);
   }
 
-  public static reconstitute(record: ITagRecordInput): TagModel {
+  public static reconstitute(record: ITagReconstitute): TagModel {
     const { id, name, createdAt, updatedAt } = record;
     const validName = TagModel.validName(name);
 
     return new TagModel(id, validName, createdAt, updatedAt);
   }
 
-  public static createDraft(candidate: ITagCandidateInput): ITagDraftOutput {
-    const { name } = candidate;
+  public static initCandidate(proposal: ITagCandidateInit): ITagCandidate {
+    const { name } = proposal;
     const validName = TagModel.validName(name);
 
     return { name: validName };
@@ -42,7 +42,7 @@ export class TagModel extends AggregateRootBase<string> {
     this.currentName = TagModel.validName(name);
   }
 
-  public toSnapshot(): ITagSnapshotOutput {
+  public toSnapshot(): ITagSnapshot {
     return {
       id: this.id,
       name: this.name,

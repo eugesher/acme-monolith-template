@@ -5,7 +5,7 @@ import {
   AuthEmailTakenException,
   AuthRoleNotFoundException,
   UserStaffUserModel,
-  type IUserStaffUserDraftOutput,
+  type IUserStaffUserCandidate,
 } from '../../domain';
 import {
   USER_CREDENTIALS_PORT,
@@ -37,16 +37,16 @@ export class UserRegisterUseCase {
     UserStaffUserModel.assertPasswordStrength(password);
 
     const passwordHash = await this.credentials.hashPassword(password);
-    const userDraft = UserStaffUserModel.createDraft({ email, passwordHash, roleIds });
-    const userId = await this.transaction.run(() => this.insert(userDraft));
+    const userCandidate = UserStaffUserModel.initCandidate({ email, passwordHash, roleIds });
+    const userId = await this.transaction.run(() => this.insert(userCandidate));
 
     this.logger.info({ userId }, 'User registered');
 
-    return { id: userId, email: userDraft.email };
+    return { id: userId, email: userCandidate.email };
   }
 
-  private async insert(draft: IUserStaffUserDraftOutput): Promise<string> {
-    const { email, passwordHash, status, roleIds } = draft;
+  private async insert(candidate: IUserStaffUserCandidate): Promise<string> {
+    const { email, passwordHash, status, roleIds } = candidate;
 
     const insertResult = await this.repository.insertUser({ email, passwordHash, status });
 

@@ -36,9 +36,9 @@ describe('NoteRevisionModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts an edit of the note', () => {
-      const draft = NoteRevisionModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes a revision candidate for an edit of the note', () => {
+      const candidate = NoteRevisionModel.initCandidate({
         noteId: '7',
         noteVersion: 2,
         bodyBefore: 'Check the supplier',
@@ -47,7 +47,7 @@ describe('NoteRevisionModel', () => {
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         noteId: '7',
         noteVersion: 2,
         bodyBefore: 'Check the supplier',
@@ -59,7 +59,7 @@ describe('NoteRevisionModel', () => {
 
     it.each([1, 2.5])('refuses note version %s with NOTE_VERSION_INVALID', (noteVersion) => {
       expect(() =>
-        NoteRevisionModel.createDraft({
+        NoteRevisionModel.initCandidate({
           noteId: '7',
           noteVersion,
           bodyBefore: 'Check the supplier',

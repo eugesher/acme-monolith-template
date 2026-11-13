@@ -1,1 +1,1 @@
-export * from './inputs/product-core-record.input';
+export * from './params/product-core-reconstitute.interface';

@@ -19,9 +19,9 @@ describe('OrderModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts one product per requested unit in the request order', () => {
-      const draft = OrderModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes a candidate with one product per requested unit in the request order', () => {
+      const candidate = OrderModel.initCandidate({
         customerId: 'customer-1',
         productIds: ['100', '103', '100'],
         products: [{ id: '100' }, { id: '103' }],
@@ -31,12 +31,12 @@ describe('OrderModel', () => {
         ],
       });
 
-      expect(draft).toEqual({ customerId: 'customer-1', productIds: ['100', '103', '100'] });
+      expect(candidate).toEqual({ customerId: 'customer-1', productIds: ['100', '103', '100'] });
     });
 
     it('refuses an empty order with ORDER_EMPTY', () => {
       expect(() =>
-        OrderModel.createDraft({
+        OrderModel.initCandidate({
           customerId: 'customer-1',
           productIds: [],
           products: [],
@@ -52,7 +52,7 @@ describe('OrderModel', () => {
 
     it('refuses a product that is not active with ORDER_PRODUCT_NOT_FOUND', () => {
       expect(() =>
-        OrderModel.createDraft({
+        OrderModel.initCandidate({
           customerId: 'customer-1',
           productIds: ['999'],
           products: [],
@@ -69,7 +69,7 @@ describe('OrderModel', () => {
 
     it('refuses more units than in stock with ORDER_STOCK_INSUFFICIENT', () => {
       expect(() =>
-        OrderModel.createDraft({
+        OrderModel.initCandidate({
           customerId: 'customer-1',
           productIds: ['100', '100', '100'],
           products: [{ id: '100' }],
@@ -86,7 +86,7 @@ describe('OrderModel', () => {
 
     it('counts a product without stock data as zero in stock', () => {
       expect(() =>
-        OrderModel.createDraft({
+        OrderModel.initCandidate({
           customerId: 'customer-1',
           productIds: ['100'],
           products: [{ id: '100' }],
@@ -101,19 +101,19 @@ describe('OrderModel', () => {
     });
 
     it('accepts exactly the units in stock', () => {
-      const draft = OrderModel.createDraft({
+      const candidate = OrderModel.initCandidate({
         customerId: 'customer-1',
         productIds: ['100', '100'],
         products: [{ id: '100' }],
         stockOnHand: [{ productId: '100', quantity: 2 }],
       });
 
-      expect(draft.productIds).toEqual(['100', '100']);
+      expect(candidate.productIds).toEqual(['100', '100']);
     });
   });
 
-  describe('getMovements', () => {
-    it('turns every ordered product into a movement of its order product', () => {
+  describe('getProductStockMovements', () => {
+    it('turns every ordered product into a stock movement of its order product', () => {
       const order = OrderModel.reconstitute({
         id: '600',
         createdAt: new Date('2026-01-03T00:00:00.000Z'),
@@ -123,7 +123,7 @@ describe('OrderModel', () => {
         ],
       });
 
-      expect(order.getMovements()).toEqual([
+      expect(order.getProductStockMovements()).toEqual([
         { productId: '100', orderProductId: '601' },
         { productId: '100', orderProductId: '602' },
       ]);

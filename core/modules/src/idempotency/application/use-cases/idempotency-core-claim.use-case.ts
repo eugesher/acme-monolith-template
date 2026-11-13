@@ -8,7 +8,7 @@ import {
   type IIdempotencyCoreClaimView,
 } from '@acme-core/contracts/idempotency';
 
-import { IdempotencyCoreKeyModel, type IIdempotencyCoreKeyDraftOutput } from '../../domain';
+import { IdempotencyCoreKeyModel, type IIdempotencyCoreKeyCandidate } from '../../domain';
 import {
   IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
   IdempotencyCoreClaimInsertOutcomeEnum,
@@ -27,8 +27,8 @@ export class IdempotencyCoreClaimUseCase {
   public async execute(command: IIdempotencyCoreClaimCommand): Promise<IIdempotencyCoreClaimView> {
     const { scope, key, body } = command;
     const requestFingerprint = BodyFingerprintHelper.compute(body);
-    const keyDraft = IdempotencyCoreKeyModel.createDraft({ scope, key, requestFingerprint });
-    const insertOutcome = await this.insert(keyDraft);
+    const keyCandidate = IdempotencyCoreKeyModel.initCandidate({ scope, key, requestFingerprint });
+    const insertOutcome = await this.insert(keyCandidate);
 
     if (insertOutcome) {
       return { outcome: IdempotencyCoreClaimOutcomeEnum.CLAIMED, storedResponse: undefined };
@@ -66,8 +66,8 @@ export class IdempotencyCoreClaimUseCase {
     return { outcome: IdempotencyCoreClaimOutcomeEnum.IN_FLIGHT, storedResponse: undefined };
   }
 
-  private async insert(draft: IIdempotencyCoreKeyDraftOutput): Promise<boolean> {
-    const { scope, key, requestFingerprint, status, responseBody } = draft;
+  private async insert(candidate: IIdempotencyCoreKeyCandidate): Promise<boolean> {
+    const { scope, key, requestFingerprint, status, responseBody } = candidate;
 
     const insertOutcome = await this.repository.insert({
       scope,

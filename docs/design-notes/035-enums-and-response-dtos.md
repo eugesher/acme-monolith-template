@@ -59,24 +59,29 @@ OpenAPI document lists the values and the client can generate the same enum.
 
 ## Domain interfaces
 
-The interfaces of a domain lie in two folders, by the side of the model or the event they are on:
+The interfaces of a domain lie in two folders, by the side of the model or the event they are on.
+They follow the params and snapshots of a helper (see `029-naming.md`): a method of a model takes
+one params object, and every shape a model or an event answers is a snapshot.
 
-| Folder                       | Kind            | What it is                                                                 |
-| ---------------------------- | --------------- | -------------------------------------------------------------------------- |
-| `domain/interfaces/inputs/`  | `record`        | the row a model is rebuilt from, `Model.reconstitute(record)`              |
-|                              | `candidate`     | the data a new row is checked against, `Model.createDraft`                 |
-|                              | `changes`       | the edits a model takes, `ProductModel.update(changes)`                    |
-| `domain/interfaces/outputs/` | `draft`         | the row `createDraft` answers for an insert                                |
-|                              | `snapshot`      | the state a model answers with `toSnapshot()`                              |
-|                              | `changes`       | the diff a model answers, `TagCommonSubjectTagsModel.replace`              |
-|                              | `ledger-record` | the ledger record an event answers, `ProductPublishedEvent.toLedgerRecord` |
+| Folder                         | Name                    | What it is                                                                                                                                                                                                                                        |
+| ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain/interfaces/params/`    | `I<Model>Reconstitute`  | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                                                                     |
+|                                | `I<Model>CandidateInit` | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                            |
+|                                | `I<Model><Action>`      | the edits an operation takes, `IProductUpdate` for `ProductModel.update(changes)`                                                                                                                                                                 |
+| `domain/interfaces/snapshots/` | `I<Model>Candidate`     | the row `initCandidate` answers for an insert                                                                                                                                                                                                     |
+|                                | `I<Model>Snapshot`      | the state a model answers with `toSnapshot()`                                                                                                                                                                                                     |
+|                                | `I<Subject>`            | another answer, by its noun: `ITagCommonSubjectTagsChanges` from `TagCommonSubjectTagsModel.replace`, `IOrderProductStockMovement` from `OrderModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
 
-The direction is the type of the file and the kind ends its name: `product-record.input.ts` holds
-`IProductRecordInput`, `auth-customer-draft.output.ts` holds `IAuthCustomerDraftOutput`, and
-`tag-common-subject-tags-changes.output.ts` sets the diff of tags apart from
-`product-changes.input.ts`. A part of an input or an output without a kind of its own takes the
-direction alone: `order-stock.input.ts` is a field of `IOrderCandidateInput`,
-`order-product.output.ts` an element of `IOrderSnapshotOutput`.
+The folder names the role, so the file repeats the name without `I` and ends with `.interface.ts`:
+`order-reconstitute.interface.ts` holds `IOrderReconstitute`, `order-candidate.interface.ts` holds
+`IOrderCandidate`. The argument takes the name of what it holds: `record`, `proposal`, `changes`.
+
+A part of a params object is `I<Params><Part>`: `IOrderCandidateInitProduct` and
+`IOrderCandidateInitProductStock` are the fields `products` and `stockOnHand` of
+`IOrderCandidateInit`. A part has a file of its own once another file names it, as the private
+checks of `OrderModel` do; until then it stays unexported in the file of its params, as
+`IProductStockCoreOnHandReconstituteStockSum`. A part of a snapshot is the snapshot of its noun:
+`IOrderProductSnapshot` is an element of `IOrderSnapshot`.
 
 ## Read models
 
@@ -93,9 +98,9 @@ puts the snapshots on the page. A module that only reads has a domain for that a
 
 **A list model carries the columns of the list.** A page of orders carries no products, so
 `OrderGetManyModel` rebuilds it, not `OrderModel`, whose record requires them. Both live in the
-domain of the order, the list model with `order-get-many-record.input.ts` and
-`order-get-many-snapshot.output.ts`. A list model does not repeat the checks of the aggregate: it
-rebuilds what the aggregate stored.
+domain of the order, the list model with `order-get-many-reconstitute.interface.ts` and
+`order-get-many-snapshot.interface.ts`. Its `toSnapshot` is private: only `toViewData` calls it. A
+list model does not repeat the checks of the aggregate: it rebuilds what the aggregate stored.
 
 **A model may be rebuilt from several rows.** `ProductStockCoreOnHandModel.reconstitute` takes the
 ids of the products and the sums of their stock rows as one record and answers the stock of every

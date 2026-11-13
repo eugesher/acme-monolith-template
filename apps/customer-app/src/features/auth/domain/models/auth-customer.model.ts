@@ -4,9 +4,9 @@ import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exce
 import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
 import { AuthUserInactiveException } from '../exceptions/auth-user-inactive.exception';
 import type {
-  IAuthCustomerCandidateInput,
-  IAuthCustomerDraftOutput,
-  IAuthCustomerRecordInput,
+  IAuthCustomerCandidate,
+  IAuthCustomerCandidateInit,
+  IAuthCustomerReconstitute,
 } from '../interfaces';
 
 export class AuthCustomerModel {
@@ -19,14 +19,14 @@ export class AuthCustomerModel {
     public readonly status: UserStatusEnum,
   ) {}
 
-  public static reconstitute(record: IAuthCustomerRecordInput): AuthCustomerModel {
+  public static reconstitute(record: IAuthCustomerReconstitute): AuthCustomerModel {
     const { id, passwordHash, status } = record;
 
     return new AuthCustomerModel(id, passwordHash, status);
   }
 
-  public static createDraft(candidate: IAuthCustomerCandidateInput): IAuthCustomerDraftOutput {
-    const { email, passwordHash } = candidate;
+  public static initCandidate(proposal: IAuthCustomerCandidateInit): IAuthCustomerCandidate {
+    const { email, passwordHash } = proposal;
     const normalizedEmail = AuthCustomerModel.normalizeEmail(email);
 
     if (!AuthCustomerModel.EMAIL_PATTERN.test(normalizedEmail)) {

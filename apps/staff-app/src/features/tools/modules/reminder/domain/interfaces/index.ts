@@ -1,7 +1,7 @@
-export * from './inputs/reminder-candidate.input';
-export * from './inputs/reminder-get-many-record.input';
-export * from './inputs/reminder-record.input';
+export * from './params/reminder-candidate-init.interface';
+export * from './params/reminder-get-many-reconstitute.interface';
+export * from './params/reminder-reconstitute.interface';
 
-export * from './outputs/reminder-draft.output';
-export * from './outputs/reminder-get-many-snapshot.output';
-export * from './outputs/reminder-snapshot.output';
+export * from './snapshots/reminder-candidate.interface';
+export * from './snapshots/reminder-get-many-snapshot.interface';
+export * from './snapshots/reminder-snapshot.interface';

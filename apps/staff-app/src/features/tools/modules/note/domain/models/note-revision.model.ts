@@ -1,9 +1,9 @@
 import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
 import type {
-  INoteRevisionCandidateInput,
-  INoteRevisionDraftOutput,
-  INoteRevisionRecordInput,
-  INoteRevisionSnapshotOutput,
+  INoteRevisionCandidate,
+  INoteRevisionCandidateInit,
+  INoteRevisionReconstitute,
+  INoteRevisionSnapshot,
 } from '../interfaces';
 
 export class NoteRevisionModel {
@@ -22,7 +22,7 @@ export class NoteRevisionModel {
     Object.freeze(this);
   }
 
-  public static reconstitute(record: INoteRevisionRecordInput): NoteRevisionModel {
+  public static reconstitute(record: INoteRevisionReconstitute): NoteRevisionModel {
     const { id, noteId, noteVersion, bodyBefore, bodyAfter, editorId, correlationId, recordedAt } =
       record;
     const validNoteVersion = NoteRevisionModel.validNoteVersion(noteVersion);
@@ -39,8 +39,8 @@ export class NoteRevisionModel {
     );
   }
 
-  public static createDraft(candidate: INoteRevisionCandidateInput): INoteRevisionDraftOutput {
-    const { noteId, noteVersion, bodyBefore, bodyAfter, editorId, correlationId } = candidate;
+  public static initCandidate(proposal: INoteRevisionCandidateInit): INoteRevisionCandidate {
+    const { noteId, noteVersion, bodyBefore, bodyAfter, editorId, correlationId } = proposal;
     const validNoteVersion = NoteRevisionModel.validNoteVersion(noteVersion);
 
     return {
@@ -53,7 +53,7 @@ export class NoteRevisionModel {
     };
   }
 
-  public toSnapshot(): INoteRevisionSnapshotOutput {
+  public toSnapshot(): INoteRevisionSnapshot {
     return {
       id: this.id,
       noteId: this.noteId,

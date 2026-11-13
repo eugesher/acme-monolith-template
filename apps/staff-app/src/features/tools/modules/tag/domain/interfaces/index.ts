@@ -1,7 +1,7 @@
-export * from './inputs/tag-candidate.input';
-export * from './inputs/tag-get-many-record.input';
-export * from './inputs/tag-record.input';
+export * from './params/tag-candidate-init.interface';
+export * from './params/tag-get-many-reconstitute.interface';
+export * from './params/tag-reconstitute.interface';
 
-export * from './outputs/tag-draft.output';
-export * from './outputs/tag-get-many-snapshot.output';
-export * from './outputs/tag-snapshot.output';
+export * from './snapshots/tag-candidate.interface';
+export * from './snapshots/tag-get-many-snapshot.interface';
+export * from './snapshots/tag-snapshot.interface';

@@ -1,6 +1,6 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import type { IStaffAuthCoreUserRecordInput } from '../interfaces';
+import type { IStaffAuthCoreUserReconstitute } from '../interfaces';
 
 export class StaffAuthCoreUserModel {
   private constructor(
@@ -9,7 +9,7 @@ export class StaffAuthCoreUserModel {
     public readonly status: UserStatusEnum,
   ) {}
 
-  public static reconstitute(record: IStaffAuthCoreUserRecordInput): StaffAuthCoreUserModel {
+  public static reconstitute(record: IStaffAuthCoreUserReconstitute): StaffAuthCoreUserModel {
     const { id, passwordHash, status } = record;
 
     return new StaffAuthCoreUserModel(id, passwordHash, status);

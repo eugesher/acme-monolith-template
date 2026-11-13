@@ -67,11 +67,11 @@ describe('ProductModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts a product at version 1 with a trimmed name', () => {
-      const draft = ProductModel.createDraft({ sku: 'SKU-0001', name: '  Lamp  ' });
+  describe('initCandidate', () => {
+    it('initializes a product candidate at version 1 with a trimmed name', () => {
+      const candidate = ProductModel.initCandidate({ sku: 'SKU-0001', name: '  Lamp  ' });
 
-      expect(draft).toEqual({ sku: 'SKU-0001', name: 'Lamp', status: 'draft', version: 1 });
+      expect(candidate).toEqual({ sku: 'SKU-0001', name: 'Lamp', status: 'draft', version: 1 });
     });
 
     it.each([
@@ -80,7 +80,7 @@ describe('ProductModel', () => {
       ['a sku starting with a dash', '-ABC'],
       ['a sku longer than 64', `A${'B'.repeat(64)}`],
     ])('refuses %s with PRODUCT_SKU_INVALID', (_, sku) => {
-      expect(() => ProductModel.createDraft({ sku, name: 'Lamp' })).toThrow(
+      expect(() => ProductModel.initCandidate({ sku, name: 'Lamp' })).toThrow(
         expect.objectContaining({ code: 'PRODUCT_SKU_INVALID' }) as Error,
       );
     });
@@ -89,7 +89,7 @@ describe('ProductModel', () => {
       ['a blank name', '   '],
       ['a name longer than 255', 'n'.repeat(256)],
     ])('refuses %s with PRODUCT_NAME_INVALID', (_, name) => {
-      expect(() => ProductModel.createDraft({ sku: 'SKU-0001', name })).toThrow(
+      expect(() => ProductModel.initCandidate({ sku: 'SKU-0001', name })).toThrow(
         expect.objectContaining({
           code: 'PRODUCT_NAME_INVALID',
           message: 'Product.name must be a non-empty string of at most 255 characters',
@@ -98,9 +98,9 @@ describe('ProductModel', () => {
     });
 
     it('accepts a name of 255 characters', () => {
-      const draft = ProductModel.createDraft({ sku: 'SKU-0001', name: 'n'.repeat(255) });
+      const candidate = ProductModel.initCandidate({ sku: 'SKU-0001', name: 'n'.repeat(255) });
 
-      expect(draft.name).toHaveLength(255);
+      expect(candidate.name).toHaveLength(255);
     });
   });
 

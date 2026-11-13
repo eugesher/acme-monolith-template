@@ -1,10 +1,10 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import type {
-  IRoleCandidateInput,
-  IRoleDraftOutput,
-  IRoleRecordInput,
-  IRoleSnapshotOutput,
+  IRoleCandidate,
+  IRoleCandidateInit,
+  IRoleReconstitute,
+  IRoleSnapshot,
 } from '../interfaces';
 
 export class RoleModel {
@@ -18,15 +18,15 @@ export class RoleModel {
     private codes: PermissionCodeEnum[],
   ) {}
 
-  public static reconstitute(record: IRoleRecordInput): RoleModel {
+  public static reconstitute(record: IRoleReconstitute): RoleModel {
     const { id, name, rolePermissions } = record;
     const permissionCodes = rolePermissions.map((rolePermission) => rolePermission.code).sort();
 
     return new RoleModel(id, name, permissionCodes);
   }
 
-  public static createDraft(candidate: IRoleCandidateInput): IRoleDraftOutput {
-    const { name, permissionCodes } = candidate;
+  public static initCandidate(proposal: IRoleCandidateInit): IRoleCandidate {
+    const { name, permissionCodes } = proposal;
 
     return { name, permissionCodes: [...new Set(permissionCodes)] };
   }
@@ -35,7 +35,7 @@ export class RoleModel {
     this.codes = [...new Set(requested)];
   }
 
-  public toSnapshot(): IRoleSnapshotOutput {
+  public toSnapshot(): IRoleSnapshot {
     return { id: this.id, name: this.name, permissionCodes: [...this.permissionCodes] };
   }
 }

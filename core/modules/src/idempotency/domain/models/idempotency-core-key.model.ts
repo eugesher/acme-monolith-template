@@ -2,9 +2,9 @@ import { IdempotencyStatusEnum } from '@acme-libs/kernel';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import type {
-  IIdempotencyCoreKeyCandidateInput,
-  IIdempotencyCoreKeyDraftOutput,
-  IIdempotencyCoreKeyRecordInput,
+  IIdempotencyCoreKeyCandidate,
+  IIdempotencyCoreKeyCandidateInit,
+  IIdempotencyCoreKeyReconstitute,
 } from '../interfaces';
 
 export class IdempotencyCoreKeyModel {
@@ -18,16 +18,16 @@ export class IdempotencyCoreKeyModel {
     Object.freeze(this);
   }
 
-  public static reconstitute(record: IIdempotencyCoreKeyRecordInput): IdempotencyCoreKeyModel {
+  public static reconstitute(record: IIdempotencyCoreKeyReconstitute): IdempotencyCoreKeyModel {
     const { requestFingerprint, status, responseBody } = record;
 
     return new IdempotencyCoreKeyModel(requestFingerprint, status, responseBody);
   }
 
-  public static createDraft(
-    candidate: IIdempotencyCoreKeyCandidateInput,
-  ): IIdempotencyCoreKeyDraftOutput {
-    const { scope, key, requestFingerprint } = candidate;
+  public static initCandidate(
+    proposal: IIdempotencyCoreKeyCandidateInit,
+  ): IIdempotencyCoreKeyCandidate {
+    const { scope, key, requestFingerprint } = proposal;
 
     if (key.length === 0) {
       throw new Error('IdempotencyKey.key is required');

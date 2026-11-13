@@ -1,10 +1,10 @@
 import { LedgerAppendEntryModel } from '../ledger-append-entry.model';
-import type { ILedgerAppendEntryDraftOutput } from '../../interfaces';
+import type { ILedgerAppendEntryCandidate } from '../../interfaces';
 
 describe('LedgerAppendEntryModel', () => {
-  describe('createDraft', () => {
+  describe('initCandidate', () => {
     it('trims the operation key and the action', () => {
-      const draft = LedgerAppendEntryModel.createDraft({
+      const candidate = LedgerAppendEntryModel.initCandidate({
         operationKey: '  product-archived:12 ',
         subjectType: 'product',
         subjectId: '12',
@@ -14,7 +14,7 @@ describe('LedgerAppendEntryModel', () => {
         occurredAt: new Date('2026-01-01T00:00:00.000Z'),
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         operationKey: 'product-archived:12',
         subjectType: 'product',
         subjectId: '12',
@@ -48,8 +48,8 @@ describe('LedgerAppendEntryModel', () => {
         'LedgerEntry.occurredAt must be a valid instant',
       ],
     ])('rejects %s', (_case, operationKey, action, occurredAt, message) => {
-      const createDraft = (): ILedgerAppendEntryDraftOutput =>
-        LedgerAppendEntryModel.createDraft({
+      const initCandidate = (): ILedgerAppendEntryCandidate =>
+        LedgerAppendEntryModel.initCandidate({
           operationKey,
           subjectType: 'product',
           subjectId: '12',
@@ -59,7 +59,7 @@ describe('LedgerAppendEntryModel', () => {
           occurredAt: new Date(occurredAt),
         });
 
-      expect(createDraft).toThrow(message);
+      expect(initCandidate).toThrow(message);
     });
   });
 });

@@ -1,3 +1,3 @@
-export * from './inputs/user-staff-user-candidate.input';
+export * from './params/user-staff-user-candidate-init.interface';
 
-export * from './outputs/user-staff-user-draft.output';
+export * from './snapshots/user-staff-user-candidate.interface';

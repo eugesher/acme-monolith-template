@@ -1,5 +1,5 @@
-export * from './inputs/role-candidate.input';
-export * from './inputs/role-record.input';
+export * from './params/role-candidate-init.interface';
+export * from './params/role-reconstitute.interface';
 
-export * from './outputs/role-draft.output';
-export * from './outputs/role-snapshot.output';
+export * from './snapshots/role-candidate.interface';
+export * from './snapshots/role-snapshot.interface';

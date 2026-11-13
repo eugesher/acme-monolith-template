@@ -1,17 +1,17 @@
 import { IdentityExceptionCodeEnum, UserStatusEnum } from '@acme-libs/kernel';
 
 import { AuthCustomerModel } from '../auth-customer.model';
-import type { IAuthCustomerDraftOutput } from '../../interfaces';
+import type { IAuthCustomerCandidate } from '../../interfaces';
 
 describe('AuthCustomerModel', () => {
-  describe('createDraft', () => {
-    it('drafts an active customer with a normalized email and no id until it is stored', () => {
-      const draft = AuthCustomerModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes an active customer candidate with a normalized email and no id until it is stored', () => {
+      const candidate = AuthCustomerModel.initCandidate({
         email: '  Eve@Example.COM ',
         passwordHash: 'hash',
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         email: 'eve@example.com',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,
@@ -21,8 +21,8 @@ describe('AuthCustomerModel', () => {
     it.each(['eve', 'eve@', '@example.com', 'eve@example', 'e ve@example.com'])(
       'rejects the malformed email %s',
       (email) => {
-        const register = (): IAuthCustomerDraftOutput =>
-          AuthCustomerModel.createDraft({ email, passwordHash: 'hash' });
+        const register = (): IAuthCustomerCandidate =>
+          AuthCustomerModel.initCandidate({ email, passwordHash: 'hash' });
 
         expect(register).toThrow(
           expect.objectContaining({

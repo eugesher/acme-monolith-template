@@ -2,7 +2,7 @@ import { AggregateRootBase } from '@acme-libs/toolkit';
 
 import { ProductStockAddedEvent } from '../events/product-stock-added.event';
 import { ProductQuantityInvalidException } from '../exceptions/product-quantity-invalid.exception';
-import type { IProductStockRecordInput } from '../interfaces';
+import type { IProductStockReconstitute } from '../interfaces';
 
 export class ProductStockModel extends AggregateRootBase<string> {
   private static readonly ADD_MAX_QUANTITY = 100_000;
@@ -14,7 +14,7 @@ export class ProductStockModel extends AggregateRootBase<string> {
     super(productId);
   }
 
-  public static reconstitute(record: IProductStockRecordInput): ProductStockModel {
+  public static reconstitute(record: IProductStockReconstitute): ProductStockModel {
     const { id, sku } = record;
 
     return new ProductStockModel(id, sku);

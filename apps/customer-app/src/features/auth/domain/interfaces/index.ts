@@ -1,4 +1,4 @@
-export * from './inputs/auth-customer-candidate.input';
-export * from './inputs/auth-customer-record.input';
+export * from './params/auth-customer-candidate-init.interface';
+export * from './params/auth-customer-reconstitute.interface';
 
-export * from './outputs/auth-customer-draft.output';
+export * from './snapshots/auth-customer-candidate.interface';

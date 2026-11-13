@@ -2,14 +2,14 @@ import { UserStatusEnum } from '@acme-libs/kernel';
 
 import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
 import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
-import type { IUserStaffUserCandidateInput, IUserStaffUserDraftOutput } from '../interfaces';
+import type { IUserStaffUserCandidate, IUserStaffUserCandidateInit } from '../interfaces';
 
 export class UserStaffUserModel {
   private static readonly EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private static readonly MIN_PASSWORD_LENGTH = 12;
 
-  public static createDraft(candidate: IUserStaffUserCandidateInput): IUserStaffUserDraftOutput {
-    const { email, passwordHash, roleIds } = candidate;
+  public static initCandidate(proposal: IUserStaffUserCandidateInit): IUserStaffUserCandidate {
+    const { email, passwordHash, roleIds } = proposal;
     const normalizedEmail = UserStaffUserModel.normalizeEmail(email);
 
     if (!UserStaffUserModel.EMAIL_PATTERN.test(normalizedEmail)) {

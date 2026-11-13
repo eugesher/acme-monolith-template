@@ -6,7 +6,7 @@ import {
   ProductIdempotentRequestInFlightException,
   ProductModel,
   ProductSkuTakenException,
-  type IProductDraftOutput,
+  type IProductCandidate,
 } from '../../domain';
 import {
   PRODUCT_CREATE_REPOSITORY_PORT,
@@ -92,20 +92,20 @@ export class ProductCreateUseCase {
       throw new ProductSkuTakenException(sku);
     }
 
-    const productDraft = ProductModel.createDraft({ sku, name });
+    const productCandidate = ProductModel.initCandidate({ sku, name });
 
-    return await this.transaction.run(() => this.persist(productDraft, command));
+    return await this.transaction.run(() => this.persist(productCandidate, command));
   }
 
   private async persist(
-    draft: IProductDraftOutput,
+    candidate: IProductCandidate,
     command: IProductCreateCommand,
   ): Promise<IProductView> {
     const { staffUserId, idempotencyKey } = command;
-    const insertResult = await this.repository.insert(draft);
+    const insertResult = await this.repository.insert(candidate);
 
     if (insertResult.outcome === ProductCreateInsertOutcomeEnum.DUPLICATE) {
-      throw new ProductSkuTakenException(draft.sku);
+      throw new ProductSkuTakenException(candidate.sku);
     }
 
     const productRecord = await this.repository.findInserted(insertResult.id);

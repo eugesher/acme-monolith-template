@@ -1,3 +1,3 @@
-export * from './inputs/tag-common-subject-tags-record.input';
+export * from './params/tag-common-subject-tags-reconstitute.interface';
 
-export * from './outputs/tag-common-subject-tags-changes.output';
+export * from './snapshots/tag-common-subject-tags-changes.interface';

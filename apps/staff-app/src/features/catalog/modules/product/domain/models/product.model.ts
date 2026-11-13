@@ -7,11 +7,11 @@ import { ProductNameInvalidException } from '../exceptions/product-name-invalid.
 import { ProductSkuInvalidException } from '../exceptions/product-sku-invalid.exception';
 import { ProductVersionInvalidException } from '../exceptions/product-version-invalid.exception';
 import type {
-  IProductCandidateInput,
-  IProductChangesInput,
-  IProductDraftOutput,
-  IProductRecordInput,
-  IProductSnapshotOutput,
+  IProductCandidate,
+  IProductCandidateInit,
+  IProductReconstitute,
+  IProductSnapshot,
+  IProductUpdate,
 } from '../interfaces';
 
 export class ProductModel extends AggregateRootBase<string> {
@@ -42,7 +42,7 @@ export class ProductModel extends AggregateRootBase<string> {
     super(id);
   }
 
-  public static reconstitute(record: IProductRecordInput): ProductModel {
+  public static reconstitute(record: IProductReconstitute): ProductModel {
     const { id, sku, name, status, version, createdAt, updatedAt } = record;
     const validSku = ProductModel.validSku(sku);
     const validName = ProductModel.validName(name);
@@ -51,15 +51,15 @@ export class ProductModel extends AggregateRootBase<string> {
     return new ProductModel(id, validSku, validName, status, validVersion, createdAt, updatedAt);
   }
 
-  public static createDraft(candidate: IProductCandidateInput): IProductDraftOutput {
-    const { sku, name } = candidate;
+  public static initCandidate(proposal: IProductCandidateInit): IProductCandidate {
+    const { sku, name } = proposal;
     const validSku = ProductModel.validSku(sku);
     const validName = ProductModel.validName(name);
 
     return { sku: validSku, name: validName, status: ProductStatusEnum.DRAFT, version: 1 };
   }
 
-  public update(changes: IProductChangesInput): void {
+  public update(changes: IProductUpdate): void {
     const { name } = changes;
 
     if (name === undefined) {
@@ -106,7 +106,7 @@ export class ProductModel extends AggregateRootBase<string> {
     this.addDomainEvent(publishedEvent);
   }
 
-  public toSnapshot(): IProductSnapshotOutput {
+  public toSnapshot(): IProductSnapshot {
     return {
       id: this.id,
       sku: this.sku,

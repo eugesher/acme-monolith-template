@@ -49,16 +49,16 @@ describe('ReminderModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts a pending reminder at version 1 with a trimmed title and body', () => {
-      const draft = ReminderModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes a pending reminder candidate at version 1 with a trimmed title and body', () => {
+      const candidate = ReminderModel.initCandidate({
         ownerId: 'owner-1',
         title: '  Call the bank  ',
         body: '  About the card  ',
         dueOn: '2026-11-05',
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         ownerId: 'owner-1',
         title: 'Call the bank',
         body: 'About the card',
@@ -69,14 +69,14 @@ describe('ReminderModel', () => {
     });
 
     it('accepts an empty body', () => {
-      const draft = ReminderModel.createDraft({
+      const candidate = ReminderModel.initCandidate({
         ownerId: 'owner-1',
         title: 'Call the bank',
         body: '   ',
         dueOn: '2026-11-05',
       });
 
-      expect(draft.body).toBe('');
+      expect(candidate.body).toBe('');
     });
 
     it.each([
@@ -84,7 +84,7 @@ describe('ReminderModel', () => {
       ['a title longer than 255', 't'.repeat(256)],
     ])('refuses %s with REMINDER_TITLE_INVALID', (_, title) => {
       expect(() =>
-        ReminderModel.createDraft({ ownerId: 'owner-1', title, body: '', dueOn: '2026-11-05' }),
+        ReminderModel.initCandidate({ ownerId: 'owner-1', title, body: '', dueOn: '2026-11-05' }),
       ).toThrow(
         expect.objectContaining({
           code: 'REMINDER_TITLE_INVALID',
@@ -94,20 +94,20 @@ describe('ReminderModel', () => {
     });
 
     it('accepts a title of 255 characters and a body of 2000', () => {
-      const draft = ReminderModel.createDraft({
+      const candidate = ReminderModel.initCandidate({
         ownerId: 'owner-1',
         title: 't'.repeat(255),
         body: 'b'.repeat(2000),
         dueOn: '2026-11-05',
       });
 
-      expect(draft.title).toHaveLength(255);
-      expect(draft.body).toHaveLength(2000);
+      expect(candidate.title).toHaveLength(255);
+      expect(candidate.body).toHaveLength(2000);
     });
 
     it('refuses a body longer than 2000 with REMINDER_BODY_INVALID', () => {
       expect(() =>
-        ReminderModel.createDraft({
+        ReminderModel.initCandidate({
           ownerId: 'owner-1',
           title: 'Call the bank',
           body: 'b'.repeat(2001),
@@ -127,7 +127,12 @@ describe('ReminderModel', () => {
       ['an empty string', ''],
     ])('refuses %s as a malformed due date', (_, dueOn) => {
       expect(() =>
-        ReminderModel.createDraft({ ownerId: 'owner-1', title: 'Call the bank', body: '', dueOn }),
+        ReminderModel.initCandidate({
+          ownerId: 'owner-1',
+          title: 'Call the bank',
+          body: '',
+          dueOn,
+        }),
       ).toThrow(
         expect.objectContaining({
           code: 'REMINDER_DUE_ON_INVALID',
@@ -142,7 +147,12 @@ describe('ReminderModel', () => {
       ['month 13', '2026-13-01'],
     ])('refuses %s as a date that does not exist', (_, dueOn) => {
       expect(() =>
-        ReminderModel.createDraft({ ownerId: 'owner-1', title: 'Call the bank', body: '', dueOn }),
+        ReminderModel.initCandidate({
+          ownerId: 'owner-1',
+          title: 'Call the bank',
+          body: '',
+          dueOn,
+        }),
       ).toThrow(
         expect.objectContaining({
           code: 'REMINDER_DUE_ON_INVALID',
@@ -152,14 +162,14 @@ describe('ReminderModel', () => {
     });
 
     it('accepts the 29th of February of a leap year', () => {
-      const draft = ReminderModel.createDraft({
+      const candidate = ReminderModel.initCandidate({
         ownerId: 'owner-1',
         title: 'Call the bank',
         body: '',
         dueOn: '2028-02-29',
       });
 
-      expect(draft.dueOn).toBe('2028-02-29');
+      expect(candidate.dueOn).toBe('2028-02-29');
     });
   });
 

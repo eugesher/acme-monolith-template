@@ -1,7 +1,7 @@
 import { DomainEventBase } from '@acme-libs/toolkit';
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
-import type { IProductLedgerRecordOutput } from '../interfaces';
+import type { IProductLedgerRecord } from '../interfaces';
 
 export class ProductPublishedEvent extends DomainEventBase<string> {
   constructor(
@@ -13,7 +13,7 @@ export class ProductPublishedEvent extends DomainEventBase<string> {
     super(productId);
   }
 
-  public toLedgerRecord(): IProductLedgerRecordOutput {
+  public toLedgerRecord(): IProductLedgerRecord {
     const { aggregateId, sku, version, previousStatus } = this;
     const occurredAt = this.occurredAt.toISOString();
 

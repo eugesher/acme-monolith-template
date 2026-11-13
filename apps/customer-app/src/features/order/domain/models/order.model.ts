@@ -4,26 +4,26 @@ import { OrderEmptyException } from '../exceptions/order-empty.exception';
 import { OrderProductNotFoundException } from '../exceptions/order-product-not-found.exception';
 import { OrderStockInsufficientException } from '../exceptions/order-stock-insufficient.exception';
 import type {
-  IOrderActiveProductInput,
-  IOrderCandidateInput,
-  IOrderDraftOutput,
-  IOrderMovementOutput,
-  IOrderProductOutput,
-  IOrderRecordInput,
-  IOrderSnapshotOutput,
-  IOrderStockInput,
+  IOrderCandidate,
+  IOrderCandidateInit,
+  IOrderCandidateInitProduct,
+  IOrderCandidateInitProductStock,
+  IOrderProductSnapshot,
+  IOrderProductStockMovement,
+  IOrderReconstitute,
+  IOrderSnapshot,
 } from '../interfaces';
 
 export class OrderModel extends AggregateRootBase<string> {
   private constructor(
     id: string,
-    public readonly products: readonly IOrderProductOutput[],
+    public readonly products: readonly IOrderProductSnapshot[],
     public readonly createdAt: Date,
   ) {
     super(id);
   }
 
-  public static reconstitute(record: IOrderRecordInput): OrderModel {
+  public static reconstitute(record: IOrderReconstitute): OrderModel {
     const { id, createdAt, orderProducts } = record;
     const products = orderProducts.map((orderProduct) => ({
       id: orderProduct.id,
@@ -35,8 +35,8 @@ export class OrderModel extends AggregateRootBase<string> {
     return new OrderModel(id, products, createdAt);
   }
 
-  public static createDraft(candidate: IOrderCandidateInput): IOrderDraftOutput {
-    const { customerId, productIds, products, stockOnHand } = candidate;
+  public static initCandidate(proposal: IOrderCandidateInit): IOrderCandidate {
+    const { customerId, productIds, products, stockOnHand } = proposal;
 
     if (productIds.length === 0) {
       throw new OrderEmptyException();
@@ -48,14 +48,14 @@ export class OrderModel extends AggregateRootBase<string> {
     return { customerId, productIds: [...productIds] };
   }
 
-  public getMovements(): IOrderMovementOutput[] {
+  public getProductStockMovements(): IOrderProductStockMovement[] {
     return this.products.map((product) => ({
       productId: product.productId,
       orderProductId: product.id,
     }));
   }
 
-  public toSnapshot(): IOrderSnapshotOutput {
+  public toSnapshot(): IOrderSnapshot {
     const products = this.products.map((product) => ({
       id: product.id,
       productId: product.productId,
@@ -70,7 +70,7 @@ export class OrderModel extends AggregateRootBase<string> {
     };
   }
 
-  private static assertFound(productIds: string[], products: IOrderActiveProductInput[]): void {
+  private static assertFound(productIds: string[], products: IOrderCandidateInitProduct[]): void {
     for (const productId of productIds) {
       const isProductFound = products.some((product) => product.id === productId);
 
@@ -80,7 +80,10 @@ export class OrderModel extends AggregateRootBase<string> {
     }
   }
 
-  private static assertInStock(productIds: string[], stockOnHand: IOrderStockInput[]): void {
+  private static assertInStock(
+    productIds: string[],
+    stockOnHand: IOrderCandidateInitProductStock[],
+  ): void {
     const distinctIds = new Set(productIds);
 
     for (const productId of distinctIds) {

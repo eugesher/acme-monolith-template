@@ -1,18 +1,18 @@
 import { IdentityExceptionCodeEnum, UserStatusEnum } from '@acme-libs/kernel';
 
 import { UserStaffUserModel } from '../user-staff-user.model';
-import type { IUserStaffUserDraftOutput } from '../../interfaces';
+import type { IUserStaffUserCandidate } from '../../interfaces';
 
 describe('UserStaffUserModel', () => {
-  describe('createDraft', () => {
-    it('drafts an active user with a normalized email, unique roles and no id until it is stored', () => {
-      const draft = UserStaffUserModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes an active user candidate with a normalized email, unique roles and no id until it is stored', () => {
+      const candidate = UserStaffUserModel.initCandidate({
         email: '  Editor@Example.COM ',
         passwordHash: 'hash',
         roleIds: ['2', '2', '3'],
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         email: 'editor@example.com',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,
@@ -23,8 +23,8 @@ describe('UserStaffUserModel', () => {
     it.each(['editor', 'editor@', '@example.com', 'editor@example', 'ed itor@example.com'])(
       'rejects the malformed email %s',
       (email) => {
-        const register = (): IUserStaffUserDraftOutput =>
-          UserStaffUserModel.createDraft({ email, passwordHash: 'hash', roleIds: [] });
+        const register = (): IUserStaffUserCandidate =>
+          UserStaffUserModel.initCandidate({ email, passwordHash: 'hash', roleIds: [] });
 
         expect(register).toThrow(
           expect.objectContaining({

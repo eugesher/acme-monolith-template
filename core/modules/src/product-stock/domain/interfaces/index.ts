@@ -1,4 +1,3 @@
-export * from './inputs/product-stock-core-on-hand-record.input';
-export * from './inputs/product-stock-core-sum.input';
+export * from './params/product-stock-core-on-hand-reconstitute.interface';
 
-export * from './outputs/product-stock-core-on-hand-snapshot.output';
+export * from './snapshots/product-stock-core-on-hand-snapshot.interface';

@@ -1,7 +1,4 @@
-import type {
-  ILedgerListEntriesRecordInput,
-  ILedgerListEntriesSnapshotOutput,
-} from '../interfaces';
+import type { ILedgerListEntriesReconstitute, ILedgerListEntriesSnapshot } from '../interfaces';
 
 export class LedgerListEntriesModel {
   private constructor(
@@ -16,7 +13,7 @@ export class LedgerListEntriesModel {
     public readonly recordedAt: Date,
   ) {}
 
-  public static reconstitute(record: ILedgerListEntriesRecordInput): LedgerListEntriesModel {
+  public static reconstitute(record: ILedgerListEntriesReconstitute): LedgerListEntriesModel {
     const {
       id,
       operationKey,
@@ -43,8 +40,8 @@ export class LedgerListEntriesModel {
   }
 
   public static toViewData(
-    records: ILedgerListEntriesRecordInput[],
-  ): ILedgerListEntriesSnapshotOutput[] {
+    records: ILedgerListEntriesReconstitute[],
+  ): ILedgerListEntriesSnapshot[] {
     return records.map((record) => {
       const ledgerEntry = LedgerListEntriesModel.reconstitute(record);
 
@@ -52,7 +49,7 @@ export class LedgerListEntriesModel {
     });
   }
 
-  public toSnapshot(): ILedgerListEntriesSnapshotOutput {
+  private toSnapshot(): ILedgerListEntriesSnapshot {
     return {
       id: this.id,
       operationKey: this.operationKey,

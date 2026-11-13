@@ -23,14 +23,14 @@ describe('RoleModel', () => {
     });
   });
 
-  describe('createDraft', () => {
+  describe('initCandidate', () => {
     it('keeps the name and drops the duplicate codes', () => {
-      const draft = RoleModel.createDraft({
+      const candidate = RoleModel.initCandidate({
         name: 'auditor',
         permissionCodes: [PermissionCodeEnum.LEDGER_READ, PermissionCodeEnum.LEDGER_READ],
       });
 
-      expect(draft).toEqual({ name: 'auditor', permissionCodes: ['ledger:read'] });
+      expect(candidate).toEqual({ name: 'auditor', permissionCodes: ['ledger:read'] });
     });
   });
 

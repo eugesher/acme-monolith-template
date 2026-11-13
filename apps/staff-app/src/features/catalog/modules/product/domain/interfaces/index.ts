@@ -1,9 +1,9 @@
-export * from './inputs/product-candidate.input';
-export * from './inputs/product-changes.input';
-export * from './inputs/product-get-many-record.input';
-export * from './inputs/product-record.input';
+export * from './params/product-candidate-init.interface';
+export * from './params/product-get-many-reconstitute.interface';
+export * from './params/product-reconstitute.interface';
+export * from './params/product-update.interface';
 
-export * from './outputs/product-draft.output';
-export * from './outputs/product-get-many-snapshot.output';
-export * from './outputs/product-ledger-record.output';
-export * from './outputs/product-snapshot.output';
+export * from './snapshots/product-candidate.interface';
+export * from './snapshots/product-get-many-snapshot.interface';
+export * from './snapshots/product-ledger-record.interface';
+export * from './snapshots/product-snapshot.interface';

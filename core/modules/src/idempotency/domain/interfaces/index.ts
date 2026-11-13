@@ -1,4 +1,4 @@
-export * from './inputs/idempotency-core-key-candidate.input';
-export * from './inputs/idempotency-core-key-record.input';
+export * from './params/idempotency-core-key-candidate-init.interface';
+export * from './params/idempotency-core-key-reconstitute.interface';
 
-export * from './outputs/idempotency-core-key-draft.output';
+export * from './snapshots/idempotency-core-key-candidate.interface';

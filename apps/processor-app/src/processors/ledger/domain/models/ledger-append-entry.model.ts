@@ -1,14 +1,11 @@
-import type {
-  ILedgerAppendEntryCandidateInput,
-  ILedgerAppendEntryDraftOutput,
-} from '../interfaces';
+import type { ILedgerAppendEntryCandidate, ILedgerAppendEntryCandidateInit } from '../interfaces';
 
 export class LedgerAppendEntryModel {
-  public static createDraft(
-    candidate: ILedgerAppendEntryCandidateInput,
-  ): ILedgerAppendEntryDraftOutput {
+  public static initCandidate(
+    proposal: ILedgerAppendEntryCandidateInit,
+  ): ILedgerAppendEntryCandidate {
     const { operationKey, subjectType, subjectId, action, payload, correlationId, occurredAt } =
-      candidate;
+      proposal;
     const key = operationKey.trim();
     const verb = action.trim();
 

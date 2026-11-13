@@ -57,8 +57,7 @@ enqueues them on the `ledger-record` queue (see `022-enqueue-after-commit.md` an
 `004-append-only-journal.md`). An event that goes to the ledger builds its record itself,
 `ProductPublishedEvent.toLedgerRecord(correlationId)`: the event knows its fields and its aggregate,
 and the adapter only adds the correlation id. The domain may not import the ledger contracts, so the
-event answers `IProductLedgerRecordOutput`, a type of its own with the shape of the record of the
-lib.
+event answers `IProductLedgerRecord`, a type of its own with the shape of the record of the lib.
 
 ## `PATCH` edits fields, `PUT` sets a state
 

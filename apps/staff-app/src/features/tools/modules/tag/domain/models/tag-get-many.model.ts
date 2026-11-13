@@ -1,4 +1,4 @@
-import type { ITagGetManyRecordInput, ITagGetManySnapshotOutput } from '../interfaces';
+import type { ITagGetManyReconstitute, ITagGetManySnapshot } from '../interfaces';
 
 export class TagGetManyModel {
   private constructor(
@@ -8,13 +8,13 @@ export class TagGetManyModel {
     public readonly updatedAt: Date,
   ) {}
 
-  public static reconstitute(record: ITagGetManyRecordInput): TagGetManyModel {
+  public static reconstitute(record: ITagGetManyReconstitute): TagGetManyModel {
     const { id, name, createdAt, updatedAt } = record;
 
     return new TagGetManyModel(id, name, createdAt, updatedAt);
   }
 
-  public static toViewData(records: ITagGetManyRecordInput[]): ITagGetManySnapshotOutput[] {
+  public static toViewData(records: ITagGetManyReconstitute[]): ITagGetManySnapshot[] {
     return records.map((record) => {
       const tag = TagGetManyModel.reconstitute(record);
 
@@ -22,7 +22,7 @@ export class TagGetManyModel {
     });
   }
 
-  public toSnapshot(): ITagGetManySnapshotOutput {
+  private toSnapshot(): ITagGetManySnapshot {
     return {
       id: this.id,
       name: this.name,

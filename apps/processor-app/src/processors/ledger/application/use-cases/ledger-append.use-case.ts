@@ -6,7 +6,7 @@ import { CorrelationContextHelper } from '@acme-libs/observability';
 import {
   LedgerAppendEntryModel,
   LedgerAppendHelper,
-  type ILedgerAppendEntryDraftOutput,
+  type ILedgerAppendEntryCandidate,
 } from '../../domain';
 import {
   LEDGER_APPEND_REPOSITORY_PORT,
@@ -31,7 +31,7 @@ export class LedgerAppendUseCase {
 
     const instant = LedgerAppendHelper.parseInstant(occurredAt, 'occurredAt');
     const correlationId = CorrelationContextHelper.current(LedgerAppendUseCase.name);
-    const entryDraft = LedgerAppendEntryModel.createDraft({
+    const entryCandidate = LedgerAppendEntryModel.initCandidate({
       operationKey,
       subjectType,
       subjectId,
@@ -40,21 +40,21 @@ export class LedgerAppendUseCase {
       correlationId,
       occurredAt: instant,
     });
-    const appendOutcome = await this.append(entryDraft);
+    const appendOutcome = await this.append(entryCandidate);
     const { id, appended } = appendOutcome;
     const message = appended ? 'Ledger record appended' : 'Ledger record already appended';
 
-    this.logger.info({ id, operationKey: entryDraft.operationKey, appended }, message);
+    this.logger.info({ id, operationKey: entryCandidate.operationKey, appended }, message);
   }
 
-  private async append(draft: ILedgerAppendEntryDraftOutput): Promise<ILedgerAppendOutcomeView> {
-    const insertResult = await this.repository.insert(draft);
+  private async append(candidate: ILedgerAppendEntryCandidate): Promise<ILedgerAppendOutcomeView> {
+    const insertResult = await this.repository.insert(candidate);
 
     if (insertResult.outcome === LedgerAppendEntryInsertOutcomeEnum.INSERTED) {
       return { id: insertResult.id, appended: true };
     }
 
-    const existingEntry = await this.repository.findByOperationKey(draft.operationKey);
+    const existingEntry = await this.repository.findByOperationKey(candidate.operationKey);
 
     return { id: existingEntry.id, appended: false };
   }

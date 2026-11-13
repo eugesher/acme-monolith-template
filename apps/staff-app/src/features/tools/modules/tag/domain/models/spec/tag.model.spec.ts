@@ -2,11 +2,11 @@ import { TagNameInvalidException } from '../../exceptions/tag-name-invalid.excep
 import { TagModel } from '../tag.model';
 
 describe('TagModel', () => {
-  describe('createDraft', () => {
-    it('drafts a tag with the trimmed name', () => {
-      const draft = TagModel.createDraft({ name: '  fragile  ' });
+  describe('initCandidate', () => {
+    it('initializes a tag candidate with the trimmed name', () => {
+      const candidate = TagModel.initCandidate({ name: '  fragile  ' });
 
-      expect(draft).toEqual({ name: 'fragile' });
+      expect(candidate).toEqual({ name: 'fragile' });
     });
 
     it.each([
@@ -14,13 +14,13 @@ describe('TagModel', () => {
       ['a name of spaces', '   '],
       ['a name of 65 characters', 'a'.repeat(65)],
     ])('rejects %s', (_case, name) => {
-      expect(() => TagModel.createDraft({ name })).toThrow(TagNameInvalidException);
+      expect(() => TagModel.initCandidate({ name })).toThrow(TagNameInvalidException);
     });
 
     it('accepts a name of 64 characters', () => {
-      const draft = TagModel.createDraft({ name: 'a'.repeat(64) });
+      const candidate = TagModel.initCandidate({ name: 'a'.repeat(64) });
 
-      expect(draft).toEqual({ name: 'a'.repeat(64) });
+      expect(candidate).toEqual({ name: 'a'.repeat(64) });
     });
   });
 

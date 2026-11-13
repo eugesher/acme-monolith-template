@@ -1,12 +1,12 @@
 import type {
-  ITagCommonSubjectTagsChangesOutput,
-  ITagCommonSubjectTagsRecordInput,
+  ITagCommonSubjectTagsChanges,
+  ITagCommonSubjectTagsReconstitute,
 } from '../interfaces';
 
 export class TagCommonSubjectTagsModel {
   private constructor(private readonly tagIds: ReadonlySet<string>) {}
 
-  public static reconstitute(record: ITagCommonSubjectTagsRecordInput): TagCommonSubjectTagsModel {
+  public static reconstitute(record: ITagCommonSubjectTagsReconstitute): TagCommonSubjectTagsModel {
     const { tagIds } = record;
 
     return new TagCommonSubjectTagsModel(new Set(tagIds));
@@ -19,7 +19,7 @@ export class TagCommonSubjectTagsModel {
     return [...distinct].filter((tagId) => !known.has(tagId));
   }
 
-  public replace(tagIds: readonly string[]): ITagCommonSubjectTagsChangesOutput {
+  public replace(tagIds: readonly string[]): ITagCommonSubjectTagsChanges {
     const nextTagIds = new Set(tagIds);
     const linkTagIds = [...nextTagIds].filter((tagId) => !this.tagIds.has(tagId));
     const unlinkTagIds = [...this.tagIds].filter((tagId) => !nextTagIds.has(tagId));

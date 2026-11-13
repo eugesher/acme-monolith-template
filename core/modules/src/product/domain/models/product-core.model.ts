@@ -1,6 +1,6 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
-import type { IProductCoreRecordInput } from '../interfaces';
+import type { IProductCoreReconstitute } from '../interfaces';
 
 export class ProductCoreModel {
   public get status(): ProductStatusEnum {
@@ -22,7 +22,7 @@ export class ProductCoreModel {
     private currentVersion: number,
   ) {}
 
-  public static reconstitute(record: IProductCoreRecordInput): ProductCoreModel {
+  public static reconstitute(record: IProductCoreReconstitute): ProductCoreModel {
     const { id, sku, status, version } = record;
 
     return new ProductCoreModel(id, sku, status, version);
