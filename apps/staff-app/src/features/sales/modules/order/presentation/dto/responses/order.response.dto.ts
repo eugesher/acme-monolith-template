@@ -1,5 +1,13 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+class OrderResponseItemProductDto {
+  @ApiResponseProperty({ example: 'SKU-0001' })
+  public sku: string;
+
+  @ApiResponseProperty({ example: 'Reference product' })
+  public name: string;
+}
+
 class OrderResponseItemDto {
   @ApiResponseProperty({ example: '900' })
   public id: string;
@@ -7,11 +15,8 @@ class OrderResponseItemDto {
   @ApiResponseProperty({ example: '100' })
   public productId: string;
 
-  @ApiResponseProperty({ example: 'SKU-0001' })
-  public sku: string;
-
-  @ApiResponseProperty({ example: 'Reference product' })
-  public name: string;
+  @ApiResponseProperty({ type: OrderResponseItemProductDto })
+  public product: OrderResponseItemProductDto;
 }
 
 export class OrderResponseDto {
@@ -25,5 +30,5 @@ export class OrderResponseDto {
   public createdAt: string;
 
   @ApiResponseProperty({ type: [OrderResponseItemDto] })
-  public products: OrderResponseItemDto[];
+  public orderProducts: OrderResponseItemDto[];
 }

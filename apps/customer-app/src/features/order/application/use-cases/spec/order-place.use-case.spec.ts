@@ -81,10 +81,10 @@ describe('OrderPlaceUseCase', () => {
       expect(view).toEqual({
         id: '610',
         createdAt: '2026-01-05T08:00:00.000Z',
-        products: [
-          { id: '620', productId: '100', sku: 'SKU-0001', name: 'Lamp' },
-          { id: '621', productId: '103', sku: 'SKU-0004', name: 'Chair' },
-          { id: '622', productId: '100', sku: 'SKU-0001', name: 'Lamp' },
+        orderProducts: [
+          { id: '620', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+          { id: '621', productId: '103', product: { sku: 'SKU-0004', name: 'Chair' } },
+          { id: '622', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
         ],
       });
       expect(withdraw).toHaveBeenCalledWith({

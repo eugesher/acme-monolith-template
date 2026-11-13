@@ -2,10 +2,12 @@ export interface IOrderGetOneView {
   id: string;
   customerId: string;
   createdAt: string;
-  products: {
+  orderProducts: {
     id: string;
     productId: string;
-    sku: string;
-    name: string;
+    product: {
+      sku: string;
+      name: string;
+    };
   }[];
 }

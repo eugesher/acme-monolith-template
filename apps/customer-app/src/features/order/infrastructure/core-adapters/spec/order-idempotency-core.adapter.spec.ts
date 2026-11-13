@@ -50,12 +50,15 @@ describe('OrderIdempotencyCoreAdapter', () => {
     it('answers a replay with the stored response', async () => {
       handleClaim.mockResolvedValue({
         outcome: IdempotencyCoreClaimOutcomeEnum.REPLAY,
-        storedResponse: { id: '600', products: [] },
+        storedResponse: { id: '600', orderProducts: [] },
       });
 
       const result = await adapter.claim({ customerId: '101', key: 'key-1', body: {} });
 
-      expect(result).toEqual({ outcome: 'replay', storedResponse: { id: '600', products: [] } });
+      expect(result).toEqual({
+        outcome: 'replay',
+        storedResponse: { id: '600', orderProducts: [] },
+      });
     });
   });
 

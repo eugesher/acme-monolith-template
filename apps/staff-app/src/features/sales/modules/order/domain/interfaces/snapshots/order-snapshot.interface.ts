@@ -4,5 +4,5 @@ export interface IOrderSnapshot {
   id: string;
   customerId: string;
   createdAt: string;
-  products: IOrderProductSnapshot[];
+  orderProducts: IOrderProductSnapshot[];
 }

@@ -25,7 +25,7 @@ describe('OrderController', () => {
 
   describe('handlePlace', () => {
     it('places the order of the body for the caller under the idempotency key', async () => {
-      place.mockResolvedValue({ id: '610', products: [] });
+      place.mockResolvedValue({ id: '610', orderProducts: [] });
 
       const response = await controller.handlePlace(
         { id: 'customer-1', email: 'ann@example.com' },
@@ -33,7 +33,7 @@ describe('OrderController', () => {
         'key-1',
       );
 
-      expect(response).toEqual({ id: '610', products: [] });
+      expect(response).toEqual({ id: '610', orderProducts: [] });
       expect(place).toHaveBeenCalledWith({
         customerId: 'customer-1',
         productIds: ['100', '100'],
@@ -58,14 +58,14 @@ describe('OrderController', () => {
 
   describe('handleGetOne', () => {
     it('reads the order of the path for the caller', async () => {
-      getOne.mockResolvedValue({ id: '600', products: [] });
+      getOne.mockResolvedValue({ id: '600', orderProducts: [] });
 
       const response = await controller.handleGetOne(
         { id: 'customer-1', email: 'ann@example.com' },
         { orderId: '600' },
       );
 
-      expect(response).toEqual({ id: '600', products: [] });
+      expect(response).toEqual({ id: '600', orderProducts: [] });
       expect(getOne).toHaveBeenCalledWith({ customerId: 'customer-1', orderId: '600' });
     });
   });

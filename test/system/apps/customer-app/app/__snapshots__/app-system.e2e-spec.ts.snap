@@ -150,24 +150,30 @@ exports[`App Order POST /api/orders should place the order, append its ledger en
     "body": {
       "createdAt": Any<String>,
       "id": Any<String>,
-      "products": [
+      "orderProducts": [
         {
           "id": Any<String>,
-          "name": "Product to archive",
+          "product": {
+            "name": "Product to archive",
+            "sku": "SKU-0004",
+          },
           "productId": "103",
-          "sku": "SKU-0004",
         },
         {
           "id": Any<String>,
-          "name": "Product to archive",
+          "product": {
+            "name": "Product to archive",
+            "sku": "SKU-0004",
+          },
           "productId": "103",
-          "sku": "SKU-0004",
         },
         {
           "id": Any<String>,
-          "name": "Product to archive",
+          "product": {
+            "name": "Product to archive",
+            "sku": "SKU-0004",
+          },
           "productId": "103",
-          "sku": "SKU-0004",
         },
       ],
     },

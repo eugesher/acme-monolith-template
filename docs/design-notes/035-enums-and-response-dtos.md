@@ -38,7 +38,7 @@ is exported, so a nested class cannot be reused by another response and drift wi
 
 | Nested DTO                   | Name                    | Example                                     |
 | ---------------------------- | ----------------------- | ------------------------------------------- |
-| the element of an array      | `<Container>ItemDto`    | `OrderResponseItemDto` for `products`       |
+| the element of an array      | `<Container>ItemDto`    | `OrderResponseItemDto` for `orderProducts`  |
 | the value of an object field | `<Container><Field>Dto` | `QueueResponseJobCountsDto` for `jobCounts` |
 
 `<Container>` is the name of the exported DTO without `Dto`. The field suffix is taken only by the

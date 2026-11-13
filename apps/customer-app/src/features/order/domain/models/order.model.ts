@@ -17,7 +17,7 @@ import type {
 export class OrderModel extends AggregateRootBase<string> {
   private constructor(
     id: string,
-    public readonly products: readonly IOrderProductSnapshot[],
+    public readonly orderProducts: readonly IOrderProductSnapshot[],
     public readonly createdAt: Date,
   ) {
     super(id);
@@ -25,14 +25,8 @@ export class OrderModel extends AggregateRootBase<string> {
 
   public static reconstitute(record: IOrderReconstitute): OrderModel {
     const { id, createdAt, orderProducts } = record;
-    const products = orderProducts.map((orderProduct) => ({
-      id: orderProduct.id,
-      productId: orderProduct.productId,
-      sku: orderProduct.product.sku,
-      name: orderProduct.product.name,
-    }));
 
-    return new OrderModel(id, products, createdAt);
+    return new OrderModel(id, orderProducts, createdAt);
   }
 
   public static initCandidate(proposal: IOrderCandidateInit): IOrderCandidate {
@@ -49,24 +43,17 @@ export class OrderModel extends AggregateRootBase<string> {
   }
 
   public getProductStockMovements(): IOrderProductStockMovement[] {
-    return this.products.map((product) => ({
-      productId: product.productId,
-      orderProductId: product.id,
+    return this.orderProducts.map((orderProduct) => ({
+      productId: orderProduct.productId,
+      orderProductId: orderProduct.id,
     }));
   }
 
   public toSnapshot(): IOrderSnapshot {
-    const products = this.products.map((product) => ({
-      id: product.id,
-      productId: product.productId,
-      sku: product.sku,
-      name: product.name,
-    }));
-
     return {
       id: this.id,
       createdAt: this.createdAt.toISOString(),
-      products,
+      orderProducts: [...this.orderProducts],
     };
   }
 

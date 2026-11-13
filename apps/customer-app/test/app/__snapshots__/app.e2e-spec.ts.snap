@@ -462,12 +462,14 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
     "body": {
       "createdAt": "2026-01-01T00:00:00.000Z",
       "id": "601",
-      "products": [
+      "orderProducts": [
         {
           "id": "602",
-          "name": "Seeded reference product",
+          "product": {
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
           "productId": "100",
-          "sku": "SKU-0001",
         },
       ],
     },
@@ -481,12 +483,14 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
     "body": {
       "createdAt": "2026-01-02T00:00:00.000Z",
       "id": "602",
-      "products": [
+      "orderProducts": [
         {
           "id": "603",
-          "name": "Deleted product",
+          "product": {
+            "name": "Deleted product",
+            "sku": "SKU-0008",
+          },
           "productId": "107",
-          "sku": "SKU-0008",
         },
       ],
     },
@@ -571,18 +575,22 @@ exports[`App Order POST /api/orders should place an order of another customer un
     "body": {
       "createdAt": Any<String>,
       "id": Any<String>,
-      "products": [
+      "orderProducts": [
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
+          "product": {
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
           "productId": "100",
-          "sku": "SKU-0001",
         },
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
+          "product": {
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
           "productId": "100",
-          "sku": "SKU-0001",
         },
       ],
     },
@@ -669,18 +677,22 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
     "body": {
       "createdAt": Any<String>,
       "id": Any<String>,
-      "products": [
+      "orderProducts": [
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
+          "product": {
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
           "productId": "100",
-          "sku": "SKU-0001",
         },
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
+          "product": {
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
           "productId": "100",
-          "sku": "SKU-0001",
         },
       ],
     },

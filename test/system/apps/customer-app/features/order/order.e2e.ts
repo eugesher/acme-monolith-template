@@ -61,7 +61,7 @@ export class OrderE2E {
             body: {
               id: expect.any(String),
               createdAt: expect.any(String),
-              products: [
+              orderProducts: [
                 { id: expect.any(String) },
                 { id: expect.any(String) },
                 { id: expect.any(String) },
@@ -120,14 +120,14 @@ export class OrderE2E {
           db: {
             order: [{ id: response.body.id }],
             order_product: [
-              { id: response.body.products[0].id, order_id: response.body.id },
-              { id: response.body.products[1].id, order_id: response.body.id },
-              { id: response.body.products[2].id, order_id: response.body.id },
+              { id: response.body.orderProducts[0].id, order_id: response.body.id },
+              { id: response.body.orderProducts[1].id, order_id: response.body.id },
+              { id: response.body.orderProducts[2].id, order_id: response.body.id },
             ],
             product_stock: [
-              { order_product_id: response.body.products[0].id },
-              { order_product_id: response.body.products[1].id },
-              { order_product_id: response.body.products[2].id },
+              { order_product_id: response.body.orderProducts[0].id },
+              { order_product_id: response.body.orderProducts[1].id },
+              { order_product_id: response.body.orderProducts[2].id },
             ],
             ledger_entry: [
               { operation_key: `order-placed:${response.body.id}`, subject_id: response.body.id },

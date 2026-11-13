@@ -13,8 +13,8 @@ describe('OrderModel', () => {
 
       expect(order.id).toBe('600');
       expect(order.createdAt).toEqual(new Date('2026-01-03T00:00:00.000Z'));
-      expect(order.products).toEqual([
-        { id: '600', productId: '100', sku: 'SKU-0001', name: 'Lamp' },
+      expect(order.orderProducts).toEqual([
+        { id: '600', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
       ]);
     });
   });
@@ -143,7 +143,9 @@ describe('OrderModel', () => {
       expect(order.toSnapshot()).toEqual({
         id: '600',
         createdAt: '2026-01-03T00:00:00.000Z',
-        products: [{ id: '601', productId: '100', sku: 'SKU-0001', name: 'Lamp' }],
+        orderProducts: [
+          { id: '601', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+        ],
       });
     });
   });

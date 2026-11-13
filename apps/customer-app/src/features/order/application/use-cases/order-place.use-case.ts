@@ -61,7 +61,7 @@ export class OrderPlaceUseCase {
     }
 
     const orderView = await this.write(command);
-    const placedProductIds = orderView.products.map((product) => product.productId);
+    const placedProductIds = orderView.orderProducts.map((orderProduct) => orderProduct.productId);
 
     await this.ledger.recordPlaced({
       orderId: orderView.id,
