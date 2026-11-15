@@ -25,6 +25,7 @@ describe('OrderPlaceUseCase', () => {
     insertOrderProducts = jest.fn().mockResolvedValue(undefined);
     findPlaced = jest.fn().mockResolvedValue({
       id: '610',
+      customerId: 'customer-1',
       createdAt: new Date('2026-01-05T08:00:00.000Z'),
       orderProducts: [
         { id: '620', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
@@ -111,15 +112,31 @@ describe('OrderPlaceUseCase', () => {
       });
 
       expect(recordPlaced).toHaveBeenCalledWith({
-        orderId: '610',
-        customerId: 'customer-1',
-        productIds: ['100', '103', '100'],
+        subjectId: '610',
+        occurredAt: '2026-01-05T08:00:00.000Z',
+        payload: {
+          customerId: 'customer-1',
+          orderProducts: [
+            { id: '620', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+            { id: '621', productId: '103', product: { sku: 'SKU-0004', name: 'Chair' } },
+            { id: '622', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+          ],
+        },
       });
       expect(run.mock.invocationCallOrder[0]).toBeLessThan(
         recordPlaced.mock.invocationCallOrder[0],
       );
       expect(logger.info).toHaveBeenCalledWith(
-        { orderId: '610', customerId: 'customer-1', units: 3 },
+        {
+          id: '610',
+          createdAt: '2026-01-05T08:00:00.000Z',
+          customerId: 'customer-1',
+          orderProducts: [
+            { id: '620', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+            { id: '621', productId: '103', product: { sku: 'SKU-0004', name: 'Chair' } },
+            { id: '622', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+          ],
+        },
         'Order placed',
       );
     });

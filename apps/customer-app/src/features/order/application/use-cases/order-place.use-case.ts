@@ -60,28 +60,21 @@ export class OrderPlaceUseCase {
         return idempotencyClaim.storedResponse;
       }
       default: {
-        const orderView = await this.write(command);
-        const placedProductIds = orderView.orderProducts.map(
-          (orderProduct) => orderProduct.productId,
-        );
+        const order = await this.write(command);
+        const orderLedgerPayload = order.toLedgerPayload();
+        const orderLoggerPayload = order.toLoggerPayload();
+        const orderView = order.toSnapshot();
 
-        await this.ledger.recordPlaced({
-          orderId: orderView.id,
-          customerId,
-          productIds: placedProductIds,
-        });
+        await this.ledger.recordPlaced(orderLedgerPayload);
 
-        this.logger.info(
-          { orderId: orderView.id, customerId, units: placedProductIds.length },
-          'Order placed',
-        );
+        this.logger.info(orderLoggerPayload, 'Order placed');
 
         return orderView;
       }
     }
   }
 
-  private async write(command: IOrderPlaceCommand): Promise<IOrderView> {
+  private async write(command: IOrderPlaceCommand): Promise<OrderModel> {
     const { customerId, idempotencyKey } = command;
 
     try {
@@ -93,7 +86,7 @@ export class OrderPlaceUseCase {
     }
   }
 
-  private async persist(command: IOrderPlaceCommand): Promise<IOrderView> {
+  private async persist(command: IOrderPlaceCommand): Promise<OrderModel> {
     const { customerId, productIds, idempotencyKey } = command;
 
     const orderCandidate = OrderCandidateModel.create({ customerId, productIds });
@@ -116,12 +109,13 @@ export class OrderPlaceUseCase {
 
     const orderRecord = await this.repository.findPlaced(orderId);
     const order = OrderModel.reconstitute(orderRecord);
-    const orderView = order.toSnapshot();
-    const movements = order.getProductStockMovements();
 
+    const movements = order.getProductStockMovements();
     await this.productStock.withdraw({ movements });
+
+    const orderView = order.toSnapshot();
     await this.idempotency.complete({ customerId, key: idempotencyKey, response: orderView });
 
-    return orderView;
+    return order;
   }
 }

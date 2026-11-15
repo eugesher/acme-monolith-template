@@ -656,9 +656,23 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
       "operationKey": Any<String>,
       "payload": {
         "customerId": "101",
-        "productIds": [
-          "100",
-          "100",
+        "orderProducts": [
+          {
+            "id": Any<String>,
+            "product": {
+              "name": "Seeded reference product",
+              "sku": "SKU-0001",
+            },
+            "productId": "100",
+          },
+          {
+            "id": Any<String>,
+            "product": {
+              "name": "Seeded reference product",
+              "sku": "SKU-0001",
+            },
+            "productId": "100",
+          },
         ],
       },
       "subjectId": Any<String>,

@@ -55,8 +55,8 @@ facts it records, such as `recordPlaced`, and implements it in
 `infrastructure/core-adapters/<module>-ledger-core.adapter.ts`. The adapter builds the record
 without the correlation id, which the ledger takes from the context itself, and calls the facade.
 Nothing is inherited, and the application has no ledger service. An event builds its record itself,
-but infrastructure may not import the domain, so the use case picks the events that go to the ledger
-and passes them through the command of the port.
+but infrastructure may not import the domain, so the use case asks each event that goes to the
+ledger for its record and passes the records through the command of the port.
 
 ## Where the queue is declared
 

@@ -21,15 +21,14 @@ export class OrderLedgerCoreAdapter implements IOrderLedgerPort {
   ) {}
 
   public async recordPlaced(command: IOrderLedgerRecordPlacedCommand): Promise<void> {
-    const { orderId, customerId, productIds } = command;
-    const occurredAt = new Date().toISOString();
+    const { subjectId, occurredAt, payload } = command;
 
     await this.ledger.handleEnqueue({
-      operationKey: `order-placed:${orderId}`,
+      operationKey: `order-placed:${subjectId}`,
       subjectType: 'order',
-      subjectId: orderId,
+      subjectId,
       action: 'OrderPlaced',
-      payload: { customerId, productIds },
+      payload,
       occurredAt,
     });
   }

@@ -1,6 +1,8 @@
 import { AggregateRootBase } from '@acme-libs/toolkit';
 
 import type {
+  IOrderPlaceLedgerPayload,
+  IOrderPlaceLoggerPayload,
   IOrderProductSnapshot,
   IOrderProductStockMovement,
   IOrderReconstitute,
@@ -10,6 +12,7 @@ import type {
 export class OrderModel extends AggregateRootBase<string> {
   private constructor(
     id: string,
+    public readonly customerId: string,
     public readonly orderProducts: readonly IOrderProductSnapshot[],
     public readonly createdAt: Date,
   ) {
@@ -17,9 +20,9 @@ export class OrderModel extends AggregateRootBase<string> {
   }
 
   public static reconstitute(record: IOrderReconstitute): OrderModel {
-    const { id, createdAt, orderProducts } = record;
+    const { id, customerId, createdAt, orderProducts } = record;
 
-    return new OrderModel(id, orderProducts, createdAt);
+    return new OrderModel(id, customerId, orderProducts, createdAt);
   }
 
   public getProductStockMovements(): IOrderProductStockMovement[] {
@@ -29,11 +32,35 @@ export class OrderModel extends AggregateRootBase<string> {
     }));
   }
 
+  public toLedgerPayload(): IOrderPlaceLedgerPayload {
+    return {
+      subjectId: this.id,
+      occurredAt: this.createdAt.toISOString(),
+      payload: {
+        customerId: this.customerId,
+        orderProducts: this.cloneOrderProducts(),
+      },
+    };
+  }
+
+  public toLoggerPayload(): IOrderPlaceLoggerPayload {
+    return {
+      id: this.id,
+      createdAt: this.createdAt.toISOString(),
+      customerId: this.customerId,
+      orderProducts: this.cloneOrderProducts(),
+    };
+  }
+
   public toSnapshot(): IOrderSnapshot {
     return {
       id: this.id,
       createdAt: this.createdAt.toISOString(),
-      orderProducts: [...this.orderProducts],
+      orderProducts: this.cloneOrderProducts(),
     };
+  }
+
+  private cloneOrderProducts(): IOrderProductSnapshot[] {
+    return [...this.orderProducts];
   }
 }

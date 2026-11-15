@@ -1,5 +1,6 @@
 export interface IOrderReconstitute {
   id: string;
+  customerId: string;
   createdAt: Date;
   orderProducts: {
     id: string;

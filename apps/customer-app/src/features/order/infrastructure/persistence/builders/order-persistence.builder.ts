@@ -40,7 +40,7 @@ export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
   }
 
   private selectOrder(): this {
-    this.select([`${this.alias}.id`, `${this.alias}.createdAt`]);
+    this.select([`${this.alias}.id`, `${this.alias}.customerId`, `${this.alias}.createdAt`]);
 
     return this;
   }

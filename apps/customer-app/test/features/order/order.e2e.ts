@@ -86,6 +86,9 @@ export class OrderE2E {
               operationKey: expect.any(String),
               subjectId: expect.any(String),
               occurredAt: expect.any(String),
+              payload: {
+                orderProducts: [{ id: expect.any(String) }, { id: expect.any(String) }],
+              },
             },
           ],
         });

@@ -107,6 +107,13 @@ export class OrderE2E {
                 subject_id: expect.any(String),
                 occurred_at: expect.any(Date),
                 recorded_at: expect.any(Date),
+                payload: {
+                  orderProducts: [
+                    { id: expect.any(String) },
+                    { id: expect.any(String) },
+                    { id: expect.any(String) },
+                  ],
+                },
               },
               {
                 id: expect.any(String),
