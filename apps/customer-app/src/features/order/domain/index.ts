@@ -10,5 +10,6 @@ export * from './exceptions/order-stock-insufficient.exception';
 
 export * from './interfaces';
 
+export * from './models/order-candidate.model';
 export * from './models/order-get-many.model';
 export * from './models/order.model';

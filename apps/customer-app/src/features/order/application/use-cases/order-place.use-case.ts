@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import {
+  OrderCandidateModel,
   OrderIdempotencyKeyReusedException,
   OrderIdempotentRequestInFlightException,
   OrderModel,
@@ -46,35 +47,38 @@ export class OrderPlaceUseCase {
       body: { productIds },
     });
 
-    if (idempotencyClaim.outcome === OrderIdempotencyOutcomeEnum.REPLAY) {
-      this.logger.info({ idempotencyKey }, 'Order placement replayed from the idempotency store');
+    switch (idempotencyClaim.outcome) {
+      case OrderIdempotencyOutcomeEnum.IN_FLIGHT: {
+        throw new OrderIdempotentRequestInFlightException(idempotencyKey);
+      }
+      case OrderIdempotencyOutcomeEnum.MISMATCH: {
+        throw new OrderIdempotencyKeyReusedException(idempotencyKey);
+      }
+      case OrderIdempotencyOutcomeEnum.REPLAY: {
+        this.logger.info({ idempotencyKey }, 'Order placement replayed from the idempotency store');
 
-      return idempotencyClaim.storedResponse;
+        return idempotencyClaim.storedResponse;
+      }
+      default: {
+        const orderView = await this.write(command);
+        const placedProductIds = orderView.orderProducts.map(
+          (orderProduct) => orderProduct.productId,
+        );
+
+        await this.ledger.recordPlaced({
+          orderId: orderView.id,
+          customerId,
+          productIds: placedProductIds,
+        });
+
+        this.logger.info(
+          { orderId: orderView.id, customerId, units: placedProductIds.length },
+          'Order placed',
+        );
+
+        return orderView;
+      }
     }
-
-    if (idempotencyClaim.outcome === OrderIdempotencyOutcomeEnum.IN_FLIGHT) {
-      throw new OrderIdempotentRequestInFlightException(idempotencyKey);
-    }
-
-    if (idempotencyClaim.outcome === OrderIdempotencyOutcomeEnum.MISMATCH) {
-      throw new OrderIdempotencyKeyReusedException(idempotencyKey);
-    }
-
-    const orderView = await this.write(command);
-    const placedProductIds = orderView.orderProducts.map((orderProduct) => orderProduct.productId);
-
-    await this.ledger.recordPlaced({
-      orderId: orderView.id,
-      customerId,
-      productIds: placedProductIds,
-    });
-
-    this.logger.info(
-      { orderId: orderView.id, customerId, units: placedProductIds.length },
-      'Order placed',
-    );
-
-    return orderView;
   }
 
   private async write(command: IOrderPlaceCommand): Promise<IOrderView> {
@@ -91,27 +95,29 @@ export class OrderPlaceUseCase {
 
   private async persist(command: IOrderPlaceCommand): Promise<IOrderView> {
     const { customerId, productIds, idempotencyKey } = command;
-    const distinctIds = [...new Set(productIds)];
 
-    const stockOnHand = await this.productStock.lock({ productIds: distinctIds });
-    const products = await this.repository.findActiveProducts(distinctIds);
+    const orderCandidate = OrderCandidateModel.create({ customerId, productIds });
+    orderCandidate.validate();
 
-    const orderCandidate = OrderModel.initCandidate({
-      customerId,
-      productIds,
-      products,
-      stockOnHand,
+    const stockQuantities = await this.productStock.lock({
+      productIds: orderCandidate.distinctProductIds,
     });
+    const activeProducts = await this.repository.findActiveProducts(
+      orderCandidate.distinctProductIds,
+    );
+
+    orderCandidate.assertProducts(activeProducts);
+    orderCandidate.assertStockQuantities(stockQuantities);
+
     const orderId = await this.repository.insertOrder({ customerId: orderCandidate.customerId });
 
-    const orderProducts = orderCandidate.productIds.map((productId) => ({ orderId, productId }));
+    const orderProducts = orderCandidate.getOrderProductCandidates(orderId);
     await this.repository.insertOrderProducts(orderProducts);
 
     const orderRecord = await this.repository.findPlaced(orderId);
-
-    const placed = OrderModel.reconstitute(orderRecord);
-    const orderView = placed.toSnapshot();
-    const movements = placed.getProductStockMovements();
+    const order = OrderModel.reconstitute(orderRecord);
+    const orderView = order.toSnapshot();
+    const movements = order.getProductStockMovements();
 
     await this.productStock.withdraw({ movements });
     await this.idempotency.complete({ customerId, key: idempotencyKey, response: orderView });

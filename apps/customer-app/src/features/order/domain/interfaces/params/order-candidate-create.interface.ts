@@ -1,4 +1,4 @@
-export interface IOrderCandidate {
+export interface IOrderCandidateCreate {
   customerId: string;
   productIds: string[];
 }

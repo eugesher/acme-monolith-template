@@ -73,15 +73,21 @@ one params object, and every shape a model or an event answers is a snapshot.
 |                                | `I<Subject>`            | another answer, by its noun: `ITagCommonSubjectTagsChanges` from `TagCommonSubjectTagsModel.replace`, `IOrderProductStockMovement` from `OrderModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
 
 The folder names the role, so the file repeats the name without `I` and ends with `.interface.ts`:
-`order-reconstitute.interface.ts` holds `IOrderReconstitute`, `order-candidate.interface.ts` holds
-`IOrderCandidate`. The argument takes the name of what it holds: `record`, `proposal`, `changes`.
+`order-reconstitute.interface.ts` holds `IOrderReconstitute`, `role-candidate.interface.ts` holds
+`IRoleCandidate`. The argument takes the name of what it holds: `record`, `proposal`, `changes`.
 
-A part of a params object is `I<Params><Part>`: `IOrderCandidateInitProduct` and
-`IOrderCandidateInitProductStock` are the fields `products` and `stockOnHand` of
-`IOrderCandidateInit`. A part has a file of its own once another file names it, as the private
-checks of `OrderModel` do; until then it stays unexported in the file of its params, as
-`IProductStockCoreOnHandReconstituteStockSum`. A part of a snapshot is the snapshot of its noun:
+A part of a params object is `I<Params><Part>`, unexported in the file of its params until another
+file names it: `IProductStockCoreOnHandReconstituteStockSum` is the element of `stockSums` in
+`IProductStockCoreOnHandReconstitute`. A part of a snapshot is the snapshot of its noun:
 `IOrderProductSnapshot` is an element of `IOrderSnapshot`.
+
+**A candidate checked in steps is a model of its own.** `initCandidate` checks a new row in one
+call, against data the use case already holds. An order is checked against rows the use case reads
+only after a lock (see `021-pessimistic-locking.md`), so `OrderCandidateModel.create(proposal)`
+holds the request, `validate()` refuses an empty one before any read, `distinctProductIds` names the
+rows to lock and read, `assertProducts` and `assertStockQuantities` check what was read, and
+`getOrderProductCandidates(orderId)` answers the rows to insert. Each check takes its own params,
+`IOrderCandidateActiveProduct` and `IOrderCandidateStockQuantity`.
 
 ## Read models
 
