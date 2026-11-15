@@ -38,7 +38,7 @@ export class OrderModel extends AggregateRootBase<string> {
       occurredAt: this.createdAt.toISOString(),
       payload: {
         customerId: this.customerId,
-        orderProducts: this.cloneOrderProducts(),
+        orderProducts: this.orderProducts,
       },
     };
   }
@@ -48,7 +48,7 @@ export class OrderModel extends AggregateRootBase<string> {
       id: this.id,
       createdAt: this.createdAt.toISOString(),
       customerId: this.customerId,
-      orderProducts: this.cloneOrderProducts(),
+      orderProducts: this.orderProducts,
     };
   }
 
@@ -56,11 +56,7 @@ export class OrderModel extends AggregateRootBase<string> {
     return {
       id: this.id,
       createdAt: this.createdAt.toISOString(),
-      orderProducts: this.cloneOrderProducts(),
+      orderProducts: this.orderProducts,
     };
-  }
-
-  private cloneOrderProducts(): IOrderProductSnapshot[] {
-    return [...this.orderProducts];
   }
 }

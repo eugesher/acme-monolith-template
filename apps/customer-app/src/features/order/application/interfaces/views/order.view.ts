@@ -1,7 +1,7 @@
 import type { IOrderProductView } from './order-product.view';
 
 export interface IOrderView {
-  id: string;
-  createdAt: string;
-  orderProducts: IOrderProductView[];
+  readonly id: string;
+  readonly createdAt: string;
+  readonly orderProducts: readonly IOrderProductView[];
 }

@@ -27,5 +27,5 @@ export class OrderResponseDto {
   public createdAt: string;
 
   @ApiResponseProperty({ type: [OrderResponseItemDto] })
-  public orderProducts: OrderResponseItemDto[];
+  public orderProducts: readonly OrderResponseItemDto[];
 }

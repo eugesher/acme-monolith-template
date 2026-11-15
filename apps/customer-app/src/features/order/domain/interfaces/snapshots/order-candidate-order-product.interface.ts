@@ -1,4 +1,4 @@
 export interface IOrderCandidateOrderProduct {
-  orderId: string;
-  productId: string;
+  readonly orderId: string;
+  readonly productId: string;
 }

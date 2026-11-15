@@ -1,4 +1,4 @@
 export interface IOrderProductStockMovement {
-  productId: string;
-  orderProductId: string;
+  readonly productId: string;
+  readonly orderProductId: string;
 }

@@ -1,8 +1,8 @@
 export interface IOrderProductView {
-  id: string;
-  productId: string;
-  product: {
-    sku: string;
-    name: string;
+  readonly id: string;
+  readonly productId: string;
+  readonly product: {
+    readonly sku: string;
+    readonly name: string;
   };
 }

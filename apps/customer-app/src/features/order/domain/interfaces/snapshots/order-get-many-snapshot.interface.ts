@@ -1,4 +1,4 @@
 export interface IOrderGetManySnapshot {
-  id: string;
-  createdAt: string;
+  readonly id: string;
+  readonly createdAt: string;
 }
