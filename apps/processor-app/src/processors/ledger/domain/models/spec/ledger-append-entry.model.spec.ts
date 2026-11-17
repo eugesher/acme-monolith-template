@@ -63,14 +63,6 @@ describe('LedgerAppendEntryModel', () => {
     });
   });
 
-  describe('toReceiveLoggerPayload', () => {
-    it('answers the operation key and the action of the received record', () => {
-      expect(
-        LedgerAppendEntryModel.toReceiveLoggerPayload('product-archived:12:2', 'ProductArchived'),
-      ).toEqual({ operationKey: 'product-archived:12:2', action: 'ProductArchived' });
-    });
-  });
-
   describe('toAppendLoggerPayload', () => {
     it('answers the id of the entry and the operation key of the candidate', () => {
       const candidate = LedgerAppendEntryModel.initCandidate({

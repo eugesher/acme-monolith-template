@@ -16,8 +16,6 @@ import type {
   IReminderRescheduleLoggerPayload,
   IReminderSnapshot,
   IReminderUpdateQuery,
-  IReminderWriteExhaustedLoggerPayload,
-  IReminderWriteRetryLoggerPayload,
 } from '../interfaces';
 
 export class ReminderModel extends AggregateRootBase {
@@ -85,17 +83,6 @@ export class ReminderModel extends AggregateRootBase {
       status: ReminderStatusEnum.PENDING,
       version: 1,
     };
-  }
-
-  public static toWriteRetryLoggerPayload(
-    id: string,
-    version: number,
-  ): IReminderWriteRetryLoggerPayload {
-    return { id, version };
-  }
-
-  public static toWriteExhaustedLoggerPayload(id: string): IReminderWriteExhaustedLoggerPayload {
-    return { id };
   }
 
   public complete(): void {

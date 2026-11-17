@@ -68,12 +68,6 @@ describe('AuthCustomerModel', () => {
     });
   });
 
-  describe('toRegisterLoggerPayload', () => {
-    it('answers the id of the registered customer', () => {
-      expect(AuthCustomerModel.toRegisterLoggerPayload('105')).toEqual({ id: '105' });
-    });
-  });
-
   describe('normalizeEmail', () => {
     it('trims the email and lowers its case', () => {
       const email = AuthCustomerModel.normalizeEmail('  Ann@Example.COM ');

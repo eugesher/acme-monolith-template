@@ -48,7 +48,7 @@ describe('ProductStockModel', () => {
       expect(productStock.toOnHandSnapshot(15)).toEqual({ productId: '12', quantity: 15 });
     });
 
-    it('answers the log fields of a restock and of a replay', () => {
+    it('answers the log fields of a restock', () => {
       expect(
         ProductStockModel.toAddLoggerPayload({
           productStockId: '700',
@@ -56,9 +56,6 @@ describe('ProductStockModel', () => {
           quantity: 5,
         }),
       ).toEqual({ id: '700', productId: '12', quantity: 5 });
-      expect(ProductStockModel.toAddReplayLoggerPayload('key-1')).toEqual({
-        idempotencyKey: 'key-1',
-      });
     });
   });
 });

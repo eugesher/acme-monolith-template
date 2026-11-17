@@ -15,8 +15,6 @@ import type {
   INoteRevisionInsertQueryBuild,
   INoteSnapshot,
   INoteUpdateQuery,
-  INoteWriteExhaustedLoggerPayload,
-  INoteWriteRetryLoggerPayload,
 } from '../interfaces';
 
 export class NoteModel extends AggregateRootBase {
@@ -85,17 +83,6 @@ export class NoteModel extends AggregateRootBase {
       resolved: false,
       version: 1,
     };
-  }
-
-  public static toWriteRetryLoggerPayload(
-    id: string,
-    version: number,
-  ): INoteWriteRetryLoggerPayload {
-    return { id, version };
-  }
-
-  public static toWriteExhaustedLoggerPayload(id: string): INoteWriteExhaustedLoggerPayload {
-    return { id };
   }
 
   public edit(body: string): void {

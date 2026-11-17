@@ -13,5 +13,3 @@ export * from './snapshots/note-resolve-logger-payload.interface';
 export * from './snapshots/note-revision-insert-query.interface';
 export * from './snapshots/note-snapshot.interface';
 export * from './snapshots/note-update-query.interface';
-export * from './snapshots/note-write-exhausted-logger-payload.interface';
-export * from './snapshots/note-write-retry-logger-payload.interface';

@@ -291,13 +291,5 @@ describe('ProductModel', () => {
       expect(product.toUpdateLoggerPayload()).toEqual({ id: '12', version: 3 });
       expect(product.toPublishLoggerPayload()).toEqual({ id: '12' });
     });
-
-    it('answers the log fields of a replay and of a lost optimistic race without a product', () => {
-      expect(ProductModel.toCreateReplayLoggerPayload('key-1')).toEqual({
-        idempotencyKey: 'key-1',
-      });
-      expect(ProductModel.toWriteRetryLoggerPayload('12', 4)).toEqual({ id: '12', version: 4 });
-      expect(ProductModel.toWriteExhaustedLoggerPayload('12')).toEqual({ id: '12' });
-    });
   });
 });

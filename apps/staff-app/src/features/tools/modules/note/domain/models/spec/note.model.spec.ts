@@ -333,10 +333,5 @@ describe('NoteModel', () => {
       expect(note.toEditLoggerPayload()).toEqual({ id: '7', authorId: 'admin-1', version: 3 });
       expect(note.toResolveLoggerPayload()).toEqual({ id: '7', version: 3 });
     });
-
-    it('answers the log fields of a lost optimistic race without a note', () => {
-      expect(NoteModel.toWriteRetryLoggerPayload('7', 4)).toEqual({ id: '7', version: 4 });
-      expect(NoteModel.toWriteExhaustedLoggerPayload('7')).toEqual({ id: '7' });
-    });
   });
 });

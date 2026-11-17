@@ -21,11 +21,10 @@ The record of the ledger carries the subject, the payload and, where the model k
 was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
 and the action (see `022-enqueue-after-commit.md`).
 
-**Without an instance, a static method answers.** A replay has only the key, a lost optimistic race
-only the id and the version as read, a registration only the issued id and the candidate:
-`ProductModel.toCreateReplayLoggerPayload(idempotencyKey)`,
-`NoteModel.toWriteRetryLoggerPayload(id, version)`,
-`AuthCustomerModel.toRegisterSnapshot(id, candidate)`.
+**Without an instance, a static method answers.** A registration has only the issued id and the
+candidate, so `AuthCustomerModel.toRegisterSnapshot(id, candidate)` picks the fields of the response
+from them. A static method that would only wrap its arguments in an object is not written: the use
+case logs the literal (see below).
 
 **One model answers each of its use cases with a method of its own.** `ProductModel` serves the
 creation, the update and the publication, so it has `toCreateLoggerPayload`, `toUpdateLoggerPayload`
@@ -46,6 +45,8 @@ the params of a helper (see `029-naming.md`): `IIdempotencyCoreKeyLoggerPayloadB
 
 - A command of a port made of the values of the request: `{ productId, expectedVersion }`, the body
   of an idempotency claim.
+- A line of the log made of the values at hand only: `{ idempotencyKey }` of a replay,
+  `{ id, version }` of a lost optimistic race, `{ id }` of a registration.
 - The outcome of the application: `{ outcome, tags, missingTagIds }`, and the answer of another
   module passed on as is, `{ tags }`.
 - A choice of the application the domain cannot see: the signs of the kinds of a stock movement come

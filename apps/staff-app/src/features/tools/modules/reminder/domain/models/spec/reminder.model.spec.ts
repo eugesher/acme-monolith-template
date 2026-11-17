@@ -330,10 +330,5 @@ describe('ReminderModel', () => {
       });
       expect(reminder.toDeleteLoggerPayload()).toEqual({ id: '7' });
     });
-
-    it('answers the log fields of a lost optimistic race without a reminder', () => {
-      expect(ReminderModel.toWriteRetryLoggerPayload('7', 4)).toEqual({ id: '7', version: 4 });
-      expect(ReminderModel.toWriteExhaustedLoggerPayload('7')).toEqual({ id: '7' });
-    });
   });
 });

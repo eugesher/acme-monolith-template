@@ -2,7 +2,6 @@ import type {
   ILedgerAppendEntryAppendLoggerPayload,
   ILedgerAppendEntryCandidate,
   ILedgerAppendEntryCandidateInit,
-  ILedgerAppendEntryReceiveLoggerPayload,
 } from '../interfaces';
 
 export class LedgerAppendEntryModel {
@@ -35,13 +34,6 @@ export class LedgerAppendEntryModel {
       correlationId,
       occurredAt,
     };
-  }
-
-  public static toReceiveLoggerPayload(
-    operationKey: string,
-    action: string,
-  ): ILedgerAppendEntryReceiveLoggerPayload {
-    return { operationKey, action };
   }
 
   public static toAppendLoggerPayload(

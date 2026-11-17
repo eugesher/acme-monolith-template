@@ -43,9 +43,8 @@ export class ProductWriteService {
       maxAttempts,
       isConflict: (error): error is ProductWriteConflictError =>
         error instanceof ProductWriteConflictError,
-      retryContext: (conflict) =>
-        ProductModel.toWriteRetryLoggerPayload(productId, conflict.currentVersion),
-      exhaustedContext: () => ProductModel.toWriteExhaustedLoggerPayload(productId),
+      retryContext: (conflict) => ({ id: productId, version: conflict.currentVersion }),
+      exhaustedContext: () => ({ id: productId }),
       onExhausted: (conflict, attempts) => {
         throw new ProductVersionMismatchException(
           productId,

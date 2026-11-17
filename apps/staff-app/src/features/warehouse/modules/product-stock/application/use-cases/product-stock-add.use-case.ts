@@ -53,9 +53,7 @@ export class ProductStockAddUseCase {
     });
 
     if (idempotencyClaim.outcome === ProductStockIdempotencyOutcomeEnum.REPLAY) {
-      const replayLoggerPayload = ProductStockModel.toAddReplayLoggerPayload(idempotencyKey);
-
-      this.logger.info(replayLoggerPayload, 'Product restock replayed from the idempotency store');
+      this.logger.info({ idempotencyKey }, 'Product restock replayed from the idempotency store');
 
       return idempotencyClaim.storedResponse;
     }

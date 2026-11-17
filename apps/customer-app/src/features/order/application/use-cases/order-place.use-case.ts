@@ -55,12 +55,7 @@ export class OrderPlaceUseCase {
         throw new OrderIdempotencyKeyReusedException(idempotencyKey);
       }
       case OrderIdempotencyOutcomeEnum.REPLAY: {
-        const replayLoggerPayload = OrderPlaceModel.toReplayLoggerPayload(idempotencyKey);
-
-        this.logger.info(
-          replayLoggerPayload,
-          'Order placement replayed from the idempotency store',
-        );
+        this.logger.info({ idempotencyKey }, 'Order placement replayed from the idempotency store');
 
         return idempotencyClaim.storedResponse;
       }

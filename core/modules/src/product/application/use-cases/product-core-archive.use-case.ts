@@ -40,12 +40,7 @@ export class ProductCoreArchiveUseCase {
     const { outcome, currentVersion } = archiveView;
 
     if (outcome === ProductCoreArchiveOutcomeEnum.ARCHIVED) {
-      const archiveLoggerPayload = ProductCoreModel.toArchiveLoggerPayload(
-        productId,
-        currentVersion,
-      );
-
-      this.logger.info(archiveLoggerPayload, 'Product archived');
+      this.logger.info({ id: productId, version: currentVersion }, 'Product archived');
     }
 
     return archiveView;

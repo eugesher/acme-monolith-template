@@ -9,7 +9,6 @@ import type {
   IAuthCustomerLoginLoggerPayload,
   IAuthCustomerReconstitute,
   IAuthCustomerRegisterLedgerPayload,
-  IAuthCustomerRegisterLoggerPayload,
   IAuthCustomerRegisterSnapshot,
 } from '../interfaces';
 
@@ -49,10 +48,6 @@ export class AuthCustomerModel {
 
   public static toRegisterLedgerPayload(id: string): IAuthCustomerRegisterLedgerPayload {
     return { subjectId: id };
-  }
-
-  public static toRegisterLoggerPayload(id: string): IAuthCustomerRegisterLoggerPayload {
-    return { id };
   }
 
   public static normalizeEmail(email: string): string {

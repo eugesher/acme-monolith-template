@@ -65,9 +65,5 @@ describe('ProductCoreModel', () => {
         payload: { sku: 'SKU-0001', previousStatus: 'active' },
       });
     });
-
-    it('answers the log fields of an archive without a product', () => {
-      expect(ProductCoreModel.toArchiveLoggerPayload('12', 4)).toEqual({ id: '12', version: 4 });
-    });
   });
 });

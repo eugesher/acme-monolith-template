@@ -5,7 +5,6 @@ import { ProductQuantityInvalidException } from '../exceptions/product-quantity-
 import type {
   IProductStockAddLoggerPayload,
   IProductStockAddLoggerPayloadBuild,
-  IProductStockAddReplayLoggerPayload,
   IProductStockOnHandSnapshot,
   IProductStockReconstitute,
 } from '../interfaces';
@@ -24,12 +23,6 @@ export class ProductStockModel extends AggregateRootBase {
     const { id, sku } = record;
 
     return new ProductStockModel(id, sku);
-  }
-
-  public static toAddReplayLoggerPayload(
-    idempotencyKey: string,
-  ): IProductStockAddReplayLoggerPayload {
-    return { idempotencyKey };
   }
 
   public static toAddLoggerPayload(

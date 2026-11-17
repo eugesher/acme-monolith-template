@@ -1,9 +1,7 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
-import type { Maybe } from '@acme-libs/toolkit';
 
 import type {
   IProductCoreArchiveLedgerPayload,
-  IProductCoreArchiveLoggerPayload,
   IProductCoreReconstitute,
   IProductCoreUpdateQuery,
 } from '../interfaces';
@@ -32,13 +30,6 @@ export class ProductCoreModel {
     const { id, sku, status, version } = record;
 
     return new ProductCoreModel(id, sku, status, version);
-  }
-
-  public static toArchiveLoggerPayload(
-    id: string,
-    version: Maybe<number>,
-  ): IProductCoreArchiveLoggerPayload {
-    return { id, version };
   }
 
   public archive(): void {

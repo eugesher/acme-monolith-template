@@ -10,7 +10,6 @@ export * from './snapshots/order-candidate-order-product.interface';
 export * from './snapshots/order-get-many-snapshot.interface';
 export * from './snapshots/order-place-ledger-payload.interface';
 export * from './snapshots/order-place-logger-payload.interface';
-export * from './snapshots/order-place-replay-logger-payload.interface';
 export * from './snapshots/order-product-reference-snapshot.interface';
 export * from './snapshots/order-product-snapshot.interface';
 export * from './snapshots/order-product-stock-movement.interface';

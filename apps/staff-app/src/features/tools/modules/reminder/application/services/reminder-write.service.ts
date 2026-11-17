@@ -41,9 +41,8 @@ export class ReminderWriteService {
       maxAttempts: this.occRetryAttempts,
       isConflict: (error): error is ReminderWriteConflictError =>
         error instanceof ReminderWriteConflictError,
-      retryContext: (conflict) =>
-        ReminderModel.toWriteRetryLoggerPayload(reminderId, conflict.currentVersion),
-      exhaustedContext: () => ReminderModel.toWriteExhaustedLoggerPayload(reminderId),
+      retryContext: (conflict) => ({ id: reminderId, version: conflict.currentVersion }),
+      exhaustedContext: () => ({ id: reminderId }),
       onExhausted: (conflict, attempts) => {
         throw new ReminderVersionMismatchException(reminderId, attempts, conflict.currentVersion);
       },

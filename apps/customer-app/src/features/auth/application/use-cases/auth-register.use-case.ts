@@ -38,10 +38,9 @@ export class AuthRegisterUseCase {
     const passwordHash = await this.credentials.hashPassword(password);
     const customerCandidate = AuthCustomerModel.initCandidate({ email, passwordHash });
     const customerId = await this.insert(customerCandidate);
-    const customerLoggerPayload = AuthCustomerModel.toRegisterLoggerPayload(customerId);
     const customerLedgerPayload = AuthCustomerModel.toRegisterLedgerPayload(customerId);
 
-    this.logger.info(customerLoggerPayload, 'Customer registered');
+    this.logger.info({ id: customerId }, 'Customer registered');
 
     await this.ledger.recordRegistered(customerLedgerPayload);
 
