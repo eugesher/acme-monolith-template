@@ -8,4 +8,4 @@ export * from './snapshots/tag-delete-logger-payload.interface';
 export * from './snapshots/tag-get-many-snapshot.interface';
 export * from './snapshots/tag-rename-logger-payload.interface';
 export * from './snapshots/tag-snapshot.interface';
-export * from './snapshots/tag-update-query.interface';
+export * from './snapshots/tag-update-payload.interface';

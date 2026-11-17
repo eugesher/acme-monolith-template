@@ -34,11 +34,11 @@ export class RoleCreateUseCase {
   }
 
   private async insert(candidate: RoleCandidateModel): Promise<string> {
-    const roleInsertQuery = candidate.toInsertQuery();
-    const insertResult = await this.repository.insertRole(roleInsertQuery);
+    const roleInsertPayload = candidate.toInsertPayload();
+    const insertResult = await this.repository.insertRole(roleInsertPayload);
 
     if (insertResult.outcome === RoleCreateStaffRoleInsertOutcomeEnum.DUPLICATE) {
-      throw new AuthRoleNameTakenException(roleInsertQuery.name);
+      throw new AuthRoleNameTakenException(roleInsertPayload.name);
     }
 
     const { id } = insertResult;

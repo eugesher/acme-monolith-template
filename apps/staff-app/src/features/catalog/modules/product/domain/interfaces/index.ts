@@ -11,4 +11,4 @@ export * from './snapshots/product-ledger-record.interface';
 export * from './snapshots/product-publish-logger-payload.interface';
 export * from './snapshots/product-snapshot.interface';
 export * from './snapshots/product-update-logger-payload.interface';
-export * from './snapshots/product-update-query.interface';
+export * from './snapshots/product-update-payload.interface';

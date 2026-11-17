@@ -74,8 +74,8 @@ export class ProductWriteService {
       return { product, domainEvents };
     }
 
-    const productUpdateQuery = product.toUpdateQuery(versionAsRead);
-    const isUpdated = await this.repository.update(productUpdateQuery);
+    const productUpdatePayload = product.toUpdatePayload(versionAsRead);
+    const isUpdated = await this.repository.update(productUpdatePayload);
 
     if (!isUpdated) {
       const currentProduct = await this.load(productId);

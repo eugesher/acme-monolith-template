@@ -1,6 +1,6 @@
-import type { ITagCommonSubjectTagsLinkQuery } from './tag-common-subject-tags-link-query.interface';
+import type { ITagCommonSubjectTagsLinkPayload } from './tag-common-subject-tags-link-payload.interface';
 
 export interface ITagCommonSubjectTagsChanges {
-  readonly link: ITagCommonSubjectTagsLinkQuery;
-  readonly unlink: ITagCommonSubjectTagsLinkQuery;
+  readonly link: ITagCommonSubjectTagsLinkPayload;
+  readonly unlink: ITagCommonSubjectTagsLinkPayload;
 }

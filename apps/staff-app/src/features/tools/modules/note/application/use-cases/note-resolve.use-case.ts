@@ -35,8 +35,8 @@ export class NoteResolveUseCase {
 
     note.resolve();
 
-    const noteUpdateQuery = note.toUpdateQuery(versionAsRead);
-    const isSaved = await this.repository.update(noteUpdateQuery);
+    const noteUpdatePayload = note.toUpdatePayload(versionAsRead);
+    const isSaved = await this.repository.update(noteUpdatePayload);
 
     return await this.writeService.reload({ noteId, authorId, isSaved });
   }

@@ -17,8 +17,8 @@ export class IdempotencyCoreCompleteUseCase {
 
   public async execute(command: IIdempotencyCoreCompleteCommand): Promise<void> {
     const { scope, key, response } = command;
-    const completeQuery = IdempotencyCoreKeyModel.toCompleteQuery({ scope, key, response });
+    const completePayload = IdempotencyCoreKeyModel.toCompletePayload({ scope, key, response });
 
-    await this.repository.complete(completeQuery);
+    await this.repository.complete(completePayload);
   }
 }

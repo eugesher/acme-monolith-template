@@ -2,7 +2,7 @@ import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import type {
   IRoleCandidateCreate,
-  IRoleCandidateInsertQuery,
+  IRoleCandidateInsertPayload,
   IRoleCandidateRolePermission,
   IRoleCreateLoggerPayload,
   IRoleSnapshot,
@@ -20,7 +20,7 @@ export class RoleCandidateModel {
     return new RoleCandidateModel(name, [...new Set(permissionCodes)]);
   }
 
-  public toInsertQuery(): IRoleCandidateInsertQuery {
+  public toInsertPayload(): IRoleCandidateInsertPayload {
     return { name: this.name };
   }
 

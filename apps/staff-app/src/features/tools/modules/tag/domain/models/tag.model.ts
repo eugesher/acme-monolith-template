@@ -9,7 +9,7 @@ import type {
   ITagReconstitute,
   ITagRenameLoggerPayload,
   ITagSnapshot,
-  ITagUpdateQuery,
+  ITagUpdatePayload,
 } from '../interfaces';
 
 export class TagModel extends AggregateRootBase {
@@ -55,7 +55,7 @@ export class TagModel extends AggregateRootBase {
     };
   }
 
-  public toUpdateQuery(): ITagUpdateQuery {
+  public toUpdatePayload(): ITagUpdatePayload {
     return { id: this.id, name: this.name };
   }
 

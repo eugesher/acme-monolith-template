@@ -26,9 +26,9 @@ describe('ProductStockCoreMovementsModel', () => {
     });
   });
 
-  describe('toInsertQueries', () => {
+  describe('toInsertPayloads', () => {
     it('answers one row per movement with the quantity under the sign of the kind', () => {
-      expect(stockMovements.toInsertQueries()).toEqual([
+      expect(stockMovements.toInsertPayloads()).toEqual([
         { productId: '103', quantity: -1, orderProductId: '620' },
         { productId: '100', quantity: -2, orderProductId: '621' },
         { productId: '103', quantity: -1, orderProductId: '622' },

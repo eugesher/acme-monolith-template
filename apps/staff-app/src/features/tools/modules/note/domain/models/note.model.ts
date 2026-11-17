@@ -11,10 +11,10 @@ import type {
   INoteEditLoggerPayload,
   INoteReconstitute,
   INoteResolveLoggerPayload,
-  INoteRevisionInsertQuery,
-  INoteRevisionInsertQueryBuild,
+  INoteRevisionInsertPayload,
+  INoteRevisionInsertPayloadBuild,
   INoteSnapshot,
-  INoteUpdateQuery,
+  INoteUpdatePayload,
 } from '../interfaces';
 
 export class NoteModel extends AggregateRootBase {
@@ -119,7 +119,7 @@ export class NoteModel extends AggregateRootBase {
     };
   }
 
-  public toUpdateQuery(versionAsRead: number): INoteUpdateQuery {
+  public toUpdatePayload(versionAsRead: number): INoteUpdatePayload {
     return {
       id: this.id,
       versionAsRead,
@@ -129,7 +129,9 @@ export class NoteModel extends AggregateRootBase {
     };
   }
 
-  public toRevisionInsertQuery(params: INoteRevisionInsertQueryBuild): INoteRevisionInsertQuery {
+  public toRevisionInsertPayload(
+    params: INoteRevisionInsertPayloadBuild,
+  ): INoteRevisionInsertPayload {
     const { bodyBefore, editorId, correlationId } = params;
 
     return {

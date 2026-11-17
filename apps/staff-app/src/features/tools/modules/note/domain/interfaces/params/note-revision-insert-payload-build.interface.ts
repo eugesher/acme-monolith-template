@@ -1,4 +1,4 @@
-export interface INoteRevisionInsertQueryBuild {
+export interface INoteRevisionInsertPayloadBuild {
   bodyBefore: string;
   editorId: string;
   correlationId: string;

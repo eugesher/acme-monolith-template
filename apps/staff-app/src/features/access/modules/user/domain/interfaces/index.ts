@@ -6,5 +6,5 @@ export * from './snapshots/user-reassign-roles-logger-payload.interface';
 export * from './snapshots/user-reassign-roles-snapshot.interface';
 export * from './snapshots/user-register-logger-payload.interface';
 export * from './snapshots/user-register-snapshot.interface';
-export * from './snapshots/user-staff-user-candidate-insert-query.interface';
+export * from './snapshots/user-staff-user-candidate-insert-payload.interface';
 export * from './snapshots/user-staff-user-role.interface';

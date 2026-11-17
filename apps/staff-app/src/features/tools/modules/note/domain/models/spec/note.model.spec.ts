@@ -297,7 +297,7 @@ describe('NoteModel', () => {
     });
 
     it('answers the row to update under the version as read', () => {
-      expect(note.toUpdateQuery(2)).toEqual({
+      expect(note.toUpdatePayload(2)).toEqual({
         id: '7',
         versionAsRead: 2,
         body: 'Check the supplier',
@@ -308,7 +308,7 @@ describe('NoteModel', () => {
 
     it('answers the revision of the edit at the version of the note', () => {
       expect(
-        note.toRevisionInsertQuery({
+        note.toRevisionInsertPayload({
           bodyBefore: 'Old body',
           editorId: 'admin-1',
           correlationId: 'correlation-1',

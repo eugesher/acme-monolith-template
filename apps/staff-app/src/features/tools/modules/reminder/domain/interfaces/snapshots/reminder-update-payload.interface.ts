@@ -1,6 +1,6 @@
 import type { ReminderStatusEnum } from '@acme-libs/kernel';
 
-export interface IReminderUpdateQuery {
+export interface IReminderUpdatePayload {
   readonly id: string;
   readonly versionAsRead: number;
   readonly dueOn: string;

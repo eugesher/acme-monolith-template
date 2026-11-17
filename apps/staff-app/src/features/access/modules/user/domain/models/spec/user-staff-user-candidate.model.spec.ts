@@ -55,9 +55,9 @@ describe('UserStaffUserCandidateModel', () => {
     });
   });
 
-  describe('toInsertQuery', () => {
+  describe('toInsertPayload', () => {
     it('answers an active user row with the normalized email', () => {
-      expect(candidate.toInsertQuery()).toEqual({
+      expect(candidate.toInsertPayload()).toEqual({
         email: 'editor@example.com',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,

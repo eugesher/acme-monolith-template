@@ -9,4 +9,4 @@ export * from './snapshots/reminder-delete-logger-payload.interface';
 export * from './snapshots/reminder-get-many-snapshot.interface';
 export * from './snapshots/reminder-reschedule-logger-payload.interface';
 export * from './snapshots/reminder-snapshot.interface';
-export * from './snapshots/reminder-update-query.interface';
+export * from './snapshots/reminder-update-payload.interface';

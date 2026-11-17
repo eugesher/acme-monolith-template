@@ -1,6 +1,6 @@
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
-export interface IProductCoreUpdateQuery {
+export interface IProductCoreUpdatePayload {
   readonly id: string;
   readonly versionAsRead: number;
   readonly status: ProductStatusEnum;

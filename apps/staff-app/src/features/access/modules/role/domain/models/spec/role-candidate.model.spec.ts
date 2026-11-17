@@ -12,9 +12,9 @@ describe('RoleCandidateModel', () => {
     });
   });
 
-  describe('toInsertQuery', () => {
+  describe('toInsertPayload', () => {
     it('answers the role row to insert', () => {
-      expect(candidate.toInsertQuery()).toEqual({ name: 'auditor' });
+      expect(candidate.toInsertPayload()).toEqual({ name: 'auditor' });
     });
   });
 

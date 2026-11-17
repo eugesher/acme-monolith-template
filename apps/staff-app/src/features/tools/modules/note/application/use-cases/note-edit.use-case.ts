@@ -68,21 +68,21 @@ export class NoteEditUseCase {
 
   private async save(command: INoteEditSaveCommand): Promise<boolean> {
     const { note, versionAsRead, bodyBefore, editorId } = command;
-    const noteUpdateQuery = note.toUpdateQuery(versionAsRead);
-    const isUpdated = await this.repository.update(noteUpdateQuery);
+    const noteUpdatePayload = note.toUpdatePayload(versionAsRead);
+    const isUpdated = await this.repository.update(noteUpdatePayload);
 
     if (!isUpdated) {
       return false;
     }
 
     const correlationId = CorrelationContextHelper.current(NoteEditUseCase.name);
-    const noteRevisionInsertQuery = note.toRevisionInsertQuery({
+    const noteRevisionInsertPayload = note.toRevisionInsertPayload({
       bodyBefore,
       editorId,
       correlationId,
     });
 
-    await this.repository.appendRevision(noteRevisionInsertQuery);
+    await this.repository.appendRevision(noteRevisionInsertPayload);
 
     return true;
   }

@@ -50,7 +50,7 @@ describe('ProductCoreModel', () => {
     });
 
     it('answers the row to update under the version as read', () => {
-      expect(product.toUpdateQuery(3)).toEqual({
+      expect(product.toUpdatePayload(3)).toEqual({
         id: '12',
         versionAsRead: 3,
         status: 'archived',

@@ -42,8 +42,8 @@ export class UserRegisterUseCase {
   }
 
   private async insert(candidate: UserStaffUserCandidateModel): Promise<string> {
-    const userInsertQuery = candidate.toInsertQuery();
-    const insertResult = await this.repository.insertUser(userInsertQuery);
+    const userInsertPayload = candidate.toInsertPayload();
+    const insertResult = await this.repository.insertUser(userInsertPayload);
 
     if (insertResult.outcome === UserRegisterStaffUserInsertOutcomeEnum.DUPLICATE) {
       throw new AuthEmailTakenException();

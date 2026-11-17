@@ -7,7 +7,7 @@ import type {
   IUserRegisterLoggerPayload,
   IUserRegisterSnapshot,
   IUserStaffUserCandidateCreate,
-  IUserStaffUserCandidateInsertQuery,
+  IUserStaffUserCandidateInsertPayload,
   IUserStaffUserRole,
   IUserStaffUserStoredRole,
 } from '../interfaces';
@@ -43,7 +43,7 @@ export class UserStaffUserCandidateModel {
     }
   }
 
-  public toInsertQuery(): IUserStaffUserCandidateInsertQuery {
+  public toInsertPayload(): IUserStaffUserCandidateInsertPayload {
     return { email: this.email, passwordHash: this.passwordHash, status: UserStatusEnum.ACTIVE };
   }
 

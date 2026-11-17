@@ -4,8 +4,8 @@ import type { Nullable } from '@acme-libs/toolkit';
 import type {
   IIdempotencyCoreKeyCandidate,
   IIdempotencyCoreKeyCandidateInit,
-  IIdempotencyCoreKeyCompleteQuery,
-  IIdempotencyCoreKeyCompleteQueryBuild,
+  IIdempotencyCoreKeyCompletePayload,
+  IIdempotencyCoreKeyCompletePayloadBuild,
   IIdempotencyCoreKeyLoggerPayload,
   IIdempotencyCoreKeyLoggerPayloadBuild,
   IIdempotencyCoreKeyReconstitute,
@@ -50,9 +50,9 @@ export class IdempotencyCoreKeyModel {
     };
   }
 
-  public static toCompleteQuery(
-    params: IIdempotencyCoreKeyCompleteQueryBuild,
-  ): IIdempotencyCoreKeyCompleteQuery {
+  public static toCompletePayload(
+    params: IIdempotencyCoreKeyCompletePayloadBuild,
+  ): IIdempotencyCoreKeyCompletePayload {
     const { scope, key, response } = params;
     const responseBody = JSON.stringify(response);
 

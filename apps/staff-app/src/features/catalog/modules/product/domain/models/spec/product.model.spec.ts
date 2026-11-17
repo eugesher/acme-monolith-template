@@ -269,7 +269,7 @@ describe('ProductModel', () => {
     });
 
     it('answers the row to update under the version as read', () => {
-      expect(product.toUpdateQuery(2)).toEqual({
+      expect(product.toUpdatePayload(2)).toEqual({
         id: '12',
         versionAsRead: 2,
         name: 'Lamp',

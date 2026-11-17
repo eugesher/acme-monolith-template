@@ -16,7 +16,7 @@ import type {
   IProductSnapshot,
   IProductUpdate,
   IProductUpdateLoggerPayload,
-  IProductUpdateQuery,
+  IProductUpdatePayload,
 } from '../interfaces';
 
 export class ProductModel extends AggregateRootBase {
@@ -123,7 +123,7 @@ export class ProductModel extends AggregateRootBase {
     };
   }
 
-  public toUpdateQuery(versionAsRead: number): IProductUpdateQuery {
+  public toUpdatePayload(versionAsRead: number): IProductUpdatePayload {
     return {
       id: this.id,
       versionAsRead,

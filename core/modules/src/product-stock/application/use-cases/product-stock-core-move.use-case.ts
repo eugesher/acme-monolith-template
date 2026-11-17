@@ -53,7 +53,7 @@ export class ProductStockCoreMoveUseCase {
     const sign = ProductStockCoreMoveUseCase.SIGNS[kind];
     const stockMovements = ProductStockCoreMovementsModel.create({ sign, movements });
     const productIds = stockMovements.distinctProductIds;
-    const movementRows = stockMovements.toInsertQueries();
+    const movementRows = stockMovements.toInsertPayloads();
 
     await this.repository.lockProducts(productIds);
 

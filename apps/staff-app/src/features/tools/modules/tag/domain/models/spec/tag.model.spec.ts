@@ -78,7 +78,7 @@ describe('TagModel', () => {
         updatedAt: new Date('2026-01-02T00:00:00.000Z'),
       });
 
-      expect(tag.toUpdateQuery()).toEqual({ id: '300', name: 'fragile' });
+      expect(tag.toUpdatePayload()).toEqual({ id: '300', name: 'fragile' });
       expect(tag.toCreateLoggerPayload()).toEqual({ id: '300', name: 'fragile' });
       expect(tag.toRenameLoggerPayload()).toEqual({ id: '300', name: 'fragile' });
       expect(tag.toDeleteLoggerPayload()).toEqual({ id: '300' });

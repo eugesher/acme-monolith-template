@@ -119,15 +119,19 @@ describe('IdempotencyCoreKeyModel', () => {
     });
   });
 
-  describe('toCompleteQuery', () => {
+  describe('toCompletePayload', () => {
     it('answers the key with the response serialized for storage', () => {
-      const query = IdempotencyCoreKeyModel.toCompleteQuery({
+      const completePayload = IdempotencyCoreKeyModel.toCompletePayload({
         scope: 'customer:101',
         key: 'key-1',
         response: { id: '12' },
       });
 
-      expect(query).toEqual({ scope: 'customer:101', key: 'key-1', responseBody: '{"id":"12"}' });
+      expect(completePayload).toEqual({
+        scope: 'customer:101',
+        key: 'key-1',
+        responseBody: '{"id":"12"}',
+      });
     });
   });
 

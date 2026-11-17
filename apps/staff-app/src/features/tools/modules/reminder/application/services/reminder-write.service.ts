@@ -63,8 +63,8 @@ export class ReminderWriteService {
       return reminder;
     }
 
-    const reminderUpdateQuery = reminder.toUpdateQuery(versionAsRead);
-    const isUpdated = await this.repository.update(reminderUpdateQuery);
+    const reminderUpdatePayload = reminder.toUpdatePayload(versionAsRead);
+    const isUpdated = await this.repository.update(reminderUpdatePayload);
 
     if (!isUpdated) {
       const currentReminder = await this.load(reminderId);

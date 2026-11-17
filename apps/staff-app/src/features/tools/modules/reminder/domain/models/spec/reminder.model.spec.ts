@@ -311,7 +311,7 @@ describe('ReminderModel', () => {
     });
 
     it('answers the row to update under the version as read', () => {
-      expect(reminder.toUpdateQuery(2)).toEqual({
+      expect(reminder.toUpdatePayload(2)).toEqual({
         id: '7',
         versionAsRead: 2,
         dueOn: '2026-11-05',

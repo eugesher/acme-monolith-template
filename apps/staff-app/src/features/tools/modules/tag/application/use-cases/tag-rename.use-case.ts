@@ -43,11 +43,11 @@ export class TagRenameUseCase {
   }
 
   private async update(tag: TagModel): Promise<void> {
-    const tagUpdateQuery = tag.toUpdateQuery();
-    const renameOutcome = await this.repository.update(tagUpdateQuery);
+    const tagUpdatePayload = tag.toUpdatePayload();
+    const renameOutcome = await this.repository.update(tagUpdatePayload);
 
     if (renameOutcome === TagRenameUpdateOutcomeEnum.DUPLICATE) {
-      throw new TagNameTakenException(tagUpdateQuery.name);
+      throw new TagNameTakenException(tagUpdatePayload.name);
     }
   }
 }

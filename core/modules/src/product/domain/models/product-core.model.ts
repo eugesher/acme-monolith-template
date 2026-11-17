@@ -3,7 +3,7 @@ import { ProductStatusEnum } from '@acme-libs/kernel';
 import type {
   IProductCoreArchiveLedgerPayload,
   IProductCoreReconstitute,
-  IProductCoreUpdateQuery,
+  IProductCoreUpdatePayload,
 } from '../interfaces';
 
 export class ProductCoreModel {
@@ -41,7 +41,7 @@ export class ProductCoreModel {
     this.currentVersion += 1;
   }
 
-  public toUpdateQuery(versionAsRead: number): IProductCoreUpdateQuery {
+  public toUpdatePayload(versionAsRead: number): IProductCoreUpdatePayload {
     return { id: this.id, versionAsRead, status: this.status, version: this.version };
   }
 

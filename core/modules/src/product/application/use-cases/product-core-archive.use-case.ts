@@ -75,9 +75,9 @@ export class ProductCoreArchiveUseCase {
 
     product.archive();
 
-    const productUpdateQuery = product.toUpdateQuery(versionAsRead);
+    const productUpdatePayload = product.toUpdatePayload(versionAsRead);
 
-    await this.repository.update(productUpdateQuery);
+    await this.repository.update(productUpdatePayload);
 
     const archiveLedgerPayload = product.toArchiveLedgerPayload(previousStatus);
 

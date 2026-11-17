@@ -5,7 +5,7 @@ export * from './params/order-get-many-reconstitute.interface';
 export * from './params/order-place-reconstitute.interface';
 export * from './params/order-reconstitute.interface';
 
-export * from './snapshots/order-candidate-insert-query.interface';
+export * from './snapshots/order-candidate-insert-payload.interface';
 export * from './snapshots/order-candidate-order-product.interface';
 export * from './snapshots/order-get-many-snapshot.interface';
 export * from './snapshots/order-place-ledger-payload.interface';

@@ -1,7 +1,7 @@
 import type {
   IProductStockCoreMovementsCreate,
   IProductStockCoreMovementsInsertedRow,
-  IProductStockCoreMovementsInsertQuery,
+  IProductStockCoreMovementsInsertPayload,
   IProductStockCoreMovementsPostSubtractLoggerPayload,
 } from '../interfaces';
 
@@ -31,7 +31,7 @@ export class ProductStockCoreMovementsModel {
     return rows.map((row) => String(row.id));
   }
 
-  public toInsertQueries(): IProductStockCoreMovementsInsertQuery[] {
+  public toInsertPayloads(): IProductStockCoreMovementsInsertPayload[] {
     return this.movements.map((movement) => ({
       productId: movement.productId,
       quantity: this.sign * movement.quantity,

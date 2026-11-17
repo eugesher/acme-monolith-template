@@ -15,7 +15,7 @@ import type {
   IReminderReconstitute,
   IReminderRescheduleLoggerPayload,
   IReminderSnapshot,
-  IReminderUpdateQuery,
+  IReminderUpdatePayload,
 } from '../interfaces';
 
 export class ReminderModel extends AggregateRootBase {
@@ -119,7 +119,7 @@ export class ReminderModel extends AggregateRootBase {
     };
   }
 
-  public toUpdateQuery(versionAsRead: number): IReminderUpdateQuery {
+  public toUpdatePayload(versionAsRead: number): IReminderUpdatePayload {
     return {
       id: this.id,
       versionAsRead,
