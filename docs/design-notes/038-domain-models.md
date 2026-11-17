@@ -75,7 +75,7 @@ one params object, and every shape a model or an event answers is a snapshot.
 |                                | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                                               |
 |                                | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductUpdateModel.update(changes)`                                                                                                                                                                              |
 |                                | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                                                                                                |
-|                                | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteRevisionInsertPayloadBuild`                                                                                                                                                                                  |
+|                                | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteEditRevisionInsertPayloadBuild`                                                                                                                                                                              |
 | `domain/interfaces/snapshots/` | `I<Model>Candidate`                              | the row `initCandidate` answers for an insert                                                                                                                                                                                                                        |
 |                                | `I<Model>Snapshot`                               | the state a model answers with `toSnapshot()`                                                                                                                                                                                                                        |
 |                                | `I<Model>InsertPayload`, `I<Model>UpdatePayload` | the row to write, `IRoleCandidateInsertPayload`, `INoteUpdatePayload`; `Query` stays the kind of an outbound interface                                                                                                                                               |
@@ -84,8 +84,14 @@ one params object, and every shape a model or an event answers is a snapshot.
 |                                | `I<Subject>`                                     | another answer, by its noun: `ITagCommonSubjectTagsReplaceChanges` from `TagCommonSubjectTagsReplaceModel.replace`, `IOrderProductStockMovement` from `OrderPlaceModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
 
 The folder names the role, so the file repeats the name without `I` and ends with `.interface.ts`:
-`order-reconstitute.interface.ts` holds `IOrderReconstitute`, `product-candidate.interface.ts` holds
-`IProductCandidate`. The argument takes the name of what it holds: `record`, `proposal`, `changes`.
+`order-reconstitute.interface.ts` holds `IOrderReconstitute`,
+`product-create-candidate.interface.ts` holds `IProductCreateCandidate`. The argument takes the name
+of what it holds: `record`, `proposal`, `changes`.
+
+`<Model>` is the model that answers: an interface of one use case takes its model's name,
+`IProductCreateCandidate`, `IRoleReassignPermissionsLoggerPayload`, and an interface every model of
+an aggregate reads keeps the name of the aggregate, `IProductReconstitute`, `IProductSnapshot`,
+`IProductUpdatePayload`.
 
 A part of a params object is `I<Params><Part>`, unexported in the file of its params until another
 file names it: `IProductStockCoreOnHandReconstituteStockSum` is the element of `stockSums` in
