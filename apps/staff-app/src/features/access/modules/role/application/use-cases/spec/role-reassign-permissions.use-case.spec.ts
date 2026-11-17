@@ -65,7 +65,10 @@ describe('RoleReassignPermissionsUseCase', () => {
     ]);
     expect(outcomes).toEqual(['begin', 'commit']);
     expect(logger.info).toHaveBeenCalledWith(
-      { role: 'editor', permissionCodes: ['access-management', 'product:read'] },
+      {
+        name: 'editor',
+        rolePermissions: [{ code: 'access-management' }, { code: 'product:read' }],
+      },
       'Role permissions reassigned',
     );
   });

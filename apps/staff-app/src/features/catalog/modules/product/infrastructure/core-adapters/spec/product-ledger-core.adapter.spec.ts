@@ -16,7 +16,11 @@ describe('ProductLedgerCoreAdapter', () => {
 
   describe('recordCreated', () => {
     it('enqueues a creation under the stored id', async () => {
-      await adapter.recordCreated({ productId: '12', sku: 'SKU-0001', name: 'Lamp' });
+      await adapter.recordCreated({
+        subjectId: '12',
+        occurredAt: '2026-01-05T08:00:00.000Z',
+        payload: { sku: 'SKU-0001', name: 'Lamp' },
+      });
 
       expect(handleEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-created:12',

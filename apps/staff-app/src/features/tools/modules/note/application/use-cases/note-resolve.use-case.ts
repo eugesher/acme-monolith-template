@@ -21,11 +21,11 @@ export class NoteResolveUseCase {
   public async execute(command: INoteResolveCommand): Promise<INoteView> {
     const { noteId } = command;
     const resolvedNote = await this.writeService.run({ noteId }, () => this.attempt(command));
-    const noteView = resolvedNote.toSnapshot();
+    const noteLoggerPayload = resolvedNote.toResolveLoggerPayload();
 
-    this.logger.info({ noteId, version: noteView.version }, 'Note resolved');
+    this.logger.info(noteLoggerPayload, 'Note resolved');
 
-    return noteView;
+    return resolvedNote.toSnapshot();
   }
 
   private async attempt(command: INoteResolveCommand): Promise<NoteModel> {
@@ -35,13 +35,8 @@ export class NoteResolveUseCase {
 
     note.resolve();
 
-    const isSaved = await this.repository.update({
-      id: note.id,
-      versionAsRead,
-      body: note.body,
-      resolved: note.resolved,
-      version: note.version,
-    });
+    const noteUpdateQuery = note.toUpdateQuery(versionAsRead);
+    const isSaved = await this.repository.update(noteUpdateQuery);
 
     return await this.writeService.reload({ noteId, authorId, isSaved });
   }

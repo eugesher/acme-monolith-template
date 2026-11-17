@@ -146,7 +146,7 @@ describe('ProductStockCoreMoveUseCase', () => {
         {
           err: new Error('redis is down'),
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
-          productIds: ['100'],
+          products: [{ id: '100' }],
         },
         'Post-subtract enqueue failed permanently: the out-of-stock check of these products did not run, replay it',
       );

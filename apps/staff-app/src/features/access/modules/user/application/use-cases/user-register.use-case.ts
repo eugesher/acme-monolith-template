@@ -1,12 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import {
-  AuthEmailTakenException,
-  AuthRoleNotFoundException,
-  UserStaffUserModel,
-  type IUserStaffUserCandidate,
-} from '../../domain';
+import { AuthEmailTakenException, UserStaffUserCandidateModel } from '../../domain';
 import {
   USER_CREDENTIALS_PORT,
   USER_REGISTER_REPOSITORY_PORT,
@@ -34,37 +29,32 @@ export class UserRegisterUseCase {
   public async execute(command: IUserRegisterCommand): Promise<IUserRegisterView> {
     const { email, password, roleIds } = command;
 
-    UserStaffUserModel.assertPasswordStrength(password);
+    UserStaffUserCandidateModel.assertPasswordStrength(password);
 
     const passwordHash = await this.credentials.hashPassword(password);
-    const userCandidate = UserStaffUserModel.initCandidate({ email, passwordHash, roleIds });
+    const userCandidate = UserStaffUserCandidateModel.create({ email, passwordHash, roleIds });
     const userId = await this.transaction.run(() => this.insert(userCandidate));
+    const userLoggerPayload = userCandidate.toLoggerPayload(userId);
 
-    this.logger.info({ userId }, 'User registered');
+    this.logger.info(userLoggerPayload, 'User registered');
 
-    return { id: userId, email: userCandidate.email };
+    return userCandidate.toSnapshot(userId);
   }
 
-  private async insert(candidate: IUserStaffUserCandidate): Promise<string> {
-    const { email, passwordHash, status, roleIds } = candidate;
-
-    const insertResult = await this.repository.insertUser({ email, passwordHash, status });
+  private async insert(candidate: UserStaffUserCandidateModel): Promise<string> {
+    const userInsertQuery = candidate.toInsertQuery();
+    const insertResult = await this.repository.insertUser(userInsertQuery);
 
     if (insertResult.outcome === UserRegisterStaffUserInsertOutcomeEnum.DUPLICATE) {
       throw new AuthEmailTakenException();
     }
 
     const { id } = insertResult;
-    const storedRoles = await this.repository.findRoles(roleIds);
-    const missingRoleId = roleIds.find(
-      (roleId) => !storedRoles.some((stored) => stored.id === roleId),
-    );
+    const storedRoles = await this.repository.findRoles(candidate.distinctRoleIds);
 
-    if (missingRoleId !== undefined) {
-      throw new AuthRoleNotFoundException(missingRoleId);
-    }
+    candidate.assertRoles(storedRoles);
 
-    const userRoles = storedRoles.map((role) => ({ userId: id, roleId: role.id }));
+    const userRoles = candidate.getUserRoles(id);
 
     await this.repository.insertUserRoles(userRoles);
 

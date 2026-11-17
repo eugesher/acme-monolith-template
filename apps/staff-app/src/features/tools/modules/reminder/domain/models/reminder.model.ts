@@ -9,8 +9,15 @@ import { ReminderVersionInvalidException } from '../exceptions/reminder-version-
 import type {
   IReminderCandidate,
   IReminderCandidateInit,
+  IReminderCompleteLoggerPayload,
+  IReminderCreateLoggerPayload,
+  IReminderDeleteLoggerPayload,
   IReminderReconstitute,
+  IReminderRescheduleLoggerPayload,
   IReminderSnapshot,
+  IReminderUpdateQuery,
+  IReminderWriteExhaustedLoggerPayload,
+  IReminderWriteRetryLoggerPayload,
 } from '../interfaces';
 
 export class ReminderModel extends AggregateRootBase {
@@ -80,6 +87,17 @@ export class ReminderModel extends AggregateRootBase {
     };
   }
 
+  public static toWriteRetryLoggerPayload(
+    id: string,
+    version: number,
+  ): IReminderWriteRetryLoggerPayload {
+    return { id, version };
+  }
+
+  public static toWriteExhaustedLoggerPayload(id: string): IReminderWriteExhaustedLoggerPayload {
+    return { id };
+  }
+
   public complete(): void {
     this.assertPending();
 
@@ -112,6 +130,32 @@ export class ReminderModel extends AggregateRootBase {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(versionAsRead: number): IReminderUpdateQuery {
+    return {
+      id: this.id,
+      versionAsRead,
+      dueOn: this.dueOn,
+      status: this.status,
+      version: this.version,
+    };
+  }
+
+  public toCreateLoggerPayload(): IReminderCreateLoggerPayload {
+    return { id: this.id, ownerId: this.ownerId };
+  }
+
+  public toCompleteLoggerPayload(): IReminderCompleteLoggerPayload {
+    return { id: this.id, version: this.version };
+  }
+
+  public toRescheduleLoggerPayload(): IReminderRescheduleLoggerPayload {
+    return { id: this.id, dueOn: this.dueOn, version: this.version };
+  }
+
+  public toDeleteLoggerPayload(): IReminderDeleteLoggerPayload {
+    return { id: this.id };
   }
 
   private static validTitle(title: string): string {

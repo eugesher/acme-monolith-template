@@ -19,10 +19,9 @@ describe('ProductCoreLedgerCoreAdapter', () => {
   describe('recordArchived', () => {
     it('enqueues the archive under the product and the version it produced', async () => {
       await adapter.recordArchived({
-        productId: '12',
-        sku: 'SKU-0001',
+        subjectId: '12',
         version: 4,
-        previousStatus: ProductStatusEnum.ACTIVE,
+        payload: { sku: 'SKU-0001', previousStatus: ProductStatusEnum.ACTIVE },
       });
 
       expect(handleEnqueue).toHaveBeenCalledTimes(1);

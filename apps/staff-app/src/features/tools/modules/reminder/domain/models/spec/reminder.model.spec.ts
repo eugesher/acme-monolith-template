@@ -292,4 +292,48 @@ describe('ReminderModel', () => {
       });
     });
   });
+
+  describe('payloads', () => {
+    let reminder: ReminderModel;
+
+    beforeEach(() => {
+      reminder = ReminderModel.reconstitute({
+        id: '7',
+        ownerId: 'owner-1',
+        title: 'Call the bank',
+        body: 'About the card',
+        dueOn: '2026-11-05',
+        status: ReminderStatusEnum.PENDING,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+    });
+
+    it('answers the row to update under the version as read', () => {
+      expect(reminder.toUpdateQuery(2)).toEqual({
+        id: '7',
+        versionAsRead: 2,
+        dueOn: '2026-11-05',
+        status: 'pending',
+        version: 3,
+      });
+    });
+
+    it('answers the log fields of a creation, a completion, a rescheduling and a deletion', () => {
+      expect(reminder.toCreateLoggerPayload()).toEqual({ id: '7', ownerId: 'owner-1' });
+      expect(reminder.toCompleteLoggerPayload()).toEqual({ id: '7', version: 3 });
+      expect(reminder.toRescheduleLoggerPayload()).toEqual({
+        id: '7',
+        dueOn: '2026-11-05',
+        version: 3,
+      });
+      expect(reminder.toDeleteLoggerPayload()).toEqual({ id: '7' });
+    });
+
+    it('answers the log fields of a lost optimistic race without a reminder', () => {
+      expect(ReminderModel.toWriteRetryLoggerPayload('7', 4)).toEqual({ id: '7', version: 4 });
+      expect(ReminderModel.toWriteExhaustedLoggerPayload('7')).toEqual({ id: '7' });
+    });
+  });
 });

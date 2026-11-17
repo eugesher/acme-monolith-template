@@ -68,4 +68,20 @@ describe('TagModel', () => {
       expect(tag.name).toBe('fragile');
     });
   });
+
+  describe('payloads', () => {
+    it('answers the row to update and the log fields of a creation, a rename and a deletion', () => {
+      const tag = TagModel.reconstitute({
+        id: '300',
+        name: 'fragile',
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+
+      expect(tag.toUpdateQuery()).toEqual({ id: '300', name: 'fragile' });
+      expect(tag.toCreateLoggerPayload()).toEqual({ id: '300', name: 'fragile' });
+      expect(tag.toRenameLoggerPayload()).toEqual({ id: '300', name: 'fragile' });
+      expect(tag.toDeleteLoggerPayload()).toEqual({ id: '300' });
+    });
+  });
 });

@@ -41,8 +41,9 @@ export class ReminderWriteService {
       maxAttempts: this.occRetryAttempts,
       isConflict: (error): error is ReminderWriteConflictError =>
         error instanceof ReminderWriteConflictError,
-      retryContext: (conflict) => ({ reminderId, currentVersion: conflict.currentVersion }),
-      exhaustedContext: () => ({ reminderId }),
+      retryContext: (conflict) =>
+        ReminderModel.toWriteRetryLoggerPayload(reminderId, conflict.currentVersion),
+      exhaustedContext: () => ReminderModel.toWriteExhaustedLoggerPayload(reminderId),
       onExhausted: (conflict, attempts) => {
         throw new ReminderVersionMismatchException(reminderId, attempts, conflict.currentVersion);
       },
@@ -63,13 +64,8 @@ export class ReminderWriteService {
       return reminder;
     }
 
-    const isUpdated = await this.repository.update({
-      id: reminder.id,
-      versionAsRead,
-      dueOn: reminder.dueOn,
-      status: reminder.status,
-      version: reminder.version,
-    });
+    const reminderUpdateQuery = reminder.toUpdateQuery(versionAsRead);
+    const isUpdated = await this.repository.update(reminderUpdateQuery);
 
     if (!isUpdated) {
       const currentReminder = await this.load(reminderId);

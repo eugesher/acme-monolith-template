@@ -20,18 +20,10 @@ export class NoteCreateUseCase {
     const noteId = await this.repository.insert(noteCandidate);
     const noteRecord = await this.repository.findInserted(noteId);
     const createdNote = NoteModel.reconstitute(noteRecord);
-    const noteView = createdNote.toSnapshot();
+    const noteLoggerPayload = createdNote.toCreateLoggerPayload();
 
-    this.logger.info(
-      {
-        noteId: noteView.id,
-        subjectType: noteView.subjectType,
-        subjectId: noteView.subjectId,
-        authorId,
-      },
-      'Note created',
-    );
+    this.logger.info(noteLoggerPayload, 'Note created');
 
-    return noteView;
+    return createdNote.toSnapshot();
   }
 }

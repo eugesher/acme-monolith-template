@@ -63,7 +63,7 @@ describe('ProductCoreArchiveUseCase', () => {
         status: 'archived',
         version: 4,
       });
-      expect(logger.info).toHaveBeenCalledWith({ productId: '12', version: 4 }, 'Product archived');
+      expect(logger.info).toHaveBeenCalledWith({ id: '12', version: 4 }, 'Product archived');
     });
 
     it('drops the cached catalog and records the archive in the ledger only after the commit', async () => {
@@ -71,10 +71,9 @@ describe('ProductCoreArchiveUseCase', () => {
 
       expect(outcomes).toEqual(['update', 'commit', 'invalidate', 'record']);
       expect(recordArchived).toHaveBeenCalledWith({
-        productId: '12',
-        sku: 'SKU-0001',
+        subjectId: '12',
         version: 4,
-        previousStatus: 'active',
+        payload: { sku: 'SKU-0001', previousStatus: 'active' },
       });
     });
 

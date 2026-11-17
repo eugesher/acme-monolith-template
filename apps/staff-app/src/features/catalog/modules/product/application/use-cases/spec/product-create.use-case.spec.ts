@@ -101,17 +101,14 @@ describe('ProductCreateUseCase', () => {
       });
 
       expect(recordCreated).toHaveBeenCalledWith({
-        productId: '12',
-        sku: 'SKU-0001',
-        name: 'Lamp',
+        subjectId: '12',
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        payload: { sku: 'SKU-0001', name: 'Lamp' },
       });
       expect(run.mock.invocationCallOrder[0]).toBeLessThan(
         recordCreated.mock.invocationCallOrder[0],
       );
-      expect(logger.info).toHaveBeenCalledWith(
-        { productId: '12', sku: 'SKU-0001' },
-        'Product created',
-      );
+      expect(logger.info).toHaveBeenCalledWith({ id: '12', sku: 'SKU-0001' }, 'Product created');
     });
 
     it('answers a replay with the stored response and does nothing else', async () => {

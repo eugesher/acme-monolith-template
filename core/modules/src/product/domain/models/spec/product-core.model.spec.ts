@@ -36,4 +36,38 @@ describe('ProductCoreModel', () => {
       expect(product.version).toBe(5);
     });
   });
+
+  describe('payloads', () => {
+    let product: ProductCoreModel;
+
+    beforeEach(() => {
+      product = ProductCoreModel.reconstitute({
+        id: '12',
+        sku: 'SKU-0001',
+        status: ProductStatusEnum.ARCHIVED,
+        version: 4,
+      });
+    });
+
+    it('answers the row to update under the version as read', () => {
+      expect(product.toUpdateQuery(3)).toEqual({
+        id: '12',
+        versionAsRead: 3,
+        status: 'archived',
+        version: 4,
+      });
+    });
+
+    it('answers the archive as a ledger record with the status it left', () => {
+      expect(product.toArchiveLedgerPayload(ProductStatusEnum.ACTIVE)).toEqual({
+        subjectId: '12',
+        version: 4,
+        payload: { sku: 'SKU-0001', previousStatus: 'active' },
+      });
+    });
+
+    it('answers the log fields of an archive without a product', () => {
+      expect(ProductCoreModel.toArchiveLoggerPayload('12', 4)).toEqual({ id: '12', version: 4 });
+    });
+  });
 });

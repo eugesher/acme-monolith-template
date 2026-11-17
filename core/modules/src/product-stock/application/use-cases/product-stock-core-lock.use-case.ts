@@ -23,10 +23,10 @@ export class ProductStockCoreLockUseCase {
   ): Promise<IProductStockCoreOnHandView[]> {
     const { productIds } = command;
     const lockedProducts = await this.repository.lockProducts(productIds);
-    const lockedIds = lockedProducts.map((product) => product.id);
+    const lockedIds = ProductStockCoreOnHandModel.toProductIds(lockedProducts);
     const stockSums = await this.repository.sumStock(lockedIds);
     const onHand = ProductStockCoreOnHandModel.reconstitute({
-      productIds: lockedIds,
+      products: lockedProducts,
       stockSums,
     });
 

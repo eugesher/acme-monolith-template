@@ -38,12 +38,14 @@ export class AuthRegisterUseCase {
     const passwordHash = await this.credentials.hashPassword(password);
     const customerCandidate = AuthCustomerModel.initCandidate({ email, passwordHash });
     const customerId = await this.insert(customerCandidate);
+    const customerLoggerPayload = AuthCustomerModel.toRegisterLoggerPayload(customerId);
+    const customerLedgerPayload = AuthCustomerModel.toRegisterLedgerPayload(customerId);
 
-    this.logger.info({ customerId }, 'Customer registered');
+    this.logger.info(customerLoggerPayload, 'Customer registered');
 
-    await this.ledger.recordRegistered({ customerId });
+    await this.ledger.recordRegistered(customerLedgerPayload);
 
-    return { id: customerId, email: customerCandidate.email };
+    return AuthCustomerModel.toRegisterSnapshot(customerId, customerCandidate);
   }
 
   private async insert(candidate: IAuthCustomerCandidate): Promise<string> {

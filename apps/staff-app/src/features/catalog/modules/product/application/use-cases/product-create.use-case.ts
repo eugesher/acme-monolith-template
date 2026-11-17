@@ -46,7 +46,9 @@ export class ProductCreateUseCase {
     });
 
     if (idempotencyClaim.outcome === ProductIdempotencyOutcomeEnum.REPLAY) {
-      this.logger.info({ idempotencyKey }, 'Product creation replayed from the idempotency store');
+      const replayLoggerPayload = ProductModel.toCreateReplayLoggerPayload(idempotencyKey);
+
+      this.logger.info(replayLoggerPayload, 'Product creation replayed from the idempotency store');
 
       return idempotencyClaim.storedResponse;
     }
@@ -59,20 +61,18 @@ export class ProductCreateUseCase {
       throw new ProductIdempotencyKeyReusedException(idempotencyKey);
     }
 
-    const productView = await this.write(command);
+    const product = await this.write(command);
+    const productLedgerPayload = product.toCreateLedgerPayload();
+    const productLoggerPayload = product.toCreateLoggerPayload();
 
-    await this.ledger.recordCreated({
-      productId: productView.id,
-      sku: productView.sku,
-      name: productView.name,
-    });
+    await this.ledger.recordCreated(productLedgerPayload);
 
-    this.logger.info({ productId: productView.id, sku: productView.sku }, 'Product created');
+    this.logger.info(productLoggerPayload, 'Product created');
 
-    return productView;
+    return product.toSnapshot();
   }
 
-  private async write(command: IProductCreateCommand): Promise<IProductView> {
+  private async write(command: IProductCreateCommand): Promise<ProductModel> {
     const { staffUserId, idempotencyKey } = command;
 
     try {
@@ -84,7 +84,7 @@ export class ProductCreateUseCase {
     }
   }
 
-  private async create(command: IProductCreateCommand): Promise<IProductView> {
+  private async create(command: IProductCreateCommand): Promise<ProductModel> {
     const { sku, name } = command;
     const isSkuTaken = await this.repository.existsBySku(sku);
 
@@ -100,7 +100,7 @@ export class ProductCreateUseCase {
   private async persist(
     candidate: IProductCandidate,
     command: IProductCreateCommand,
-  ): Promise<IProductView> {
+  ): Promise<ProductModel> {
     const { staffUserId, idempotencyKey } = command;
     const insertResult = await this.repository.insert(candidate);
 
@@ -114,6 +114,6 @@ export class ProductCreateUseCase {
 
     await this.idempotency.complete({ staffUserId, key: idempotencyKey, response: productView });
 
-    return productView;
+    return createdProduct;
   }
 }

@@ -4,8 +4,12 @@ import { TagNameInvalidException } from '../exceptions/tag-name-invalid.exceptio
 import type {
   ITagCandidate,
   ITagCandidateInit,
+  ITagCreateLoggerPayload,
+  ITagDeleteLoggerPayload,
   ITagReconstitute,
+  ITagRenameLoggerPayload,
   ITagSnapshot,
+  ITagUpdateQuery,
 } from '../interfaces';
 
 export class TagModel extends AggregateRootBase {
@@ -49,6 +53,22 @@ export class TagModel extends AggregateRootBase {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(): ITagUpdateQuery {
+    return { id: this.id, name: this.name };
+  }
+
+  public toCreateLoggerPayload(): ITagCreateLoggerPayload {
+    return { id: this.id, name: this.name };
+  }
+
+  public toRenameLoggerPayload(): ITagRenameLoggerPayload {
+    return { id: this.id, name: this.name };
+  }
+
+  public toDeleteLoggerPayload(): ITagDeleteLoggerPayload {
+    return { id: this.id };
   }
 
   private static validName(name: string): string {

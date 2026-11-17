@@ -10,7 +10,10 @@ export interface IProductLedgerRecordEventsCommand {
 }
 
 export interface IProductLedgerRecordCreatedCommand {
-  productId: string;
-  sku: string;
-  name: string;
+  subjectId: string;
+  occurredAt: string;
+  payload: {
+    sku: string;
+    name: string;
+  };
 }

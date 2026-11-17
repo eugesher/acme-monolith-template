@@ -4,6 +4,6 @@ interface IProductStockCoreOnHandReconstituteStockSum {
 }
 
 export interface IProductStockCoreOnHandReconstitute {
-  productIds: string[];
+  products: { id: string }[];
   stockSums: IProductStockCoreOnHandReconstituteStockSum[];
 }

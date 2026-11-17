@@ -93,7 +93,7 @@ describe('ProductStockAddUseCase', () => {
         recordEvents.mock.invocationCallOrder[0],
       );
       expect(logger.info).toHaveBeenCalledWith(
-        { productId: '12', quantity: 5, onHand: 15 },
+        { id: '700', productId: '12', quantity: 5 },
         'Product restocked',
       );
     });

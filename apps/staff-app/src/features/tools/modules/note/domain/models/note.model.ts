@@ -7,8 +7,16 @@ import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.
 import type {
   INoteCandidate,
   INoteCandidateInit,
+  INoteCreateLoggerPayload,
+  INoteEditLoggerPayload,
   INoteReconstitute,
+  INoteResolveLoggerPayload,
+  INoteRevisionCandidateInit,
+  INoteRevisionCandidateInitBuild,
   INoteSnapshot,
+  INoteUpdateQuery,
+  INoteWriteExhaustedLoggerPayload,
+  INoteWriteRetryLoggerPayload,
 } from '../interfaces';
 
 export class NoteModel extends AggregateRootBase {
@@ -79,6 +87,17 @@ export class NoteModel extends AggregateRootBase {
     };
   }
 
+  public static toWriteRetryLoggerPayload(
+    id: string,
+    version: number,
+  ): INoteWriteRetryLoggerPayload {
+    return { id, version };
+  }
+
+  public static toWriteExhaustedLoggerPayload(id: string): INoteWriteExhaustedLoggerPayload {
+    return { id };
+  }
+
   public edit(body: string): void {
     this.assertOpen();
 
@@ -111,6 +130,48 @@ export class NoteModel extends AggregateRootBase {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(versionAsRead: number): INoteUpdateQuery {
+    return {
+      id: this.id,
+      versionAsRead,
+      body: this.body,
+      resolved: this.resolved,
+      version: this.version,
+    };
+  }
+
+  public toRevisionCandidateInit(
+    params: INoteRevisionCandidateInitBuild,
+  ): INoteRevisionCandidateInit {
+    const { bodyBefore, editorId, correlationId } = params;
+
+    return {
+      noteId: this.id,
+      noteVersion: this.version,
+      bodyBefore,
+      bodyAfter: this.body,
+      editorId,
+      correlationId,
+    };
+  }
+
+  public toCreateLoggerPayload(): INoteCreateLoggerPayload {
+    return {
+      id: this.id,
+      subjectType: this.subjectType,
+      subjectId: this.subjectId,
+      authorId: this.authorId,
+    };
+  }
+
+  public toEditLoggerPayload(): INoteEditLoggerPayload {
+    return { id: this.id, authorId: this.authorId, version: this.version };
+  }
+
+  public toResolveLoggerPayload(): INoteResolveLoggerPayload {
+    return { id: this.id, version: this.version };
   }
 
   private static validSubjectType(subjectType: string): string {

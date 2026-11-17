@@ -3,47 +3,94 @@ import { TagCommonSubjectTagsModel } from '../tag-common-subject-tags.model';
 describe('TagCommonSubjectTagsModel', () => {
   describe('missingTagIds', () => {
     it('answers the requested ids that were not found, once each', () => {
-      const missing = TagCommonSubjectTagsModel.missingTagIds(['1', '2', '3', '3'], ['2']);
+      const missing = TagCommonSubjectTagsModel.missingTagIds(
+        ['1', '2', '3', '3'],
+        [{ id: '2', name: 'vip' }],
+      );
 
       expect(missing).toEqual(['1', '3']);
     });
 
     it('answers nothing when every requested id was found', () => {
-      const missing = TagCommonSubjectTagsModel.missingTagIds(['1', '2'], ['2', '1']);
+      const missing = TagCommonSubjectTagsModel.missingTagIds(
+        ['1', '2'],
+        [
+          { id: '2', name: 'vip' },
+          { id: '1', name: 'promo' },
+        ],
+      );
 
       expect(missing).toEqual([]);
     });
   });
 
-  describe('replace', () => {
-    it('links the new tags and unlinks the dropped ones', () => {
-      const subjectTags = TagCommonSubjectTagsModel.reconstitute({
-        tagIds: ['1', '2'],
+  describe('toTagSnapshots', () => {
+    it('answers the id and the name of every tag', () => {
+      const snapshots = TagCommonSubjectTagsModel.toTagSnapshots([{ id: '1', name: 'promo' }]);
+
+      expect(snapshots).toEqual([{ id: '1', name: 'promo' }]);
+    });
+  });
+
+  describe('toReplaceLoggerPayload', () => {
+    it('answers the subject and the tags it now carries', () => {
+      const payload = TagCommonSubjectTagsModel.toReplaceLoggerPayload({
+        subjectType: 'product',
+        subjectId: '100',
+        tags: [{ id: '1', name: 'promo' }],
       });
 
-      const changes = subjectTags.replace(['2', '3']);
+      expect(payload).toEqual({
+        subjectType: 'product',
+        subjectId: '100',
+        subjectTags: [{ tagId: '1' }],
+      });
+    });
+  });
 
-      expect(changes).toEqual({ linkTagIds: ['3'], unlinkTagIds: ['1'] });
+  describe('replace', () => {
+    let subjectTags: TagCommonSubjectTagsModel;
+
+    beforeEach(() => {
+      subjectTags = TagCommonSubjectTagsModel.reconstitute({
+        subjectType: 'product',
+        subjectId: '100',
+        subjectTags: [{ tagId: '1' }, { tagId: '2' }],
+      });
+    });
+
+    it('links the new tags and unlinks the dropped ones', () => {
+      const changes = subjectTags.replace([
+        { id: '2', name: 'vip' },
+        { id: '3', name: 'heavy' },
+      ]);
+
+      expect(changes).toEqual({
+        link: { subjectType: 'product', subjectId: '100', tagIds: ['3'] },
+        unlink: { subjectType: 'product', subjectId: '100', tagIds: ['1'] },
+      });
     });
 
     it('changes nothing when the subject already carries exactly the tags', () => {
-      const subjectTags = TagCommonSubjectTagsModel.reconstitute({
-        tagIds: ['1', '2'],
+      const changes = subjectTags.replace([
+        { id: '2', name: 'vip' },
+        { id: '1', name: 'promo' },
+        { id: '2', name: 'vip' },
+      ]);
+
+      expect(changes).toEqual({
+        link: { subjectType: 'product', subjectId: '100', tagIds: [] },
+        unlink: { subjectType: 'product', subjectId: '100', tagIds: [] },
       });
-
-      const changes = subjectTags.replace(['2', '1', '2']);
-
-      expect(changes).toEqual({ linkTagIds: [], unlinkTagIds: [] });
     });
 
     it('unlinks every tag when the list is empty', () => {
-      const subjectTags = TagCommonSubjectTagsModel.reconstitute({
-        tagIds: ['1', '2'],
-      });
-
       const changes = subjectTags.replace([]);
 
-      expect(changes).toEqual({ linkTagIds: [], unlinkTagIds: ['1', '2'] });
+      expect(changes).toEqual({
+        link: { subjectType: 'product', subjectId: '100', tagIds: [] },
+        unlink: { subjectType: 'product', subjectId: '100', tagIds: ['1', '2'] },
+      });
     });
   });
 });

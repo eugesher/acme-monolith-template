@@ -84,7 +84,7 @@ describe('IdempotencyCoreClaimUseCase', () => {
 
       expect(claim).toEqual({ outcome: 'in-flight', storedResponse: undefined });
       expect(logger.info).toHaveBeenCalledWith(
-        { scope: 'customer:101', key: 'key-1' },
+        { scope: 'customer:101', idempotencyKey: 'key-1' },
         'Idempotency key is in flight, the request is refused',
       );
     });
@@ -119,7 +119,7 @@ describe('IdempotencyCoreClaimUseCase', () => {
 
       expect(claim).toEqual({ outcome: 'mismatch', storedResponse: undefined });
       expect(logger.info).toHaveBeenCalledWith(
-        { scope: 'customer:101', key: 'key-1' },
+        { scope: 'customer:101', idempotencyKey: 'key-1' },
         'Idempotency key reused with another body, the request is refused',
       );
     });
@@ -136,7 +136,7 @@ describe('IdempotencyCoreClaimUseCase', () => {
 
       expect(claim).toEqual({ outcome: 'in-flight', storedResponse: undefined });
       expect(logger.info).toHaveBeenCalledWith(
-        { scope: 'customer:101', key: 'key-1' },
+        { scope: 'customer:101', idempotencyKey: 'key-1' },
         'Idempotency key is in flight, the request is refused',
       );
     });

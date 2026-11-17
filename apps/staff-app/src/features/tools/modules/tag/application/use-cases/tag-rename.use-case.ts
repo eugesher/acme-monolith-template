@@ -35,18 +35,19 @@ export class TagRenameUseCase {
 
     const renamed = await this.accessService.load({ tagId });
 
-    this.logger.info({ tagId, nameAsRead, name: renamed.name }, 'Tag renamed');
+    const tagLoggerPayload = renamed.toRenameLoggerPayload();
+
+    this.logger.info(tagLoggerPayload, 'Tag renamed');
 
     return renamed.toSnapshot();
   }
 
   private async update(tag: TagModel): Promise<void> {
-    const { id, name } = tag;
-
-    const renameOutcome = await this.repository.update({ id, name });
+    const tagUpdateQuery = tag.toUpdateQuery();
+    const renameOutcome = await this.repository.update(tagUpdateQuery);
 
     if (renameOutcome === TagRenameUpdateOutcomeEnum.DUPLICATE) {
-      throw new TagNameTakenException(name);
+      throw new TagNameTakenException(tagUpdateQuery.name);
     }
   }
 }

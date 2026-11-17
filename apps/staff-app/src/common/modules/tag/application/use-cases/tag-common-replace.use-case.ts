@@ -32,9 +32,13 @@ export class TagCommonReplaceUseCase {
     const { outcome, tags } = replaceView;
 
     if (outcome === TagCommonReplaceOutcomeEnum.REPLACED) {
-      const tagIds = tags.map((tag) => tag.id);
+      const replaceLoggerPayload = TagCommonSubjectTagsModel.toReplaceLoggerPayload({
+        subjectType,
+        subjectId,
+        tags,
+      });
 
-      this.logger.info({ subjectType, subjectId, tagIds }, 'Subject tags replaced');
+      this.logger.info(replaceLoggerPayload, 'Subject tags replaced');
     }
 
     return replaceView;
@@ -43,23 +47,25 @@ export class TagCommonReplaceUseCase {
   private async replace(command: ITagCommonReplaceCommand): Promise<ITagCommonReplaceView> {
     const { subjectType, subjectId, tagIds } = command;
     const tags = await this.repository.lockTags(tagIds);
-    const foundTagIds = tags.map((tag) => tag.id);
-    const missingTagIds = TagCommonSubjectTagsModel.missingTagIds(tagIds, foundTagIds);
+    const missingTagIds = TagCommonSubjectTagsModel.missingTagIds(tagIds, tags);
 
     if (missingTagIds.length > 0) {
       return { outcome: TagCommonReplaceOutcomeEnum.TAG_NOT_FOUND, tags: [], missingTagIds };
     }
 
-    const linked = await this.repository.findLinked({ subjectType, subjectId });
-    const linkedTagIds = linked.map((link) => link.tagId);
-    const subjectTags = TagCommonSubjectTagsModel.reconstitute({ tagIds: linkedTagIds });
-    const { linkTagIds, unlinkTagIds } = subjectTags.replace(foundTagIds);
+    const subjectTagRecords = await this.repository.findLinked({ subjectType, subjectId });
+    const subjectTags = TagCommonSubjectTagsModel.reconstitute({
+      subjectType,
+      subjectId,
+      subjectTags: subjectTagRecords,
+    });
+    const subjectTagChanges = subjectTags.replace(tags);
 
-    await this.repository.unlink({ subjectType, subjectId, tagIds: unlinkTagIds });
-    await this.repository.link({ subjectType, subjectId, tagIds: linkTagIds });
+    await this.repository.unlink(subjectTagChanges.unlink);
+    await this.repository.link(subjectTagChanges.link);
 
-    const tagViews = tags.map((tag) => ({ id: tag.id, name: tag.name }));
+    const tagSnapshots = TagCommonSubjectTagsModel.toTagSnapshots(tags);
 
-    return { outcome: TagCommonReplaceOutcomeEnum.REPLACED, tags: tagViews, missingTagIds: [] };
+    return { outcome: TagCommonReplaceOutcomeEnum.REPLACED, tags: tagSnapshots, missingTagIds: [] };
   }
 }

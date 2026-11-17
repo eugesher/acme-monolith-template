@@ -252,4 +252,52 @@ describe('ProductModel', () => {
       });
     });
   });
+
+  describe('payloads', () => {
+    let product: ProductModel;
+
+    beforeEach(() => {
+      product = ProductModel.reconstitute({
+        id: '12',
+        sku: 'SKU-0001',
+        name: 'Lamp',
+        status: ProductStatusEnum.ACTIVE,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+    });
+
+    it('answers the row to update under the version as read', () => {
+      expect(product.toUpdateQuery(2)).toEqual({
+        id: '12',
+        versionAsRead: 2,
+        name: 'Lamp',
+        status: 'active',
+        version: 3,
+      });
+    });
+
+    it('answers the creation as a ledger record at the time the product was created', () => {
+      expect(product.toCreateLedgerPayload()).toEqual({
+        subjectId: '12',
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        payload: { sku: 'SKU-0001', name: 'Lamp' },
+      });
+    });
+
+    it('answers the log fields of a creation, an update and a publication', () => {
+      expect(product.toCreateLoggerPayload()).toEqual({ id: '12', sku: 'SKU-0001' });
+      expect(product.toUpdateLoggerPayload()).toEqual({ id: '12', version: 3 });
+      expect(product.toPublishLoggerPayload()).toEqual({ id: '12' });
+    });
+
+    it('answers the log fields of a replay and of a lost optimistic race without a product', () => {
+      expect(ProductModel.toCreateReplayLoggerPayload('key-1')).toEqual({
+        idempotencyKey: 'key-1',
+      });
+      expect(ProductModel.toWriteRetryLoggerPayload('12', 4)).toEqual({ id: '12', version: 4 });
+      expect(ProductModel.toWriteExhaustedLoggerPayload('12')).toEqual({ id: '12' });
+    });
+  });
 });

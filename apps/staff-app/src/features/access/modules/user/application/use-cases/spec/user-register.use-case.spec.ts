@@ -71,7 +71,7 @@ describe('UserRegisterUseCase', () => {
     expect(repository.findRoles).toHaveBeenCalledWith(['2']);
     expect(repository.insertUserRoles).toHaveBeenCalledWith([{ userId: '5', roleId: '2' }]);
     expect(outcomes).toEqual(['begin', 'insert', 'commit']);
-    expect(logger.info).toHaveBeenCalledWith({ userId: '5' }, 'User registered');
+    expect(logger.info).toHaveBeenCalledWith({ id: '5' }, 'User registered');
   });
 
   it('refuses a role that is not stored and rolls the transaction back', async () => {

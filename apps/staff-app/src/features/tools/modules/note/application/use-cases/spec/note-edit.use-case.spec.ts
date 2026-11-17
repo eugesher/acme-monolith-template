@@ -96,7 +96,7 @@ describe('NoteEditUseCase', () => {
         updatedAt: '2026-01-03T00:00:00.000Z',
       });
       expect(logger.info).toHaveBeenCalledWith(
-        { noteId: '7', editorId: 'admin-1', version: 3, edited: true },
+        { id: '7', authorId: 'admin-1', version: 3 },
         'Note edited',
       );
     });
@@ -129,7 +129,7 @@ describe('NoteEditUseCase', () => {
       expect(findOwned).toHaveBeenCalledTimes(1);
       expect(view.version).toBe(2);
       expect(logger.info).toHaveBeenCalledWith(
-        { noteId: '7', editorId: 'admin-1', version: 2, edited: false },
+        { id: '7', authorId: 'admin-1', version: 2 },
         'Note edit was a no-op',
       );
     });
@@ -173,7 +173,7 @@ describe('NoteEditUseCase', () => {
       expect(update).toHaveBeenCalledTimes(2);
       expect(appendRevision).toHaveBeenCalledTimes(1);
       expect(logger.info).toHaveBeenCalledWith(
-        { noteId: '7', currentVersion: 2, attempt: 1, maxAttempts: 3 },
+        { id: '7', version: 2, attempt: 1, maxAttempts: 3 },
         'Note write conflict — retrying with a fresh read',
       );
     });

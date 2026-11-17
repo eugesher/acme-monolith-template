@@ -278,4 +278,65 @@ describe('NoteModel', () => {
       });
     });
   });
+
+  describe('payloads', () => {
+    let note: NoteModel;
+
+    beforeEach(() => {
+      note = NoteModel.reconstitute({
+        id: '7',
+        subjectType: 'product',
+        subjectId: '42',
+        body: 'Check the supplier',
+        authorId: 'admin-1',
+        resolved: false,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+    });
+
+    it('answers the row to update under the version as read', () => {
+      expect(note.toUpdateQuery(2)).toEqual({
+        id: '7',
+        versionAsRead: 2,
+        body: 'Check the supplier',
+        resolved: false,
+        version: 3,
+      });
+    });
+
+    it('answers the revision of the edit at the version of the note', () => {
+      expect(
+        note.toRevisionCandidateInit({
+          bodyBefore: 'Old body',
+          editorId: 'admin-1',
+          correlationId: 'correlation-1',
+        }),
+      ).toEqual({
+        noteId: '7',
+        noteVersion: 3,
+        bodyBefore: 'Old body',
+        bodyAfter: 'Check the supplier',
+        editorId: 'admin-1',
+        correlationId: 'correlation-1',
+      });
+    });
+
+    it('answers the log fields of a creation, an edit and a resolution', () => {
+      expect(note.toCreateLoggerPayload()).toEqual({
+        id: '7',
+        subjectType: 'product',
+        subjectId: '42',
+        authorId: 'admin-1',
+      });
+      expect(note.toEditLoggerPayload()).toEqual({ id: '7', authorId: 'admin-1', version: 3 });
+      expect(note.toResolveLoggerPayload()).toEqual({ id: '7', version: 3 });
+    });
+
+    it('answers the log fields of a lost optimistic race without a note', () => {
+      expect(NoteModel.toWriteRetryLoggerPayload('7', 4)).toEqual({ id: '7', version: 4 });
+      expect(NoteModel.toWriteExhaustedLoggerPayload('7')).toEqual({ id: '7' });
+    });
+  });
 });

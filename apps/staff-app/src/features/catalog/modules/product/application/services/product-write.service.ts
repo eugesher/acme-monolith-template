@@ -43,8 +43,9 @@ export class ProductWriteService {
       maxAttempts,
       isConflict: (error): error is ProductWriteConflictError =>
         error instanceof ProductWriteConflictError,
-      retryContext: (conflict) => ({ productId, currentVersion: conflict.currentVersion }),
-      exhaustedContext: () => ({ productId }),
+      retryContext: (conflict) =>
+        ProductModel.toWriteRetryLoggerPayload(productId, conflict.currentVersion),
+      exhaustedContext: () => ProductModel.toWriteExhaustedLoggerPayload(productId),
       onExhausted: (conflict, attempts) => {
         throw new ProductVersionMismatchException(
           productId,
@@ -74,13 +75,8 @@ export class ProductWriteService {
       return { product, domainEvents };
     }
 
-    const isUpdated = await this.repository.update({
-      id: product.id,
-      versionAsRead,
-      name: product.name,
-      status: product.status,
-      version: product.version,
-    });
+    const productUpdateQuery = product.toUpdateQuery(versionAsRead);
+    const isUpdated = await this.repository.update(productUpdateQuery);
 
     if (!isUpdated) {
       const currentProduct = await this.load(productId);

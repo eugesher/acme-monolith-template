@@ -3,7 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { OccRetryHelper } from '@acme-libs/toolkit';
 
-import { NoteVersionMismatchException, type NoteModel } from '../../domain';
+import { NoteModel, NoteVersionMismatchException } from '../../domain';
 import { NOTE_OCC_RETRY_ATTEMPTS_TOKEN } from '../../outbound';
 import { NoteWriteConflictError } from '../errors/note-write-conflict.error';
 import { NoteAccessService } from './note-access.service';
@@ -28,8 +28,9 @@ export class NoteWriteService {
       maxAttempts: this.occRetryAttempts,
       isConflict: (error): error is NoteWriteConflictError =>
         error instanceof NoteWriteConflictError,
-      retryContext: (conflict) => ({ noteId, currentVersion: conflict.currentVersion }),
-      exhaustedContext: () => ({ noteId }),
+      retryContext: (conflict) =>
+        NoteModel.toWriteRetryLoggerPayload(noteId, conflict.currentVersion),
+      exhaustedContext: () => NoteModel.toWriteExhaustedLoggerPayload(noteId),
       onExhausted: (conflict, attempts) => {
         throw new NoteVersionMismatchException(noteId, attempts, conflict.currentVersion);
       },

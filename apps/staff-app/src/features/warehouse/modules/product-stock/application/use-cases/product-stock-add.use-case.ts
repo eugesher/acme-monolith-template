@@ -53,7 +53,9 @@ export class ProductStockAddUseCase {
     });
 
     if (idempotencyClaim.outcome === ProductStockIdempotencyOutcomeEnum.REPLAY) {
-      this.logger.info({ idempotencyKey }, 'Product restock replayed from the idempotency store');
+      const replayLoggerPayload = ProductStockModel.toAddReplayLoggerPayload(idempotencyKey);
+
+      this.logger.info(replayLoggerPayload, 'Product restock replayed from the idempotency store');
 
       return idempotencyClaim.storedResponse;
     }
@@ -73,7 +75,13 @@ export class ProductStockAddUseCase {
 
     await this.ledger.recordEvents({ ledgerRecords });
 
-    this.logger.info({ productId, quantity, onHand: stockOnHand.quantity }, 'Product restocked');
+    const addLoggerPayload = ProductStockModel.toAddLoggerPayload({
+      productStockId,
+      productId,
+      quantity,
+    });
+
+    this.logger.info(addLoggerPayload, 'Product restocked');
 
     return stockOnHand;
   }
@@ -107,7 +115,7 @@ export class ProductStockAddUseCase {
     const domainEvents = productStock.pullDomainEvents();
     const added = await this.movement.add({ productId, quantity });
     const { productStockId } = added;
-    const stockOnHand = { productId, quantity: added.quantity };
+    const stockOnHand = productStock.toOnHandSnapshot(added.quantity);
 
     await this.idempotency.complete({ staffUserId, key: idempotencyKey, response: stockOnHand });
 

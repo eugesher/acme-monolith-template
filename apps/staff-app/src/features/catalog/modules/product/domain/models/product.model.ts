@@ -9,9 +9,17 @@ import { ProductVersionInvalidException } from '../exceptions/product-version-in
 import type {
   IProductCandidate,
   IProductCandidateInit,
+  IProductCreateLedgerPayload,
+  IProductCreateLoggerPayload,
+  IProductCreateReplayLoggerPayload,
+  IProductPublishLoggerPayload,
   IProductReconstitute,
   IProductSnapshot,
   IProductUpdate,
+  IProductUpdateLoggerPayload,
+  IProductUpdateQuery,
+  IProductWriteExhaustedLoggerPayload,
+  IProductWriteRetryLoggerPayload,
 } from '../interfaces';
 
 export class ProductModel extends AggregateRootBase {
@@ -57,6 +65,23 @@ export class ProductModel extends AggregateRootBase {
     const validName = ProductModel.validName(name);
 
     return { sku: validSku, name: validName, status: ProductStatusEnum.DRAFT, version: 1 };
+  }
+
+  public static toCreateReplayLoggerPayload(
+    idempotencyKey: string,
+  ): IProductCreateReplayLoggerPayload {
+    return { idempotencyKey };
+  }
+
+  public static toWriteRetryLoggerPayload(
+    id: string,
+    version: number,
+  ): IProductWriteRetryLoggerPayload {
+    return { id, version };
+  }
+
+  public static toWriteExhaustedLoggerPayload(id: string): IProductWriteExhaustedLoggerPayload {
+    return { id };
   }
 
   public update(changes: IProductUpdate): void {
@@ -116,6 +141,36 @@ export class ProductModel extends AggregateRootBase {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(versionAsRead: number): IProductUpdateQuery {
+    return {
+      id: this.id,
+      versionAsRead,
+      name: this.name,
+      status: this.status,
+      version: this.version,
+    };
+  }
+
+  public toCreateLedgerPayload(): IProductCreateLedgerPayload {
+    return {
+      subjectId: this.id,
+      occurredAt: this.createdAt.toISOString(),
+      payload: { sku: this.sku, name: this.name },
+    };
+  }
+
+  public toCreateLoggerPayload(): IProductCreateLoggerPayload {
+    return { id: this.id, sku: this.sku };
+  }
+
+  public toUpdateLoggerPayload(): IProductUpdateLoggerPayload {
+    return { id: this.id, version: this.version };
+  }
+
+  public toPublishLoggerPayload(): IProductPublishLoggerPayload {
+    return { id: this.id };
   }
 
   private static validSku(sku: string): string {

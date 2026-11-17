@@ -18,9 +18,11 @@ export class TagDeleteUseCase {
   public async execute(command: ITagDeleteCommand): Promise<void> {
     const { tagId } = command;
 
-    await this.accessService.load({ tagId });
+    const tag = await this.accessService.load({ tagId });
     await this.repository.delete(tagId);
 
-    this.logger.info({ tagId }, 'Tag deleted');
+    const tagLoggerPayload = tag.toDeleteLoggerPayload();
+
+    this.logger.info(tagLoggerPayload, 'Tag deleted');
   }
 }

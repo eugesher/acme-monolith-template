@@ -35,10 +35,10 @@ export class ProductPublishUseCase {
     await this.catalogCache.invalidate();
     await this.ledger.recordEvents({ ledgerRecords });
 
-    const productView = product.toSnapshot();
+    const productLoggerPayload = product.toPublishLoggerPayload();
 
-    this.logger.info({ productId }, 'Product published');
+    this.logger.info(productLoggerPayload, 'Product published');
 
-    return productView;
+    return product.toSnapshot();
   }
 }

@@ -59,7 +59,7 @@ describe('TagRenameUseCase', () => {
         updatedAt: '2026-01-02T00:00:00.000Z',
       });
       expect(logger.info).toHaveBeenCalledWith(
-        { tagId: '300', nameAsRead: 'fragile', name: 'handle-with-care' },
+        { id: '300', name: 'handle-with-care' },
         'Tag renamed',
       );
     });

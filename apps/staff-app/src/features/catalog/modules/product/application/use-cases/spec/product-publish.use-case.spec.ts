@@ -73,7 +73,7 @@ describe('ProductPublishUseCase', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-03T00:00:00.000Z',
       });
-      expect(logger.info).toHaveBeenCalledWith({ productId: '12' }, 'Product published');
+      expect(logger.info).toHaveBeenCalledWith({ id: '12' }, 'Product published');
     });
 
     it('leaves an update out of the ledger', async () => {

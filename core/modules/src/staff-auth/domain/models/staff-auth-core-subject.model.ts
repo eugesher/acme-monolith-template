@@ -1,6 +1,9 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
-import type { IStaffAuthCoreSubjectReconstitute } from '../interfaces';
+import type {
+  IStaffAuthCoreSubjectReconstitute,
+  IStaffAuthCoreSubjectSnapshot,
+} from '../interfaces';
 
 export class StaffAuthCoreSubjectModel {
   private constructor(
@@ -19,5 +22,14 @@ export class StaffAuthCoreSubjectModel {
     const permissionCodes = [...new Set(codes)].sort();
 
     return new StaffAuthCoreSubjectModel(id, email, roles, permissionCodes);
+  }
+
+  public toSnapshot(): IStaffAuthCoreSubjectSnapshot {
+    return {
+      id: this.id,
+      email: this.email,
+      roles: [...this.roles],
+      permissionCodes: [...this.permissionCodes],
+    };
   }
 }

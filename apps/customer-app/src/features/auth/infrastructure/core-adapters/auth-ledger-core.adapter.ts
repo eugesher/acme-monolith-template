@@ -21,13 +21,13 @@ export class AuthLedgerCoreAdapter implements IAuthLedgerPort {
   ) {}
 
   public async recordRegistered(command: IAuthLedgerRecordRegisteredCommand): Promise<void> {
-    const { customerId } = command;
+    const { subjectId } = command;
     const occurredAt = new Date().toISOString();
 
     await this.ledger.handleEnqueue({
-      operationKey: `customer-registered:${customerId}`,
+      operationKey: `customer-registered:${subjectId}`,
       subjectType: 'customer',
-      subjectId: customerId,
+      subjectId,
       action: 'CustomerRegistered',
       payload: {},
       occurredAt,

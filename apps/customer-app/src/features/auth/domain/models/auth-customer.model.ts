@@ -6,7 +6,11 @@ import { AuthUserInactiveException } from '../exceptions/auth-user-inactive.exce
 import type {
   IAuthCustomerCandidate,
   IAuthCustomerCandidateInit,
+  IAuthCustomerLoginLoggerPayload,
   IAuthCustomerReconstitute,
+  IAuthCustomerRegisterLedgerPayload,
+  IAuthCustomerRegisterLoggerPayload,
+  IAuthCustomerRegisterSnapshot,
 } from '../interfaces';
 
 export class AuthCustomerModel {
@@ -36,6 +40,21 @@ export class AuthCustomerModel {
     return { email: normalizedEmail, passwordHash, status: UserStatusEnum.ACTIVE };
   }
 
+  public static toRegisterSnapshot(
+    id: string,
+    candidate: IAuthCustomerCandidate,
+  ): IAuthCustomerRegisterSnapshot {
+    return { id, email: candidate.email };
+  }
+
+  public static toRegisterLedgerPayload(id: string): IAuthCustomerRegisterLedgerPayload {
+    return { subjectId: id };
+  }
+
+  public static toRegisterLoggerPayload(id: string): IAuthCustomerRegisterLoggerPayload {
+    return { id };
+  }
+
   public static normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
   }
@@ -44,6 +63,10 @@ export class AuthCustomerModel {
     if (password.length < AuthCustomerModel.MIN_PASSWORD_LENGTH) {
       throw new AuthPasswordTooWeakException(AuthCustomerModel.MIN_PASSWORD_LENGTH);
     }
+  }
+
+  public toLoginLoggerPayload(): IAuthCustomerLoginLoggerPayload {
+    return { id: this.id };
   }
 
   public assertActive(): void {

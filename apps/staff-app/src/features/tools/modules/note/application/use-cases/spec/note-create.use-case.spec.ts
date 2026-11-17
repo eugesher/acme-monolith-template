@@ -54,7 +54,7 @@ describe('NoteCreateUseCase', () => {
         updatedAt: '2026-01-01T00:00:00.000Z',
       });
       expect(logger.info).toHaveBeenCalledWith(
-        { noteId: '7', subjectType: 'product', subjectId: '42', authorId: 'admin-1' },
+        { id: '7', subjectType: 'product', subjectId: '42', authorId: 'admin-1' },
         'Note created',
       );
     });

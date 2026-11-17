@@ -43,8 +43,10 @@ export class IdempotencyCoreClaimUseCase {
     const existingKey = IdempotencyCoreKeyModel.reconstitute(keyRecord);
 
     if (!existingKey.matches(requestFingerprint)) {
+      const keyLoggerPayload = IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key });
+
       this.logger.info(
-        { scope, key },
+        keyLoggerPayload,
         'Idempotency key reused with another body, the request is refused',
       );
 
@@ -52,7 +54,7 @@ export class IdempotencyCoreClaimUseCase {
     }
 
     if (existingKey.isCompleted()) {
-      const storedResponse: unknown = JSON.parse(existingKey.responseBody);
+      const storedResponse = existingKey.toStoredResponse();
 
       return { outcome: IdempotencyCoreClaimOutcomeEnum.REPLAY, storedResponse };
     }
@@ -61,21 +63,15 @@ export class IdempotencyCoreClaimUseCase {
   }
 
   private inFlight(scope: string, key: string): IIdempotencyCoreClaimView {
-    this.logger.info({ scope, key }, 'Idempotency key is in flight, the request is refused');
+    const keyLoggerPayload = IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key });
+
+    this.logger.info(keyLoggerPayload, 'Idempotency key is in flight, the request is refused');
 
     return { outcome: IdempotencyCoreClaimOutcomeEnum.IN_FLIGHT, storedResponse: undefined };
   }
 
   private async insert(candidate: IIdempotencyCoreKeyCandidate): Promise<boolean> {
-    const { scope, key, requestFingerprint, status, responseBody } = candidate;
-
-    const insertOutcome = await this.repository.insert({
-      scope,
-      idempotencyKey: key,
-      requestFingerprint,
-      status,
-      responseBody,
-    });
+    const insertOutcome = await this.repository.insert(candidate);
 
     return insertOutcome === IdempotencyCoreClaimInsertOutcomeEnum.INSERTED;
   }

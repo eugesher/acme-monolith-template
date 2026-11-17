@@ -60,10 +60,7 @@ describe('ReminderCreateUseCase', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
       });
-      expect(logger.info).toHaveBeenCalledWith(
-        { reminderId: '7', ownerId: 'owner-1' },
-        'Reminder created',
-      );
+      expect(logger.info).toHaveBeenCalledWith({ id: '7', ownerId: 'owner-1' }, 'Reminder created');
     });
 
     it('invalidates the summary only after the insert', async () => {

@@ -1,6 +1,6 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
-export interface IRoleCandidate {
+export interface IRoleCandidateCreate {
   name: string;
   permissionCodes: PermissionCodeEnum[];
 }

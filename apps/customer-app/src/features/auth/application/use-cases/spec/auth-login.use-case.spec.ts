@@ -42,7 +42,7 @@ describe('AuthLoginUseCase', () => {
       password: 'correct-horse',
     });
     expect(credentials.issueAccessToken).toHaveBeenCalledWith('customer-1');
-    expect(logger.info).toHaveBeenCalledWith({ customerId: 'customer-1' }, 'Customer logged in');
+    expect(logger.info).toHaveBeenCalledWith({ id: 'customer-1' }, 'Customer logged in');
   });
 
   it('rejects an unknown email after the same password check and with the same error as a wrong password', async () => {

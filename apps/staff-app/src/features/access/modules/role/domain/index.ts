@@ -4,4 +4,5 @@ export * from './exceptions/base/role-base.exception';
 
 export * from './interfaces';
 
+export * from './models/role-candidate.model';
 export * from './models/role.model';

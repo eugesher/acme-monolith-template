@@ -103,4 +103,4 @@ suffix of its syntax, `.interface.ts` or `.type.ts` (`hosted-repository.interfac
 
 A layered lib keeps `commands` and `views` for the input and output of a use case or a port: a
 params interface is to a helper what a command is to a use case, a snapshot what a view is. A domain
-names its params and snapshots the same way (see `035-enums-and-response-dtos.md`).
+names its params and snapshots the same way (see `038-domain-models.md`).

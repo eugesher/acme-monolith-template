@@ -56,7 +56,7 @@ describe('ProductUpdateUseCase', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-03T00:00:00.000Z',
       });
-      expect(logger.info).toHaveBeenCalledWith({ productId: '12', version: 4 }, 'Product updated');
+      expect(logger.info).toHaveBeenCalledWith({ id: '12', version: 4 }, 'Product updated');
     });
 
     it('invalidates the customer catalog after the write', async () => {

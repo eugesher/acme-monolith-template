@@ -4,6 +4,10 @@ import type { Nullable } from '@acme-libs/toolkit';
 import type {
   IIdempotencyCoreKeyCandidate,
   IIdempotencyCoreKeyCandidateInit,
+  IIdempotencyCoreKeyCompleteQuery,
+  IIdempotencyCoreKeyCompleteQueryBuild,
+  IIdempotencyCoreKeyLoggerPayload,
+  IIdempotencyCoreKeyLoggerPayloadBuild,
   IIdempotencyCoreKeyReconstitute,
 } from '../interfaces';
 
@@ -39,11 +43,28 @@ export class IdempotencyCoreKeyModel {
 
     return {
       scope,
-      key,
+      idempotencyKey: key,
       requestFingerprint,
       status: IdempotencyStatusEnum.IN_FLIGHT,
       responseBody: null,
     };
+  }
+
+  public static toCompleteQuery(
+    params: IIdempotencyCoreKeyCompleteQueryBuild,
+  ): IIdempotencyCoreKeyCompleteQuery {
+    const { scope, key, response } = params;
+    const responseBody = JSON.stringify(response);
+
+    return { scope, key, responseBody };
+  }
+
+  public static toKeyLoggerPayload(
+    params: IIdempotencyCoreKeyLoggerPayloadBuild,
+  ): IIdempotencyCoreKeyLoggerPayload {
+    const { scope, key } = params;
+
+    return { scope, idempotencyKey: key };
   }
 
   public matches(requestFingerprint: string): boolean {
@@ -52,5 +73,9 @@ export class IdempotencyCoreKeyModel {
 
   public isCompleted(): this is IdempotencyCoreKeyModel & { responseBody: string } {
     return this.status === IdempotencyStatusEnum.COMPLETED && this.responseBody !== null;
+  }
+
+  public toStoredResponse(): unknown {
+    return this.responseBody === null ? null : JSON.parse(this.responseBody);
   }
 }

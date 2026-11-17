@@ -91,7 +91,7 @@ describe('ProductWriteService', () => {
       expect(update).toHaveBeenCalledTimes(2);
       expect(written.product.version).toBe(4);
       expect(logger.info).toHaveBeenCalledWith(
-        { productId: '12', currentVersion: 4, attempt: 1, maxAttempts: 5 },
+        { id: '12', version: 4, attempt: 1, maxAttempts: 5 },
         'Product write conflict — retrying with a fresh read',
       );
     });
@@ -110,7 +110,7 @@ describe('ProductWriteService', () => {
       });
       expect(update).toHaveBeenCalledTimes(5);
       expect(logger.warn).toHaveBeenCalledWith(
-        { productId: '12', attempts: 5, maxAttempts: 5 },
+        { id: '12', attempts: 5, maxAttempts: 5 },
         'Product write conflict exhausted retry budget',
       );
     });

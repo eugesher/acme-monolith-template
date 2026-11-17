@@ -74,4 +74,10 @@ describe('OrderPlaceModel', () => {
       });
     });
   });
+
+  describe('toReplayLoggerPayload', () => {
+    it('answers the idempotency key of the replayed placement', () => {
+      expect(OrderPlaceModel.toReplayLoggerPayload('key-1')).toEqual({ idempotencyKey: 'key-1' });
+    });
+  });
 });

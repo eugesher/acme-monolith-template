@@ -30,7 +30,7 @@ describe('IdempotencyCoreKeyModel', () => {
 
       expect(candidate).toEqual({
         scope: 'customer:101',
-        key: 'key-1',
+        idempotencyKey: 'key-1',
         requestFingerprint: 'abc',
         status: 'in_flight',
         responseBody: null,
@@ -44,7 +44,7 @@ describe('IdempotencyCoreKeyModel', () => {
         requestFingerprint: 'abc',
       });
 
-      expect(candidate.key).toHaveLength(128);
+      expect(candidate.idempotencyKey).toHaveLength(128);
     });
 
     it.each([
@@ -116,6 +116,51 @@ describe('IdempotencyCoreKeyModel', () => {
       });
 
       expect(key.isCompleted()).toBe(false);
+    });
+  });
+
+  describe('toCompleteQuery', () => {
+    it('answers the key with the response serialized for storage', () => {
+      const query = IdempotencyCoreKeyModel.toCompleteQuery({
+        scope: 'customer:101',
+        key: 'key-1',
+        response: { id: '12' },
+      });
+
+      expect(query).toEqual({ scope: 'customer:101', key: 'key-1', responseBody: '{"id":"12"}' });
+    });
+  });
+
+  describe('toKeyLoggerPayload', () => {
+    it('answers the scope and the key', () => {
+      const payload = IdempotencyCoreKeyModel.toKeyLoggerPayload({
+        scope: 'customer:101',
+        key: 'key-1',
+      });
+
+      expect(payload).toEqual({ scope: 'customer:101', idempotencyKey: 'key-1' });
+    });
+  });
+
+  describe('toStoredResponse', () => {
+    it('answers the stored response parsed back', () => {
+      const completedKey = IdempotencyCoreKeyModel.reconstitute({
+        requestFingerprint: 'fingerprint',
+        status: IdempotencyStatusEnum.COMPLETED,
+        responseBody: '{"id":"12"}',
+      });
+
+      expect(completedKey.toStoredResponse()).toEqual({ id: '12' });
+    });
+
+    it('answers null for a key without a stored response', () => {
+      const inFlightKey = IdempotencyCoreKeyModel.reconstitute({
+        requestFingerprint: 'fingerprint',
+        status: IdempotencyStatusEnum.IN_FLIGHT,
+        responseBody: null,
+      });
+
+      expect(inFlightKey.toStoredResponse()).toBeNull();
     });
   });
 });

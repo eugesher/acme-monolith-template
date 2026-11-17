@@ -89,7 +89,7 @@ describe('ReminderWriteService', () => {
       expect(update).toHaveBeenCalledTimes(2);
       expect(written.version).toBe(3);
       expect(logger.info).toHaveBeenCalledWith(
-        { reminderId: '7', currentVersion: 3, attempt: 1, maxAttempts: 5 },
+        { id: '7', version: 3, attempt: 1, maxAttempts: 5 },
         'Reminder write conflict — retrying with a fresh read',
       );
     });
@@ -106,7 +106,7 @@ describe('ReminderWriteService', () => {
       });
       expect(update).toHaveBeenCalledTimes(5);
       expect(logger.warn).toHaveBeenCalledWith(
-        { reminderId: '7', attempts: 5, maxAttempts: 5 },
+        { id: '7', attempts: 5, maxAttempts: 5 },
         'Reminder write conflict exhausted retry budget',
       );
     });

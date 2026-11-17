@@ -3,6 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import type { IIdempotencyCoreReleaseCommand } from '@acme-core/contracts/idempotency';
 
+import { IdempotencyCoreKeyModel } from '../../domain';
 import {
   IDEMPOTENCY_CORE_RELEASE_REPOSITORY_PORT,
   type IIdempotencyCoreReleaseRepositoryPort,
@@ -22,6 +23,8 @@ export class IdempotencyCoreReleaseUseCase {
 
     await this.repository.deleteInFlight({ scope, key });
 
-    this.logger.info({ scope, key }, 'Idempotency claim released');
+    const keyLoggerPayload = IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key });
+
+    this.logger.info(keyLoggerPayload, 'Idempotency claim released');
   }
 }

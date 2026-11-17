@@ -58,10 +58,7 @@ describe('LedgerAppendUseCase', () => {
           { operationKey: ' product-archived:12:2 ', action: 'ProductArchived' },
           'Ledger record received',
         ],
-        [
-          { id: '4210', operationKey: 'product-archived:12:2', appended: true },
-          'Ledger record appended',
-        ],
+        [{ id: '4210', operationKey: 'product-archived:12:2' }, 'Ledger record appended'],
       ]);
     });
 
@@ -80,7 +77,7 @@ describe('LedgerAppendUseCase', () => {
       );
 
       expect(logger.info).toHaveBeenLastCalledWith(
-        { id: '4210', operationKey: 'product-archived:12:2', appended: false },
+        { id: '4210', operationKey: 'product-archived:12:2' },
         'Ledger record already appended',
       );
     });

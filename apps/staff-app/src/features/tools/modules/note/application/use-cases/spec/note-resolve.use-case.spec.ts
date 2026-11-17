@@ -66,7 +66,7 @@ describe('NoteResolveUseCase', () => {
       expect(view.resolved).toBe(true);
       expect(view.version).toBe(3);
       expect(view.updatedAt).toBe('2026-01-03T00:00:00.000Z');
-      expect(logger.info).toHaveBeenCalledWith({ noteId: '7', version: 3 }, 'Note resolved');
+      expect(logger.info).toHaveBeenCalledWith({ id: '7', version: 3 }, 'Note resolved');
     });
 
     it('retries a lost race with a fresh read', async () => {
@@ -89,7 +89,7 @@ describe('NoteResolveUseCase', () => {
 
       expect(update).toHaveBeenCalledTimes(2);
       expect(logger.info).toHaveBeenCalledWith(
-        { noteId: '7', currentVersion: 2, attempt: 1, maxAttempts: 3 },
+        { id: '7', version: 2, attempt: 1, maxAttempts: 3 },
         'Note write conflict — retrying with a fresh read',
       );
     });

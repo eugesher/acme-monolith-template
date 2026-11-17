@@ -64,7 +64,7 @@ describe('ReminderRescheduleUseCase', () => {
         updatedAt: '2026-01-03T00:00:00.000Z',
       });
       expect(logger.info).toHaveBeenCalledWith(
-        { reminderId: '7', dueOn: '2026-11-12', version: 3 },
+        { id: '7', dueOn: '2026-11-12', version: 3 },
         'Reminder rescheduled',
       );
     });

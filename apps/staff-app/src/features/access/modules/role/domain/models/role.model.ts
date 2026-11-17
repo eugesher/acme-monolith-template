@@ -1,9 +1,9 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import type {
-  IRoleCandidate,
-  IRoleCandidateInit,
+  IRoleReassignPermissionsLoggerPayload,
   IRoleReconstitute,
+  IRoleRolePermission,
   IRoleSnapshot,
 } from '../interfaces';
 
@@ -25,17 +25,21 @@ export class RoleModel {
     return new RoleModel(id, name, permissionCodes);
   }
 
-  public static initCandidate(proposal: IRoleCandidateInit): IRoleCandidate {
-    const { name, permissionCodes } = proposal;
-
-    return { name, permissionCodes: [...new Set(permissionCodes)] };
-  }
-
   public reassignPermissions(requested: PermissionCodeEnum[]): void {
     this.codes = [...new Set(requested)];
   }
 
   public toSnapshot(): IRoleSnapshot {
     return { id: this.id, name: this.name, permissionCodes: [...this.permissionCodes] };
+  }
+
+  public getRolePermissions(): IRoleRolePermission[] {
+    return this.codes.map((code) => ({ roleId: this.id, code }));
+  }
+
+  public toReassignPermissionsLoggerPayload(): IRoleReassignPermissionsLoggerPayload {
+    const rolePermissions = this.codes.map((code) => ({ code }));
+
+    return { name: this.name, rolePermissions };
   }
 }

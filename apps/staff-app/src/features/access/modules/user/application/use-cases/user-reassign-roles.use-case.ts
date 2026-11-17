@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthRoleNotFoundException, AuthUserNotFoundException } from '../../domain';
+import { AuthUserNotFoundException, UserStaffUserRolesModel } from '../../domain';
 import {
   USER_REASSIGN_ROLES_REPOSITORY_PORT,
   USER_TRANSACTION_PORT,
@@ -29,27 +29,28 @@ export class UserReassignRolesUseCase {
       throw new AuthUserNotFoundException(userId);
     }
 
+    const userRoles = UserStaffUserRolesModel.create({ userId, roleIds });
     const storedRoles = await this.repository.findRoles(roleIds);
-    const missingRoleId = roleIds.find(
-      (roleId) => !storedRoles.some((stored) => stored.id === roleId),
-    );
 
-    if (missingRoleId !== undefined) {
-      throw new AuthRoleNotFoundException(missingRoleId);
-    }
+    userRoles.assertRoles(storedRoles);
 
-    await this.transaction.run(() => this.reassign(command));
+    await this.transaction.run(() => this.reassign(userRoles, command));
 
-    this.logger.info({ userId, roleIds }, 'Roles reassigned');
+    const userRolesLoggerPayload = userRoles.toLoggerPayload();
 
-    return { id: userId, roleIds };
+    this.logger.info(userRolesLoggerPayload, 'Roles reassigned');
+
+    return userRoles.toSnapshot();
   }
 
-  private async reassign(command: IUserReassignRolesCommand): Promise<void> {
+  private async reassign(
+    userRoles: UserStaffUserRolesModel,
+    command: IUserReassignRolesCommand,
+  ): Promise<void> {
     const { userId, roleIds } = command;
-    const userRoles = roleIds.map((roleId) => ({ userId, roleId }));
+    const userRoleInsertQueries = userRoles.getUserRoles();
 
     await this.repository.deleteUserRolesExcept(userId, roleIds);
-    await this.repository.insertUserRolesIgnore(userRoles);
+    await this.repository.insertUserRolesIgnore(userRoleInsertQueries);
   }
 }

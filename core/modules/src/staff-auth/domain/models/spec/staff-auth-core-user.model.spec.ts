@@ -48,4 +48,16 @@ describe('StaffAuthCoreUserModel', () => {
       expect(user.isActive()).toBe(false);
     });
   });
+
+  describe('toLoginLoggerPayload', () => {
+    it('answers the id of the user who logged in', () => {
+      const user = StaffAuthCoreUserModel.reconstitute({
+        id: 'user-1',
+        passwordHash: 'hash',
+        status: UserStatusEnum.ACTIVE,
+      });
+
+      expect(user.toLoginLoggerPayload()).toEqual({ id: 'user-1' });
+    });
+  });
 });

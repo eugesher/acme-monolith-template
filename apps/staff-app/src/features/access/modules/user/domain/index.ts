@@ -7,4 +7,5 @@ export * from './exceptions/base/user-base.exception';
 
 export * from './interfaces';
 
-export * from './models/user-staff-user.model';
+export * from './models/user-staff-user-candidate.model';
+export * from './models/user-staff-user-roles.model';

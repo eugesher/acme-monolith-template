@@ -1,8 +1,10 @@
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
 export interface IProductCoreLedgerRecordArchivedCommand {
-  productId: string;
-  sku: string;
+  subjectId: string;
   version: number;
-  previousStatus: ProductStatusEnum;
+  payload: {
+    sku: string;
+    previousStatus: ProductStatusEnum;
+  };
 }

@@ -35,10 +35,10 @@ export class ReminderCreateUseCase {
 
     await this.summary.invalidate(ownerId);
 
-    const reminderView = createdReminder.toSnapshot();
+    const reminderLoggerPayload = createdReminder.toCreateLoggerPayload();
 
-    this.logger.info({ reminderId: reminderView.id, ownerId }, 'Reminder created');
+    this.logger.info(reminderLoggerPayload, 'Reminder created');
 
-    return reminderView;
+    return createdReminder.toSnapshot();
   }
 }

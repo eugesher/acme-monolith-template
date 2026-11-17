@@ -1,3 +1,5 @@
 export interface ITagCommonSubjectTagsReconstitute {
-  tagIds: string[];
+  subjectType: string;
+  subjectId: string;
+  subjectTags: { tagId: string }[];
 }

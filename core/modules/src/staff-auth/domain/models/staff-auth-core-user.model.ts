@@ -1,6 +1,9 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import type { IStaffAuthCoreUserReconstitute } from '../interfaces';
+import type {
+  IStaffAuthCoreUserLoginLoggerPayload,
+  IStaffAuthCoreUserReconstitute,
+} from '../interfaces';
 
 export class StaffAuthCoreUserModel {
   private constructor(
@@ -21,5 +24,9 @@ export class StaffAuthCoreUserModel {
 
   public isActive(): boolean {
     return this.status === UserStatusEnum.ACTIVE;
+  }
+
+  public toLoginLoggerPayload(): IStaffAuthCoreUserLoginLoggerPayload {
+    return { id: this.id };
   }
 }

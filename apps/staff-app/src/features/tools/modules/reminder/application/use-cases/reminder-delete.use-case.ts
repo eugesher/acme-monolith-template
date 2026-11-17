@@ -25,10 +25,12 @@ export class ReminderDeleteUseCase {
   public async execute(command: IReminderDeleteCommand): Promise<void> {
     const { reminderId, ownerId } = command;
 
-    await this.accessService.loadOwned({ reminderId, ownerId });
+    const reminder = await this.accessService.loadOwned({ reminderId, ownerId });
     await this.repository.softDelete(reminderId);
     await this.summary.invalidate(ownerId);
 
-    this.logger.info({ reminderId }, 'Reminder deleted');
+    const reminderLoggerPayload = reminder.toDeleteLoggerPayload();
+
+    this.logger.info(reminderLoggerPayload, 'Reminder deleted');
   }
 }

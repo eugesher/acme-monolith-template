@@ -64,7 +64,9 @@ export class StaffAuthCoreLoginUseCase {
 
     const accessToken = await this.credentials.issueAccessToken(user.id);
 
-    this.logger.info({ userId: user.id }, 'User logged in');
+    const userLoggerPayload = user.toLoginLoggerPayload();
+
+    this.logger.info(userLoggerPayload, 'User logged in');
 
     return { outcome: StaffAuthCoreLoginOutcomeEnum.LOGGED_IN, userId: user.id, accessToken };
   }
