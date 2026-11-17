@@ -23,14 +23,18 @@ describe('RoleModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('keeps the name and drops the duplicate codes', () => {
-      const draft = RoleModel.createDraft({
-        name: 'auditor',
-        permissionCodes: [PermissionCodeEnum.LEDGER_READ, PermissionCodeEnum.LEDGER_READ],
-      });
+  describe('getRolePermissions', () => {
+    it('answers a row of the role for every permission code', () => {
+      expect(role.getRolePermissions()).toEqual([{ roleId: '2', code: 'access-management' }]);
+    });
+  });
 
-      expect(draft).toEqual({ name: 'auditor', permissionCodes: ['ledger:read'] });
+  describe('toReassignPermissionsLoggerPayload', () => {
+    it('answers the name of the role and its permissions', () => {
+      expect(role.toReassignPermissionsLoggerPayload()).toEqual({
+        name: 'editor',
+        rolePermissions: [{ code: 'access-management' }],
+      });
     });
   });
 

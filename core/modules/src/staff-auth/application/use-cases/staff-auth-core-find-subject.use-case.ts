@@ -31,11 +31,6 @@ export class StaffAuthCoreFindSubjectUseCase {
 
     const subject = StaffAuthCoreSubjectModel.reconstitute(userRecord);
 
-    return {
-      id: subject.id,
-      email: subject.email,
-      roles: [...subject.roles],
-      permissionCodes: [...subject.permissionCodes],
-    };
+    return subject.toSnapshot();
   }
 }

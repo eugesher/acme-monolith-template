@@ -1,4 +1,4 @@
-import type { INoteGetRevisionsRecordInput, INoteGetRevisionsSnapshotOutput } from '../interfaces';
+import type { INoteGetRevisionsReconstitute, INoteGetRevisionsSnapshot } from '../interfaces';
 
 export class NoteGetRevisionsModel {
   private constructor(
@@ -12,7 +12,7 @@ export class NoteGetRevisionsModel {
     public readonly recordedAt: Date,
   ) {}
 
-  public static reconstitute(record: INoteGetRevisionsRecordInput): NoteGetRevisionsModel {
+  public static reconstitute(record: INoteGetRevisionsReconstitute): NoteGetRevisionsModel {
     const { id, noteId, noteVersion, bodyBefore, bodyAfter, editorId, correlationId, recordedAt } =
       record;
 
@@ -28,9 +28,7 @@ export class NoteGetRevisionsModel {
     );
   }
 
-  public static toViewData(
-    records: INoteGetRevisionsRecordInput[],
-  ): INoteGetRevisionsSnapshotOutput[] {
+  public static toViewData(records: INoteGetRevisionsReconstitute[]): INoteGetRevisionsSnapshot[] {
     return records.map((record) => {
       const revision = NoteGetRevisionsModel.reconstitute(record);
 
@@ -38,7 +36,7 @@ export class NoteGetRevisionsModel {
     });
   }
 
-  public toSnapshot(): INoteGetRevisionsSnapshotOutput {
+  private toSnapshot(): INoteGetRevisionsSnapshot {
     return {
       id: this.id,
       noteId: this.noteId,

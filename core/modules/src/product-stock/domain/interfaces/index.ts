@@ -1,4 +1,7 @@
-export * from './inputs/product-stock-core-on-hand-record.input';
-export * from './inputs/product-stock-core-sum.input';
+export * from './params/product-stock-core-movements-create.interface';
+export * from './params/product-stock-core-movements-inserted-row.interface';
+export * from './params/product-stock-core-on-hand-reconstitute.interface';
 
-export * from './outputs/product-stock-core-on-hand-snapshot.output';
+export * from './snapshots/product-stock-core-movements-insert-query.interface';
+export * from './snapshots/product-stock-core-movements-post-subtract-logger-payload.interface';
+export * from './snapshots/product-stock-core-on-hand-snapshot.interface';

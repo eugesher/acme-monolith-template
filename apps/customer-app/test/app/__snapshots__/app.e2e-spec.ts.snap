@@ -462,12 +462,14 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
     "body": {
       "createdAt": "2026-01-01T00:00:00.000Z",
       "id": "601",
-      "products": [
+      "orderProducts": [
         {
           "id": "602",
-          "name": "Seeded reference product",
-          "productId": "100",
-          "sku": "SKU-0001",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
         },
       ],
     },
@@ -481,12 +483,14 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
     "body": {
       "createdAt": "2026-01-02T00:00:00.000Z",
       "id": "602",
-      "products": [
+      "orderProducts": [
         {
           "id": "603",
-          "name": "Deleted product",
-          "productId": "107",
-          "sku": "SKU-0008",
+          "product": {
+            "id": "107",
+            "name": "Deleted product",
+            "sku": "SKU-0008",
+          },
         },
       ],
     },
@@ -571,18 +575,22 @@ exports[`App Order POST /api/orders should place an order of another customer un
     "body": {
       "createdAt": Any<String>,
       "id": Any<String>,
-      "products": [
+      "orderProducts": [
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
-          "productId": "100",
-          "sku": "SKU-0001",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
         },
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
-          "productId": "100",
-          "sku": "SKU-0001",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
         },
       ],
     },
@@ -648,9 +656,19 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
       "operationKey": Any<String>,
       "payload": {
         "customerId": "101",
-        "productIds": [
-          "100",
-          "100",
+        "orderProducts": [
+          {
+            "id": Any<String>,
+            "product": {
+              "id": "100",
+            },
+          },
+          {
+            "id": Any<String>,
+            "product": {
+              "id": "100",
+            },
+          },
         ],
       },
       "subjectId": Any<String>,
@@ -669,18 +687,22 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
     "body": {
       "createdAt": Any<String>,
       "id": Any<String>,
-      "products": [
+      "orderProducts": [
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
-          "productId": "100",
-          "sku": "SKU-0001",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
         },
         {
           "id": Any<String>,
-          "name": "Seeded reference product",
-          "productId": "100",
-          "sku": "SKU-0001",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
         },
       ],
     },

@@ -40,4 +40,25 @@ describe('ProductStockModel', () => {
       );
     });
   });
+
+  describe('payloads', () => {
+    it('answers the stock on hand of the product', () => {
+      const productStock = ProductStockModel.reconstitute({ id: '12', sku: 'SKU-0001' });
+
+      expect(productStock.toOnHandSnapshot(15)).toEqual({ productId: '12', quantity: 15 });
+    });
+
+    it('answers the log fields of a restock and of a replay', () => {
+      expect(
+        ProductStockModel.toAddLoggerPayload({
+          productStockId: '700',
+          productId: '12',
+          quantity: 5,
+        }),
+      ).toEqual({ id: '700', productId: '12', quantity: 5 });
+      expect(ProductStockModel.toAddReplayLoggerPayload('key-1')).toEqual({
+        idempotencyKey: 'key-1',
+      });
+    });
+  });
 });

@@ -33,17 +33,14 @@ export class NoteEditUseCase {
   ) {}
 
   public async execute(command: INoteEditCommand): Promise<INoteView> {
-    const { noteId, editorId } = command;
+    const { noteId } = command;
     const editOutcome = await this.writeService.run({ noteId }, () => this.attempt(command));
-    const noteView = editOutcome.note.toSnapshot();
     const message = editOutcome.edited ? 'Note edited' : 'Note edit was a no-op';
+    const noteLoggerPayload = editOutcome.note.toEditLoggerPayload();
 
-    this.logger.info(
-      { noteId, editorId, version: noteView.version, edited: editOutcome.edited },
-      message,
-    );
+    this.logger.info(noteLoggerPayload, message);
 
-    return noteView;
+    return editOutcome.note.toSnapshot();
   }
 
   private async attempt(command: INoteEditCommand): Promise<INoteEditOutcomeView> {
@@ -59,7 +56,7 @@ export class NoteEditUseCase {
     }
 
     const isSaved = await this.transaction.run(() =>
-      this.save({ noteId, note, versionAsRead, bodyBefore, editorId }),
+      this.save({ note, versionAsRead, bodyBefore, editorId }),
     );
     const storedNote = await this.writeService.reload({
       noteId,
@@ -71,28 +68,21 @@ export class NoteEditUseCase {
   }
 
   private async save(command: INoteEditSaveCommand): Promise<boolean> {
-    const { noteId, note, versionAsRead, bodyBefore, editorId } = command;
-    const isUpdated = await this.repository.update({
-      id: note.id,
-      versionAsRead,
-      body: note.body,
-      resolved: note.resolved,
-      version: note.version,
-    });
+    const { note, versionAsRead, bodyBefore, editorId } = command;
+    const noteUpdateQuery = note.toUpdateQuery(versionAsRead);
+    const isUpdated = await this.repository.update(noteUpdateQuery);
 
     if (!isUpdated) {
       return false;
     }
 
     const correlationId = CorrelationContextHelper.current(NoteEditUseCase.name);
-    const revision = NoteRevisionModel.createDraft({
-      noteId,
-      noteVersion: note.version,
+    const revisionCandidateInit = note.toRevisionCandidateInit({
       bodyBefore,
-      bodyAfter: note.body,
       editorId,
       correlationId,
     });
+    const revision = NoteRevisionModel.initCandidate(revisionCandidateInit);
 
     await this.repository.appendRevision(revision);
 

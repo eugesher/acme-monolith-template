@@ -1,3 +1,5 @@
-export * from './inputs/ledger-append-entry-candidate.input';
+export * from './params/ledger-append-entry-candidate-init.interface';
 
-export * from './outputs/ledger-append-entry-draft.output';
+export * from './snapshots/ledger-append-entry-append-logger-payload.interface';
+export * from './snapshots/ledger-append-entry-candidate.interface';
+export * from './snapshots/ledger-append-entry-receive-logger-payload.interface';

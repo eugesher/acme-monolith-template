@@ -64,6 +64,13 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
+    it('outbound may NOT reach domain — a port speaks its own types', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/outbound/interfaces/commands/__fixture__.ts',
+        code: 'import { x } from "../../../domain";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
     it('application MAY reach its own domain and outbound', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',

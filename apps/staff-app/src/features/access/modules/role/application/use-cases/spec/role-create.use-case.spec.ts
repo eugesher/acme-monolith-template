@@ -62,7 +62,7 @@ describe('RoleCreateUseCase', () => {
       { roleId: '7', code: 'order:read' },
     ]);
     expect(outcomes).toEqual(['begin', 'commit']);
-    expect(logger.info).toHaveBeenCalledWith({ roleId: '7' }, 'Role created');
+    expect(logger.info).toHaveBeenCalledWith({ id: '7' }, 'Role created');
   });
 
   it('stores a role without permissions', async () => {

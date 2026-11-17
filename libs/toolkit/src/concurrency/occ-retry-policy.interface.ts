@@ -8,7 +8,7 @@ export interface IOccRetryPolicy<TConflict> {
   logger: IOccRetryLogger;
   maxAttempts: number;
   isConflict: (error: unknown) => error is TConflict;
-  retryContext: (conflict: TConflict) => Record<string, unknown>;
-  exhaustedContext: (conflict: TConflict) => Record<string, unknown>;
+  retryContext: (conflict: TConflict) => object;
+  exhaustedContext: (conflict: TConflict) => object;
   onExhausted: (conflict: TConflict, attempts: number) => never;
 }

@@ -5,7 +5,7 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { LedgerAppendEntryInsertOutcomeEnum } from '../../../outbound';
 import { LedgerAppendUseCase } from '../ledger-append.use-case';
-import type { ILedgerAppendEntryDraftOutput } from '../../../domain';
+import type { ILedgerAppendEntryCandidate } from '../../../domain';
 
 describe('LedgerAppendUseCase', () => {
   let insert: jest.Mock;
@@ -42,9 +42,9 @@ describe('LedgerAppendUseCase', () => {
         }),
       );
 
-      const [draft] = insert.mock.calls[0] as [ILedgerAppendEntryDraftOutput];
+      const [candidate] = insert.mock.calls[0] as [ILedgerAppendEntryCandidate];
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         operationKey: 'product-archived:12:2',
         subjectType: 'product',
         subjectId: '12',
@@ -58,10 +58,7 @@ describe('LedgerAppendUseCase', () => {
           { operationKey: ' product-archived:12:2 ', action: 'ProductArchived' },
           'Ledger record received',
         ],
-        [
-          { id: '4210', operationKey: 'product-archived:12:2', appended: true },
-          'Ledger record appended',
-        ],
+        [{ id: '4210', operationKey: 'product-archived:12:2' }, 'Ledger record appended'],
       ]);
     });
 
@@ -80,7 +77,7 @@ describe('LedgerAppendUseCase', () => {
       );
 
       expect(logger.info).toHaveBeenLastCalledWith(
-        { id: '4210', operationKey: 'product-archived:12:2', appended: false },
+        { id: '4210', operationKey: 'product-archived:12:2' },
         'Ledger record already appended',
       );
     });

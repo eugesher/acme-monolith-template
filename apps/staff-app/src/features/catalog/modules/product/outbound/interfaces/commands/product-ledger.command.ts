@@ -1,11 +1,19 @@
-import type { ProductPublishedEvent } from '../../../domain';
-
 export interface IProductLedgerRecordEventsCommand {
-  events: ProductPublishedEvent[];
+  ledgerRecords: {
+    operationKey: string;
+    subjectType: string;
+    subjectId: string;
+    action: string;
+    payload: Record<string, unknown>;
+    occurredAt: string;
+  }[];
 }
 
 export interface IProductLedgerRecordCreatedCommand {
-  productId: string;
-  sku: string;
-  name: string;
+  subjectId: string;
+  occurredAt: string;
+  payload: {
+    sku: string;
+    name: string;
+  };
 }

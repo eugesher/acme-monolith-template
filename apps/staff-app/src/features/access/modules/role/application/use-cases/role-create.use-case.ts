@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthRoleNameTakenException, RoleModel, type IRoleDraftOutput } from '../../domain';
+import { AuthRoleNameTakenException, RoleCandidateModel } from '../../domain';
 import {
   ROLE_CREATE_REPOSITORY_PORT,
   ROLE_TRANSACTION_PORT,
@@ -24,25 +24,25 @@ export class RoleCreateUseCase {
 
   public async execute(command: IRoleCreateCommand): Promise<IRoleView> {
     const { name, permissionCodes } = command;
-    const roleDraft = RoleModel.createDraft({ name, permissionCodes });
-    const roleId = await this.transaction.run(() => this.insert(roleDraft));
+    const roleCandidate = RoleCandidateModel.create({ name, permissionCodes });
+    const roleId = await this.transaction.run(() => this.insert(roleCandidate));
+    const roleLoggerPayload = roleCandidate.toLoggerPayload(roleId);
 
-    this.logger.info({ roleId }, 'Role created');
+    this.logger.info(roleLoggerPayload, 'Role created');
 
-    return { id: roleId, name: roleDraft.name, permissionCodes: roleDraft.permissionCodes };
+    return roleCandidate.toSnapshot(roleId);
   }
 
-  private async insert(draft: IRoleDraftOutput): Promise<string> {
-    const { name, permissionCodes } = draft;
-
-    const insertResult = await this.repository.insertRole({ name });
+  private async insert(candidate: RoleCandidateModel): Promise<string> {
+    const roleInsertQuery = candidate.toInsertQuery();
+    const insertResult = await this.repository.insertRole(roleInsertQuery);
 
     if (insertResult.outcome === RoleCreateStaffRoleInsertOutcomeEnum.DUPLICATE) {
-      throw new AuthRoleNameTakenException(name);
+      throw new AuthRoleNameTakenException(roleInsertQuery.name);
     }
 
     const { id } = insertResult;
-    const rolePermissions = permissionCodes.map((code) => ({ roleId: id, code }));
+    const rolePermissions = candidate.getRolePermissions(id);
 
     await this.repository.insertRolePermissions(rolePermissions);
 

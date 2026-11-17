@@ -1,4 +1,4 @@
-import type { IOrderGetManyRecordInput, IOrderGetManySnapshotOutput } from '../interfaces';
+import type { IOrderGetManyReconstitute, IOrderGetManySnapshot } from '../interfaces';
 
 export class OrderGetManyModel {
   private constructor(
@@ -7,13 +7,13 @@ export class OrderGetManyModel {
     public readonly createdAt: Date,
   ) {}
 
-  public static reconstitute(record: IOrderGetManyRecordInput): OrderGetManyModel {
+  public static reconstitute(record: IOrderGetManyReconstitute): OrderGetManyModel {
     const { id, customerId, createdAt } = record;
 
     return new OrderGetManyModel(id, customerId, createdAt);
   }
 
-  public static toViewData(records: IOrderGetManyRecordInput[]): IOrderGetManySnapshotOutput[] {
+  public static toViewData(records: IOrderGetManyReconstitute[]): IOrderGetManySnapshot[] {
     return records.map((record) => {
       const order = OrderGetManyModel.reconstitute(record);
 
@@ -21,7 +21,7 @@ export class OrderGetManyModel {
     });
   }
 
-  public toSnapshot(): IOrderGetManySnapshotOutput {
+  private toSnapshot(): IOrderGetManySnapshot {
     return {
       id: this.id,
       customerId: this.customerId,

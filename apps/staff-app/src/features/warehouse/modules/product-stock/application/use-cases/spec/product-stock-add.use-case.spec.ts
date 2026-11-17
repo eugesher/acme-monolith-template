@@ -2,7 +2,6 @@ import type { PinoLogger } from 'nestjs-pino';
 
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ProductStockAddedEvent } from '../../../domain';
 import { ProductStockAddUseCase } from '../product-stock-add.use-case';
 
 describe('ProductStockAddUseCase', () => {
@@ -18,6 +17,7 @@ describe('ProductStockAddUseCase', () => {
   let useCase: ProductStockAddUseCase;
 
   beforeEach(() => {
+    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     findById = jest.fn().mockResolvedValue({ id: '12', sku: 'SKU-0001' });
     lock = jest.fn().mockResolvedValue(undefined);
     add = jest.fn().mockResolvedValue({ productStockId: '700', quantity: 15 });
@@ -35,6 +35,10 @@ describe('ProductStockAddUseCase', () => {
       { run },
       logger as unknown as PinoLogger,
     );
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('execute', () => {
@@ -74,14 +78,22 @@ describe('ProductStockAddUseCase', () => {
       });
 
       expect(recordEvents).toHaveBeenCalledWith({
-        productStockId: '700',
-        events: [expect.any(ProductStockAddedEvent)],
+        ledgerRecords: [
+          {
+            operationKey: 'product-restocked:700',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductRestocked',
+            payload: { sku: 'SKU-0001', quantity: 5 },
+            occurredAt: '2026-01-05T08:00:00.000Z',
+          },
+        ],
       });
       expect(run.mock.invocationCallOrder[0]).toBeLessThan(
         recordEvents.mock.invocationCallOrder[0],
       );
       expect(logger.info).toHaveBeenCalledWith(
-        { productId: '12', quantity: 5, onHand: 15 },
+        { id: '700', productId: '12', quantity: 5 },
         'Product restocked',
       );
     });

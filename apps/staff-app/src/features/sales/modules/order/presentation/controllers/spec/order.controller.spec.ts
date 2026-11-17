@@ -40,11 +40,11 @@ describe('OrderController', () => {
 
   describe('handleGetOne', () => {
     it('reads the order of the path', async () => {
-      getOne.mockResolvedValue({ id: '600', products: [] });
+      getOne.mockResolvedValue({ id: '600', orderProducts: [] });
 
       const response = await controller.handleGetOne({ orderId: '600' });
 
-      expect(response).toEqual({ id: '600', products: [] });
+      expect(response).toEqual({ id: '600', orderProducts: [] });
       expect(getOne).toHaveBeenCalledWith({ orderId: '600' });
     });
   });

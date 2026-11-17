@@ -61,10 +61,25 @@ exports[`App Order POST /api/orders should place the order, append its ledger en
         "operation_key": Any<String>,
         "payload": {
           "customerId": "101",
-          "productIds": [
-            "103",
-            "103",
-            "103",
+          "orderProducts": [
+            {
+              "id": Any<String>,
+              "product": {
+                "id": "103",
+              },
+            },
+            {
+              "id": Any<String>,
+              "product": {
+                "id": "103",
+              },
+            },
+            {
+              "id": Any<String>,
+              "product": {
+                "id": "103",
+              },
+            },
           ],
         },
         "recorded_at": Any<Date>,
@@ -150,24 +165,30 @@ exports[`App Order POST /api/orders should place the order, append its ledger en
     "body": {
       "createdAt": Any<String>,
       "id": Any<String>,
-      "products": [
+      "orderProducts": [
         {
           "id": Any<String>,
-          "name": "Product to archive",
-          "productId": "103",
-          "sku": "SKU-0004",
+          "product": {
+            "id": "103",
+            "name": "Product to archive",
+            "sku": "SKU-0004",
+          },
         },
         {
           "id": Any<String>,
-          "name": "Product to archive",
-          "productId": "103",
-          "sku": "SKU-0004",
+          "product": {
+            "id": "103",
+            "name": "Product to archive",
+            "sku": "SKU-0004",
+          },
         },
         {
           "id": Any<String>,
-          "name": "Product to archive",
-          "productId": "103",
-          "sku": "SKU-0004",
+          "product": {
+            "id": "103",
+            "name": "Product to archive",
+            "sku": "SKU-0004",
+          },
         },
       ],
     },

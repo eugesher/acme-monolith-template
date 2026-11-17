@@ -42,7 +42,7 @@ describe('TagCreateUseCase', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
       });
-      expect(logger.info).toHaveBeenCalledWith({ tagId: '303', name: 'heavy' }, 'Tag created');
+      expect(logger.info).toHaveBeenCalledWith({ id: '303', name: 'heavy' }, 'Tag created');
     });
 
     it('throws TagNameInvalidException and stores nothing for an empty name', async () => {

@@ -2,9 +2,13 @@ import { IdempotencyStatusEnum } from '@acme-libs/kernel';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import type {
-  IIdempotencyCoreKeyCandidateInput,
-  IIdempotencyCoreKeyDraftOutput,
-  IIdempotencyCoreKeyRecordInput,
+  IIdempotencyCoreKeyCandidate,
+  IIdempotencyCoreKeyCandidateInit,
+  IIdempotencyCoreKeyCompleteQuery,
+  IIdempotencyCoreKeyCompleteQueryBuild,
+  IIdempotencyCoreKeyLoggerPayload,
+  IIdempotencyCoreKeyLoggerPayloadBuild,
+  IIdempotencyCoreKeyReconstitute,
 } from '../interfaces';
 
 export class IdempotencyCoreKeyModel {
@@ -18,16 +22,16 @@ export class IdempotencyCoreKeyModel {
     Object.freeze(this);
   }
 
-  public static reconstitute(record: IIdempotencyCoreKeyRecordInput): IdempotencyCoreKeyModel {
+  public static reconstitute(record: IIdempotencyCoreKeyReconstitute): IdempotencyCoreKeyModel {
     const { requestFingerprint, status, responseBody } = record;
 
     return new IdempotencyCoreKeyModel(requestFingerprint, status, responseBody);
   }
 
-  public static createDraft(
-    candidate: IIdempotencyCoreKeyCandidateInput,
-  ): IIdempotencyCoreKeyDraftOutput {
-    const { scope, key, requestFingerprint } = candidate;
+  public static initCandidate(
+    proposal: IIdempotencyCoreKeyCandidateInit,
+  ): IIdempotencyCoreKeyCandidate {
+    const { scope, key, requestFingerprint } = proposal;
 
     if (key.length === 0) {
       throw new Error('IdempotencyKey.key is required');
@@ -39,11 +43,28 @@ export class IdempotencyCoreKeyModel {
 
     return {
       scope,
-      key,
+      idempotencyKey: key,
       requestFingerprint,
       status: IdempotencyStatusEnum.IN_FLIGHT,
       responseBody: null,
     };
+  }
+
+  public static toCompleteQuery(
+    params: IIdempotencyCoreKeyCompleteQueryBuild,
+  ): IIdempotencyCoreKeyCompleteQuery {
+    const { scope, key, response } = params;
+    const responseBody = JSON.stringify(response);
+
+    return { scope, key, responseBody };
+  }
+
+  public static toKeyLoggerPayload(
+    params: IIdempotencyCoreKeyLoggerPayloadBuild,
+  ): IIdempotencyCoreKeyLoggerPayload {
+    const { scope, key } = params;
+
+    return { scope, idempotencyKey: key };
   }
 
   public matches(requestFingerprint: string): boolean {
@@ -52,5 +73,9 @@ export class IdempotencyCoreKeyModel {
 
   public isCompleted(): this is IdempotencyCoreKeyModel & { responseBody: string } {
     return this.status === IdempotencyStatusEnum.COMPLETED && this.responseBody !== null;
+  }
+
+  public toStoredResponse(): unknown {
+    return this.responseBody === null ? null : JSON.parse(this.responseBody);
   }
 }

@@ -1,5 +1,9 @@
-export * from './inputs/role-candidate.input';
-export * from './inputs/role-record.input';
+export * from './params/role-candidate-create.interface';
+export * from './params/role-reconstitute.interface';
 
-export * from './outputs/role-draft.output';
-export * from './outputs/role-snapshot.output';
+export * from './snapshots/role-candidate-insert-query.interface';
+export * from './snapshots/role-candidate-role-permission.interface';
+export * from './snapshots/role-create-logger-payload.interface';
+export * from './snapshots/role-reassign-permissions-logger-payload.interface';
+export * from './snapshots/role-role-permission.interface';
+export * from './snapshots/role-snapshot.interface';

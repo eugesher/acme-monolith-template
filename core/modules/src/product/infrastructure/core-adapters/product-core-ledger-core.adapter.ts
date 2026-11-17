@@ -21,15 +21,15 @@ export class ProductCoreLedgerCoreAdapter implements IProductCoreLedgerPort {
   ) {}
 
   public async recordArchived(command: IProductCoreLedgerRecordArchivedCommand): Promise<void> {
-    const { productId, sku, version, previousStatus } = command;
+    const { subjectId, version, payload } = command;
     const occurredAt = new Date().toISOString();
 
     await this.ledger.handleEnqueue({
-      operationKey: `product-archived:${productId}:${version}`,
+      operationKey: `product-archived:${subjectId}:${version}`,
       subjectType: 'product',
-      subjectId: productId,
+      subjectId,
       action: 'ProductArchived',
-      payload: { sku, previousStatus },
+      payload,
       occurredAt,
     });
   }

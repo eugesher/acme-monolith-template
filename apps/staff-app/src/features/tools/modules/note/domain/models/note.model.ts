@@ -5,13 +5,21 @@ import { NoteResolvedException } from '../exceptions/note-resolved.exception';
 import { NoteSubjectInvalidException } from '../exceptions/note-subject-invalid.exception';
 import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
 import type {
-  INoteCandidateInput,
-  INoteDraftOutput,
-  INoteRecordInput,
-  INoteSnapshotOutput,
+  INoteCandidate,
+  INoteCandidateInit,
+  INoteCreateLoggerPayload,
+  INoteEditLoggerPayload,
+  INoteReconstitute,
+  INoteResolveLoggerPayload,
+  INoteRevisionCandidateInit,
+  INoteRevisionCandidateInitBuild,
+  INoteSnapshot,
+  INoteUpdateQuery,
+  INoteWriteExhaustedLoggerPayload,
+  INoteWriteRetryLoggerPayload,
 } from '../interfaces';
 
-export class NoteModel extends AggregateRootBase<string> {
+export class NoteModel extends AggregateRootBase {
   public get body(): string {
     return this.currentBody;
   }
@@ -42,7 +50,7 @@ export class NoteModel extends AggregateRootBase<string> {
     super(id);
   }
 
-  public static reconstitute(record: INoteRecordInput): NoteModel {
+  public static reconstitute(record: INoteReconstitute): NoteModel {
     const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
       record;
     const validSubjectType = NoteModel.validSubjectType(subjectType);
@@ -63,8 +71,8 @@ export class NoteModel extends AggregateRootBase<string> {
     );
   }
 
-  public static createDraft(candidate: INoteCandidateInput): INoteDraftOutput {
-    const { subjectType, subjectId, body, authorId } = candidate;
+  public static initCandidate(proposal: INoteCandidateInit): INoteCandidate {
+    const { subjectType, subjectId, body, authorId } = proposal;
     const validSubjectType = NoteModel.validSubjectType(subjectType);
     const validSubjectId = NoteModel.validSubjectId(subjectId);
     const validBody = NoteModel.validBody(body);
@@ -77,6 +85,17 @@ export class NoteModel extends AggregateRootBase<string> {
       resolved: false,
       version: 1,
     };
+  }
+
+  public static toWriteRetryLoggerPayload(
+    id: string,
+    version: number,
+  ): INoteWriteRetryLoggerPayload {
+    return { id, version };
+  }
+
+  public static toWriteExhaustedLoggerPayload(id: string): INoteWriteExhaustedLoggerPayload {
+    return { id };
   }
 
   public edit(body: string): void {
@@ -99,7 +118,7 @@ export class NoteModel extends AggregateRootBase<string> {
     this.currentVersion += 1;
   }
 
-  public toSnapshot(): INoteSnapshotOutput {
+  public toSnapshot(): INoteSnapshot {
     return {
       id: this.id,
       subjectType: this.subjectType,
@@ -111,6 +130,48 @@ export class NoteModel extends AggregateRootBase<string> {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(versionAsRead: number): INoteUpdateQuery {
+    return {
+      id: this.id,
+      versionAsRead,
+      body: this.body,
+      resolved: this.resolved,
+      version: this.version,
+    };
+  }
+
+  public toRevisionCandidateInit(
+    params: INoteRevisionCandidateInitBuild,
+  ): INoteRevisionCandidateInit {
+    const { bodyBefore, editorId, correlationId } = params;
+
+    return {
+      noteId: this.id,
+      noteVersion: this.version,
+      bodyBefore,
+      bodyAfter: this.body,
+      editorId,
+      correlationId,
+    };
+  }
+
+  public toCreateLoggerPayload(): INoteCreateLoggerPayload {
+    return {
+      id: this.id,
+      subjectType: this.subjectType,
+      subjectId: this.subjectId,
+      authorId: this.authorId,
+    };
+  }
+
+  public toEditLoggerPayload(): INoteEditLoggerPayload {
+    return { id: this.id, authorId: this.authorId, version: this.version };
+  }
+
+  public toResolveLoggerPayload(): INoteResolveLoggerPayload {
+    return { id: this.id, version: this.version };
   }
 
   private static validSubjectType(subjectType: string): string {

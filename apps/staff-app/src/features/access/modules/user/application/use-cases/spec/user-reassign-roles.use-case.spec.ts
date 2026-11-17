@@ -64,7 +64,7 @@ describe('UserReassignRolesUseCase', () => {
     ]);
     expect(outcomes).toEqual(['begin', 'delete', 'insert', 'commit']);
     expect(logger.info).toHaveBeenCalledWith(
-      { userId: 'user-1', roleIds: ['2', '3'] },
+      { id: 'user-1', userRoles: [{ roleId: '2' }, { roleId: '3' }] },
       'Roles reassigned',
     );
   });

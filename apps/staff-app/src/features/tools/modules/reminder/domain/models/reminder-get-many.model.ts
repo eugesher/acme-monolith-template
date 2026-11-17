@@ -1,6 +1,6 @@
 import type { ReminderStatusEnum } from '@acme-libs/kernel';
 
-import type { IReminderGetManyRecordInput, IReminderGetManySnapshotOutput } from '../interfaces';
+import type { IReminderGetManyReconstitute, IReminderGetManySnapshot } from '../interfaces';
 
 export class ReminderGetManyModel {
   private constructor(
@@ -15,7 +15,7 @@ export class ReminderGetManyModel {
     public readonly updatedAt: Date,
   ) {}
 
-  public static reconstitute(record: IReminderGetManyRecordInput): ReminderGetManyModel {
+  public static reconstitute(record: IReminderGetManyReconstitute): ReminderGetManyModel {
     const { id, ownerId, title, body, dueOn, status, version, createdAt, updatedAt } = record;
 
     return new ReminderGetManyModel(
@@ -31,9 +31,7 @@ export class ReminderGetManyModel {
     );
   }
 
-  public static toViewData(
-    records: IReminderGetManyRecordInput[],
-  ): IReminderGetManySnapshotOutput[] {
+  public static toViewData(records: IReminderGetManyReconstitute[]): IReminderGetManySnapshot[] {
     return records.map((record) => {
       const reminder = ReminderGetManyModel.reconstitute(record);
 
@@ -41,7 +39,7 @@ export class ReminderGetManyModel {
     });
   }
 
-  public toSnapshot(): IReminderGetManySnapshotOutput {
+  private toSnapshot(): IReminderGetManySnapshot {
     return {
       id: this.id,
       ownerId: this.ownerId,

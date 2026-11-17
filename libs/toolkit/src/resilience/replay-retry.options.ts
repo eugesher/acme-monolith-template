@@ -8,6 +8,6 @@ export interface IReplayRetryOptions {
   logger: IReplayRetryLogger;
   correlationId: string;
   label: string;
-  context: Record<string, unknown>;
+  context: object;
   replayMessage: string;
 }

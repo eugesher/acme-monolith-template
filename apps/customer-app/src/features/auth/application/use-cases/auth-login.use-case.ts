@@ -45,7 +45,9 @@ export class AuthLoginUseCase {
 
     const accessToken = await this.credentials.issueAccessToken(customer.id);
 
-    this.logger.info({ customerId: customer.id }, 'Customer logged in');
+    const customerLoggerPayload = customer.toLoginLoggerPayload();
+
+    this.logger.info(customerLoggerPayload, 'Customer logged in');
 
     return { accessToken };
   }

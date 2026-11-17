@@ -7,13 +7,20 @@ import { ReminderDueOnInvalidException } from '../exceptions/reminder-due-on-inv
 import { ReminderTitleInvalidException } from '../exceptions/reminder-title-invalid.exception';
 import { ReminderVersionInvalidException } from '../exceptions/reminder-version-invalid.exception';
 import type {
-  IReminderCandidateInput,
-  IReminderDraftOutput,
-  IReminderRecordInput,
-  IReminderSnapshotOutput,
+  IReminderCandidate,
+  IReminderCandidateInit,
+  IReminderCompleteLoggerPayload,
+  IReminderCreateLoggerPayload,
+  IReminderDeleteLoggerPayload,
+  IReminderReconstitute,
+  IReminderRescheduleLoggerPayload,
+  IReminderSnapshot,
+  IReminderUpdateQuery,
+  IReminderWriteExhaustedLoggerPayload,
+  IReminderWriteRetryLoggerPayload,
 } from '../interfaces';
 
-export class ReminderModel extends AggregateRootBase<string> {
+export class ReminderModel extends AggregateRootBase {
   public get dueOn(): string {
     return this.currentDueOn;
   }
@@ -44,7 +51,7 @@ export class ReminderModel extends AggregateRootBase<string> {
     super(id);
   }
 
-  public static reconstitute(record: IReminderRecordInput): ReminderModel {
+  public static reconstitute(record: IReminderReconstitute): ReminderModel {
     const { id, ownerId, title, body, dueOn, status, version, createdAt, updatedAt } = record;
     const validTitle = ReminderModel.validTitle(title);
     const validBody = ReminderModel.validBody(body);
@@ -64,8 +71,8 @@ export class ReminderModel extends AggregateRootBase<string> {
     );
   }
 
-  public static createDraft(candidate: IReminderCandidateInput): IReminderDraftOutput {
-    const { ownerId, title, body, dueOn } = candidate;
+  public static initCandidate(proposal: IReminderCandidateInit): IReminderCandidate {
+    const { ownerId, title, body, dueOn } = proposal;
     const validTitle = ReminderModel.validTitle(title);
     const validBody = ReminderModel.validBody(body);
     const validDueOn = ReminderModel.validDueOn(dueOn);
@@ -78,6 +85,17 @@ export class ReminderModel extends AggregateRootBase<string> {
       status: ReminderStatusEnum.PENDING,
       version: 1,
     };
+  }
+
+  public static toWriteRetryLoggerPayload(
+    id: string,
+    version: number,
+  ): IReminderWriteRetryLoggerPayload {
+    return { id, version };
+  }
+
+  public static toWriteExhaustedLoggerPayload(id: string): IReminderWriteExhaustedLoggerPayload {
+    return { id };
   }
 
   public complete(): void {
@@ -100,7 +118,7 @@ export class ReminderModel extends AggregateRootBase<string> {
     this.currentVersion += 1;
   }
 
-  public toSnapshot(): IReminderSnapshotOutput {
+  public toSnapshot(): IReminderSnapshot {
     return {
       id: this.id,
       ownerId: this.ownerId,
@@ -112,6 +130,32 @@ export class ReminderModel extends AggregateRootBase<string> {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(versionAsRead: number): IReminderUpdateQuery {
+    return {
+      id: this.id,
+      versionAsRead,
+      dueOn: this.dueOn,
+      status: this.status,
+      version: this.version,
+    };
+  }
+
+  public toCreateLoggerPayload(): IReminderCreateLoggerPayload {
+    return { id: this.id, ownerId: this.ownerId };
+  }
+
+  public toCompleteLoggerPayload(): IReminderCompleteLoggerPayload {
+    return { id: this.id, version: this.version };
+  }
+
+  public toRescheduleLoggerPayload(): IReminderRescheduleLoggerPayload {
+    return { id: this.id, dueOn: this.dueOn, version: this.version };
+  }
+
+  public toDeleteLoggerPayload(): IReminderDeleteLoggerPayload {
+    return { id: this.id };
   }
 
   private static validTitle(title: string): string {

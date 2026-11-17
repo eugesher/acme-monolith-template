@@ -56,7 +56,7 @@ describe('NoteWriteService', () => {
       expect(result).toBe('written');
       expect(attempt).toHaveBeenCalledTimes(2);
       expect(logger.info).toHaveBeenCalledWith(
-        { noteId: '7', currentVersion: 4, attempt: 1, maxAttempts: 5 },
+        { id: '7', version: 4, attempt: 1, maxAttempts: 5 },
         'Note write conflict — retrying with a fresh read',
       );
     });
@@ -71,7 +71,7 @@ describe('NoteWriteService', () => {
       });
       expect(attempt).toHaveBeenCalledTimes(5);
       expect(logger.warn).toHaveBeenCalledWith(
-        { noteId: '7', attempts: 5, maxAttempts: 5 },
+        { id: '7', attempts: 5, maxAttempts: 5 },
         'Note write conflict exhausted retry budget',
       );
     });

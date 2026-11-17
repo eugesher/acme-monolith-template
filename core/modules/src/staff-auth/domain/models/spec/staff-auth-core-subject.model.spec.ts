@@ -45,4 +45,23 @@ describe('StaffAuthCoreSubjectModel', () => {
       expect(subject).toMatchObject({ roles: [], permissionCodes: [] });
     });
   });
+
+  describe('toSnapshot', () => {
+    it('answers the subject with copies of its roles and permission codes', () => {
+      const subject = StaffAuthCoreSubjectModel.reconstitute({
+        id: 'user-1',
+        email: 'editor@example.com',
+        userRoles: [
+          { role: { name: 'editor', rolePermissions: [{ code: PermissionCodeEnum.LEDGER_READ }] } },
+        ],
+      });
+
+      expect(subject.toSnapshot()).toEqual({
+        id: 'user-1',
+        email: 'editor@example.com',
+        roles: ['editor'],
+        permissionCodes: ['ledger:read'],
+      });
+    });
+  });
 });

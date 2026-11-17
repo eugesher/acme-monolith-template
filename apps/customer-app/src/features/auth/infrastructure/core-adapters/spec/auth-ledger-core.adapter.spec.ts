@@ -16,7 +16,7 @@ describe('AuthLedgerCoreAdapter', () => {
 
   describe('recordRegistered', () => {
     it('enqueues the registration under the operation key and correlation id', async () => {
-      await adapter.recordRegistered({ customerId: 'customer-1' });
+      await adapter.recordRegistered({ subjectId: 'customer-1' });
 
       expect(handleEnqueue).toHaveBeenCalledTimes(1);
       expect(handleEnqueue).toHaveBeenCalledWith({

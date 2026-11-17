@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { TagModel, TagNameTakenException } from '../../domain';
+import { TagModel, TagNameTakenException, type ITagCandidate } from '../../domain';
 import {
   TAG_CREATE_REPOSITORY_PORT,
   TagCreateInsertOutcomeEnum,
@@ -20,22 +20,22 @@ export class TagCreateUseCase {
 
   public async execute(command: ITagCreateCommand): Promise<ITagView> {
     const { name } = command;
-    const tagDraft = TagModel.createDraft({ name });
-    const tagId = await this.insert(tagDraft.name);
+    const tagCandidate = TagModel.initCandidate({ name });
+    const tagId = await this.insert(tagCandidate);
     const tagRecord = await this.repository.findInserted(tagId);
     const createdTag = TagModel.reconstitute(tagRecord);
-    const tagView = createdTag.toSnapshot();
+    const tagLoggerPayload = createdTag.toCreateLoggerPayload();
 
-    this.logger.info({ tagId: tagView.id, name: tagView.name }, 'Tag created');
+    this.logger.info(tagLoggerPayload, 'Tag created');
 
-    return tagView;
+    return createdTag.toSnapshot();
   }
 
-  private async insert(name: string): Promise<string> {
-    const insertResult = await this.repository.insert({ name });
+  private async insert(candidate: ITagCandidate): Promise<string> {
+    const insertResult = await this.repository.insert(candidate);
 
     if (insertResult.outcome === TagCreateInsertOutcomeEnum.DUPLICATE) {
-      throw new TagNameTakenException(name);
+      throw new TagNameTakenException(candidate.name);
     }
 
     return insertResult.id;

@@ -69,7 +69,11 @@ describe('TagCommonReplaceUseCase', () => {
       });
       expect(outcomes).toEqual(['unlink', 'link', 'commit']);
       expect(logger.info).toHaveBeenCalledWith(
-        { subjectType: 'product', subjectId: '100', tagIds: ['301', '302'] },
+        {
+          subjectType: 'product',
+          subjectId: '100',
+          subjectTags: [{ tagId: '301' }, { tagId: '302' }],
+        },
         'Subject tags replaced',
       );
     });

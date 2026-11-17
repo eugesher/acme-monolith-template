@@ -36,7 +36,7 @@ describe('TagDeleteUseCase', () => {
 
       expect(load).toHaveBeenCalledWith({ tagId: '300' });
       expect(remove).toHaveBeenCalledWith('300');
-      expect(logger.info).toHaveBeenCalledWith({ tagId: '300' }, 'Tag deleted');
+      expect(logger.info).toHaveBeenCalledWith({ id: '300' }, 'Tag deleted');
     });
 
     it('deletes nothing for an unknown tag', async () => {

@@ -67,11 +67,11 @@ describe('ProductModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts a product at version 1 with a trimmed name', () => {
-      const draft = ProductModel.createDraft({ sku: 'SKU-0001', name: '  Lamp  ' });
+  describe('initCandidate', () => {
+    it('initializes a product candidate at version 1 with a trimmed name', () => {
+      const candidate = ProductModel.initCandidate({ sku: 'SKU-0001', name: '  Lamp  ' });
 
-      expect(draft).toEqual({ sku: 'SKU-0001', name: 'Lamp', status: 'draft', version: 1 });
+      expect(candidate).toEqual({ sku: 'SKU-0001', name: 'Lamp', status: 'draft', version: 1 });
     });
 
     it.each([
@@ -80,7 +80,7 @@ describe('ProductModel', () => {
       ['a sku starting with a dash', '-ABC'],
       ['a sku longer than 64', `A${'B'.repeat(64)}`],
     ])('refuses %s with PRODUCT_SKU_INVALID', (_, sku) => {
-      expect(() => ProductModel.createDraft({ sku, name: 'Lamp' })).toThrow(
+      expect(() => ProductModel.initCandidate({ sku, name: 'Lamp' })).toThrow(
         expect.objectContaining({ code: 'PRODUCT_SKU_INVALID' }) as Error,
       );
     });
@@ -89,7 +89,7 @@ describe('ProductModel', () => {
       ['a blank name', '   '],
       ['a name longer than 255', 'n'.repeat(256)],
     ])('refuses %s with PRODUCT_NAME_INVALID', (_, name) => {
-      expect(() => ProductModel.createDraft({ sku: 'SKU-0001', name })).toThrow(
+      expect(() => ProductModel.initCandidate({ sku: 'SKU-0001', name })).toThrow(
         expect.objectContaining({
           code: 'PRODUCT_NAME_INVALID',
           message: 'Product.name must be a non-empty string of at most 255 characters',
@@ -98,9 +98,9 @@ describe('ProductModel', () => {
     });
 
     it('accepts a name of 255 characters', () => {
-      const draft = ProductModel.createDraft({ sku: 'SKU-0001', name: 'n'.repeat(255) });
+      const candidate = ProductModel.initCandidate({ sku: 'SKU-0001', name: 'n'.repeat(255) });
 
-      expect(draft.name).toHaveLength(255);
+      expect(candidate.name).toHaveLength(255);
     });
   });
 
@@ -250,6 +250,54 @@ describe('ProductModel', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-02T00:00:00.000Z',
       });
+    });
+  });
+
+  describe('payloads', () => {
+    let product: ProductModel;
+
+    beforeEach(() => {
+      product = ProductModel.reconstitute({
+        id: '12',
+        sku: 'SKU-0001',
+        name: 'Lamp',
+        status: ProductStatusEnum.ACTIVE,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+    });
+
+    it('answers the row to update under the version as read', () => {
+      expect(product.toUpdateQuery(2)).toEqual({
+        id: '12',
+        versionAsRead: 2,
+        name: 'Lamp',
+        status: 'active',
+        version: 3,
+      });
+    });
+
+    it('answers the creation as a ledger record at the time the product was created', () => {
+      expect(product.toCreateLedgerPayload()).toEqual({
+        subjectId: '12',
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        payload: { sku: 'SKU-0001', name: 'Lamp' },
+      });
+    });
+
+    it('answers the log fields of a creation, an update and a publication', () => {
+      expect(product.toCreateLoggerPayload()).toEqual({ id: '12', sku: 'SKU-0001' });
+      expect(product.toUpdateLoggerPayload()).toEqual({ id: '12', version: 3 });
+      expect(product.toPublishLoggerPayload()).toEqual({ id: '12' });
+    });
+
+    it('answers the log fields of a replay and of a lost optimistic race without a product', () => {
+      expect(ProductModel.toCreateReplayLoggerPayload('key-1')).toEqual({
+        idempotencyKey: 'key-1',
+      });
+      expect(ProductModel.toWriteRetryLoggerPayload('12', 4)).toEqual({ id: '12', version: 4 });
+      expect(ProductModel.toWriteExhaustedLoggerPayload('12')).toEqual({ id: '12' });
     });
   });
 });

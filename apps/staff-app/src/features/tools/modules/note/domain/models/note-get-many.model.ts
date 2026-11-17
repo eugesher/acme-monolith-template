@@ -1,4 +1,4 @@
-import type { INoteGetManyRecordInput, INoteGetManySnapshotOutput } from '../interfaces';
+import type { INoteGetManyReconstitute, INoteGetManySnapshot } from '../interfaces';
 
 export class NoteGetManyModel {
   private constructor(
@@ -13,7 +13,7 @@ export class NoteGetManyModel {
     public readonly updatedAt: Date,
   ) {}
 
-  public static reconstitute(record: INoteGetManyRecordInput): NoteGetManyModel {
+  public static reconstitute(record: INoteGetManyReconstitute): NoteGetManyModel {
     const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
       record;
 
@@ -30,7 +30,7 @@ export class NoteGetManyModel {
     );
   }
 
-  public static toViewData(records: INoteGetManyRecordInput[]): INoteGetManySnapshotOutput[] {
+  public static toViewData(records: INoteGetManyReconstitute[]): INoteGetManySnapshot[] {
     return records.map((record) => {
       const note = NoteGetManyModel.reconstitute(record);
 
@@ -38,7 +38,7 @@ export class NoteGetManyModel {
     });
   }
 
-  public toSnapshot(): INoteGetManySnapshotOutput {
+  private toSnapshot(): INoteGetManySnapshot {
     return {
       id: this.id,
       subjectType: this.subjectType,

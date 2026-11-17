@@ -23,10 +23,10 @@ export class ReminderCompleteUseCase {
 
     await this.summary.invalidate(ownerId);
 
-    const reminderView = writtenReminder.toSnapshot();
+    const reminderLoggerPayload = writtenReminder.toCompleteLoggerPayload();
 
-    this.logger.info({ reminderId, version: reminderView.version }, 'Reminder completed');
+    this.logger.info(reminderLoggerPayload, 'Reminder completed');
 
-    return reminderView;
+    return writtenReminder.toSnapshot();
   }
 }

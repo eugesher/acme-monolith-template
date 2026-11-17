@@ -4,7 +4,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import {
   AuthCustomerModel,
   AuthEmailTakenException,
-  type IAuthCustomerDraftOutput,
+  type IAuthCustomerCandidate,
 } from '../../domain';
 import {
   AUTH_CREDENTIALS_PORT,
@@ -36,18 +36,20 @@ export class AuthRegisterUseCase {
     AuthCustomerModel.assertPasswordStrength(password);
 
     const passwordHash = await this.credentials.hashPassword(password);
-    const customerDraft = AuthCustomerModel.createDraft({ email, passwordHash });
-    const customerId = await this.insert(customerDraft);
+    const customerCandidate = AuthCustomerModel.initCandidate({ email, passwordHash });
+    const customerId = await this.insert(customerCandidate);
+    const customerLoggerPayload = AuthCustomerModel.toRegisterLoggerPayload(customerId);
+    const customerLedgerPayload = AuthCustomerModel.toRegisterLedgerPayload(customerId);
 
-    this.logger.info({ customerId }, 'Customer registered');
+    this.logger.info(customerLoggerPayload, 'Customer registered');
 
-    await this.ledger.recordRegistered({ customerId });
+    await this.ledger.recordRegistered(customerLedgerPayload);
 
-    return { id: customerId, email: customerDraft.email };
+    return AuthCustomerModel.toRegisterSnapshot(customerId, customerCandidate);
   }
 
-  private async insert(draft: IAuthCustomerDraftOutput): Promise<string> {
-    const insertResult = await this.repository.insert(draft);
+  private async insert(candidate: IAuthCustomerCandidate): Promise<string> {
+    const insertResult = await this.repository.insert(candidate);
 
     if (insertResult.outcome === AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE) {
       throw new AuthEmailTakenException();

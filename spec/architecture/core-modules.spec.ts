@@ -121,6 +121,13 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
+    it('core outbound may NOT reach domain — a port speaks its own types', async () => {
+      await expect({
+        file: 'core/modules/src/__ledger-fixture__/outbound/__fixture__.ts',
+        code: 'import { x } from "../domain";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
     it('core application may NOT reach its own infrastructure', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/application/__fixture__.ts',

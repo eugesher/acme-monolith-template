@@ -1,6 +1,6 @@
-export * from './inputs/order-get-many-record.input';
-export * from './inputs/order-record.input';
+export * from './params/order-get-many-reconstitute.interface';
+export * from './params/order-reconstitute.interface';
 
-export * from './outputs/order-get-many-snapshot.output';
-export * from './outputs/order-product.output';
-export * from './outputs/order-snapshot.output';
+export * from './snapshots/order-get-many-snapshot.interface';
+export * from './snapshots/order-product-snapshot.interface';
+export * from './snapshots/order-snapshot.interface';

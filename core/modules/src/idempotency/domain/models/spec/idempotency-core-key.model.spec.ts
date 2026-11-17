@@ -20,17 +20,17 @@ describe('IdempotencyCoreKeyModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts an in-flight key without a stored response', () => {
-      const draft = IdempotencyCoreKeyModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes an in-flight key candidate without a stored response', () => {
+      const candidate = IdempotencyCoreKeyModel.initCandidate({
         scope: 'customer:101',
         key: 'key-1',
         requestFingerprint: 'abc',
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         scope: 'customer:101',
-        key: 'key-1',
+        idempotencyKey: 'key-1',
         requestFingerprint: 'abc',
         status: 'in_flight',
         responseBody: null,
@@ -38,13 +38,13 @@ describe('IdempotencyCoreKeyModel', () => {
     });
 
     it('accepts a key of 128 characters', () => {
-      const draft = IdempotencyCoreKeyModel.createDraft({
+      const candidate = IdempotencyCoreKeyModel.initCandidate({
         scope: 'customer:101',
         key: 'k'.repeat(128),
         requestFingerprint: 'abc',
       });
 
-      expect(draft.key).toHaveLength(128);
+      expect(candidate.idempotencyKey).toHaveLength(128);
     });
 
     it.each([
@@ -56,7 +56,7 @@ describe('IdempotencyCoreKeyModel', () => {
       ],
     ])('refuses %s', (_case, value, message) => {
       expect(() =>
-        IdempotencyCoreKeyModel.createDraft({
+        IdempotencyCoreKeyModel.initCandidate({
           scope: 'customer:101',
           key: value,
           requestFingerprint: 'abc',
@@ -116,6 +116,51 @@ describe('IdempotencyCoreKeyModel', () => {
       });
 
       expect(key.isCompleted()).toBe(false);
+    });
+  });
+
+  describe('toCompleteQuery', () => {
+    it('answers the key with the response serialized for storage', () => {
+      const query = IdempotencyCoreKeyModel.toCompleteQuery({
+        scope: 'customer:101',
+        key: 'key-1',
+        response: { id: '12' },
+      });
+
+      expect(query).toEqual({ scope: 'customer:101', key: 'key-1', responseBody: '{"id":"12"}' });
+    });
+  });
+
+  describe('toKeyLoggerPayload', () => {
+    it('answers the scope and the key', () => {
+      const payload = IdempotencyCoreKeyModel.toKeyLoggerPayload({
+        scope: 'customer:101',
+        key: 'key-1',
+      });
+
+      expect(payload).toEqual({ scope: 'customer:101', idempotencyKey: 'key-1' });
+    });
+  });
+
+  describe('toStoredResponse', () => {
+    it('answers the stored response parsed back', () => {
+      const completedKey = IdempotencyCoreKeyModel.reconstitute({
+        requestFingerprint: 'fingerprint',
+        status: IdempotencyStatusEnum.COMPLETED,
+        responseBody: '{"id":"12"}',
+      });
+
+      expect(completedKey.toStoredResponse()).toEqual({ id: '12' });
+    });
+
+    it('answers null for a key without a stored response', () => {
+      const inFlightKey = IdempotencyCoreKeyModel.reconstitute({
+        requestFingerprint: 'fingerprint',
+        status: IdempotencyStatusEnum.IN_FLIGHT,
+        responseBody: null,
+      });
+
+      expect(inFlightKey.toStoredResponse()).toBeNull();
     });
   });
 });

@@ -40,7 +40,12 @@ export class ProductCoreArchiveUseCase {
     const { outcome, currentVersion } = archiveView;
 
     if (outcome === ProductCoreArchiveOutcomeEnum.ARCHIVED) {
-      this.logger.info({ productId, version: currentVersion }, 'Product archived');
+      const archiveLoggerPayload = ProductCoreModel.toArchiveLoggerPayload(
+        productId,
+        currentVersion,
+      );
+
+      this.logger.info(archiveLoggerPayload, 'Product archived');
     }
 
     return archiveView;
@@ -75,19 +80,15 @@ export class ProductCoreArchiveUseCase {
 
     product.archive();
 
-    await this.repository.update({
-      id: product.id,
-      versionAsRead,
-      status: product.status,
-      version: product.version,
-    });
+    const productUpdateQuery = product.toUpdateQuery(versionAsRead);
 
-    const { id, sku, version } = product;
-    const archivedProduct = { productId: id, sku, version, previousStatus };
+    await this.repository.update(productUpdateQuery);
+
+    const archiveLedgerPayload = product.toArchiveLedgerPayload(previousStatus);
 
     this.transaction.afterCommit(() => this.catalogCache.invalidate());
-    this.transaction.afterCommit(() => this.ledger.recordArchived(archivedProduct));
+    this.transaction.afterCommit(() => this.ledger.recordArchived(archiveLedgerPayload));
 
-    return { outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED, currentVersion: version };
+    return { outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED, currentVersion: product.version };
   }
 }

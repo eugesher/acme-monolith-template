@@ -23,13 +23,10 @@ export class ReminderRescheduleUseCase {
 
     await this.summary.invalidate(ownerId);
 
-    const reminderView = writtenReminder.toSnapshot();
+    const reminderLoggerPayload = writtenReminder.toRescheduleLoggerPayload();
 
-    this.logger.info(
-      { reminderId, dueOn: reminderView.dueOn, version: reminderView.version },
-      'Reminder rescheduled',
-    );
+    this.logger.info(reminderLoggerPayload, 'Reminder rescheduled');
 
-    return reminderView;
+    return writtenReminder.toSnapshot();
   }
 }

@@ -51,7 +51,7 @@ describe('ReminderDeleteUseCase', () => {
       expect(softDelete.mock.invocationCallOrder[0]).toBeLessThan(
         invalidate.mock.invocationCallOrder[0],
       );
-      expect(logger.info).toHaveBeenCalledWith({ reminderId: '7' }, 'Reminder deleted');
+      expect(logger.info).toHaveBeenCalledWith({ id: '7' }, 'Reminder deleted');
     });
 
     it('deletes nothing when the caller does not own the reminder', async () => {

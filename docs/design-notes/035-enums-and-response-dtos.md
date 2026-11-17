@@ -38,7 +38,7 @@ is exported, so a nested class cannot be reused by another response and drift wi
 
 | Nested DTO                   | Name                    | Example                                     |
 | ---------------------------- | ----------------------- | ------------------------------------------- |
-| the element of an array      | `<Container>ItemDto`    | `OrderResponseItemDto` for `products`       |
+| the element of an array      | `<Container>ItemDto`    | `OrderResponseItemDto` for `orderProducts`  |
 | the value of an object field | `<Container><Field>Dto` | `QueueResponseJobCountsDto` for `jobCounts` |
 
 `<Container>` is the name of the exported DTO without `Dto`. The field suffix is taken only by the
@@ -56,47 +56,3 @@ takes no `nullable`. The client reads one shape and never checks for an absent k
 
 **An enum field names its enum in the schema**: `@ApiResponseProperty({ enum, example })`, so the
 OpenAPI document lists the values and the client can generate the same enum.
-
-## Domain interfaces
-
-The interfaces of a domain lie in two folders, by the side of the model or the event they are on:
-
-| Folder                       | Kind            | What it is                                                                 |
-| ---------------------------- | --------------- | -------------------------------------------------------------------------- |
-| `domain/interfaces/inputs/`  | `record`        | the row a model is rebuilt from, `Model.reconstitute(record)`              |
-|                              | `candidate`     | the data a new row is checked against, `Model.createDraft`                 |
-|                              | `changes`       | the edits a model takes, `ProductModel.update(changes)`                    |
-| `domain/interfaces/outputs/` | `draft`         | the row `createDraft` answers for an insert                                |
-|                              | `snapshot`      | the state a model answers with `toSnapshot()`                              |
-|                              | `changes`       | the diff a model answers, `TagCommonSubjectTagsModel.replace`              |
-|                              | `ledger-record` | the ledger record an event answers, `ProductPublishedEvent.toLedgerRecord` |
-
-The direction is the type of the file and the kind ends its name: `product-record.input.ts` holds
-`IProductRecordInput`, `auth-customer-draft.output.ts` holds `IAuthCustomerDraftOutput`, and
-`tag-common-subject-tags-changes.output.ts` sets the diff of tags apart from
-`product-changes.input.ts`. A part of an input or an output without a kind of its own takes the
-direction alone: `order-stock.input.ts` is a field of `IOrderCandidateInput`,
-`order-product.output.ts` an element of `IOrderSnapshotOutput`.
-
-## Read models
-
-A read answers what a model makes of the record, never the record mapped in the application layer:
-for one row the use case calls `Model.reconstitute(record)` and answers `toSnapshot()`. A page has a
-model of its own, `<Context>GetManyModel`, whose static `toViewData(records)` rebuilds every row and
-answers the snapshots (`TagGetManyModel`): the domain defines the listed item, and the use case only
-puts the snapshots on the page. A module that only reads has a domain for that alone:
-`LedgerListEntriesModel` in `apps/staff-app/src/features/ledger`, `ProductStockCoreOnHandModel` in
-`core/modules/src/product-stock`.
-
-**A read model is a plain class.** It records no events and takes no changes, so it does not extend
-`AggregateRootBase`, like `StaffAuthCoreSubjectModel`.
-
-**A list model carries the columns of the list.** A page of orders carries no products, so
-`OrderGetManyModel` rebuilds it, not `OrderModel`, whose record requires them. Both live in the
-domain of the order, the list model with `order-get-many-record.input.ts` and
-`order-get-many-snapshot.output.ts`. A list model does not repeat the checks of the aggregate: it
-rebuilds what the aggregate stored.
-
-**A model may be rebuilt from several rows.** `ProductStockCoreOnHandModel.reconstitute` takes the
-ids of the products and the sums of their stock rows as one record and answers the stock of every
-product in the order of the ids, zero for a product without rows.

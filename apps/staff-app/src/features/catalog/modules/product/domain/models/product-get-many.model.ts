@@ -1,6 +1,6 @@
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
-import type { IProductGetManyRecordInput, IProductGetManySnapshotOutput } from '../interfaces';
+import type { IProductGetManyReconstitute, IProductGetManySnapshot } from '../interfaces';
 
 export class ProductGetManyModel {
   private constructor(
@@ -13,13 +13,13 @@ export class ProductGetManyModel {
     public readonly updatedAt: Date,
   ) {}
 
-  public static reconstitute(record: IProductGetManyRecordInput): ProductGetManyModel {
+  public static reconstitute(record: IProductGetManyReconstitute): ProductGetManyModel {
     const { id, sku, name, status, version, createdAt, updatedAt } = record;
 
     return new ProductGetManyModel(id, sku, name, status, version, createdAt, updatedAt);
   }
 
-  public static toViewData(records: IProductGetManyRecordInput[]): IProductGetManySnapshotOutput[] {
+  public static toViewData(records: IProductGetManyReconstitute[]): IProductGetManySnapshot[] {
     return records.map((record) => {
       const product = ProductGetManyModel.reconstitute(record);
 
@@ -27,7 +27,7 @@ export class ProductGetManyModel {
     });
   }
 
-  public toSnapshot(): IProductGetManySnapshotOutput {
+  private toSnapshot(): IProductGetManySnapshot {
     return {
       id: this.id,
       sku: this.sku,

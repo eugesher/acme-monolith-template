@@ -4,5 +4,5 @@ import type { ProductModel } from '../../../domain';
 
 export interface IProductWriteView {
   product: ProductModel;
-  domainEvents: DomainEventBase<string>[];
+  domainEvents: DomainEventBase[];
 }

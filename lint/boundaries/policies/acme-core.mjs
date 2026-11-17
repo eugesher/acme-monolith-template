@@ -17,12 +17,7 @@ const ownContracts = to('acme-core:contracts', own('module'));
 
 export const acmeCore = [
   from('acme-core:modules:domain', [layer('domain'), baseLibs()]),
-  from('acme-core:modules:outbound', [
-    layer('domain'),
-    layer('outbound'),
-    ownContracts,
-    baseLibs(),
-  ]),
+  from('acme-core:modules:outbound', [layer('outbound'), ownContracts, baseLibs()]),
   fromFile('acme-core:modules:outbound', persistenceInterfaces, [to('acme-core:entities')]),
   from('acme-core:modules:application', [
     layer('domain'),

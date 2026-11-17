@@ -4,7 +4,7 @@ import { ReminderStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { ReminderCreateUseCase } from '../reminder-create.use-case';
-import type { IReminderDraftOutput } from '../../../domain';
+import type { IReminderCandidate } from '../../../domain';
 
 describe('ReminderCreateUseCase', () => {
   let insert: jest.Mock;
@@ -43,7 +43,7 @@ describe('ReminderCreateUseCase', () => {
         body: undefined,
         dueOn: '2026-11-05',
       });
-      const [reminder] = insert.mock.calls[0] as [IReminderDraftOutput];
+      const [reminder] = insert.mock.calls[0] as [IReminderCandidate];
 
       expect(reminder.title).toBe('Call the bank');
       expect(reminder.body).toBe('');
@@ -60,10 +60,7 @@ describe('ReminderCreateUseCase', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
       });
-      expect(logger.info).toHaveBeenCalledWith(
-        { reminderId: '7', ownerId: 'owner-1' },
-        'Reminder created',
-      );
+      expect(logger.info).toHaveBeenCalledWith({ id: '7', ownerId: 'owner-1' }, 'Reminder created');
     });
 
     it('invalidates the summary only after the insert', async () => {

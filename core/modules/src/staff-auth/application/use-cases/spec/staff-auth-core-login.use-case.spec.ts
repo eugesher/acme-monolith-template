@@ -45,7 +45,7 @@ describe('StaffAuthCoreLoginUseCase', () => {
         password: 'correct-horse',
       });
       expect(credentials.issueAccessToken).toHaveBeenCalledWith('user-1');
-      expect(logger.info).toHaveBeenCalledWith({ userId: 'user-1' }, 'User logged in');
+      expect(logger.info).toHaveBeenCalledWith({ id: 'user-1' }, 'User logged in');
     });
 
     it('answers an unknown email after the same password check and with the outcome of a wrong password', async () => {

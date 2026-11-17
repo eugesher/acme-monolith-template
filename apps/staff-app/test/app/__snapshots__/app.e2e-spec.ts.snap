@@ -1664,12 +1664,14 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should read an order wit
       "createdAt": "2026-01-02T00:00:00.000Z",
       "customerId": "102",
       "id": "602",
-      "products": [
+      "orderProducts": [
         {
           "id": "603",
-          "name": "Deleted product",
-          "productId": "107",
-          "sku": "SKU-0008",
+          "product": {
+            "id": "107",
+            "name": "Deleted product",
+            "sku": "SKU-0008",
+          },
         },
       ],
     },
@@ -1684,18 +1686,22 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should read the order of
       "createdAt": "2026-01-01T00:00:00.000Z",
       "customerId": "101",
       "id": "600",
-      "products": [
+      "orderProducts": [
         {
           "id": "600",
-          "name": "Seeded reference product",
-          "productId": "100",
-          "sku": "SKU-0001",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
         },
         {
           "id": "601",
-          "name": "Sold out product",
-          "productId": "106",
-          "sku": "SKU-0007",
+          "product": {
+            "id": "106",
+            "name": "Sold out product",
+            "sku": "SKU-0007",
+          },
         },
       ],
     },

@@ -52,7 +52,7 @@ export class OrderE2E {
             body: {
               id: expect.any(String),
               createdAt: expect.any(String),
-              products: [{ id: expect.any(String) }, { id: expect.any(String) }],
+              orderProducts: [{ id: expect.any(String) }, { id: expect.any(String) }],
             },
           },
           db: {
@@ -86,6 +86,9 @@ export class OrderE2E {
               operationKey: expect.any(String),
               subjectId: expect.any(String),
               occurredAt: expect.any(String),
+              payload: {
+                orderProducts: [{ id: expect.any(String) }, { id: expect.any(String) }],
+              },
             },
           ],
         });
@@ -93,12 +96,12 @@ export class OrderE2E {
           db: {
             order: [{ id: response.body.id }],
             order_product: [
-              { id: response.body.products[0].id, order_id: response.body.id },
-              { id: response.body.products[1].id, order_id: response.body.id },
+              { id: response.body.orderProducts[0].id, order_id: response.body.id },
+              { id: response.body.orderProducts[1].id, order_id: response.body.id },
             ],
             product_stock: [
-              { order_product_id: response.body.products[0].id },
-              { order_product_id: response.body.products[1].id },
+              { order_product_id: response.body.orderProducts[0].id },
+              { order_product_id: response.body.orderProducts[1].id },
             ],
           },
           ledger_record_queue: [
@@ -198,7 +201,7 @@ export class OrderE2E {
             body: {
               id: expect.any(String),
               createdAt: expect.any(String),
-              products: [{ id: expect.any(String) }, { id: expect.any(String) }],
+              orderProducts: [{ id: expect.any(String) }, { id: expect.any(String) }],
             },
           },
         });

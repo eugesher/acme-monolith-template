@@ -1,14 +1,16 @@
 import type {
-  ILedgerAppendEntryCandidateInput,
-  ILedgerAppendEntryDraftOutput,
+  ILedgerAppendEntryAppendLoggerPayload,
+  ILedgerAppendEntryCandidate,
+  ILedgerAppendEntryCandidateInit,
+  ILedgerAppendEntryReceiveLoggerPayload,
 } from '../interfaces';
 
 export class LedgerAppendEntryModel {
-  public static createDraft(
-    candidate: ILedgerAppendEntryCandidateInput,
-  ): ILedgerAppendEntryDraftOutput {
+  public static initCandidate(
+    proposal: ILedgerAppendEntryCandidateInit,
+  ): ILedgerAppendEntryCandidate {
     const { operationKey, subjectType, subjectId, action, payload, correlationId, occurredAt } =
-      candidate;
+      proposal;
     const key = operationKey.trim();
     const verb = action.trim();
 
@@ -33,5 +35,19 @@ export class LedgerAppendEntryModel {
       correlationId,
       occurredAt,
     };
+  }
+
+  public static toReceiveLoggerPayload(
+    operationKey: string,
+    action: string,
+  ): ILedgerAppendEntryReceiveLoggerPayload {
+    return { operationKey, action };
+  }
+
+  public static toAppendLoggerPayload(
+    id: string,
+    candidate: ILedgerAppendEntryCandidate,
+  ): ILedgerAppendEntryAppendLoggerPayload {
+    return { id, operationKey: candidate.operationKey };
   }
 }

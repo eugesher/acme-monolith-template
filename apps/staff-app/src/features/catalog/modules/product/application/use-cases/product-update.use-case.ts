@@ -24,10 +24,10 @@ export class ProductUpdateUseCase {
 
     await this.catalogCache.invalidate();
 
-    const productView = product.toSnapshot();
+    const productLoggerPayload = product.toUpdateLoggerPayload();
 
-    this.logger.info({ productId, version: productView.version }, 'Product updated');
+    this.logger.info(productLoggerPayload, 'Product updated');
 
-    return productView;
+    return product.toSnapshot();
   }
 }

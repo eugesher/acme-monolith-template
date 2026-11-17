@@ -9,7 +9,11 @@ import {
   type IProductStockCoreMoveView,
 } from '@acme-core/contracts/product-stock';
 
-import { ProductStockCoreOnHandModel } from '../../domain';
+import {
+  ProductStockCoreMovementsModel,
+  ProductStockCoreOnHandModel,
+  type IProductStockCoreMovementsPostSubtractLoggerPayload,
+} from '../../domain';
 import {
   PRODUCT_STOCK_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
   PRODUCT_STOCK_CORE_MOVE_REPOSITORY_PORT,
@@ -47,30 +51,31 @@ export class ProductStockCoreMoveUseCase {
   public async execute(command: IProductStockCoreMoveCommand): Promise<IProductStockCoreMoveView> {
     const { kind, movements } = command;
     const sign = ProductStockCoreMoveUseCase.SIGNS[kind];
-    const productIds = [...new Set(movements.map((movement) => movement.productId))];
-    const movementRows = movements.map((movement) => ({
-      productId: movement.productId,
-      quantity: sign * movement.quantity,
-      orderProductId: movement.orderProductId,
-    }));
+    const stockMovements = ProductStockCoreMovementsModel.create({ sign, movements });
+    const productIds = stockMovements.distinctProductIds;
+    const movementRows = stockMovements.toInsertQueries();
 
     await this.repository.lockProducts(productIds);
 
-    const insertedIdentifiers = await this.repository.insertMany(movementRows);
-    const productStockIds = insertedIdentifiers.map((identifier) => String(identifier.id));
+    const insertedRows = await this.repository.insertMany(movementRows);
+    const productStockIds = ProductStockCoreMovementsModel.toProductStockIds(insertedRows);
     const stockSums = await this.repository.sumStock(productIds);
-    const onHand = ProductStockCoreOnHandModel.reconstitute({ productIds, stockSums });
+    const onHand = ProductStockCoreOnHandModel.reconstitute({
+      products: stockMovements.distinctProducts,
+      stockSums,
+    });
     const stockOnHand = onHand.toSnapshot();
 
     if (kind === ProductStockCoreMovementKindEnum.SUBTRACT) {
       const correlationId = CorrelationContextHelper.current(ProductStockCoreMoveUseCase.name);
 
+      const postSubtractLoggerPayload = stockMovements.toPostSubtractLoggerPayload();
+
       this.transaction.afterCommit(() =>
-        this.announceSubtract({
-          productIds,
-          correlationId,
-          timeoutMs: this.postSubtractTimeoutMs,
-        }),
+        this.announceSubtract(
+          { productIds, correlationId, timeoutMs: this.postSubtractTimeoutMs },
+          postSubtractLoggerPayload,
+        ),
       );
     }
 
@@ -79,15 +84,16 @@ export class ProductStockCoreMoveUseCase {
 
   private async announceSubtract(
     command: IProductStockCorePostSubtractEnqueueCommand,
+    loggerPayload: IProductStockCoreMovementsPostSubtractLoggerPayload,
   ): Promise<void> {
-    const { productIds, correlationId } = command;
+    const { correlationId } = command;
 
     await ReplayRetryHelper.retryThenLogForReplay(() => this.postSubtract.enqueue(command), {
       maxAttempts: this.postSubtractRetryAttempts,
       logger: this.logger,
       correlationId,
       label: 'Post-subtract enqueue',
-      context: { productIds },
+      context: loggerPayload,
       replayMessage:
         'Post-subtract enqueue failed permanently: the out-of-stock check of these products did not run, replay it',
     });

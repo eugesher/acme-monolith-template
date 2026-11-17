@@ -44,16 +44,16 @@ describe('NoteModel', () => {
     });
   });
 
-  describe('createDraft', () => {
-    it('drafts an unresolved note at version 1 with a trimmed subject id and body', () => {
-      const draft = NoteModel.createDraft({
+  describe('initCandidate', () => {
+    it('initializes an unresolved note candidate at version 1 with a trimmed subject id and body', () => {
+      const candidate = NoteModel.initCandidate({
         subjectType: 'product',
         subjectId: '  42  ',
         body: '  Check the supplier  ',
         authorId: 'admin-1',
       });
 
-      expect(draft).toEqual({
+      expect(candidate).toEqual({
         subjectType: 'product',
         subjectId: '42',
         body: 'Check the supplier',
@@ -64,15 +64,15 @@ describe('NoteModel', () => {
     });
 
     it('accepts any subject the pattern allows, without checking it exists', () => {
-      const draft = NoteModel.createDraft({
+      const candidate = NoteModel.initCandidate({
         subjectType: 'support-ticket',
         subjectId: 'TCK-0001',
         body: 'Escalated',
         authorId: 'admin-1',
       });
 
-      expect(draft.subjectType).toBe('support-ticket');
-      expect(draft.subjectId).toBe('TCK-0001');
+      expect(candidate.subjectType).toBe('support-ticket');
+      expect(candidate.subjectId).toBe('TCK-0001');
     });
 
     it.each([
@@ -83,7 +83,12 @@ describe('NoteModel', () => {
       ['65 characters', `i${'t'.repeat(64)}`],
     ])('refuses a subject type with %s with NOTE_SUBJECT_INVALID', (_, subjectType) => {
       expect(() =>
-        NoteModel.createDraft({ subjectType, subjectId: '42', body: 'Body', authorId: 'admin-1' }),
+        NoteModel.initCandidate({
+          subjectType,
+          subjectId: '42',
+          body: 'Body',
+          authorId: 'admin-1',
+        }),
       ).toThrow(
         expect.objectContaining({
           code: 'NOTE_SUBJECT_INVALID',
@@ -93,15 +98,15 @@ describe('NoteModel', () => {
     });
 
     it('accepts a subject type of 64 characters and a subject id of 64', () => {
-      const draft = NoteModel.createDraft({
+      const candidate = NoteModel.initCandidate({
         subjectType: `i${'t'.repeat(63)}`,
         subjectId: 's'.repeat(64),
         body: 'Body',
         authorId: 'admin-1',
       });
 
-      expect(draft.subjectType).toHaveLength(64);
-      expect(draft.subjectId).toHaveLength(64);
+      expect(candidate.subjectType).toHaveLength(64);
+      expect(candidate.subjectId).toHaveLength(64);
     });
 
     it.each([
@@ -109,7 +114,7 @@ describe('NoteModel', () => {
       ['a subject id longer than 64', 's'.repeat(65)],
     ])('refuses %s with NOTE_SUBJECT_INVALID', (_, subjectId) => {
       expect(() =>
-        NoteModel.createDraft({
+        NoteModel.initCandidate({
           subjectType: 'product',
           subjectId,
           body: 'Body',
@@ -124,14 +129,14 @@ describe('NoteModel', () => {
     });
 
     it('accepts a body of 4000 characters', () => {
-      const draft = NoteModel.createDraft({
+      const candidate = NoteModel.initCandidate({
         subjectType: 'product',
         subjectId: '42',
         body: 'b'.repeat(4000),
         authorId: 'admin-1',
       });
 
-      expect(draft.body).toHaveLength(4000);
+      expect(candidate.body).toHaveLength(4000);
     });
 
     it.each([
@@ -139,7 +144,7 @@ describe('NoteModel', () => {
       ['a body longer than 4000', 'b'.repeat(4001)],
     ])('refuses %s with NOTE_BODY_INVALID', (_, body) => {
       expect(() =>
-        NoteModel.createDraft({
+        NoteModel.initCandidate({
           subjectType: 'product',
           subjectId: '42',
           body,
@@ -271,6 +276,67 @@ describe('NoteModel', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-02T00:00:00.000Z',
       });
+    });
+  });
+
+  describe('payloads', () => {
+    let note: NoteModel;
+
+    beforeEach(() => {
+      note = NoteModel.reconstitute({
+        id: '7',
+        subjectType: 'product',
+        subjectId: '42',
+        body: 'Check the supplier',
+        authorId: 'admin-1',
+        resolved: false,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+    });
+
+    it('answers the row to update under the version as read', () => {
+      expect(note.toUpdateQuery(2)).toEqual({
+        id: '7',
+        versionAsRead: 2,
+        body: 'Check the supplier',
+        resolved: false,
+        version: 3,
+      });
+    });
+
+    it('answers the revision of the edit at the version of the note', () => {
+      expect(
+        note.toRevisionCandidateInit({
+          bodyBefore: 'Old body',
+          editorId: 'admin-1',
+          correlationId: 'correlation-1',
+        }),
+      ).toEqual({
+        noteId: '7',
+        noteVersion: 3,
+        bodyBefore: 'Old body',
+        bodyAfter: 'Check the supplier',
+        editorId: 'admin-1',
+        correlationId: 'correlation-1',
+      });
+    });
+
+    it('answers the log fields of a creation, an edit and a resolution', () => {
+      expect(note.toCreateLoggerPayload()).toEqual({
+        id: '7',
+        subjectType: 'product',
+        subjectId: '42',
+        authorId: 'admin-1',
+      });
+      expect(note.toEditLoggerPayload()).toEqual({ id: '7', authorId: 'admin-1', version: 3 });
+      expect(note.toResolveLoggerPayload()).toEqual({ id: '7', version: 3 });
+    });
+
+    it('answers the log fields of a lost optimistic race without a note', () => {
+      expect(NoteModel.toWriteRetryLoggerPayload('7', 4)).toEqual({ id: '7', version: 4 });
+      expect(NoteModel.toWriteExhaustedLoggerPayload('7')).toEqual({ id: '7' });
     });
   });
 });

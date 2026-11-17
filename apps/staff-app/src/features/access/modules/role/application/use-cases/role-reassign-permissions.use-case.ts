@@ -23,11 +23,9 @@ export class RoleReassignPermissionsUseCase {
 
   public async execute(command: IRoleReassignPermissionsCommand): Promise<IRoleView> {
     const role = await this.transaction.run(() => this.reassign(command));
+    const roleLoggerPayload = role.toReassignPermissionsLoggerPayload();
 
-    this.logger.info(
-      { role: role.name, permissionCodes: role.permissionCodes },
-      'Role permissions reassigned',
-    );
+    this.logger.info(roleLoggerPayload, 'Role permissions reassigned');
 
     return role.toSnapshot();
   }
@@ -44,7 +42,7 @@ export class RoleReassignPermissionsUseCase {
 
     role.reassignPermissions(permissionCodes);
 
-    const rolePermissions = role.permissionCodes.map((code) => ({ roleId: role.id, code }));
+    const rolePermissions = role.getRolePermissions();
 
     await this.repository.deleteRolePermissions(role.id);
     await this.repository.insertRolePermissions(rolePermissions);

@@ -5,21 +5,22 @@ describe('OrderLedgerCoreAdapter', () => {
   let adapter: OrderLedgerCoreAdapter;
 
   beforeEach(() => {
-    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     handleEnqueue = jest.fn().mockResolvedValue(undefined);
     adapter = new OrderLedgerCoreAdapter({ handleEnqueue });
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   describe('recordPlaced', () => {
-    it('enqueues the placed order under the operation key and correlation id', async () => {
+    it('enqueues the placed order under its operation key with the payload of the order', async () => {
       await adapter.recordPlaced({
-        orderId: '610',
-        customerId: 'customer-1',
-        productIds: ['100', '100'],
+        subjectId: '610',
+        occurredAt: '2026-01-05T08:00:00.000Z',
+        payload: {
+          customerId: 'customer-1',
+          orderProducts: [
+            { id: '620', product: { id: '100' } },
+            { id: '621', product: { id: '100' } },
+          ],
+        },
       });
 
       expect(handleEnqueue).toHaveBeenCalledTimes(1);
@@ -28,7 +29,13 @@ describe('OrderLedgerCoreAdapter', () => {
         subjectType: 'order',
         subjectId: '610',
         action: 'OrderPlaced',
-        payload: { customerId: 'customer-1', productIds: ['100', '100'] },
+        payload: {
+          customerId: 'customer-1',
+          orderProducts: [
+            { id: '620', product: { id: '100' } },
+            { id: '621', product: { id: '100' } },
+          ],
+        },
         occurredAt: '2026-01-05T08:00:00.000Z',
       });
     });

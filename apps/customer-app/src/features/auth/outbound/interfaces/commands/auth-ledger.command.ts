@@ -1,3 +1,3 @@
 export interface IAuthLedgerRecordRegisteredCommand {
-  customerId: string;
+  subjectId: string;
 }

@@ -1,16 +1,17 @@
 import type {
-  IProductStockCoreOnHandRecordInput,
-  IProductStockCoreOnHandSnapshotOutput,
+  IProductStockCoreOnHandReconstitute,
+  IProductStockCoreOnHandSnapshot,
 } from '../interfaces';
 
 export class ProductStockCoreOnHandModel {
-  private constructor(public readonly stock: readonly IProductStockCoreOnHandSnapshotOutput[]) {}
+  private constructor(public readonly stock: readonly IProductStockCoreOnHandSnapshot[]) {}
 
   public static reconstitute(
-    record: IProductStockCoreOnHandRecordInput,
+    record: IProductStockCoreOnHandReconstitute,
   ): ProductStockCoreOnHandModel {
-    const { productIds, stockSums } = record;
-    const stockOnHand = productIds.map((productId) => {
+    const { products, stockSums } = record;
+    const stockOnHand = products.map((product) => {
+      const productId = product.id;
       const stockSum = stockSums.find((candidate) => candidate.productId === productId);
 
       return { productId, quantity: Number(stockSum?.quantity ?? 0) };
@@ -19,7 +20,11 @@ export class ProductStockCoreOnHandModel {
     return new ProductStockCoreOnHandModel(stockOnHand);
   }
 
-  public toSnapshot(): IProductStockCoreOnHandSnapshotOutput[] {
+  public static toProductIds(products: { id: string }[]): string[] {
+    return products.map((product) => product.id);
+  }
+
+  public toSnapshot(): IProductStockCoreOnHandSnapshot[] {
     return this.stock.map((unit) => ({ productId: unit.productId, quantity: unit.quantity }));
   }
 }

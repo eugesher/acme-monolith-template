@@ -10,6 +10,7 @@ describe('common modules (common/modules/<module>)', () => {
       'apps/__common-fixture__/src/common/modules/idempotency/index.ts',
       'apps/__common-fixture__/src/common/modules/idempotency/shell/idempotency.module.ts',
       'apps/__common-fixture__/src/common/modules/idempotency/application/index.ts',
+      'apps/__common-fixture__/src/common/modules/idempotency/domain/index.ts',
       'apps/__common-fixture__/src/common/modules/idempotency/outbound/index.ts',
       'apps/__common-fixture__/src/common/modules/idempotency/infrastructure/index.ts',
       'apps/__common-fixture__/src/common/modules/idempotency/infrastructure/core-adapters/index.ts',
@@ -54,6 +55,13 @@ describe('common modules (common/modules/<module>)', () => {
       await expect({
         file: `apps/__common-fixture__/src/common/modules/idempotency/${layer}/__fixture__.ts`,
         code: 'import { Injectable } from "@nestjs/common";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('common outbound may NOT reach domain — a port speaks its own types', async () => {
+      await expect({
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/outbound/__fixture__.ts',
+        code: 'import { x } from "../domain";',
       }).toBreakRule('boundaries/dependencies');
     });
 

@@ -2,9 +2,15 @@ import { AggregateRootBase } from '@acme-libs/toolkit';
 
 import { ProductStockAddedEvent } from '../events/product-stock-added.event';
 import { ProductQuantityInvalidException } from '../exceptions/product-quantity-invalid.exception';
-import type { IProductStockRecordInput } from '../interfaces';
+import type {
+  IProductStockAddLoggerPayload,
+  IProductStockAddLoggerPayloadBuild,
+  IProductStockAddReplayLoggerPayload,
+  IProductStockOnHandSnapshot,
+  IProductStockReconstitute,
+} from '../interfaces';
 
-export class ProductStockModel extends AggregateRootBase<string> {
+export class ProductStockModel extends AggregateRootBase {
   private static readonly ADD_MAX_QUANTITY = 100_000;
 
   private constructor(
@@ -14,10 +20,24 @@ export class ProductStockModel extends AggregateRootBase<string> {
     super(productId);
   }
 
-  public static reconstitute(record: IProductStockRecordInput): ProductStockModel {
+  public static reconstitute(record: IProductStockReconstitute): ProductStockModel {
     const { id, sku } = record;
 
     return new ProductStockModel(id, sku);
+  }
+
+  public static toAddReplayLoggerPayload(
+    idempotencyKey: string,
+  ): IProductStockAddReplayLoggerPayload {
+    return { idempotencyKey };
+  }
+
+  public static toAddLoggerPayload(
+    params: IProductStockAddLoggerPayloadBuild,
+  ): IProductStockAddLoggerPayload {
+    const { productStockId, productId, quantity } = params;
+
+    return { id: productStockId, productId, quantity };
   }
 
   public add(quantity: number): void {
@@ -25,6 +45,10 @@ export class ProductStockModel extends AggregateRootBase<string> {
     const addedEvent = new ProductStockAddedEvent(this.id, this.sku, validQuantity);
 
     this.addDomainEvent(addedEvent);
+  }
+
+  public toOnHandSnapshot(quantity: number): IProductStockOnHandSnapshot {
+    return { productId: this.id, quantity };
   }
 
   private static validQuantity(quantity: number): number {

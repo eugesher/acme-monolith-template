@@ -55,7 +55,7 @@ describe('AuthRegisterUseCase', () => {
       passwordHash: 'argon-hash',
       status: 'active',
     });
-    expect(logger.info).toHaveBeenCalledWith({ customerId: '105' }, 'Customer registered');
+    expect(logger.info).toHaveBeenCalledWith({ id: '105' }, 'Customer registered');
   });
 
   it('rejects a weak password before hashing it', async () => {
@@ -96,7 +96,7 @@ describe('AuthRegisterUseCase', () => {
   it('records the registered customer in the ledger', async () => {
     await useCase.execute({ email: 'Eve@Example.com', password: 'correct-horse-battery' });
 
-    expect(recordRegistered).toHaveBeenCalledWith({ customerId: '105' });
+    expect(recordRegistered).toHaveBeenCalledWith({ subjectId: '105' });
   });
 
   it('lets a failed ledger record reject', async () => {

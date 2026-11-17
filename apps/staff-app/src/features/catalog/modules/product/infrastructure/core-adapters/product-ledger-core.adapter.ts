@@ -22,25 +22,22 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
   ) {}
 
   public async recordCreated(command: IProductLedgerRecordCreatedCommand): Promise<void> {
-    const { productId, sku, name } = command;
-    const occurredAt = new Date().toISOString();
+    const { subjectId, occurredAt, payload } = command;
 
     await this.ledger.handleEnqueue({
-      operationKey: `product-created:${productId}`,
+      operationKey: `product-created:${subjectId}`,
       subjectType: 'product',
-      subjectId: productId,
+      subjectId,
       action: 'ProductCreated',
-      payload: { sku, name },
+      payload,
       occurredAt,
     });
   }
 
   public async recordEvents(command: IProductLedgerRecordEventsCommand): Promise<void> {
-    const { events } = command;
+    const { ledgerRecords } = command;
 
-    for (const event of events) {
-      const ledgerRecord = event.toLedgerRecord();
-
+    for (const ledgerRecord of ledgerRecords) {
       await this.ledger.handleEnqueue(ledgerRecord);
     }
   }

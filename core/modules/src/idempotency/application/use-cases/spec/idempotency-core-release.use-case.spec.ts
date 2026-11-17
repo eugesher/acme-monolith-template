@@ -18,7 +18,7 @@ describe('IdempotencyCoreReleaseUseCase', () => {
 
       expect(deleteInFlight).toHaveBeenCalledWith({ scope: 'customer:101', key: 'key-1' });
       expect(logger.info).toHaveBeenCalledWith(
-        { scope: 'customer:101', key: 'key-1' },
+        { scope: 'customer:101', idempotencyKey: 'key-1' },
         'Idempotency claim released',
       );
     });

@@ -13,13 +13,15 @@ Writes that read a sum and then write against it lock the parent rows first, in 
 
 `OrderPlaceUseCase` runs:
 
-1. `lock` takes `SELECT … FOR UPDATE` on the parent rows in `id` order and sums the child rows with
+1. `OrderCandidateModel` refuses an empty request before any query;
+2. `lock` takes `SELECT … FOR UPDATE` on the parent rows in `id` order and sums the child rows with
    `FOR SHARE`;
-2. the use case reads the parent rows through its own repository, now that nobody else can change
+3. the use case reads the parent rows through its own repository, now that nobody else can change
    them;
-3. the model checks the request against the locked state;
-4. the inserts;
-5. the idempotency key is completed with the answer (see `006-idempotency-keys.md`).
+4. the model checks the request against the locked state: the products first, then the stock, so a
+   missing product is refused as missing rather than as out of stock;
+5. the inserts;
+6. the idempotency key is completed with the answer (see `006-idempotency-keys.md`).
 
 **The parent row is the lock.** Every write that touches the sums of a row takes that row first, so
 the writes queue behind each other and each sum counts every movement committed before it.

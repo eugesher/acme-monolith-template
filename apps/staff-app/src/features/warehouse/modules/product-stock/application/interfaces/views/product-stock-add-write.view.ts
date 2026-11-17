@@ -5,5 +5,5 @@ import type { IProductStockAddView } from './product-stock-add.view';
 export interface IProductStockAddWriteView {
   stockOnHand: IProductStockAddView;
   productStockId: string;
-  domainEvents: DomainEventBase<string>[];
+  domainEvents: DomainEventBase[];
 }

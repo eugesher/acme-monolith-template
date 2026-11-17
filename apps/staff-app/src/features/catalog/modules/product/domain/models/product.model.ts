@@ -7,14 +7,22 @@ import { ProductNameInvalidException } from '../exceptions/product-name-invalid.
 import { ProductSkuInvalidException } from '../exceptions/product-sku-invalid.exception';
 import { ProductVersionInvalidException } from '../exceptions/product-version-invalid.exception';
 import type {
-  IProductCandidateInput,
-  IProductChangesInput,
-  IProductDraftOutput,
-  IProductRecordInput,
-  IProductSnapshotOutput,
+  IProductCandidate,
+  IProductCandidateInit,
+  IProductCreateLedgerPayload,
+  IProductCreateLoggerPayload,
+  IProductCreateReplayLoggerPayload,
+  IProductPublishLoggerPayload,
+  IProductReconstitute,
+  IProductSnapshot,
+  IProductUpdate,
+  IProductUpdateLoggerPayload,
+  IProductUpdateQuery,
+  IProductWriteExhaustedLoggerPayload,
+  IProductWriteRetryLoggerPayload,
 } from '../interfaces';
 
-export class ProductModel extends AggregateRootBase<string> {
+export class ProductModel extends AggregateRootBase {
   public get name(): string {
     return this.currentName;
   }
@@ -42,7 +50,7 @@ export class ProductModel extends AggregateRootBase<string> {
     super(id);
   }
 
-  public static reconstitute(record: IProductRecordInput): ProductModel {
+  public static reconstitute(record: IProductReconstitute): ProductModel {
     const { id, sku, name, status, version, createdAt, updatedAt } = record;
     const validSku = ProductModel.validSku(sku);
     const validName = ProductModel.validName(name);
@@ -51,15 +59,32 @@ export class ProductModel extends AggregateRootBase<string> {
     return new ProductModel(id, validSku, validName, status, validVersion, createdAt, updatedAt);
   }
 
-  public static createDraft(candidate: IProductCandidateInput): IProductDraftOutput {
-    const { sku, name } = candidate;
+  public static initCandidate(proposal: IProductCandidateInit): IProductCandidate {
+    const { sku, name } = proposal;
     const validSku = ProductModel.validSku(sku);
     const validName = ProductModel.validName(name);
 
     return { sku: validSku, name: validName, status: ProductStatusEnum.DRAFT, version: 1 };
   }
 
-  public update(changes: IProductChangesInput): void {
+  public static toCreateReplayLoggerPayload(
+    idempotencyKey: string,
+  ): IProductCreateReplayLoggerPayload {
+    return { idempotencyKey };
+  }
+
+  public static toWriteRetryLoggerPayload(
+    id: string,
+    version: number,
+  ): IProductWriteRetryLoggerPayload {
+    return { id, version };
+  }
+
+  public static toWriteExhaustedLoggerPayload(id: string): IProductWriteExhaustedLoggerPayload {
+    return { id };
+  }
+
+  public update(changes: IProductUpdate): void {
     const { name } = changes;
 
     if (name === undefined) {
@@ -106,7 +131,7 @@ export class ProductModel extends AggregateRootBase<string> {
     this.addDomainEvent(publishedEvent);
   }
 
-  public toSnapshot(): IProductSnapshotOutput {
+  public toSnapshot(): IProductSnapshot {
     return {
       id: this.id,
       sku: this.sku,
@@ -116,6 +141,36 @@ export class ProductModel extends AggregateRootBase<string> {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+
+  public toUpdateQuery(versionAsRead: number): IProductUpdateQuery {
+    return {
+      id: this.id,
+      versionAsRead,
+      name: this.name,
+      status: this.status,
+      version: this.version,
+    };
+  }
+
+  public toCreateLedgerPayload(): IProductCreateLedgerPayload {
+    return {
+      subjectId: this.id,
+      occurredAt: this.createdAt.toISOString(),
+      payload: { sku: this.sku, name: this.name },
+    };
+  }
+
+  public toCreateLoggerPayload(): IProductCreateLoggerPayload {
+    return { id: this.id, sku: this.sku };
+  }
+
+  public toUpdateLoggerPayload(): IProductUpdateLoggerPayload {
+    return { id: this.id, version: this.version };
+  }
+
+  public toPublishLoggerPayload(): IProductPublishLoggerPayload {
+    return { id: this.id };
   }
 
   private static validSku(sku: string): string {
