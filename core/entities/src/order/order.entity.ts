@@ -16,18 +16,18 @@ import { OrderProduct } from './order-product.entity';
 @Index('idx_order_customer', ['customerId', 'id'])
 export class Order {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Column({ type: 'bigint', unsigned: true })
-  public customerId: string;
+  public readonly customerId: string;
 
   @ManyToOne(() => Customer)
   @JoinColumn({ name: 'customer_id', foreignKeyConstraintName: 'fk_order_customer' })
-  public customer: Customer;
+  public readonly customer: Customer;
 
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 
   @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
-  public orderProducts: OrderProduct[];
+  public readonly orderProducts: OrderProduct[];
 }

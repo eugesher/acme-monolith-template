@@ -1,4 +1,4 @@
-export interface INoteRevisionCandidateInit {
+export interface INoteRevisionInsertQuery {
   noteId: string;
   noteVersion: number;
   bodyBefore: string;

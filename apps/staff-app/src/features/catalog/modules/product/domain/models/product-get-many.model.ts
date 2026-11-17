@@ -4,20 +4,14 @@ import type { IProductGetManyReconstitute, IProductGetManySnapshot } from '../in
 
 export class ProductGetManyModel {
   private constructor(
-    public readonly id: string,
-    public readonly sku: string,
-    public readonly name: string,
-    public readonly status: ProductStatusEnum,
-    public readonly version: number,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    private readonly id: string,
+    private readonly sku: string,
+    private readonly name: string,
+    private readonly status: ProductStatusEnum,
+    private readonly version: number,
+    private readonly createdAt: Date,
+    private readonly updatedAt: Date,
   ) {}
-
-  public static reconstitute(record: IProductGetManyReconstitute): ProductGetManyModel {
-    const { id, sku, name, status, version, createdAt, updatedAt } = record;
-
-    return new ProductGetManyModel(id, sku, name, status, version, createdAt, updatedAt);
-  }
 
   public static toViewData(records: IProductGetManyReconstitute[]): IProductGetManySnapshot[] {
     return records.map((record) => {
@@ -25,6 +19,12 @@ export class ProductGetManyModel {
 
       return product.toSnapshot();
     });
+  }
+
+  private static reconstitute(record: IProductGetManyReconstitute): ProductGetManyModel {
+    const { id, sku, name, status, version, createdAt, updatedAt } = record;
+
+    return new ProductGetManyModel(id, sku, name, status, version, createdAt, updatedAt);
   }
 
   private toSnapshot(): IProductGetManySnapshot {

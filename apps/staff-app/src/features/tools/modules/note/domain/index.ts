@@ -12,5 +12,4 @@ export * from './interfaces';
 
 export * from './models/note-get-many.model';
 export * from './models/note-get-revisions.model';
-export * from './models/note-revision.model';
 export * from './models/note.model';

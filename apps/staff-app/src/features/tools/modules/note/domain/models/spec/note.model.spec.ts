@@ -308,7 +308,7 @@ describe('NoteModel', () => {
 
     it('answers the revision of the edit at the version of the note', () => {
       expect(
-        note.toRevisionCandidateInit({
+        note.toRevisionInsertQuery({
           bodyBefore: 'Old body',
           editorId: 'admin-1',
           correlationId: 'correlation-1',

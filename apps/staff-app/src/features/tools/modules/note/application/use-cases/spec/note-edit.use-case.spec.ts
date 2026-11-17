@@ -6,8 +6,7 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { NoteAccessService } from '../../services/note-access.service';
 import { NoteWriteService } from '../../services/note-write.service';
 import { NoteEditUseCase } from '../note-edit.use-case';
-import type { NoteRevisionModel } from '../../../domain';
-import type { INoteEditUpdateQuery } from '../../../outbound';
+import type { INoteEditRevisionInsertQuery, INoteEditUpdateQuery } from '../../../outbound';
 
 describe('NoteEditUseCase', () => {
   let findOwned: jest.Mock;
@@ -68,21 +67,19 @@ describe('NoteEditUseCase', () => {
         useCase.execute({ noteId: '7', body: ' Supplier confirmed ', editorId: 'admin-1' }),
       );
       const [command] = update.mock.calls[0] as [INoteEditUpdateQuery];
-      const [revision] = appendRevision.mock.calls[0] as [NoteRevisionModel];
+      const [revision] = appendRevision.mock.calls[0] as [INoteEditRevisionInsertQuery];
 
       expect(run).toHaveBeenCalledTimes(1);
       expect(command.versionAsRead).toBe(2);
       expect(command.body).toBe('Supplier confirmed');
       expect(command.version).toBe(3);
       expect(revision).toEqual({
-        id: undefined,
         noteId: '7',
         noteVersion: 3,
         bodyBefore: 'Check the supplier',
         bodyAfter: 'Supplier confirmed',
         editorId: 'admin-1',
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
-        recordedAt: undefined,
       });
       expect(view).toEqual({
         id: '7',

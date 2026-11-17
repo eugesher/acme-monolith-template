@@ -15,29 +15,29 @@ import { Product } from './product.entity';
 @Index('idx_product_stock_product', ['productId', 'quantity'])
 export class ProductStock {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Column({ type: 'bigint', unsigned: true })
-  public productId: string;
+  public readonly productId: string;
 
   @ManyToOne(() => Product)
   @JoinColumn({ name: 'product_id', foreignKeyConstraintName: 'fk_product_stock_product' })
-  public product: Product;
+  public readonly product: Product;
 
   @Column({ type: 'int' })
-  public quantity: number;
+  public readonly quantity: number;
 
   @Index('uq_product_stock_order_product', { unique: true })
   @Column({ type: 'bigint', unsigned: true, nullable: true })
-  public orderProductId: string | null;
+  public readonly orderProductId: string | null;
 
   @ManyToOne(() => OrderProduct, { nullable: true })
   @JoinColumn({
     name: 'order_product_id',
     foreignKeyConstraintName: 'fk_product_stock_order_product',
   })
-  public orderProduct: OrderProduct | null;
+  public readonly orderProduct: OrderProduct | null;
 
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 }

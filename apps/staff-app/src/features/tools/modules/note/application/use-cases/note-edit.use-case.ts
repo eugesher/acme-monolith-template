@@ -3,7 +3,6 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 
-import { NoteRevisionModel } from '../../domain';
 import {
   NOTE_EDIT_REPOSITORY_PORT,
   NOTE_TRANSACTION_PORT,
@@ -77,14 +76,13 @@ export class NoteEditUseCase {
     }
 
     const correlationId = CorrelationContextHelper.current(NoteEditUseCase.name);
-    const revisionCandidateInit = note.toRevisionCandidateInit({
+    const noteRevisionInsertQuery = note.toRevisionInsertQuery({
       bodyBefore,
       editorId,
       correlationId,
     });
-    const revision = NoteRevisionModel.initCandidate(revisionCandidateInit);
 
-    await this.repository.appendRevision(revision);
+    await this.repository.appendRevision(noteRevisionInsertQuery);
 
     return true;
   }

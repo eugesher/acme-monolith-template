@@ -4,18 +4,26 @@ import type { IReminderGetManyReconstitute, IReminderGetManySnapshot } from '../
 
 export class ReminderGetManyModel {
   private constructor(
-    public readonly id: string,
-    public readonly ownerId: string,
-    public readonly title: string,
-    public readonly body: string,
-    public readonly dueOn: string,
-    public readonly status: ReminderStatusEnum,
-    public readonly version: number,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    private readonly id: string,
+    private readonly ownerId: string,
+    private readonly title: string,
+    private readonly body: string,
+    private readonly dueOn: string,
+    private readonly status: ReminderStatusEnum,
+    private readonly version: number,
+    private readonly createdAt: Date,
+    private readonly updatedAt: Date,
   ) {}
 
-  public static reconstitute(record: IReminderGetManyReconstitute): ReminderGetManyModel {
+  public static toViewData(records: IReminderGetManyReconstitute[]): IReminderGetManySnapshot[] {
+    return records.map((record) => {
+      const reminder = ReminderGetManyModel.reconstitute(record);
+
+      return reminder.toSnapshot();
+    });
+  }
+
+  private static reconstitute(record: IReminderGetManyReconstitute): ReminderGetManyModel {
     const { id, ownerId, title, body, dueOn, status, version, createdAt, updatedAt } = record;
 
     return new ReminderGetManyModel(
@@ -29,14 +37,6 @@ export class ReminderGetManyModel {
       createdAt,
       updatedAt,
     );
-  }
-
-  public static toViewData(records: IReminderGetManyReconstitute[]): IReminderGetManySnapshot[] {
-    return records.map((record) => {
-      const reminder = ReminderGetManyModel.reconstitute(record);
-
-      return reminder.toSnapshot();
-    });
   }
 
   private toSnapshot(): IReminderGetManySnapshot {

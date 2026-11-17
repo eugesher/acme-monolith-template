@@ -6,9 +6,9 @@ import type { IProductLedgerRecord } from '../interfaces';
 export class ProductPublishedEvent extends DomainEventBase {
   constructor(
     productId: string,
-    public readonly sku: string,
-    public readonly version: number,
-    public readonly previousStatus: ProductStatusEnum,
+    private readonly sku: string,
+    private readonly version: number,
+    private readonly previousStatus: ProductStatusEnum,
   ) {
     super(productId);
   }

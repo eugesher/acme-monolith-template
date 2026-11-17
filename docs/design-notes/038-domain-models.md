@@ -39,8 +39,8 @@ from others stays out (`units`, `onHand`, `nameAsRead`): the message carries the
 
 **Two values of one type travel in a params object.** Positional strings swap without an error, so
 `IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key })` and
-`NoteModel.toRevisionCandidateInit({ bodyBefore, editorId, correlationId })` take one object, named
-as the params of a helper (see `029-naming.md`): `IIdempotencyCoreKeyLoggerPayloadBuild`.
+`NoteModel.toRevisionInsertQuery({ bodyBefore, editorId, correlationId })` take one object, named as
+the params of a helper (see `029-naming.md`): `IIdempotencyCoreKeyLoggerPayloadBuild`.
 
 **What stays in the use case.**
 
@@ -67,7 +67,7 @@ one params object, and every shape a model or an event answers is a snapshot.
 |                                | `I<Model>CandidateInit`                      | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                                 |
 |                                | `I<Model><Action>`                           | the edits an operation takes, `IProductUpdate` for `ProductModel.update(changes)`                                                                                                                                                                      |
 |                                | `I<Model>Create`                             | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                                                                                  |
-|                                | `I<Model><Answer>Build`                      | the values a `to…` method builds its answer from, `INoteRevisionCandidateInitBuild`                                                                                                                                                                    |
+|                                | `I<Model><Answer>Build`                      | the values a `to…` method builds its answer from, `INoteRevisionInsertQueryBuild`                                                                                                                                                                      |
 | `domain/interfaces/snapshots/` | `I<Model>Candidate`                          | the row `initCandidate` answers for an insert                                                                                                                                                                                                          |
 |                                | `I<Model>Snapshot`                           | the state a model answers with `toSnapshot()`                                                                                                                                                                                                          |
 |                                | `I<Model>InsertQuery`, `I<Model>UpdateQuery` | the row to write, `IRoleCandidateInsertQuery`, `INoteUpdateQuery`                                                                                                                                                                                      |

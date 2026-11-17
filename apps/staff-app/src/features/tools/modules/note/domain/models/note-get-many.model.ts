@@ -2,18 +2,26 @@ import type { INoteGetManyReconstitute, INoteGetManySnapshot } from '../interfac
 
 export class NoteGetManyModel {
   private constructor(
-    public readonly id: string,
-    public readonly subjectType: string,
-    public readonly subjectId: string,
-    public readonly body: string,
-    public readonly authorId: string,
-    public readonly resolved: boolean,
-    public readonly version: number,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    private readonly id: string,
+    private readonly subjectType: string,
+    private readonly subjectId: string,
+    private readonly body: string,
+    private readonly authorId: string,
+    private readonly resolved: boolean,
+    private readonly version: number,
+    private readonly createdAt: Date,
+    private readonly updatedAt: Date,
   ) {}
 
-  public static reconstitute(record: INoteGetManyReconstitute): NoteGetManyModel {
+  public static toViewData(records: INoteGetManyReconstitute[]): INoteGetManySnapshot[] {
+    return records.map((record) => {
+      const note = NoteGetManyModel.reconstitute(record);
+
+      return note.toSnapshot();
+    });
+  }
+
+  private static reconstitute(record: INoteGetManyReconstitute): NoteGetManyModel {
     const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
       record;
 
@@ -28,14 +36,6 @@ export class NoteGetManyModel {
       createdAt,
       updatedAt,
     );
-  }
-
-  public static toViewData(records: INoteGetManyReconstitute[]): INoteGetManySnapshot[] {
-    return records.map((record) => {
-      const note = NoteGetManyModel.reconstitute(record);
-
-      return note.toSnapshot();
-    });
   }
 
   private toSnapshot(): INoteGetManySnapshot {

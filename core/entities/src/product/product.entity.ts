@@ -14,23 +14,23 @@ import { ProductStatusEnum } from '@acme-libs/kernel';
 @Entity({ name: 'product' })
 export class Product {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Index('uq_product_sku', { unique: true })
   @Column({ type: 'varchar', length: 64 })
-  public sku: string;
+  public readonly sku: string;
 
   @Column({ type: 'varchar', length: 255 })
-  public name: string;
+  public readonly name: string;
 
   @Column({ type: 'enum', enum: ProductStatusEnum, default: ProductStatusEnum.DRAFT })
-  public status: ProductStatusEnum;
+  public readonly status: ProductStatusEnum;
 
   @VersionColumn({ default: 1 })
-  public version: number;
+  public readonly version: number;
 
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
@@ -38,8 +38,8 @@ export class Product {
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public readonly updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', precision: 0, nullable: true })
-  public deletedAt: Date | null;
+  public readonly deletedAt: Date | null;
 }

@@ -15,29 +15,29 @@ import { ReminderStatusEnum } from '@acme-libs/kernel';
 @Index('idx_reminder_owner_status', ['ownerId', 'status'])
 export class Reminder {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Column({ type: 'bigint', unsigned: true })
-  public ownerId: string;
+  public readonly ownerId: string;
 
   @Column({ type: 'varchar', length: 255 })
-  public title: string;
+  public readonly title: string;
 
   @Column({ type: 'varchar', length: 2000, default: '' })
-  public body: string;
+  public readonly body: string;
 
   @Index('idx_reminder_due')
   @Column({ type: 'date' })
-  public dueOn: string;
+  public readonly dueOn: string;
 
   @Column({ type: 'enum', enum: ReminderStatusEnum, default: ReminderStatusEnum.PENDING })
-  public status: ReminderStatusEnum;
+  public readonly status: ReminderStatusEnum;
 
   @VersionColumn({ default: 1 })
-  public version: number;
+  public readonly version: number;
 
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
@@ -45,8 +45,8 @@ export class Reminder {
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public readonly updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', precision: 0, nullable: true })
-  public deletedAt: Date | null;
+  public readonly deletedAt: Date | null;
 }

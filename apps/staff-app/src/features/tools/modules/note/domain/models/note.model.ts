@@ -11,8 +11,8 @@ import type {
   INoteEditLoggerPayload,
   INoteReconstitute,
   INoteResolveLoggerPayload,
-  INoteRevisionCandidateInit,
-  INoteRevisionCandidateInitBuild,
+  INoteRevisionInsertQuery,
+  INoteRevisionInsertQueryBuild,
   INoteSnapshot,
   INoteUpdateQuery,
   INoteWriteExhaustedLoggerPayload,
@@ -142,9 +142,7 @@ export class NoteModel extends AggregateRootBase {
     };
   }
 
-  public toRevisionCandidateInit(
-    params: INoteRevisionCandidateInitBuild,
-  ): INoteRevisionCandidateInit {
+  public toRevisionInsertQuery(params: INoteRevisionInsertQueryBuild): INoteRevisionInsertQuery {
     const { bodyBefore, editorId, correlationId } = params;
 
     return {
