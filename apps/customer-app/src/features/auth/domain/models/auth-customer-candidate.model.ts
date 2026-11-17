@@ -13,24 +13,29 @@ export class AuthCustomerCandidateModel {
   private static readonly MIN_PASSWORD_LENGTH = 12;
 
   private constructor(
-    private readonly email: string,
+    private email: string,
     private readonly passwordHash: string,
   ) {}
 
   public static create(proposal: IAuthCustomerCandidateCreate): AuthCustomerCandidateModel {
     const { email, passwordHash } = proposal;
-    const normalizedEmail = AuthCustomerCandidateModel.normalizeEmail(email);
 
-    if (!AuthCustomerCandidateModel.EMAIL_PATTERN.test(normalizedEmail)) {
-      throw new AuthEmailInvalidException();
-    }
-
-    return new AuthCustomerCandidateModel(normalizedEmail, passwordHash);
+    return new AuthCustomerCandidateModel(email, passwordHash);
   }
 
   public static assertPasswordStrength(password: string): void {
     if (password.length < AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH) {
       throw new AuthPasswordTooWeakException(AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH);
+    }
+  }
+
+  public normalizeEmail(): void {
+    this.email = this.email.trim().toLowerCase();
+  }
+
+  public assertEmail(): void {
+    if (!AuthCustomerCandidateModel.EMAIL_PATTERN.test(this.email)) {
+      throw new AuthEmailInvalidException();
     }
   }
 
@@ -40,9 +45,5 @@ export class AuthCustomerCandidateModel {
 
   public toRegistered(id: string): IAuthCustomerRegisterReconstitute {
     return { id, email: this.email };
-  }
-
-  private static normalizeEmail(email: string): string {
-    return email.trim().toLowerCase();
   }
 }
