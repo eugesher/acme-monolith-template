@@ -1,6 +1,6 @@
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
-export interface IProductCoreReconstitute {
+export interface IProductCoreArchiveReconstitute {
   id: string;
   sku: string;
   status: ProductStatusEnum;

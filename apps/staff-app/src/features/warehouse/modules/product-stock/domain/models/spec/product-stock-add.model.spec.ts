@@ -1,19 +1,19 @@
 import { ProductStockAddedEvent } from '../../events/product-stock-added.event';
-import { ProductStockModel } from '../product-stock.model';
+import { ProductStockAddModel } from '../product-stock-add.model';
 
-describe('ProductStockModel', () => {
+describe('ProductStockAddModel', () => {
   describe('reconstitute', () => {
     it('restores the stock of a stored product without recording anything', () => {
-      const stock = ProductStockModel.reconstitute({ id: '12', sku: 'SKU-0001' });
+      const stock = ProductStockAddModel.reconstitute({ id: '12', sku: 'SKU-0001' });
 
-      expect({ id: stock.id, sku: stock.sku }).toEqual({ id: '12', sku: 'SKU-0001' });
+      expect(stock.id).toBe('12');
       expect(stock.pullDomainEvents()).toEqual([]);
     });
   });
 
   describe('add', () => {
     it('records the units added to the product', () => {
-      const stock = ProductStockModel.reconstitute({ id: '12', sku: 'SKU-0001' });
+      const stock = ProductStockAddModel.reconstitute({ id: '12', sku: 'SKU-0001' });
 
       stock.add(5);
 
@@ -30,7 +30,7 @@ describe('ProductStockModel', () => {
       ['a fraction', 2.5],
       ['more than 100000', 100_001],
     ])('refuses %s with PRODUCT_QUANTITY_INVALID', (_, quantity) => {
-      const stock = ProductStockModel.reconstitute({ id: '12', sku: 'SKU-0001' });
+      const stock = ProductStockAddModel.reconstitute({ id: '12', sku: 'SKU-0001' });
 
       expect(() => stock.add(quantity)).toThrow(
         expect.objectContaining({
@@ -43,14 +43,14 @@ describe('ProductStockModel', () => {
 
   describe('payloads', () => {
     it('answers the stock on hand of the product', () => {
-      const productStock = ProductStockModel.reconstitute({ id: '12', sku: 'SKU-0001' });
+      const productStock = ProductStockAddModel.reconstitute({ id: '12', sku: 'SKU-0001' });
 
       expect(productStock.toOnHandSnapshot(15)).toEqual({ productId: '12', quantity: 15 });
     });
 
     it('answers the log fields of a restock', () => {
       expect(
-        ProductStockModel.toAddLoggerPayload({
+        ProductStockAddModel.toLoggerPayload({
           productStockId: '700',
           productId: '12',
           quantity: 5,

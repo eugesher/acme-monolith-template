@@ -2,11 +2,11 @@ import { ProductStatusEnum } from '@acme-libs/kernel';
 
 import type {
   IProductCoreArchiveLedgerPayload,
-  IProductCoreReconstitute,
-  IProductCoreUpdatePayload,
+  IProductCoreArchiveReconstitute,
+  IProductCoreArchiveUpdatePayload,
 } from '../interfaces';
 
-export class ProductCoreModel {
+export class ProductCoreArchiveModel {
   public get status(): ProductStatusEnum {
     return this.currentStatus;
   }
@@ -20,16 +20,16 @@ export class ProductCoreModel {
   }
 
   private constructor(
-    public readonly id: string,
-    public readonly sku: string,
+    private readonly id: string,
+    private readonly sku: string,
     private currentStatus: ProductStatusEnum,
     private currentVersion: number,
   ) {}
 
-  public static reconstitute(record: IProductCoreReconstitute): ProductCoreModel {
+  public static reconstitute(record: IProductCoreArchiveReconstitute): ProductCoreArchiveModel {
     const { id, sku, status, version } = record;
 
-    return new ProductCoreModel(id, sku, status, version);
+    return new ProductCoreArchiveModel(id, sku, status, version);
   }
 
   public archive(): void {
@@ -41,13 +41,11 @@ export class ProductCoreModel {
     this.currentVersion += 1;
   }
 
-  public toUpdatePayload(versionAsRead: number): IProductCoreUpdatePayload {
+  public toUpdatePayload(versionAsRead: number): IProductCoreArchiveUpdatePayload {
     return { id: this.id, versionAsRead, status: this.status, version: this.version };
   }
 
-  public toArchiveLedgerPayload(
-    previousStatus: ProductStatusEnum,
-  ): IProductCoreArchiveLedgerPayload {
+  public toLedgerPayload(previousStatus: ProductStatusEnum): IProductCoreArchiveLedgerPayload {
     return {
       subjectId: this.id,
       version: this.version,

@@ -5,27 +5,27 @@ import { ProductQuantityInvalidException } from '../exceptions/product-quantity-
 import type {
   IProductStockAddLoggerPayload,
   IProductStockAddLoggerPayloadBuild,
+  IProductStockAddReconstitute,
   IProductStockOnHandSnapshot,
-  IProductStockReconstitute,
 } from '../interfaces';
 
-export class ProductStockModel extends AggregateRootBase {
+export class ProductStockAddModel extends AggregateRootBase {
   private static readonly ADD_MAX_QUANTITY = 100_000;
 
   private constructor(
     productId: string,
-    public readonly sku: string,
+    private readonly sku: string,
   ) {
     super(productId);
   }
 
-  public static reconstitute(record: IProductStockReconstitute): ProductStockModel {
+  public static reconstitute(record: IProductStockAddReconstitute): ProductStockAddModel {
     const { id, sku } = record;
 
-    return new ProductStockModel(id, sku);
+    return new ProductStockAddModel(id, sku);
   }
 
-  public static toAddLoggerPayload(
+  public static toLoggerPayload(
     params: IProductStockAddLoggerPayloadBuild,
   ): IProductStockAddLoggerPayload {
     const { productStockId, productId, quantity } = params;
@@ -34,7 +34,7 @@ export class ProductStockModel extends AggregateRootBase {
   }
 
   public add(quantity: number): void {
-    const validQuantity = ProductStockModel.validQuantity(quantity);
+    const validQuantity = ProductStockAddModel.validQuantity(quantity);
     const addedEvent = new ProductStockAddedEvent(this.id, this.sku, validQuantity);
 
     this.addDomainEvent(addedEvent);
@@ -48,9 +48,9 @@ export class ProductStockModel extends AggregateRootBase {
     if (
       !Number.isInteger(quantity) ||
       quantity < 1 ||
-      quantity > ProductStockModel.ADD_MAX_QUANTITY
+      quantity > ProductStockAddModel.ADD_MAX_QUANTITY
     ) {
-      throw new ProductQuantityInvalidException(ProductStockModel.ADD_MAX_QUANTITY, quantity);
+      throw new ProductQuantityInvalidException(ProductStockAddModel.ADD_MAX_QUANTITY, quantity);
     }
 
     return quantity;

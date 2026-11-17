@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { OrderModel, OrderNotFoundException } from '../../domain';
+import { OrderGetOneModel, OrderNotFoundException } from '../../domain';
 import { ORDER_GET_ONE_REPOSITORY_PORT, type IOrderGetOneRepositoryPort } from '../../outbound';
 import type { IOrderGetOneCommand, IOrderGetOneView } from '../interfaces';
 
@@ -19,7 +19,7 @@ export class OrderGetOneUseCase {
       throw new OrderNotFoundException(orderId);
     }
 
-    const order = OrderModel.reconstitute(orderRecord);
+    const order = OrderGetOneModel.reconstitute(orderRecord);
 
     return order.toSnapshot();
   }

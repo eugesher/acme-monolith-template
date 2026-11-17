@@ -36,7 +36,8 @@ state (see Aggregates below), and a model of one use case answers with the plain
 what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
 `TagCommonSubjectTagsModel.toSnapshots`, `ProductStockCoreMovementsModel.toIds`. A child entity
 keeps its name, `createOrderProducts`, and a model that serves several use cases keeps the use case,
-`StaffAuthCoreUserModel.toLoginLoggerPayload`.
+`ProductModel.toCreateLoggerPayload`. A model of one use case takes the use case into its own name:
+`StaffAuthCoreLoginModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`, `OrderGetOneModel`.
 
 **A line of the log names the fields of the entity.** `{ id, sku }`, not `{ productId, sku }`, and
 `{ subjectType, subjectId, subjectTags: [{ tagId }] }` for the tags of a subject. A value derived

@@ -1,21 +1,21 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
 import type {
-  IStaffAuthCoreUserLoginLoggerPayload,
-  IStaffAuthCoreUserReconstitute,
+  IStaffAuthCoreLoginLoggerPayload,
+  IStaffAuthCoreLoginReconstitute,
 } from '../interfaces';
 
-export class StaffAuthCoreUserModel {
+export class StaffAuthCoreLoginModel {
   private constructor(
     public readonly id: string,
     public readonly passwordHash: string,
-    public readonly status: UserStatusEnum,
+    private readonly status: UserStatusEnum,
   ) {}
 
-  public static reconstitute(record: IStaffAuthCoreUserReconstitute): StaffAuthCoreUserModel {
+  public static reconstitute(record: IStaffAuthCoreLoginReconstitute): StaffAuthCoreLoginModel {
     const { id, passwordHash, status } = record;
 
-    return new StaffAuthCoreUserModel(id, passwordHash, status);
+    return new StaffAuthCoreLoginModel(id, passwordHash, status);
   }
 
   public static normalizeEmail(email: string): string {
@@ -26,7 +26,7 @@ export class StaffAuthCoreUserModel {
     return this.status === UserStatusEnum.ACTIVE;
   }
 
-  public toLoginLoggerPayload(): IStaffAuthCoreUserLoginLoggerPayload {
+  public toLoggerPayload(): IStaffAuthCoreLoginLoggerPayload {
     return { id: this.id };
   }
 }

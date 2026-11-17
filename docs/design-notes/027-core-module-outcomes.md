@@ -27,7 +27,7 @@ own otherwise. It locks the row before it reads it (see `021-pessimistic-locking
 it drops a cache (see `020-cross-app-cache-invalidation.md`) and enqueues a ledger record (see
 `022-enqueue-after-commit.md`).
 
-**The module has its own model**, `ProductCoreModel`, narrowed to the columns it writes.
+**The module has its own model**, `ProductCoreArchiveModel`, narrowed to the columns it writes.
 
 ## Wiring
 

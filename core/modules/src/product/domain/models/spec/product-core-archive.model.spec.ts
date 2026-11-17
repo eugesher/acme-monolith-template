@@ -1,13 +1,13 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
-import { ProductCoreModel } from '../product-core.model';
+import { ProductCoreArchiveModel } from '../product-core-archive.model';
 
-describe('ProductCoreModel', () => {
+describe('ProductCoreArchiveModel', () => {
   describe('archive', () => {
     it.each([ProductStatusEnum.DRAFT, ProductStatusEnum.ACTIVE])(
       'archives a %s product and bumps the version',
       (status) => {
-        const product = ProductCoreModel.reconstitute({
+        const product = ProductCoreArchiveModel.reconstitute({
           id: '12',
           sku: 'SKU-0001',
           status,
@@ -23,7 +23,7 @@ describe('ProductCoreModel', () => {
     );
 
     it('changes nothing on an archived product', () => {
-      const product = ProductCoreModel.reconstitute({
+      const product = ProductCoreArchiveModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,
@@ -38,10 +38,10 @@ describe('ProductCoreModel', () => {
   });
 
   describe('payloads', () => {
-    let product: ProductCoreModel;
+    let product: ProductCoreArchiveModel;
 
     beforeEach(() => {
-      product = ProductCoreModel.reconstitute({
+      product = ProductCoreArchiveModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,
@@ -59,7 +59,7 @@ describe('ProductCoreModel', () => {
     });
 
     it('answers the archive as a ledger record with the status it left', () => {
-      expect(product.toArchiveLedgerPayload(ProductStatusEnum.ACTIVE)).toEqual({
+      expect(product.toLedgerPayload(ProductStatusEnum.ACTIVE)).toEqual({
         subjectId: '12',
         version: 4,
         payload: { sku: 'SKU-0001', previousStatus: 'active' },

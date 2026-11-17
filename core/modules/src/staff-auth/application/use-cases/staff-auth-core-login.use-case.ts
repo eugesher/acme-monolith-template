@@ -7,7 +7,7 @@ import {
   type IStaffAuthCoreLoginView,
 } from '@acme-core/contracts/staff-auth';
 
-import { StaffAuthCoreUserModel } from '../../domain';
+import { StaffAuthCoreLoginModel } from '../../domain';
 import {
   STAFF_AUTH_CORE_CREDENTIALS_PORT,
   STAFF_AUTH_CORE_LOGIN_REPOSITORY_PORT,
@@ -28,9 +28,9 @@ export class StaffAuthCoreLoginUseCase {
 
   public async execute(command: IStaffAuthCoreLoginCommand): Promise<IStaffAuthCoreLoginView> {
     const { email, password } = command;
-    const normalizedEmail = StaffAuthCoreUserModel.normalizeEmail(email);
+    const normalizedEmail = StaffAuthCoreLoginModel.normalizeEmail(email);
     const userRecord = await this.repository.findByEmail(normalizedEmail);
-    const user = userRecord ? StaffAuthCoreUserModel.reconstitute(userRecord) : null;
+    const user = userRecord ? StaffAuthCoreLoginModel.reconstitute(userRecord) : null;
     const passwordHash = user?.passwordHash ?? null;
     const isPasswordValid = await this.credentials.verifyPassword({ passwordHash, password });
 
@@ -64,7 +64,7 @@ export class StaffAuthCoreLoginUseCase {
 
     const accessToken = await this.credentials.issueAccessToken(user.id);
 
-    const userLoggerPayload = user.toLoginLoggerPayload();
+    const userLoggerPayload = user.toLoggerPayload();
 
     this.logger.info(userLoggerPayload, 'User logged in');
 

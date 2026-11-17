@@ -1,11 +1,11 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import { StaffAuthCoreUserModel } from '../staff-auth-core-user.model';
+import { StaffAuthCoreLoginModel } from '../staff-auth-core-login.model';
 
-describe('StaffAuthCoreUserModel', () => {
+describe('StaffAuthCoreLoginModel', () => {
   describe('reconstitute', () => {
     it('keeps the stored state as is', () => {
-      const user = StaffAuthCoreUserModel.reconstitute({
+      const user = StaffAuthCoreLoginModel.reconstitute({
         id: 'user-1',
         passwordHash: 'hash',
         status: UserStatusEnum.DISABLED,
@@ -21,7 +21,7 @@ describe('StaffAuthCoreUserModel', () => {
 
   describe('normalizeEmail', () => {
     it('trims and lowercases the address', () => {
-      const email = StaffAuthCoreUserModel.normalizeEmail(' Admin@Example.com ');
+      const email = StaffAuthCoreLoginModel.normalizeEmail(' Admin@Example.com ');
 
       expect(email).toBe('admin@example.com');
     });
@@ -29,7 +29,7 @@ describe('StaffAuthCoreUserModel', () => {
 
   describe('isActive', () => {
     it('answers true for an active user', () => {
-      const user = StaffAuthCoreUserModel.reconstitute({
+      const user = StaffAuthCoreLoginModel.reconstitute({
         id: 'user-1',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,
@@ -39,7 +39,7 @@ describe('StaffAuthCoreUserModel', () => {
     });
 
     it('answers false for a disabled user', () => {
-      const user = StaffAuthCoreUserModel.reconstitute({
+      const user = StaffAuthCoreLoginModel.reconstitute({
         id: 'user-1',
         passwordHash: 'hash',
         status: UserStatusEnum.DISABLED,
@@ -49,15 +49,15 @@ describe('StaffAuthCoreUserModel', () => {
     });
   });
 
-  describe('toLoginLoggerPayload', () => {
+  describe('toLoggerPayload', () => {
     it('answers the id of the user who logged in', () => {
-      const user = StaffAuthCoreUserModel.reconstitute({
+      const user = StaffAuthCoreLoginModel.reconstitute({
         id: 'user-1',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,
       });
 
-      expect(user.toLoginLoggerPayload()).toEqual({ id: 'user-1' });
+      expect(user.toLoggerPayload()).toEqual({ id: 'user-1' });
     });
   });
 });

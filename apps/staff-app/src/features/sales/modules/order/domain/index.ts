@@ -7,4 +7,4 @@ export * from './exceptions/order-tag-not-found.exception';
 export * from './interfaces';
 
 export * from './models/order-get-many.model';
-export * from './models/order.model';
+export * from './models/order-get-one.model';

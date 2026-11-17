@@ -1,4 +1,4 @@
-export interface IOrderReconstitute {
+export interface IOrderGetOneReconstitute {
   id: string;
   customerId: string;
   createdAt: Date;

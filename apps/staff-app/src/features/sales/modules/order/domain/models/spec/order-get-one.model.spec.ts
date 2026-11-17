@@ -1,9 +1,9 @@
-import { OrderModel } from '../order.model';
+import { OrderGetOneModel } from '../order-get-one.model';
 
-describe('OrderModel', () => {
+describe('OrderGetOneModel', () => {
   describe('toSnapshot', () => {
     it('answers a found order with its owner and its products', () => {
-      const order = OrderModel.reconstitute({
+      const order = OrderGetOneModel.reconstitute({
         id: '600',
         customerId: 'customer-1',
         createdAt: new Date('2026-01-03T00:00:00.000Z'),

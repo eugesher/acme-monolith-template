@@ -6,7 +6,7 @@ import {
   ProductIdempotentRequestInFlightException,
   ProductNotFoundException,
   ProductStockAddedEvent,
-  ProductStockModel,
+  ProductStockAddModel,
 } from '../../domain';
 import {
   PRODUCT_STOCK_ADD_REPOSITORY_PORT,
@@ -73,7 +73,7 @@ export class ProductStockAddUseCase {
 
     await this.ledger.recordEvents({ ledgerRecords });
 
-    const addLoggerPayload = ProductStockModel.toAddLoggerPayload({
+    const addLoggerPayload = ProductStockAddModel.toLoggerPayload({
       productStockId,
       productId,
       quantity,
@@ -106,7 +106,7 @@ export class ProductStockAddUseCase {
       throw new ProductNotFoundException(productId);
     }
 
-    const productStock = ProductStockModel.reconstitute(productRecord);
+    const productStock = ProductStockAddModel.reconstitute(productRecord);
 
     productStock.add(quantity);
 
