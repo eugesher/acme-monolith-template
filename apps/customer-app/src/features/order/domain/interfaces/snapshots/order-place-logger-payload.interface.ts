@@ -4,5 +4,5 @@ export interface IOrderPlaceLoggerPayload {
   readonly id: string;
   readonly createdAt: string;
   readonly customerId: string;
-  readonly orderProducts: readonly IOrderProductReferenceSnapshot[];
+  readonly orderProducts: IOrderProductReferenceSnapshot[];
 }

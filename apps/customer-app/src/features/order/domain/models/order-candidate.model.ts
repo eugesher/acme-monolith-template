@@ -15,7 +15,7 @@ export class OrderCandidateModel {
 
   private constructor(
     public readonly customerId: string,
-    public readonly productIds: string[],
+    public readonly productIds: readonly string[],
   ) {}
 
   public static create(proposal: IOrderCandidateCreate): OrderCandidateModel {

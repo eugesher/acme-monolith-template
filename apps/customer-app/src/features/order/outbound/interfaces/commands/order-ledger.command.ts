@@ -1,12 +1,12 @@
 export interface IOrderLedgerRecordPlacedCommand {
-  readonly subjectId: string;
-  readonly occurredAt: string;
-  readonly payload: {
-    readonly customerId: string;
-    readonly orderProducts: readonly {
-      readonly id: string;
-      readonly product: {
-        readonly id: string;
+  subjectId: string;
+  occurredAt: string;
+  payload: {
+    customerId: string;
+    orderProducts: {
+      id: string;
+      product: {
+        id: string;
       };
     }[];
   };
