@@ -27,7 +27,7 @@ export class ProductStockCoreMovementsModel {
     return new ProductStockCoreMovementsModel(sign, movements);
   }
 
-  public static toProductStockIds(rows: IProductStockCoreMovementsInsertedRow[]): string[] {
+  public static toIds(rows: IProductStockCoreMovementsInsertedRow[]): string[] {
     return rows.map((row) => String(row.id));
   }
 

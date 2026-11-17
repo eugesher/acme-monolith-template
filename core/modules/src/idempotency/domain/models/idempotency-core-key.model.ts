@@ -59,7 +59,7 @@ export class IdempotencyCoreKeyModel {
     return { scope, key, responseBody };
   }
 
-  public static toKeyLoggerPayload(
+  public static toLoggerPayload(
     params: IIdempotencyCoreKeyLoggerPayloadBuild,
   ): IIdempotencyCoreKeyLoggerPayload {
     const { scope, key } = params;

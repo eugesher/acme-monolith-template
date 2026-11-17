@@ -31,7 +31,7 @@ export class TagCommonSubjectTagsModel {
     return [...distinct].filter((tagId) => !known.has(tagId));
   }
 
-  public static toTagSnapshots(
+  public static toSnapshots(
     tags: readonly ITagCommonSubjectTagsTag[],
   ): ITagCommonSubjectTagsTagSnapshot[] {
     return tags.map((tag) => ({ id: tag.id, name: tag.name }));

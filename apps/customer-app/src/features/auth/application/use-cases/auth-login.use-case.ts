@@ -24,8 +24,10 @@ export class AuthLoginUseCase {
   public async execute(command: IAuthLoginCommand): Promise<IAuthLoginView> {
     const { email, password } = command;
     const normalizedEmail = AuthCustomerLoginModel.normalizeEmail(email);
+
     const customerRecord = await this.repository.findByEmail(normalizedEmail);
     const customer = customerRecord ? AuthCustomerLoginModel.reconstitute(customerRecord) : null;
+
     const passwordHash = customer?.passwordHash ?? null;
     const isPasswordValid = await this.credentials.verifyPassword({ passwordHash, password });
 
@@ -44,8 +46,7 @@ export class AuthLoginUseCase {
     customer.assertActive();
 
     const accessToken = await this.credentials.issueAccessToken(customer.id);
-
-    const customerLoggerPayload = customer.toLoginLoggerPayload();
+    const customerLoggerPayload = customer.toLoggerPayload();
 
     this.logger.info(customerLoggerPayload, 'Customer logged in');
 

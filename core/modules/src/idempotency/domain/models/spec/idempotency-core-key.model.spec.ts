@@ -135,9 +135,9 @@ describe('IdempotencyCoreKeyModel', () => {
     });
   });
 
-  describe('toKeyLoggerPayload', () => {
+  describe('toLoggerPayload', () => {
     it('answers the scope and the key', () => {
-      const payload = IdempotencyCoreKeyModel.toKeyLoggerPayload({
+      const payload = IdempotencyCoreKeyModel.toLoggerPayload({
         scope: 'customer:101',
         key: 'key-1',
       });

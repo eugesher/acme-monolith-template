@@ -43,7 +43,7 @@ export class IdempotencyCoreClaimUseCase {
     const existingKey = IdempotencyCoreKeyModel.reconstitute(keyRecord);
 
     if (!existingKey.matches(requestFingerprint)) {
-      const keyLoggerPayload = IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key });
+      const keyLoggerPayload = IdempotencyCoreKeyModel.toLoggerPayload({ scope, key });
 
       this.logger.info(
         keyLoggerPayload,
@@ -63,7 +63,7 @@ export class IdempotencyCoreClaimUseCase {
   }
 
   private inFlight(scope: string, key: string): IIdempotencyCoreClaimView {
-    const keyLoggerPayload = IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key });
+    const keyLoggerPayload = IdempotencyCoreKeyModel.toLoggerPayload({ scope, key });
 
     this.logger.info(keyLoggerPayload, 'Idempotency key is in flight, the request is refused');
 

@@ -64,7 +64,7 @@ export class TagCommonReplaceUseCase {
     await this.repository.unlink(subjectTagChanges.unlink);
     await this.repository.link(subjectTagChanges.link);
 
-    const tagSnapshots = TagCommonSubjectTagsModel.toTagSnapshots(tags);
+    const tagSnapshots = TagCommonSubjectTagsModel.toSnapshots(tags);
 
     return { outcome: TagCommonReplaceOutcomeEnum.REPLACED, tags: tagSnapshots, missingTagIds: [] };
   }

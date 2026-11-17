@@ -23,7 +23,7 @@ export class IdempotencyCoreReleaseUseCase {
 
     await this.repository.deleteInFlight({ scope, key });
 
-    const keyLoggerPayload = IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key });
+    const keyLoggerPayload = IdempotencyCoreKeyModel.toLoggerPayload({ scope, key });
 
     this.logger.info(keyLoggerPayload, 'Idempotency claim released');
   }

@@ -22,9 +22,9 @@ was created (`createdAt`); the adapter of the port adds the operation key, the t
 and the action (see `022-enqueue-after-commit.md`).
 
 **Without an instance, a static method answers.** An idempotency key has only its scope and key, so
-`IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key })` names the fields of the log line. A
-static method that would only wrap its arguments in an object is not written: the use case logs the
-literal (see below).
+`IdempotencyCoreKeyModel.toLoggerPayload({ scope, key })` names the fields of the log line. A static
+method that would only wrap its arguments in an object is not written: the use case logs the literal
+(see below).
 
 **One model answers each of its use cases with a method of its own.** `ProductModel` serves the
 creation, the update and the publication, so it has `toCreateLoggerPayload`, `toUpdateLoggerPayload`
@@ -37,7 +37,7 @@ from others stays out (`units`, `onHand`, `nameAsRead`): the message carries the
 `Ledger record already appended` does.
 
 **Two values of one type travel in a params object.** Positional strings swap without an error, so
-`IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key })` and
+`IdempotencyCoreKeyModel.toLoggerPayload({ scope, key })` and
 `NoteModel.toRevisionInsertPayload({ bodyBefore, editorId, correlationId })` take one object, named
 as the params of a helper (see `029-naming.md`): `IIdempotencyCoreKeyLoggerPayloadBuild`.
 

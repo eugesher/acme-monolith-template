@@ -23,7 +23,7 @@ export class AuthCustomerLoginModel {
     return email.trim().toLowerCase();
   }
 
-  public toLoginLoggerPayload(): IAuthCustomerLoginLoggerPayload {
+  public toLoggerPayload(): IAuthCustomerLoginLoggerPayload {
     return { id: this.id };
   }
 

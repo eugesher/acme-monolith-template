@@ -36,11 +36,12 @@ describe('ProductStockCoreMovementsModel', () => {
     });
   });
 
-  describe('toProductStockIds', () => {
+  describe('toIds', () => {
     it('answers the id of every inserted row as a string', () => {
-      expect(
-        ProductStockCoreMovementsModel.toProductStockIds([{ id: 700 }, { id: '701' }]),
-      ).toEqual(['700', '701']);
+      expect(ProductStockCoreMovementsModel.toIds([{ id: 700 }, { id: '701' }])).toEqual([
+        '700',
+        '701',
+      ]);
     });
   });
 

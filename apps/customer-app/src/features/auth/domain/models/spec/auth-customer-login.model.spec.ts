@@ -27,7 +27,7 @@ describe('AuthCustomerLoginModel', () => {
     });
   });
 
-  describe('toLoginLoggerPayload', () => {
+  describe('toLoggerPayload', () => {
     it('answers the id of the customer who logged in', () => {
       const customer = AuthCustomerLoginModel.reconstitute({
         id: 'customer-1',
@@ -35,7 +35,7 @@ describe('AuthCustomerLoginModel', () => {
         status: UserStatusEnum.ACTIVE,
       });
 
-      expect(customer.toLoginLoggerPayload()).toEqual({ id: 'customer-1' });
+      expect(customer.toLoggerPayload()).toEqual({ id: 'customer-1' });
     });
   });
 

@@ -24,9 +24,9 @@ describe('TagCommonSubjectTagsModel', () => {
     });
   });
 
-  describe('toTagSnapshots', () => {
+  describe('toSnapshots', () => {
     it('answers the id and the name of every tag', () => {
-      const snapshots = TagCommonSubjectTagsModel.toTagSnapshots([{ id: '1', name: 'promo' }]);
+      const snapshots = TagCommonSubjectTagsModel.toSnapshots([{ id: '1', name: 'promo' }]);
 
       expect(snapshots).toEqual([{ id: '1', name: 'promo' }]);
     });

@@ -58,7 +58,7 @@ export class ProductStockCoreMoveUseCase {
     await this.repository.lockProducts(productIds);
 
     const insertedRows = await this.repository.insertMany(movementRows);
-    const productStockIds = ProductStockCoreMovementsModel.toProductStockIds(insertedRows);
+    const productStockIds = ProductStockCoreMovementsModel.toIds(insertedRows);
     const stockSums = await this.repository.sumStock(productIds);
     const onHand = ProductStockCoreOnHandModel.reconstitute({
       products: stockMovements.distinctProducts,
