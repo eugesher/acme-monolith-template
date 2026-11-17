@@ -1,11 +1,11 @@
 import { IdentityExceptionCodeEnum, UserStatusEnum } from '@acme-libs/kernel';
 
-import { AuthCustomerModel } from '../auth-customer.model';
+import { AuthCustomerLoginModel } from '../auth-customer-login.model';
 
-describe('AuthCustomerModel', () => {
+describe('AuthCustomerLoginModel', () => {
   describe('reconstitute', () => {
     it('keeps the stored state as is', () => {
-      const customer = AuthCustomerModel.reconstitute({
+      const customer = AuthCustomerLoginModel.reconstitute({
         id: 'customer-1',
         passwordHash: 'hash',
         status: UserStatusEnum.DISABLED,
@@ -21,7 +21,7 @@ describe('AuthCustomerModel', () => {
 
   describe('normalizeEmail', () => {
     it('trims the email and lowers its case', () => {
-      const email = AuthCustomerModel.normalizeEmail('  Ann@Example.COM ');
+      const email = AuthCustomerLoginModel.normalizeEmail('  Ann@Example.COM ');
 
       expect(email).toBe('ann@example.com');
     });
@@ -29,7 +29,7 @@ describe('AuthCustomerModel', () => {
 
   describe('toLoginLoggerPayload', () => {
     it('answers the id of the customer who logged in', () => {
-      const customer = AuthCustomerModel.reconstitute({
+      const customer = AuthCustomerLoginModel.reconstitute({
         id: 'customer-1',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,
@@ -41,7 +41,7 @@ describe('AuthCustomerModel', () => {
 
   describe('assertActive', () => {
     it('lets an active customer through', () => {
-      const customer = AuthCustomerModel.reconstitute({
+      const customer = AuthCustomerLoginModel.reconstitute({
         id: 'customer-1',
         passwordHash: 'hash',
         status: UserStatusEnum.ACTIVE,
@@ -51,7 +51,7 @@ describe('AuthCustomerModel', () => {
     });
 
     it('refuses a disabled customer with AUTH_USER_INACTIVE', () => {
-      const customer = AuthCustomerModel.reconstitute({
+      const customer = AuthCustomerLoginModel.reconstitute({
         id: 'customer-1',
         passwordHash: 'hash',
         status: UserStatusEnum.DISABLED,

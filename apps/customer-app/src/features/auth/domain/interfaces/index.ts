@@ -1,5 +1,5 @@
 export * from './params/auth-customer-candidate-create.interface';
-export * from './params/auth-customer-reconstitute.interface';
+export * from './params/auth-customer-login-reconstitute.interface';
 export * from './params/auth-customer-register-reconstitute.interface';
 
 export * from './snapshots/auth-customer-candidate-insert-payload.interface';

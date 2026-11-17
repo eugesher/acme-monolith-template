@@ -2,7 +2,6 @@ import { UserStatusEnum } from '@acme-libs/kernel';
 
 import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
 import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
-import { AuthCustomerModel } from './auth-customer.model';
 import type {
   IAuthCustomerCandidateCreate,
   IAuthCustomerCandidateInsertPayload,
@@ -20,7 +19,7 @@ export class AuthCustomerCandidateModel {
 
   public static create(proposal: IAuthCustomerCandidateCreate): AuthCustomerCandidateModel {
     const { email, passwordHash } = proposal;
-    const normalizedEmail = AuthCustomerModel.normalizeEmail(email);
+    const normalizedEmail = AuthCustomerCandidateModel.normalizeEmail(email);
 
     if (!AuthCustomerCandidateModel.EMAIL_PATTERN.test(normalizedEmail)) {
       throw new AuthEmailInvalidException();
@@ -41,5 +40,9 @@ export class AuthCustomerCandidateModel {
 
   public toRegistered(id: string): IAuthCustomerRegisterReconstitute {
     return { id, email: this.email };
+  }
+
+  private static normalizeEmail(email: string): string {
+    return email.trim().toLowerCase();
   }
 }

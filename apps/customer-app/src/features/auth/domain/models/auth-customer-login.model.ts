@@ -1,19 +1,22 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
 import { AuthUserInactiveException } from '../exceptions/auth-user-inactive.exception';
-import type { IAuthCustomerLoginLoggerPayload, IAuthCustomerReconstitute } from '../interfaces';
+import type {
+  IAuthCustomerLoginLoggerPayload,
+  IAuthCustomerLoginReconstitute,
+} from '../interfaces';
 
-export class AuthCustomerModel {
+export class AuthCustomerLoginModel {
   private constructor(
     public readonly id: string,
     public readonly passwordHash: string,
     public readonly status: UserStatusEnum,
   ) {}
 
-  public static reconstitute(record: IAuthCustomerReconstitute): AuthCustomerModel {
+  public static reconstitute(record: IAuthCustomerLoginReconstitute): AuthCustomerLoginModel {
     const { id, passwordHash, status } = record;
 
-    return new AuthCustomerModel(id, passwordHash, status);
+    return new AuthCustomerLoginModel(id, passwordHash, status);
   }
 
   public static normalizeEmail(email: string): string {
