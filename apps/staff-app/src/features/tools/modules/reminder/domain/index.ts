@@ -11,5 +11,10 @@ export * from './exceptions/reminder-version-mismatch.exception';
 
 export * from './interfaces';
 
+export * from './aggregates/reminder.aggregate';
+
+export * from './models/reminder-complete.model';
+export * from './models/reminder-create.model';
+export * from './models/reminder-delete.model';
 export * from './models/reminder-get-many.model';
-export * from './models/reminder.model';
+export * from './models/reminder-reschedule.model';

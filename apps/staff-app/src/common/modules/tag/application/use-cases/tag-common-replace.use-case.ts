@@ -7,7 +7,7 @@ import {
   type ITagCommonReplaceView,
 } from '@acme-staff/contracts/tag';
 
-import { TagCommonSubjectTagsModel } from '../../domain';
+import { TagCommonSubjectTagsReplaceModel } from '../../domain';
 import {
   TAG_COMMON_REPLACE_REPOSITORY_PORT,
   TAG_COMMON_TRANSACTION_PORT,
@@ -32,7 +32,7 @@ export class TagCommonReplaceUseCase {
     const { outcome, tags } = replaceView;
 
     if (outcome === TagCommonReplaceOutcomeEnum.REPLACED) {
-      const replaceLoggerPayload = TagCommonSubjectTagsModel.toReplaceLoggerPayload({
+      const replaceLoggerPayload = TagCommonSubjectTagsReplaceModel.toLoggerPayload({
         subjectType,
         subjectId,
         tags,
@@ -47,14 +47,14 @@ export class TagCommonReplaceUseCase {
   private async replace(command: ITagCommonReplaceCommand): Promise<ITagCommonReplaceView> {
     const { subjectType, subjectId, tagIds } = command;
     const tags = await this.repository.lockTags(tagIds);
-    const missingTagIds = TagCommonSubjectTagsModel.missingTagIds(tagIds, tags);
+    const missingTagIds = TagCommonSubjectTagsReplaceModel.missingTagIds(tagIds, tags);
 
     if (missingTagIds.length > 0) {
       return { outcome: TagCommonReplaceOutcomeEnum.TAG_NOT_FOUND, tags: [], missingTagIds };
     }
 
     const subjectTagRecords = await this.repository.findLinked({ subjectType, subjectId });
-    const subjectTags = TagCommonSubjectTagsModel.reconstitute({
+    const subjectTags = TagCommonSubjectTagsReplaceModel.reconstitute({
       subjectType,
       subjectId,
       subjectTags: subjectTagRecords,
@@ -64,7 +64,7 @@ export class TagCommonReplaceUseCase {
     await this.repository.unlink(subjectTagChanges.unlink);
     await this.repository.link(subjectTagChanges.link);
 
-    const tagSnapshots = TagCommonSubjectTagsModel.toSnapshots(tags);
+    const tagSnapshots = TagCommonSubjectTagsReplaceModel.toSnapshots(tags);
 
     return { outcome: TagCommonReplaceOutcomeEnum.REPLACED, tags: tagSnapshots, missingTagIds: [] };
   }

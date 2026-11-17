@@ -15,7 +15,7 @@ export class ProductGetTagsUseCase {
   public async execute(command: IProductGetTagsCommand): Promise<IProductTagsView> {
     const { productId } = command;
 
-    await this.accessService.load({ productId });
+    await this.accessService.assertExists({ productId });
 
     const tags = await this.tag.find({ productId });
 

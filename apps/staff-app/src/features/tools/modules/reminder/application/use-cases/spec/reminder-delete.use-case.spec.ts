@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ReminderStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ReminderModel } from '../../../domain';
+import { ReminderDeleteModel } from '../../../domain';
 import { ReminderDeleteUseCase } from '../reminder-delete.use-case';
 import type { ReminderAccessService } from '../../services/reminder-access.service';
 
@@ -16,7 +16,7 @@ describe('ReminderDeleteUseCase', () => {
 
   beforeEach(() => {
     loadOwned = jest.fn().mockResolvedValue(
-      ReminderModel.reconstitute({
+      ReminderDeleteModel.reconstitute({
         id: '7',
         ownerId: 'owner-1',
         title: 'Call the bank',
@@ -45,7 +45,10 @@ describe('ReminderDeleteUseCase', () => {
         useCase.execute({ reminderId: '7', ownerId: 'owner-1' }),
       ).resolves.toBeUndefined();
 
-      expect(loadOwned).toHaveBeenCalledWith({ reminderId: '7', ownerId: 'owner-1' });
+      expect(loadOwned).toHaveBeenCalledWith(
+        { reminderId: '7', ownerId: 'owner-1' },
+        ReminderDeleteModel.reconstitute,
+      );
       expect(softDelete).toHaveBeenCalledWith('7');
       expect(invalidate).toHaveBeenCalledWith('owner-1');
       expect(softDelete.mock.invocationCallOrder[0]).toBeLessThan(

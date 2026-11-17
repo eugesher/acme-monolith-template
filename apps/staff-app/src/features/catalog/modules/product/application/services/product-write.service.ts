@@ -5,9 +5,10 @@ import { OccRetryHelper } from '@acme-libs/toolkit';
 
 import {
   ProductHelper,
-  ProductModel,
   ProductNotFoundException,
   ProductVersionMismatchException,
+  type IProductReconstitute,
+  type ProductAggregate,
 } from '../../domain';
 import {
   PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN,
@@ -30,14 +31,15 @@ export class ProductWriteService {
     private readonly logger: PinoLogger,
   ) {}
 
-  public async write(
+  public async write<TProduct extends ProductAggregate>(
     command: IProductWriteCommand,
-    mutate: (product: ProductModel) => void,
-  ): Promise<IProductWriteView> {
+    reconstitute: (record: IProductReconstitute) => TProduct,
+    mutate: (product: TProduct) => void,
+  ): Promise<IProductWriteView<TProduct>> {
     const { productId, expectedVersion } = command;
     const maxAttempts = expectedVersion === undefined ? this.occRetryAttempts : 1;
 
-    return await OccRetryHelper.run(() => this.attempt(command, mutate), {
+    return await OccRetryHelper.run(() => this.attempt(command, reconstitute, mutate), {
       subject: 'Product',
       logger: this.logger,
       maxAttempts,
@@ -55,12 +57,13 @@ export class ProductWriteService {
     });
   }
 
-  private async attempt(
+  private async attempt<TProduct extends ProductAggregate>(
     command: IProductWriteCommand,
-    mutate: (product: ProductModel) => void,
-  ): Promise<IProductWriteView> {
+    reconstitute: (record: IProductReconstitute) => TProduct,
+    mutate: (product: TProduct) => void,
+  ): Promise<IProductWriteView<TProduct>> {
     const { productId, expectedVersion } = command;
-    const product = await this.accessService.load({ productId });
+    const product = await this.accessService.load({ productId }, reconstitute);
 
     ProductHelper.assertExpectedVersion(product, expectedVersion);
 
@@ -78,23 +81,26 @@ export class ProductWriteService {
     const isUpdated = await this.repository.update(productUpdatePayload);
 
     if (!isUpdated) {
-      const currentProduct = await this.load(productId);
+      const currentProduct = await this.load(productId, reconstitute);
 
       throw new ProductWriteConflictError(productId, currentProduct.version);
     }
 
-    const savedProduct = await this.load(productId);
+    const savedProduct = await this.load(productId, reconstitute);
 
     return { product: savedProduct, domainEvents };
   }
 
-  private async load(productId: string): Promise<ProductModel> {
+  private async load<TProduct>(
+    productId: string,
+    reconstitute: (record: IProductReconstitute) => TProduct,
+  ): Promise<TProduct> {
     const productRecord = await this.repository.findById(productId);
 
     if (!productRecord) {
       throw new ProductNotFoundException(productId);
     }
 
-    return ProductModel.reconstitute(productRecord);
+    return reconstitute(productRecord);
   }
 }

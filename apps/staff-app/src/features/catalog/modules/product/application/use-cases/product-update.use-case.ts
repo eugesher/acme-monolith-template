@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { ProductUpdateModel } from '../../domain';
 import { PRODUCT_CATALOG_CACHE_PORT, type IProductCatalogCachePort } from '../../outbound';
 import { ProductWriteService } from '../services/product-write.service';
 import type { IProductUpdateCommand, IProductView } from '../interfaces';
@@ -17,14 +18,16 @@ export class ProductUpdateUseCase {
 
   public async execute(command: IProductUpdateCommand): Promise<IProductView> {
     const { productId, name, expectedVersion } = command;
-    const writeResult = await this.writeService.write({ productId, expectedVersion }, (product) =>
-      product.update({ name }),
+    const writeResult = await this.writeService.write(
+      { productId, expectedVersion },
+      ProductUpdateModel.reconstitute,
+      (product) => product.update({ name }),
     );
     const { product } = writeResult;
 
     await this.catalogCache.invalidate();
 
-    const productLoggerPayload = product.toUpdateLoggerPayload();
+    const productLoggerPayload = product.toLoggerPayload();
 
     this.logger.info(productLoggerPayload, 'Product updated');
 

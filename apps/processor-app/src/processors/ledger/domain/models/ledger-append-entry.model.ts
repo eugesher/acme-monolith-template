@@ -1,7 +1,7 @@
 import type {
-  ILedgerAppendEntryAppendLoggerPayload,
   ILedgerAppendEntryCandidate,
   ILedgerAppendEntryCandidateInit,
+  ILedgerAppendEntryLoggerPayload,
 } from '../interfaces';
 
 export class LedgerAppendEntryModel {
@@ -36,10 +36,10 @@ export class LedgerAppendEntryModel {
     };
   }
 
-  public static toAppendLoggerPayload(
+  public static toLoggerPayload(
     id: string,
     candidate: ILedgerAppendEntryCandidate,
-  ): ILedgerAppendEntryAppendLoggerPayload {
+  ): ILedgerAppendEntryLoggerPayload {
     return { id, operationKey: candidate.operationKey };
   }
 }

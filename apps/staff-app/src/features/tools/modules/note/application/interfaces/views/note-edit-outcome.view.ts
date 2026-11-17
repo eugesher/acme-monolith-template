@@ -1,6 +1,6 @@
-import type { NoteModel } from '../../../domain';
+import type { NoteEditModel } from '../../../domain';
 
 export interface INoteEditOutcomeView {
-  note: NoteModel;
+  note: NoteEditModel;
   edited: boolean;
 }

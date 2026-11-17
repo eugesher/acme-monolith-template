@@ -2,7 +2,7 @@ import type { PinoLogger } from 'nestjs-pino';
 
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { TagModel, TagNameInvalidException, TagNameTakenException } from '../../../domain';
+import { TagNameInvalidException, TagNameTakenException, TagRenameModel } from '../../../domain';
 import { TagRenameUpdateOutcomeEnum } from '../../../outbound';
 import { TagRenameUseCase } from '../tag-rename.use-case';
 import type { TagAccessService } from '../../services/tag-access.service';
@@ -17,7 +17,7 @@ describe('TagRenameUseCase', () => {
     load = jest
       .fn()
       .mockResolvedValueOnce(
-        TagModel.reconstitute({
+        TagRenameModel.reconstitute({
           id: '300',
           name: 'fragile',
           createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -25,7 +25,7 @@ describe('TagRenameUseCase', () => {
         }),
       )
       .mockResolvedValueOnce(
-        TagModel.reconstitute({
+        TagRenameModel.reconstitute({
           id: '300',
           name: 'handle-with-care',
           createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -50,8 +50,8 @@ describe('TagRenameUseCase', () => {
       const view = await useCase.execute({ tagId: '300', name: ' handle-with-care ' });
 
       expect(update).toHaveBeenCalledWith({ id: '300', name: 'handle-with-care' });
-      expect(load).toHaveBeenNthCalledWith(1, { tagId: '300' });
-      expect(load).toHaveBeenNthCalledWith(2, { tagId: '300' });
+      expect(load).toHaveBeenNthCalledWith(1, { tagId: '300' }, TagRenameModel.reconstitute);
+      expect(load).toHaveBeenNthCalledWith(2, { tagId: '300' }, TagRenameModel.reconstitute);
       expect(view).toEqual({
         id: '300',
         name: 'handle-with-care',

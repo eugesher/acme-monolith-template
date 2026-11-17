@@ -42,9 +42,9 @@ export class LedgerAppendUseCase {
     const appendOutcome = await this.append(entryCandidate);
     const { id, appended } = appendOutcome;
     const message = appended ? 'Ledger record appended' : 'Ledger record already appended';
-    const appendLoggerPayload = LedgerAppendEntryModel.toAppendLoggerPayload(id, entryCandidate);
+    const entryLoggerPayload = LedgerAppendEntryModel.toLoggerPayload(id, entryCandidate);
 
-    this.logger.info(appendLoggerPayload, message);
+    this.logger.info(entryLoggerPayload, message);
   }
 
   private async append(candidate: ILedgerAppendEntryCandidate): Promise<ILedgerAppendOutcomeView> {

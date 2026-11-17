@@ -41,7 +41,7 @@ No foreign key points at the subject, since the table serves several; the caller
 and deletes tags, so that code stays with its only caller. Reading the tags of a subject, replacing
 them and finding the subjects of a tag are asked by both `product` and `order`, so they move up into
 the common module. `Tag` is mapped by both; each keeps its own model narrowed to what it uses
-(`TagModel`, `TagCommonSubjectTagsModel`).
+(`TagAggregate`, `TagCommonSubjectTagsReplaceModel`).
 
 **A refusal is an outcome.** `replace` answers `TagCommonReplaceOutcomeEnum.TAG_NOT_FOUND` with
 `missingTagIds` instead of throwing, as a core module does (see `027-core-module-outcomes.md`). The

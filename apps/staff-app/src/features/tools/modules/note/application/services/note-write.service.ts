@@ -3,7 +3,11 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { OccRetryHelper } from '@acme-libs/toolkit';
 
-import { NoteVersionMismatchException, type NoteModel } from '../../domain';
+import {
+  NoteVersionMismatchException,
+  type INoteReconstitute,
+  type NoteAggregate,
+} from '../../domain';
 import { NOTE_OCC_RETRY_ATTEMPTS_TOKEN } from '../../outbound';
 import { NoteWriteConflictError } from '../errors/note-write-conflict.error';
 import { NoteAccessService } from './note-access.service';
@@ -36,9 +40,12 @@ export class NoteWriteService {
     });
   }
 
-  public async reload(command: INoteWriteReloadCommand): Promise<NoteModel> {
+  public async reload<TNote extends NoteAggregate>(
+    command: INoteWriteReloadCommand,
+    reconstitute: (record: INoteReconstitute) => TNote,
+  ): Promise<TNote> {
     const { noteId, authorId, isSaved } = command;
-    const note = await this.accessService.loadOwned({ noteId, authorId });
+    const note = await this.accessService.loadOwned({ noteId, authorId }, reconstitute);
 
     if (!isSaved) {
       throw new NoteWriteConflictError(noteId, note.version);

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { ProductPublishedEvent } from '../../domain';
+import { ProductPublishedEvent, ProductPublishModel } from '../../domain';
 import {
   PRODUCT_CATALOG_CACHE_PORT,
   PRODUCT_LEDGER_PORT,
@@ -25,8 +25,10 @@ export class ProductPublishUseCase {
 
   public async execute(command: IProductPublishCommand): Promise<IProductView> {
     const { productId, expectedVersion } = command;
-    const writeResult = await this.writeService.write({ productId, expectedVersion }, (product) =>
-      product.publish(),
+    const writeResult = await this.writeService.write(
+      { productId, expectedVersion },
+      ProductPublishModel.reconstitute,
+      (product) => product.publish(),
     );
     const { product, domainEvents } = writeResult;
     const publishedEvents = domainEvents.filter((event) => event instanceof ProductPublishedEvent);
@@ -35,7 +37,7 @@ export class ProductPublishUseCase {
     await this.catalogCache.invalidate();
     await this.ledger.recordEvents({ ledgerRecords });
 
-    const productLoggerPayload = product.toPublishLoggerPayload();
+    const productLoggerPayload = product.toLoggerPayload();
 
     this.logger.info(productLoggerPayload, 'Product published');
 

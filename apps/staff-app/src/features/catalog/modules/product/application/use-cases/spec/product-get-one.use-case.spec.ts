@@ -1,6 +1,6 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
-import { ProductModel } from '../../../domain';
+import { ProductGetOneModel } from '../../../domain';
 import { ProductGetOneUseCase } from '../product-get-one.use-case';
 import type { ProductAccessService } from '../../services/product-access.service';
 
@@ -10,7 +10,7 @@ describe('ProductGetOneUseCase', () => {
 
   beforeEach(() => {
     load = jest.fn().mockResolvedValue(
-      ProductModel.reconstitute({
+      ProductGetOneModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Lamp',
@@ -27,7 +27,7 @@ describe('ProductGetOneUseCase', () => {
     it('answers the view of the product the caller owns', async () => {
       const view = await useCase.execute({ productId: '12' });
 
-      expect(load).toHaveBeenCalledWith({ productId: '12' });
+      expect(load).toHaveBeenCalledWith({ productId: '12' }, ProductGetOneModel.reconstitute);
       expect(view).toEqual({
         id: '12',
         sku: 'SKU-0001',

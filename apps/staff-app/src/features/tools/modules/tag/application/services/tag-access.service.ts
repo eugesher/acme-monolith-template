@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { TagModel, TagNotFoundException } from '../../domain';
-import { TAG_ACCESS_REPOSITORY_PORT, type ITagAccessRepositoryPort } from '../../outbound';
+import { TagNotFoundException } from '../../domain';
+import {
+  TAG_ACCESS_REPOSITORY_PORT,
+  type ITagAccessRecord,
+  type ITagAccessRepositoryPort,
+} from '../../outbound';
 import type { ITagAccessLoadCommand } from '../interfaces';
 
 @Injectable()
@@ -11,7 +15,10 @@ export class TagAccessService {
     private readonly repository: ITagAccessRepositoryPort,
   ) {}
 
-  public async load(command: ITagAccessLoadCommand): Promise<TagModel> {
+  public async load<TTag>(
+    command: ITagAccessLoadCommand,
+    reconstitute: (record: ITagAccessRecord) => TTag,
+  ): Promise<TTag> {
     const { tagId } = command;
     const tagRecord = await this.repository.findById(tagId);
 
@@ -19,6 +26,6 @@ export class TagAccessService {
       throw new TagNotFoundException(tagId);
     }
 
-    return TagModel.reconstitute(tagRecord);
+    return reconstitute(tagRecord);
   }
 }

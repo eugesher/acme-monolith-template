@@ -1,7 +1,7 @@
-import type { NoteModel } from '../../../domain';
+import type { NoteEditModel } from '../../../domain';
 
 export interface INoteEditSaveCommand {
-  note: NoteModel;
+  note: NoteEditModel;
   versionAsRead: number;
   bodyBefore: string;
   editorId: string;

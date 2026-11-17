@@ -63,7 +63,7 @@ describe('LedgerAppendEntryModel', () => {
     });
   });
 
-  describe('toAppendLoggerPayload', () => {
+  describe('toLoggerPayload', () => {
     it('answers the id of the entry and the operation key of the candidate', () => {
       const candidate = LedgerAppendEntryModel.initCandidate({
         operationKey: 'product-archived:12:2',
@@ -75,7 +75,7 @@ describe('LedgerAppendEntryModel', () => {
         occurredAt: new Date('2026-01-05T08:00:00.000Z'),
       });
 
-      expect(LedgerAppendEntryModel.toAppendLoggerPayload('4210', candidate)).toEqual({
+      expect(LedgerAppendEntryModel.toLoggerPayload('4210', candidate)).toEqual({
         id: '4210',
         operationKey: 'product-archived:12:2',
       });

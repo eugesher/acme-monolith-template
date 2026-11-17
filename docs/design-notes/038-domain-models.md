@@ -11,33 +11,32 @@ what the model answers.
 
 | Shape                  | Method                                                         | Example                                            |
 | ---------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
-| the response           | `toSnapshot()`                                                 | `ProductModel.toSnapshot()`                        |
+| the response           | `toSnapshot()`                                                 | `ProductGetOneModel.toSnapshot()`                  |
 | a row to insert        | `toInsertPayload()`, `create<Children>(id)` for its child rows | `RoleCandidateModel.createRolePermissions(roleId)` |
-| a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteModel.toUpdatePayload(versionAsRead)`         |
-| a record of the ledger | `to<UseCase>LedgerPayload()`, `toLedgerPayload()`              | `ProductModel.toCreateLedgerPayload()`             |
-| a line of the log      | `to<UseCase>LoggerPayload()`, `toLoggerPayload()`              | `ReminderModel.toRescheduleLoggerPayload()`        |
+| a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteEditModel.toUpdatePayload(versionAsRead)`     |
+| a record of the ledger | `toLedgerPayload()`                                            | `ProductCreateModel.toLedgerPayload()`             |
+| a line of the log      | `toLoggerPayload()`                                            | `ReminderRescheduleModel.toLoggerPayload()`        |
 
 The record of the ledger carries the subject, the payload and, where the model knows it, the time it
 was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
 and the action (see `022-enqueue-after-commit.md`).
 
 **Without an instance, a static method answers.** An idempotency key has only its scope and key, so
-`IdempotencyCoreKeyModel.toLoggerPayload({ scope, key })` names the fields of the log line. A static
-method that would only wrap its arguments in an object is not written: the use case logs the literal
-(see below).
+`IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` names the fields of the log line. A
+static method that would only wrap its arguments in an object is not written: the use case logs the
+literal (see below).
 
-**One model answers each of its use cases with a method of its own.** `ProductModel` serves the
-creation, the update and the publication, so it has `toCreateLoggerPayload`, `toUpdateLoggerPayload`
-and `toPublishLoggerPayload`. A model is split per use case only when the use cases need different
-state (see Aggregates below), and a model of one use case answers with the plain name:
-`OrderPlaceModel.toLoggerPayload()`.
+**Every use case has a model of its own.** A model takes the use case into its name and answers with
+plain names: `ProductCreateModel`, `ProductUpdateModel` and `ProductPublishModel`, each with
+`toLoggerPayload()`, not one `ProductModel` with `toCreateLoggerPayload` and
+`toUpdateLoggerPayload`. The state and the rules the models share live in an aggregate (see
+Aggregates below).
 
-**A name does not repeat its class.** The class already names the context, so the method names only
-what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
-`TagCommonSubjectTagsModel.toSnapshots`, `ProductStockCoreMovementsModel.toIds`. A child entity
-keeps its name, `createOrderProducts`, and a model that serves several use cases keeps the use case,
-`ProductModel.toCreateLoggerPayload`. A model of one use case takes the use case into its own name:
-`StaffAuthCoreLoginModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`, `OrderGetOneModel`.
+**A name does not repeat its class.** The class already names the context and the use case, so the
+method names only what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
+`TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toIds`. A child
+entity keeps its name, `createOrderProducts`. A model in another context takes it in front:
+`StaffAuthCoreLoginModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
 
 **A line of the log names the fields of the entity.** `{ id, sku }`, not `{ productId, sku }`, and
 `{ subjectType, subjectId, subjectTags: [{ tagId }] }` for the tags of a subject. A value derived
@@ -45,9 +44,9 @@ from others stays out (`units`, `onHand`, `nameAsRead`): the message carries the
 `Ledger record already appended` does.
 
 **Two values of one type travel in a params object.** Positional strings swap without an error, so
-`IdempotencyCoreKeyModel.toLoggerPayload({ scope, key })` and
-`NoteModel.toRevisionInsertPayload({ bodyBefore, editorId, correlationId })` take one object, named
-as the params of a helper (see `029-naming.md`): `IIdempotencyCoreKeyLoggerPayloadBuild`.
+`IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` and
+`NoteEditModel.toRevisionInsertPayload({ bodyBefore, editorId, correlationId })` take one object,
+named as the params of a helper (see `029-naming.md`): `IIdempotencyCoreReleaseLoggerPayloadBuild`.
 
 **What stays in the use case.**
 
@@ -70,19 +69,19 @@ The interfaces of a domain lie in two folders, by the side of the model or the e
 They follow the params and snapshots of a helper (see `029-naming.md`): a method of a model takes
 one params object, and every shape a model or an event answers is a snapshot.
 
-| Folder                         | Name                                             | What it is                                                                                                                                                                                                                                             |
-| ------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `domain/interfaces/params/`    | `I<Model>Reconstitute`                           | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                                                                          |
-|                                | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                                 |
-|                                | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductModel.update(changes)`                                                                                                                                                                      |
-|                                | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                                                                                  |
-|                                | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteRevisionInsertPayloadBuild`                                                                                                                                                                    |
-| `domain/interfaces/snapshots/` | `I<Model>Candidate`                              | the row `initCandidate` answers for an insert                                                                                                                                                                                                          |
-|                                | `I<Model>Snapshot`                               | the state a model answers with `toSnapshot()`                                                                                                                                                                                                          |
-|                                | `I<Model>InsertPayload`, `I<Model>UpdatePayload` | the row to write, `IRoleCandidateInsertPayload`, `INoteUpdatePayload`; `Query` stays the kind of an outbound interface                                                                                                                                 |
-|                                | `I<Model><UseCase>LedgerPayload`                 | the record of the ledger, `IProductCreateLedgerPayload`                                                                                                                                                                                                |
-|                                | `I<Model><UseCase>LoggerPayload`                 | the line of the log, `IProductUpdateLoggerPayload`                                                                                                                                                                                                     |
-|                                | `I<Subject>`                                     | another answer, by its noun: `ITagCommonSubjectTagsChanges` from `TagCommonSubjectTagsModel.replace`, `IOrderProductStockMovement` from `OrderPlaceModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
+| Folder                         | Name                                             | What it is                                                                                                                                                                                                                                                           |
+| ------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain/interfaces/params/`    | `I<Model>Reconstitute`                           | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                                                                                        |
+|                                | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                                               |
+|                                | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductUpdateModel.update(changes)`                                                                                                                                                                              |
+|                                | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                                                                                                |
+|                                | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteRevisionInsertPayloadBuild`                                                                                                                                                                                  |
+| `domain/interfaces/snapshots/` | `I<Model>Candidate`                              | the row `initCandidate` answers for an insert                                                                                                                                                                                                                        |
+|                                | `I<Model>Snapshot`                               | the state a model answers with `toSnapshot()`                                                                                                                                                                                                                        |
+|                                | `I<Model>InsertPayload`, `I<Model>UpdatePayload` | the row to write, `IRoleCandidateInsertPayload`, `INoteUpdatePayload`; `Query` stays the kind of an outbound interface                                                                                                                                               |
+|                                | `I<Model><UseCase>LedgerPayload`                 | the record of the ledger, `IProductCreateLedgerPayload`                                                                                                                                                                                                              |
+|                                | `I<Model><UseCase>LoggerPayload`                 | the line of the log, `IProductUpdateLoggerPayload`                                                                                                                                                                                                                   |
+|                                | `I<Subject>`                                     | another answer, by its noun: `ITagCommonSubjectTagsReplaceChanges` from `TagCommonSubjectTagsReplaceModel.replace`, `IOrderProductStockMovement` from `OrderPlaceModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
 
 The folder names the role, so the file repeats the name without `I` and ends with `.interface.ts`:
 `order-reconstitute.interface.ts` holds `IOrderReconstitute`, `product-candidate.interface.ts` holds
@@ -96,8 +95,8 @@ file names it: `IProductStockCoreOnHandReconstituteStockSum` is the element of `
 ## Candidates
 
 **A candidate of one row is a snapshot.** `initCandidate` checks a new row in one call and answers
-it as the row to insert: `ProductModel.initCandidate(proposal)` answers `IProductCandidate`, and the
-use case inserts it as is.
+it as the row to insert: `ProductCreateModel.initCandidate(proposal)` answers
+`IProductCreateCandidate`, and the use case inserts it as is.
 
 **A candidate written to several tables, checked in steps, or answered without reading it back is a
 model of its own.** `<Model>CandidateModel.create(proposal)` only holds the request, and the use
@@ -147,13 +146,25 @@ the order of the products, zero for a product without rows.
 
 ## Aggregates
 
-**An aggregate shared by use cases that need different state has a model per use case.** The
-aggregate is an abstract class in `domain/aggregates/<context>.aggregate.ts` that holds the state
-every use case reads and answers `toSnapshot()`: `OrderAggregate`, `RoleAggregate`. Each use case
+**The models of the use cases of one entity share an aggregate.** The aggregate is an abstract class
+in `domain/aggregates/<context>.aggregate.ts` that holds the state every use case reads, the checks
+of its fields and the answers they share, `toSnapshot()` and `toUpdatePayload(versionAsRead)`:
+`OrderAggregate`, `RoleAggregate`, `ProductAggregate`, `NoteAggregate`, `ReminderAggregate`,
+`TagAggregate`. An aggregate of many columns takes the record whole and checks it in its
+constructor, so a model of a use case rebuilds itself with `new <Model>(record)`. Each use case
 extends it with a model of its own, which adds only the state and the answers that use case needs:
 `OrderPlaceModel` adds the owner, the stock movements and the payloads of the ledger and the log,
 and `OrderGetOneModel` adds nothing. The aggregate extends `AggregateRootBase`, so a model of a use
 case that only reads extends it too.
+
+**A shared service takes the model of the caller.** The access and write services of an entity serve
+several use cases, so the caller passes the static `reconstitute` of its model and gets that model
+back: `accessService.load({ tagId }, TagRenameModel.reconstitute)`,
+`writeService.write(command, ReminderCompleteModel.reconstitute, (reminder) => reminder.complete())`.
+`reconstitute` declares `this: void`, as it names its class rather than `this`, and the write
+service bounds the model by the aggregate, whose `version` and `toUpdatePayload` it needs. A use
+case that only checks the entity exists asks for no model: `NoteAccessService.assertOwned`,
+`ProductAccessService.assertExists`.
 
 **Use cases that share no state have models without an aggregate.** The login reads the hash and the
 status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and

@@ -1,9 +1,9 @@
-export * from './params/product-candidate-init.interface';
+export * from './params/product-create-candidate-init.interface';
 export * from './params/product-get-many-reconstitute.interface';
 export * from './params/product-reconstitute.interface';
 export * from './params/product-update.interface';
 
-export * from './snapshots/product-candidate.interface';
+export * from './snapshots/product-create-candidate.interface';
 export * from './snapshots/product-create-ledger-payload.interface';
 export * from './snapshots/product-create-logger-payload.interface';
 export * from './snapshots/product-get-many-snapshot.interface';

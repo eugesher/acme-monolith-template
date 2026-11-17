@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ProductModel, ProductPublishedEvent, ProductUpdatedEvent } from '../../../domain';
+import { ProductPublishedEvent, ProductPublishModel, ProductUpdatedEvent } from '../../../domain';
 import { ProductPublishUseCase } from '../product-publish.use-case';
 import type { IProductLedgerPort } from '../../../outbound';
 import type { ProductWriteService } from '../../services/product-write.service';
@@ -18,7 +18,7 @@ describe('ProductPublishUseCase', () => {
   beforeEach(() => {
     jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     write = jest.fn().mockResolvedValue({
-      product: ProductModel.reconstitute({
+      product: ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Lamp',
@@ -50,6 +50,7 @@ describe('ProductPublishUseCase', () => {
 
       expect(write).toHaveBeenCalledWith(
         { productId: '12', expectedVersion: 1 },
+        ProductPublishModel.reconstitute,
         expect.any(Function),
       );
       expect(recordEvents).toHaveBeenCalledWith({
@@ -77,7 +78,7 @@ describe('ProductPublishUseCase', () => {
     });
 
     it('leaves an update out of the ledger', async () => {
-      const { product } = (await write()) as { product: ProductModel };
+      const { product } = (await write()) as { product: ProductPublishModel };
 
       write.mockResolvedValue({
         product,
@@ -121,7 +122,7 @@ describe('ProductPublishUseCase', () => {
     });
 
     it('hands the write service a change that publishes the product', async () => {
-      const product = ProductModel.reconstitute({
+      const product = ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Lamp',
@@ -133,11 +134,15 @@ describe('ProductPublishUseCase', () => {
 
       await useCase.execute({ productId: '12', expectedVersion: 1 });
 
-      const [, mutate] = write.mock.calls[0] as [unknown, (product: ProductModel) => void];
+      const [, , mutate] = write.mock.calls[0] as [
+        unknown,
+        unknown,
+        (product: ProductPublishModel) => void,
+      ];
 
       mutate(product);
 
-      expect(product.status).toBe('active');
+      expect(product.toSnapshot().status).toBe('active');
     });
   });
 });

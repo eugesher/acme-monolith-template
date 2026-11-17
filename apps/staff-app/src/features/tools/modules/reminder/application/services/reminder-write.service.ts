@@ -4,9 +4,10 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { OccRetryHelper } from '@acme-libs/toolkit';
 
 import {
-  ReminderModel,
   ReminderNotFoundException,
   ReminderVersionMismatchException,
+  type IReminderReconstitute,
+  type ReminderAggregate,
 } from '../../domain';
 import {
   REMINDER_OCC_RETRY_ATTEMPTS_TOKEN,
@@ -29,13 +30,14 @@ export class ReminderWriteService {
     private readonly logger: PinoLogger,
   ) {}
 
-  public async write(
+  public async write<TReminder extends ReminderAggregate>(
     command: IReminderWriteCommand,
-    mutate: (reminder: ReminderModel) => void,
-  ): Promise<ReminderModel> {
+    reconstitute: (record: IReminderReconstitute) => TReminder,
+    mutate: (reminder: TReminder) => void,
+  ): Promise<TReminder> {
     const { reminderId } = command;
 
-    return await OccRetryHelper.run(() => this.attempt(command, mutate), {
+    return await OccRetryHelper.run(() => this.attempt(command, reconstitute, mutate), {
       subject: 'Reminder',
       logger: this.logger,
       maxAttempts: this.occRetryAttempts,
@@ -49,12 +51,13 @@ export class ReminderWriteService {
     });
   }
 
-  private async attempt(
+  private async attempt<TReminder extends ReminderAggregate>(
     command: IReminderWriteCommand,
-    mutate: (reminder: ReminderModel) => void,
-  ): Promise<ReminderModel> {
+    reconstitute: (record: IReminderReconstitute) => TReminder,
+    mutate: (reminder: TReminder) => void,
+  ): Promise<TReminder> {
     const { reminderId, ownerId } = command;
-    const reminder = await this.accessService.loadOwned({ reminderId, ownerId });
+    const reminder = await this.accessService.loadOwned({ reminderId, ownerId }, reconstitute);
     const versionAsRead = reminder.version;
 
     mutate(reminder);
@@ -67,21 +70,24 @@ export class ReminderWriteService {
     const isUpdated = await this.repository.update(reminderUpdatePayload);
 
     if (!isUpdated) {
-      const currentReminder = await this.load(reminderId);
+      const currentReminder = await this.load(reminderId, reconstitute);
 
       throw new ReminderWriteConflictError(reminderId, currentReminder.version);
     }
 
-    return await this.load(reminderId);
+    return await this.load(reminderId, reconstitute);
   }
 
-  private async load(reminderId: string): Promise<ReminderModel> {
+  private async load<TReminder>(
+    reminderId: string,
+    reconstitute: (record: IReminderReconstitute) => TReminder,
+  ): Promise<TReminder> {
     const reminderRecord = await this.repository.findById(reminderId);
 
     if (!reminderRecord) {
       throw new ReminderNotFoundException(reminderId);
     }
 
-    return ReminderModel.reconstitute(reminderRecord);
+    return reconstitute(reminderRecord);
   }
 }

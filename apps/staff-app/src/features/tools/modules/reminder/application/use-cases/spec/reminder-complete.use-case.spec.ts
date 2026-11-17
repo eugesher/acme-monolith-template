@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ReminderStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ReminderModel } from '../../../domain';
+import { ReminderCompleteModel } from '../../../domain';
 import { ReminderCompleteUseCase } from '../reminder-complete.use-case';
 import type { ReminderWriteService } from '../../services/reminder-write.service';
 
@@ -15,7 +15,7 @@ describe('ReminderCompleteUseCase', () => {
 
   beforeEach(() => {
     write = jest.fn().mockResolvedValue(
-      ReminderModel.reconstitute({
+      ReminderCompleteModel.reconstitute({
         id: '7',
         ownerId: 'owner-1',
         title: 'Call the bank',
@@ -42,6 +42,7 @@ describe('ReminderCompleteUseCase', () => {
 
       expect(write).toHaveBeenCalledWith(
         { reminderId: '7', ownerId: 'owner-1' },
+        ReminderCompleteModel.reconstitute,
         expect.any(Function),
       );
       expect(invalidate).toHaveBeenCalledWith('owner-1');
@@ -63,7 +64,7 @@ describe('ReminderCompleteUseCase', () => {
     });
 
     it('hands the write service a change that completes the reminder', async () => {
-      const reminder = ReminderModel.reconstitute({
+      const reminder = ReminderCompleteModel.reconstitute({
         id: '7',
         ownerId: 'owner-1',
         title: 'Call the bank',
@@ -77,11 +78,15 @@ describe('ReminderCompleteUseCase', () => {
 
       await useCase.execute({ reminderId: '7', ownerId: 'owner-1' });
 
-      const [, mutate] = write.mock.calls[0] as [unknown, (reminder: ReminderModel) => void];
+      const [, , mutate] = write.mock.calls[0] as [
+        unknown,
+        unknown,
+        (reminder: ReminderCompleteModel) => void,
+      ];
 
       mutate(reminder);
 
-      expect(reminder.status).toBe('done');
+      expect(reminder.toSnapshot().status).toBe('done');
     });
 
     it('leaves the summary alone when the write is refused', async () => {

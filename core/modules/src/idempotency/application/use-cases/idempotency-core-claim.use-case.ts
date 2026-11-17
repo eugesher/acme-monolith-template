@@ -8,7 +8,7 @@ import {
   type IIdempotencyCoreClaimView,
 } from '@acme-core/contracts/idempotency';
 
-import { IdempotencyCoreKeyModel, type IIdempotencyCoreKeyCandidate } from '../../domain';
+import { IdempotencyCoreClaimModel, type IIdempotencyCoreClaimCandidate } from '../../domain';
 import {
   IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
   IdempotencyCoreClaimInsertOutcomeEnum,
@@ -27,7 +27,11 @@ export class IdempotencyCoreClaimUseCase {
   public async execute(command: IIdempotencyCoreClaimCommand): Promise<IIdempotencyCoreClaimView> {
     const { scope, key, body } = command;
     const requestFingerprint = BodyFingerprintHelper.compute(body);
-    const keyCandidate = IdempotencyCoreKeyModel.initCandidate({ scope, key, requestFingerprint });
+    const keyCandidate = IdempotencyCoreClaimModel.initCandidate({
+      scope,
+      key,
+      requestFingerprint,
+    });
     const insertOutcome = await this.insert(keyCandidate);
 
     if (insertOutcome) {
@@ -40,10 +44,10 @@ export class IdempotencyCoreClaimUseCase {
       return this.inFlight(scope, key);
     }
 
-    const existingKey = IdempotencyCoreKeyModel.reconstitute(keyRecord);
+    const existingKey = IdempotencyCoreClaimModel.reconstitute(keyRecord);
 
     if (!existingKey.matches(requestFingerprint)) {
-      const keyLoggerPayload = IdempotencyCoreKeyModel.toLoggerPayload({ scope, key });
+      const keyLoggerPayload = IdempotencyCoreClaimModel.toLoggerPayload({ scope, key });
 
       this.logger.info(
         keyLoggerPayload,
@@ -63,14 +67,14 @@ export class IdempotencyCoreClaimUseCase {
   }
 
   private inFlight(scope: string, key: string): IIdempotencyCoreClaimView {
-    const keyLoggerPayload = IdempotencyCoreKeyModel.toLoggerPayload({ scope, key });
+    const keyLoggerPayload = IdempotencyCoreClaimModel.toLoggerPayload({ scope, key });
 
     this.logger.info(keyLoggerPayload, 'Idempotency key is in flight, the request is refused');
 
     return { outcome: IdempotencyCoreClaimOutcomeEnum.IN_FLIGHT, storedResponse: undefined };
   }
 
-  private async insert(candidate: IIdempotencyCoreKeyCandidate): Promise<boolean> {
+  private async insert(candidate: IIdempotencyCoreClaimCandidate): Promise<boolean> {
     const insertOutcome = await this.repository.insert(candidate);
 
     return insertOutcome === IdempotencyCoreClaimInsertOutcomeEnum.INSERTED;
