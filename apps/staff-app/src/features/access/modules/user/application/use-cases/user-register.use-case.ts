@@ -54,7 +54,7 @@ export class UserRegisterUseCase {
 
     candidate.assertRoles(storedRoles);
 
-    const userRoles = candidate.getUserRoles(id);
+    const userRoles = candidate.createUserRoles(id);
 
     await this.repository.insertUserRoles(userRoles);
 

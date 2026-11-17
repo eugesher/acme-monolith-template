@@ -77,9 +77,9 @@ describe('UserStaffUserCandidateModel', () => {
     });
   });
 
-  describe('getUserRoles', () => {
+  describe('createUserRoles', () => {
     it('answers one row of the user per distinct role', () => {
-      expect(candidate.getUserRoles('5')).toEqual([
+      expect(candidate.createUserRoles('5')).toEqual([
         { userId: '5', roleId: '2' },
         { userId: '5', roleId: '3' },
       ]);

@@ -9,13 +9,13 @@ what the model answers.
 
 **The model answers every shape that leaves the use case.**
 
-| Shape                  | Method                                                      | Example                                         |
-| ---------------------- | ----------------------------------------------------------- | ----------------------------------------------- |
-| the response           | `toSnapshot()`                                              | `ProductModel.toSnapshot()`                     |
-| a row to insert        | `toInsertPayload()`, `get<Children>(id)` for its child rows | `RoleCandidateModel.getRolePermissions(roleId)` |
-| a row to update        | `toUpdatePayload(versionAsRead)`                            | `NoteModel.toUpdatePayload(versionAsRead)`      |
-| a record of the ledger | `to<UseCase>LedgerPayload()`                                | `ProductModel.toCreateLedgerPayload()`          |
-| a line of the log      | `to<UseCase>LoggerPayload()`                                | `ReminderModel.toRescheduleLoggerPayload()`     |
+| Shape                  | Method                                                         | Example                                            |
+| ---------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
+| the response           | `toSnapshot()`                                                 | `ProductModel.toSnapshot()`                        |
+| a row to insert        | `toInsertPayload()`, `create<Children>(id)` for its child rows | `RoleCandidateModel.createRolePermissions(roleId)` |
+| a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteModel.toUpdatePayload(versionAsRead)`         |
+| a record of the ledger | `to<UseCase>LedgerPayload()`                                   | `ProductModel.toCreateLedgerPayload()`             |
+| a line of the log      | `to<UseCase>LoggerPayload()`                                   | `ReminderModel.toRescheduleLoggerPayload()`        |
 
 The record of the ledger carries the subject, the payload and, where the model knows it, the time it
 was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
@@ -93,7 +93,7 @@ use case inserts it as is.
 
 **A candidate written to several tables, or checked in steps, is a model of its own.**
 `<Model>CandidateModel.create(proposal)` holds the request; `toInsertPayload()` answers the main
-row, `get<Children>(id)` the child rows under the issued id, `assert…` checks what the use case
+row, `create<Children>(id)` the child rows under the issued id, `assert…` checks what the use case
 read, and `toSnapshot(id)` answers the created row without reading it back. `RoleCandidateModel`
 writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel` writes `staff_user`
 and `staff_user_roles`. A candidate of one row answers the same way with a static method of its
@@ -103,7 +103,7 @@ An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an
 empty request before any read, `distinctProductIds` names the rows to lock and read,
 `assertProducts` and `assertStockQuantities` check what was read, `toInsertPayload()` and
-`getOrderProducts(orderId)` answer the rows to insert. Each check takes its own params,
+`createOrderProducts(orderId)` answer the rows to insert. Each check takes its own params,
 `IOrderCandidateActiveProduct` and `IOrderCandidateStockQuantity`.
 
 ## Read models

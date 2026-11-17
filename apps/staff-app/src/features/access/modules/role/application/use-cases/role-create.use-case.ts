@@ -42,7 +42,7 @@ export class RoleCreateUseCase {
     }
 
     const { id } = insertResult;
-    const rolePermissions = candidate.getRolePermissions(id);
+    const rolePermissions = candidate.createRolePermissions(id);
 
     await this.repository.insertRolePermissions(rolePermissions);
 

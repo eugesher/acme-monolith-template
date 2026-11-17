@@ -57,7 +57,7 @@ export class UserStaffUserCandidateModel {
     }
   }
 
-  public getUserRoles(userId: string): IUserStaffUserRole[] {
+  public createUserRoles(userId: string): IUserStaffUserRole[] {
     return this.roleIds.map((roleId) => ({ userId, roleId }));
   }
 

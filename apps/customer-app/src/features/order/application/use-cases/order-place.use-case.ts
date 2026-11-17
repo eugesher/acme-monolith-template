@@ -105,7 +105,7 @@ export class OrderPlaceUseCase {
     const orderInsertPayload = orderCandidate.toInsertPayload();
     const orderId = await this.repository.insertOrder(orderInsertPayload);
 
-    const orderProducts = orderCandidate.getOrderProducts(orderId);
+    const orderProducts = orderCandidate.createOrderProducts(orderId);
     await this.repository.insertOrderProducts(orderProducts);
 
     const orderRecord = await this.repository.findPlaced(orderId);

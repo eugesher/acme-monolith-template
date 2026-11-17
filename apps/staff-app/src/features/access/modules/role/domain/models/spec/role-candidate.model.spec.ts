@@ -18,9 +18,9 @@ describe('RoleCandidateModel', () => {
     });
   });
 
-  describe('getRolePermissions', () => {
+  describe('createRolePermissions', () => {
     it('answers one row of the role per permission code, without duplicates', () => {
-      expect(candidate.getRolePermissions('7')).toEqual([{ roleId: '7', code: 'ledger:read' }]);
+      expect(candidate.createRolePermissions('7')).toEqual([{ roleId: '7', code: 'ledger:read' }]);
     });
   });
 

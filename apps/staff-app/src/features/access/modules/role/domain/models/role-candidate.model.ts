@@ -24,7 +24,7 @@ export class RoleCandidateModel {
     return { name: this.name };
   }
 
-  public getRolePermissions(roleId: string): IRoleCandidateRolePermission[] {
+  public createRolePermissions(roleId: string): IRoleCandidateRolePermission[] {
     return this.permissionCodes.map((code) => ({ roleId, code }));
   }
 
