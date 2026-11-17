@@ -14,8 +14,8 @@ what the model answers.
 | the response           | `toSnapshot()`                                                 | `ProductModel.toSnapshot()`                        |
 | a row to insert        | `toInsertPayload()`, `create<Children>(id)` for its child rows | `RoleCandidateModel.createRolePermissions(roleId)` |
 | a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteModel.toUpdatePayload(versionAsRead)`         |
-| a record of the ledger | `to<UseCase>LedgerPayload()`                                   | `ProductModel.toCreateLedgerPayload()`             |
-| a line of the log      | `to<UseCase>LoggerPayload()`                                   | `ReminderModel.toRescheduleLoggerPayload()`        |
+| a record of the ledger | `to<UseCase>LedgerPayload()`, `toLedgerPayload()`              | `ProductModel.toCreateLedgerPayload()`             |
+| a line of the log      | `to<UseCase>LoggerPayload()`, `toLoggerPayload()`              | `ReminderModel.toRescheduleLoggerPayload()`        |
 
 The record of the ledger carries the subject, the payload and, where the model knows it, the time it
 was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
@@ -29,7 +29,14 @@ method that would only wrap its arguments in an object is not written: the use c
 **One model answers each of its use cases with a method of its own.** `ProductModel` serves the
 creation, the update and the publication, so it has `toCreateLoggerPayload`, `toUpdateLoggerPayload`
 and `toPublishLoggerPayload`. A model is split per use case only when the use cases need different
-state (see Aggregates below).
+state (see Aggregates below), and a model of one use case answers with the plain name:
+`OrderPlaceModel.toLoggerPayload()`.
+
+**A name does not repeat its class.** The class already names the context, so the method names only
+what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
+`TagCommonSubjectTagsModel.toSnapshots`, `ProductStockCoreMovementsModel.toIds`. A child entity
+keeps its name, `createOrderProducts`, and a model that serves several use cases keeps the use case,
+`StaffAuthCoreUserModel.toLoginLoggerPayload`.
 
 **A line of the log names the fields of the entity.** `{ id, sku }`, not `{ productId, sku }`, and
 `{ subjectType, subjectId, subjectTags: [{ tagId }] }` for the tags of a subject. A value derived
@@ -92,13 +99,16 @@ it as the row to insert: `ProductModel.initCandidate(proposal)` answers `IProduc
 use case inserts it as is.
 
 **A candidate written to several tables, checked in steps, or answered without reading it back is a
-model of its own.** `<Model>CandidateModel.create(proposal)` holds the request; `toInsertPayload()`
-answers the main row, `create<Children>(id)` the child rows under the issued id, `assert…` checks
-what the use case read, and `toSnapshot(id)` answers the created row without reading it back.
-`RoleCandidateModel` writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel`
-writes `staff_user` and `staff_user_roles`, `AuthCustomerCandidateModel` answers the stored customer
-under the issued id, and `AuthCustomerRegisterModel` rebuilt from it answers the response, the
-record of the ledger and the line of the log, as `OrderPlaceModel` does for a placed order.
+model of its own.** `<Model>CandidateModel.create(proposal)` only holds the request, and the use
+case calls the checks in order, so the order is read in one place: `validate()` and `assert…` refuse
+a request, `normalizeEmail()` rewrites a field before `assertEmail()` checks it. `toInsertPayload()`
+answers the main row, `create<Children>(id)` the child rows under the issued id, and
+`toSnapshot(id)` answers the created row without reading it back. `RoleCandidateModel` writes
+`staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel` writes `staff_user` and
+`staff_user_roles`. When the answer needs a model of its own, the candidate hands its stored row
+instead: `AuthCustomerCandidateModel.toRegistered(id)` answers `IAuthCustomerRegisterReconstitute`,
+and `AuthCustomerRegisterModel` rebuilt from it answers the response, the record of the ledger and
+the line of the log, as `OrderPlaceModel` does from the record it reads after the insert.
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an
@@ -124,8 +134,9 @@ its own read records no events and takes no changes, so it does not extend `Aggr
 **A list model carries the columns of the list.** A page of orders carries no products, so
 `OrderGetManyModel` rebuilds it, not `OrderGetOneModel`, whose record requires them. Both live in
 the domain of the order, the list model with `order-get-many-reconstitute.interface.ts` and
-`order-get-many-snapshot.interface.ts`. Its `toSnapshot` is private: only `toViewData` calls it. A
-list model does not repeat the checks of the aggregate: it rebuilds what the aggregate stored.
+`order-get-many-snapshot.interface.ts`. Only `toViewData` is public: the fields, `reconstitute` and
+`toSnapshot` are private, as nothing else calls them. A list model does not repeat the checks of the
+aggregate: it rebuilds what the aggregate stored.
 
 **A model may be rebuilt from several rows.** `ProductStockCoreOnHandModel.reconstitute` takes the
 products and the sums of their stock rows as one record and answers the stock of every product in
@@ -140,3 +151,17 @@ model of its own, which adds only the state and the answers that use case needs:
 adds the owner, the stock movements and the payloads of the ledger and the log, and
 `OrderGetOneModel` adds nothing. The aggregate extends `AggregateRootBase`, so a model of a use case
 that only reads extends it too.
+
+**Use cases that share no state have models without an aggregate.** The login reads the hash and the
+status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and
+`AuthCustomerRegisterModel` stand alone. A rule both sides need is copied until an aggregate holds
+it: the candidate and the login model each normalize the email.
+
+## Access
+
+**A member is as open as its readers.** A field or a method that only its class reads is private:
+the fields of a list model, the fields of an event that only its `toLedgerRecord` reads. A field the
+use case decides on stays public, as `AuthCustomerLoginModel.passwordHash` for the check of the
+password. An id that an error only puts in its message is a plain parameter of the constructor, not
+a field. The getters of the repositories in a persistence host stay protected for the repositories
+that extend it (see `034-orm-lib.md`).
