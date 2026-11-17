@@ -21,10 +21,10 @@ The record of the ledger carries the subject, the payload and, where the model k
 was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
 and the action (see `022-enqueue-after-commit.md`).
 
-**Without an instance, a static method answers.** A registration has only the issued id and the
-candidate, so `AuthCustomerModel.toRegisterSnapshot(id, candidate)` picks the fields of the response
-from them. A static method that would only wrap its arguments in an object is not written: the use
-case logs the literal (see below).
+**Without an instance, a static method answers.** An idempotency key has only its scope and key, so
+`IdempotencyCoreKeyModel.toKeyLoggerPayload({ scope, key })` names the fields of the log line. A
+static method that would only wrap its arguments in an object is not written: the use case logs the
+literal (see below).
 
 **One model answers each of its use cases with a method of its own.** `ProductModel` serves the
 creation, the update and the publication, so it has `toCreateLoggerPayload`, `toUpdateLoggerPayload`
@@ -91,13 +91,13 @@ file names it: `IProductStockCoreOnHandReconstituteStockSum` is the element of `
 it as the row to insert: `ProductModel.initCandidate(proposal)` answers `IProductCandidate`, and the
 use case inserts it as is.
 
-**A candidate written to several tables, or checked in steps, is a model of its own.**
-`<Model>CandidateModel.create(proposal)` holds the request; `toInsertPayload()` answers the main
-row, `create<Children>(id)` the child rows under the issued id, `assert…` checks what the use case
-read, and `toSnapshot(id)` answers the created row without reading it back. `RoleCandidateModel`
-writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel` writes `staff_user`
-and `staff_user_roles`. A candidate of one row answers the same way with a static method of its
-model, `AuthCustomerModel.toRegisterSnapshot(id, candidate)`.
+**A candidate written to several tables, checked in steps, or answered without reading it back is a
+model of its own.** `<Model>CandidateModel.create(proposal)` holds the request; `toInsertPayload()`
+answers the main row, `create<Children>(id)` the child rows under the issued id, `assert…` checks
+what the use case read, and `toSnapshot(id)` answers the created row without reading it back.
+`RoleCandidateModel` writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel`
+writes `staff_user` and `staff_user_roles`, `AuthCustomerCandidateModel` answers the registered
+customer and its record of the ledger from the request under the issued id.
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an

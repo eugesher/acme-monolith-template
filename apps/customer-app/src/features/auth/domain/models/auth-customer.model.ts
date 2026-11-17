@@ -1,21 +1,9 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
-import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
 import { AuthUserInactiveException } from '../exceptions/auth-user-inactive.exception';
-import type {
-  IAuthCustomerCandidate,
-  IAuthCustomerCandidateInit,
-  IAuthCustomerLoginLoggerPayload,
-  IAuthCustomerReconstitute,
-  IAuthCustomerRegisterLedgerPayload,
-  IAuthCustomerRegisterSnapshot,
-} from '../interfaces';
+import type { IAuthCustomerLoginLoggerPayload, IAuthCustomerReconstitute } from '../interfaces';
 
 export class AuthCustomerModel {
-  private static readonly EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  private static readonly MIN_PASSWORD_LENGTH = 12;
-
   private constructor(
     public readonly id: string,
     public readonly passwordHash: string,
@@ -28,36 +16,8 @@ export class AuthCustomerModel {
     return new AuthCustomerModel(id, passwordHash, status);
   }
 
-  public static initCandidate(proposal: IAuthCustomerCandidateInit): IAuthCustomerCandidate {
-    const { email, passwordHash } = proposal;
-    const normalizedEmail = AuthCustomerModel.normalizeEmail(email);
-
-    if (!AuthCustomerModel.EMAIL_PATTERN.test(normalizedEmail)) {
-      throw new AuthEmailInvalidException();
-    }
-
-    return { email: normalizedEmail, passwordHash, status: UserStatusEnum.ACTIVE };
-  }
-
-  public static toRegisterSnapshot(
-    id: string,
-    candidate: IAuthCustomerCandidate,
-  ): IAuthCustomerRegisterSnapshot {
-    return { id, email: candidate.email };
-  }
-
-  public static toRegisterLedgerPayload(id: string): IAuthCustomerRegisterLedgerPayload {
-    return { subjectId: id };
-  }
-
   public static normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
-  }
-
-  public static assertPasswordStrength(password: string): void {
-    if (password.length < AuthCustomerModel.MIN_PASSWORD_LENGTH) {
-      throw new AuthPasswordTooWeakException(AuthCustomerModel.MIN_PASSWORD_LENGTH);
-    }
   }
 
   public toLoginLoggerPayload(): IAuthCustomerLoginLoggerPayload {

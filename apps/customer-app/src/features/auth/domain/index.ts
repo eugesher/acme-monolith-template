@@ -7,4 +7,5 @@ export * from './exceptions/base/auth-base.exception';
 
 export * from './interfaces';
 
+export * from './models/auth-customer-candidate.model';
 export * from './models/auth-customer.model';

@@ -12,8 +12,8 @@ composite key of its columns: `staff_user_roles (user_id, role_id)` and
 `PermissionCodeEnum`. The driver returns a `bigint` as a string, so an id is a `string` in
 TypeScript, and the bases of `libs/toolkit/src/ddd` take `string` for their id by default. The
 database issues the id on insert: the domain answers a candidate row without an id
-(`AuthCustomerModel.initCandidate` returns `IAuthCustomerCandidate`), and the repository returns the
-issued id (`AuthRegisterRepository.insert`).
+(`AuthCustomerCandidateModel.toInsertPayload()` answers `IAuthCustomerCandidateInsertPayload`), and
+the repository returns the issued id (`AuthRegisterRepository.insert`).
 
 **A quantity is a sum of signed movements.** `product_stock` stores one row per movement, and the
 value is `SUM(quantity)` over the rows of a key. No column holds the current value, so no update can
