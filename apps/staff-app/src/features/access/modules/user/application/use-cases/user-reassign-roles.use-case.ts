@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthUserNotFoundException, UserStaffUserRolesModel } from '../../domain';
+import { UserNotFoundException, UserStaffUserRolesModel } from '../../domain';
 import {
   USER_REASSIGN_ROLES_REPOSITORY_PORT,
   USER_TRANSACTION_PORT,
@@ -26,7 +26,7 @@ export class UserReassignRolesUseCase {
     const userExists = await this.repository.existsUser(userId);
 
     if (!userExists) {
-      throw new AuthUserNotFoundException(userId);
+      throw new UserNotFoundException(userId);
     }
 
     const userRoles = UserStaffUserRolesModel.create({ userId, roleIds });

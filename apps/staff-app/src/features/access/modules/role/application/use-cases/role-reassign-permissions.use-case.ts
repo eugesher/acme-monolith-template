@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthRoleNotFoundException, RoleReassignPermissionsModel } from '../../domain';
+import { RoleNotFoundException, RoleReassignPermissionsModel } from '../../domain';
 import {
   ROLE_REASSIGN_PERMISSIONS_REPOSITORY_PORT,
   ROLE_TRANSACTION_PORT,
@@ -37,7 +37,7 @@ export class RoleReassignPermissionsUseCase {
     const roleRecord = await this.repository.findRole(roleId);
 
     if (!roleRecord) {
-      throw new AuthRoleNotFoundException(roleId);
+      throw new RoleNotFoundException(roleId);
     }
 
     const role = RoleReassignPermissionsModel.reconstitute(roleRecord);

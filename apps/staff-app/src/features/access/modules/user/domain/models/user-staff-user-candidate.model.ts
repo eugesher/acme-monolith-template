@@ -1,8 +1,8 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
-import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
-import { AuthRoleNotFoundException } from '../exceptions/auth-role-not-found.exception';
+import { UserEmailInvalidException } from '../exceptions/user-email-invalid.exception';
+import { UserPasswordTooWeakException } from '../exceptions/user-password-too-weak.exception';
+import { UserRoleNotFoundException } from '../exceptions/user-role-not-found.exception';
 import type {
   IUserRegisterLoggerPayload,
   IUserRegisterSnapshot,
@@ -31,7 +31,7 @@ export class UserStaffUserCandidateModel {
     const normalizedEmail = UserStaffUserCandidateModel.normalizeEmail(email);
 
     if (!UserStaffUserCandidateModel.EMAIL_PATTERN.test(normalizedEmail)) {
-      throw new AuthEmailInvalidException();
+      throw new UserEmailInvalidException();
     }
 
     return new UserStaffUserCandidateModel(normalizedEmail, passwordHash, [...new Set(roleIds)]);
@@ -39,7 +39,7 @@ export class UserStaffUserCandidateModel {
 
   public static assertPasswordStrength(password: string): void {
     if (password.length < UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH) {
-      throw new AuthPasswordTooWeakException(UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH);
+      throw new UserPasswordTooWeakException(UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH);
     }
   }
 
@@ -52,7 +52,7 @@ export class UserStaffUserCandidateModel {
       const isRoleStored = storedRoles.some((storedRole) => storedRole.id === roleId);
 
       if (!isRoleStored) {
-        throw new AuthRoleNotFoundException(roleId);
+        throw new UserRoleNotFoundException(roleId);
       }
     }
   }

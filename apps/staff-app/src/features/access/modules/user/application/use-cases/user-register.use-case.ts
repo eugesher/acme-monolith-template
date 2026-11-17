@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthEmailTakenException, UserStaffUserCandidateModel } from '../../domain';
+import { UserEmailTakenException, UserStaffUserCandidateModel } from '../../domain';
 import {
   USER_CREDENTIALS_PORT,
   USER_REGISTER_REPOSITORY_PORT,
@@ -46,7 +46,7 @@ export class UserRegisterUseCase {
     const insertResult = await this.repository.insertUser(userInsertPayload);
 
     if (insertResult.outcome === UserRegisterStaffUserInsertOutcomeEnum.DUPLICATE) {
-      throw new AuthEmailTakenException();
+      throw new UserEmailTakenException();
     }
 
     const { id } = insertResult;

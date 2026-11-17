@@ -1,4 +1,4 @@
-import { AuthRoleNotFoundException } from '../exceptions/auth-role-not-found.exception';
+import { UserRoleNotFoundException } from '../exceptions/user-role-not-found.exception';
 import type {
   IUserReassignRolesLoggerPayload,
   IUserReassignRolesSnapshot,
@@ -24,7 +24,7 @@ export class UserStaffUserRolesModel {
       const isRoleStored = storedRoles.some((storedRole) => storedRole.id === roleId);
 
       if (!isRoleStored) {
-        throw new AuthRoleNotFoundException(roleId);
+        throw new UserRoleNotFoundException(roleId);
       }
     }
   }

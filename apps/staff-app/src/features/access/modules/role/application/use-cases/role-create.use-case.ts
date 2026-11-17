@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthRoleNameTakenException, RoleCandidateModel, RoleCreateModel } from '../../domain';
+import { RoleCandidateModel, RoleCreateModel, RoleNameTakenException } from '../../domain';
 import {
   ROLE_CREATE_REPOSITORY_PORT,
   ROLE_TRANSACTION_PORT,
@@ -38,7 +38,7 @@ export class RoleCreateUseCase {
     const insertResult = await this.repository.insertRole(roleInsertPayload);
 
     if (insertResult.outcome === RoleCreateStaffRoleInsertOutcomeEnum.DUPLICATE) {
-      throw new AuthRoleNameTakenException(roleInsertPayload.name);
+      throw new RoleNameTakenException(roleInsertPayload.name);
     }
 
     const roleId = insertResult.id;
