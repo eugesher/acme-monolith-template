@@ -108,7 +108,8 @@ answers the main row, `create<Children>(id)` the child rows under the issued id,
 `staff_user_roles`. When the answer needs a model of its own, the candidate hands its stored row
 instead: `AuthCustomerCandidateModel.toRegistered(id)` answers `IAuthCustomerRegisterReconstitute`,
 and `AuthCustomerRegisterModel` rebuilt from it answers the response, the record of the ledger and
-the line of the log, as `OrderPlaceModel` does from the record it reads after the insert.
+the line of the log, as `OrderPlaceModel` does from the record it reads after the insert;
+`RoleCandidateModel.toCreated(id)` hands the role to `RoleCreateModel` the same way.
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an
@@ -146,11 +147,11 @@ the order of the products, zero for a product without rows.
 
 **An aggregate shared by use cases that need different state has a model per use case.** The
 aggregate is an abstract class in `domain/aggregates/<context>.aggregate.ts` that holds the state
-every use case reads and answers `toSnapshot()`: `OrderAggregate`. Each use case extends it with a
-model of its own, which adds only the state and the answers that use case needs: `OrderPlaceModel`
-adds the owner, the stock movements and the payloads of the ledger and the log, and
-`OrderGetOneModel` adds nothing. The aggregate extends `AggregateRootBase`, so a model of a use case
-that only reads extends it too.
+every use case reads and answers `toSnapshot()`: `OrderAggregate`, `RoleAggregate`. Each use case
+extends it with a model of its own, which adds only the state and the answers that use case needs:
+`OrderPlaceModel` adds the owner, the stock movements and the payloads of the ledger and the log,
+and `OrderGetOneModel` adds nothing. The aggregate extends `AggregateRootBase`, so a model of a use
+case that only reads extends it too.
 
 **Use cases that share no state have models without an aggregate.** The login reads the hash and the
 status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and

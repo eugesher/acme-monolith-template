@@ -12,5 +12,5 @@ export class RoleResponseDto {
   @ApiResponseProperty({
     example: [PermissionCodeEnum.ACCESS_MANAGEMENT, PermissionCodeEnum.ACCESS_MANAGEMENT],
   })
-  public permissionCodes: PermissionCodeEnum[];
+  public permissionCodes: readonly PermissionCodeEnum[];
 }

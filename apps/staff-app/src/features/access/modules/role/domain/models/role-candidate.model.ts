@@ -4,8 +4,7 @@ import type {
   IRoleCandidateCreate,
   IRoleCandidateInsertPayload,
   IRoleCandidateRolePermission,
-  IRoleCreateLoggerPayload,
-  IRoleSnapshot,
+  IRoleCreateReconstitute,
 } from '../interfaces';
 
 export class RoleCandidateModel {
@@ -28,11 +27,7 @@ export class RoleCandidateModel {
     return this.permissionCodes.map((code) => ({ roleId, code }));
   }
 
-  public toSnapshot(id: string): IRoleSnapshot {
-    return { id, name: this.name, permissionCodes: [...this.permissionCodes] };
-  }
-
-  public toLoggerPayload(id: string): IRoleCreateLoggerPayload {
-    return { id };
+  public toCreated(id: string): IRoleCreateReconstitute {
+    return { id, name: this.name, permissionCodes: this.permissionCodes };
   }
 }

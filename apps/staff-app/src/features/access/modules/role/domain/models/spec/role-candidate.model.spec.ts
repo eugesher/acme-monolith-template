@@ -24,19 +24,13 @@ describe('RoleCandidateModel', () => {
     });
   });
 
-  describe('toSnapshot', () => {
+  describe('toCreated', () => {
     it('answers the created role under the issued id', () => {
-      expect(candidate.toSnapshot('7')).toEqual({
+      expect(candidate.toCreated('7')).toEqual({
         id: '7',
         name: 'auditor',
         permissionCodes: ['ledger:read'],
       });
-    });
-  });
-
-  describe('toLoggerPayload', () => {
-    it('answers the id of the created role', () => {
-      expect(candidate.toLoggerPayload('7')).toEqual({ id: '7' });
     });
   });
 });

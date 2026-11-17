@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthRoleNameTakenException, RoleCandidateModel } from '../../domain';
+import { AuthRoleNameTakenException, RoleCandidateModel, RoleCreateModel } from '../../domain';
 import {
   ROLE_CREATE_REPOSITORY_PORT,
   ROLE_TRANSACTION_PORT,
@@ -25,15 +25,15 @@ export class RoleCreateUseCase {
   public async execute(command: IRoleCreateCommand): Promise<IRoleView> {
     const { name, permissionCodes } = command;
     const roleCandidate = RoleCandidateModel.create({ name, permissionCodes });
-    const roleId = await this.transaction.run(() => this.insert(roleCandidate));
-    const roleLoggerPayload = roleCandidate.toLoggerPayload(roleId);
+    const role = await this.transaction.run(() => this.create(roleCandidate));
+    const roleLoggerPayload = role.toLoggerPayload();
 
     this.logger.info(roleLoggerPayload, 'Role created');
 
-    return roleCandidate.toSnapshot(roleId);
+    return role.toSnapshot();
   }
 
-  private async insert(candidate: RoleCandidateModel): Promise<string> {
+  private async create(candidate: RoleCandidateModel): Promise<RoleCreateModel> {
     const roleInsertPayload = candidate.toInsertPayload();
     const insertResult = await this.repository.insertRole(roleInsertPayload);
 
@@ -41,11 +41,13 @@ export class RoleCreateUseCase {
       throw new AuthRoleNameTakenException(roleInsertPayload.name);
     }
 
-    const { id } = insertResult;
-    const rolePermissions = candidate.createRolePermissions(id);
+    const roleId = insertResult.id;
 
+    const rolePermissions = candidate.createRolePermissions(roleId);
     await this.repository.insertRolePermissions(rolePermissions);
 
-    return id;
+    const createdRole = candidate.toCreated(roleId);
+
+    return RoleCreateModel.reconstitute(createdRole);
   }
 }

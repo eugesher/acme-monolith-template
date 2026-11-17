@@ -1,6 +1,6 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
-export interface IRoleRolePermission {
+export interface IRoleReassignPermissionsRolePermission {
   readonly roleId: string;
   readonly code: PermissionCodeEnum;
 }
