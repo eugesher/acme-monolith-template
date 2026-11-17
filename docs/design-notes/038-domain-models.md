@@ -46,7 +46,7 @@ as the params of a helper (see `029-naming.md`): `IIdempotencyCoreKeyLoggerPaylo
 - A command of a port made of the values of the request: `{ productId, expectedVersion }`, the body
   of an idempotency claim.
 - A line of the log made of the values at hand only: `{ idempotencyKey }` of a replay,
-  `{ id, version }` of a lost optimistic race, `{ id }` of a registration.
+  `{ id, version }` of a lost optimistic race.
 - The outcome of the application: `{ outcome, tags, missingTagIds }`, and the answer of another
   module passed on as is, `{ tags }`.
 - A choice of the application the domain cannot see: the signs of the kinds of a stock movement come
@@ -96,8 +96,9 @@ model of its own.** `<Model>CandidateModel.create(proposal)` holds the request; 
 answers the main row, `create<Children>(id)` the child rows under the issued id, `assert…` checks
 what the use case read, and `toSnapshot(id)` answers the created row without reading it back.
 `RoleCandidateModel` writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel`
-writes `staff_user` and `staff_user_roles`, `AuthCustomerCandidateModel` answers the registered
-customer and its record of the ledger from the request under the issued id.
+writes `staff_user` and `staff_user_roles`, `AuthCustomerCandidateModel` answers the stored customer
+under the issued id, and `AuthCustomerRegisterModel` rebuilt from it answers the response, the
+record of the ledger and the line of the log, as `OrderPlaceModel` does for a placed order.
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an

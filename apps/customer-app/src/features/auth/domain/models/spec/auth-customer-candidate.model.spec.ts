@@ -54,25 +54,17 @@ describe('AuthCustomerCandidateModel', () => {
     });
   });
 
-  describe('toSnapshot', () => {
-    it('answers the registered customer under the issued id with the email of the candidate', () => {
+  describe('toRegistered', () => {
+    it('answers the stored customer under the issued id with the email of the candidate', () => {
       const candidate = AuthCustomerCandidateModel.create({
         email: 'eve@example.com',
         passwordHash: 'hash',
       });
 
-      expect(candidate.toSnapshot('105')).toEqual({ id: '105', email: 'eve@example.com' });
-    });
-  });
-
-  describe('toLedgerPayload', () => {
-    it('answers the registered customer as the subject of the ledger record', () => {
-      const candidate = AuthCustomerCandidateModel.create({
+      expect(candidate.toRegistered('105')).toEqual({
+        id: '105',
         email: 'eve@example.com',
-        passwordHash: 'hash',
       });
-
-      expect(candidate.toLedgerPayload('105')).toEqual({ subjectId: '105' });
     });
   });
 });

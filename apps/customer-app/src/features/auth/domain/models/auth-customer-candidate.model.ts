@@ -6,8 +6,7 @@ import { AuthCustomerModel } from './auth-customer.model';
 import type {
   IAuthCustomerCandidateCreate,
   IAuthCustomerCandidateInsertPayload,
-  IAuthCustomerRegisterLedgerPayload,
-  IAuthCustomerRegisterSnapshot,
+  IAuthCustomerRegisterReconstitute,
 } from '../interfaces';
 
 export class AuthCustomerCandidateModel {
@@ -40,11 +39,7 @@ export class AuthCustomerCandidateModel {
     return { email: this.email, passwordHash: this.passwordHash, status: UserStatusEnum.ACTIVE };
   }
 
-  public toSnapshot(id: string): IAuthCustomerRegisterSnapshot {
+  public toRegistered(id: string): IAuthCustomerRegisterReconstitute {
     return { id, email: this.email };
-  }
-
-  public toLedgerPayload(id: string): IAuthCustomerRegisterLedgerPayload {
-    return { subjectId: id };
   }
 }

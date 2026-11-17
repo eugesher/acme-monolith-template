@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthCustomerCandidateModel, AuthEmailTakenException } from '../../domain';
+import {
+  AuthCustomerCandidateModel,
+  AuthCustomerRegisterModel,
+  AuthEmailTakenException,
+} from '../../domain';
 import {
   AUTH_CREDENTIALS_PORT,
   AUTH_LEDGER_PORT,
@@ -34,13 +38,16 @@ export class AuthRegisterUseCase {
     const passwordHash = await this.credentials.hashPassword(password);
     const customerCandidate = AuthCustomerCandidateModel.create({ email, passwordHash });
     const customerId = await this.insert(customerCandidate);
-    const customerLedgerPayload = customerCandidate.toLedgerPayload(customerId);
+    const registeredCustomer = customerCandidate.toRegistered(customerId);
+    const customer = AuthCustomerRegisterModel.reconstitute(registeredCustomer);
+    const customerLoggerPayload = customer.toLoggerPayload();
+    const customerLedgerPayload = customer.toLedgerPayload();
 
-    this.logger.info({ id: customerId }, 'Customer registered');
+    this.logger.info(customerLoggerPayload, 'Customer registered');
 
     await this.ledger.recordRegistered(customerLedgerPayload);
 
-    return customerCandidate.toSnapshot(customerId);
+    return customer.toSnapshot();
   }
 
   private async insert(candidate: AuthCustomerCandidateModel): Promise<string> {
