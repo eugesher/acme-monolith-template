@@ -102,7 +102,8 @@ export class OrderPlaceUseCase {
     orderCandidate.assertProducts(activeProducts);
     orderCandidate.assertStockQuantities(stockQuantities);
 
-    const orderId = await this.repository.insertOrder({ customerId: orderCandidate.customerId });
+    const orderInsertQuery = orderCandidate.toInsertQuery();
+    const orderId = await this.repository.insertOrder(orderInsertQuery);
 
     const orderProducts = orderCandidate.getOrderProducts(orderId);
     await this.repository.insertOrderProducts(orderProducts);

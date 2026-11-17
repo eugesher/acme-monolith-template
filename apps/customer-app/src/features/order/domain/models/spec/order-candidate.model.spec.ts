@@ -12,6 +12,17 @@ describe('OrderCandidateModel', () => {
     });
   });
 
+  describe('toInsertQuery', () => {
+    it('answers the order row to insert for the customer', () => {
+      const candidate = OrderCandidateModel.create({
+        customerId: 'customer-1',
+        productIds: ['100', '103', '100'],
+      });
+
+      expect(candidate.toInsertQuery()).toEqual({ customerId: 'customer-1' });
+    });
+  });
+
   describe('getOrderProducts', () => {
     it('answers one order product per requested unit in the request order', () => {
       const candidate = OrderCandidateModel.create({

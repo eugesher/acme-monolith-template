@@ -4,6 +4,7 @@ import { OrderStockInsufficientException } from '../exceptions/order-stock-insuf
 import type {
   IOrderCandidateActiveProduct,
   IOrderCandidateCreate,
+  IOrderCandidateInsertQuery,
   IOrderCandidateOrderProduct,
   IOrderCandidateStockQuantity,
 } from '../interfaces';
@@ -14,14 +15,18 @@ export class OrderCandidateModel {
   }
 
   private constructor(
-    public readonly customerId: string,
-    public readonly productIds: readonly string[],
+    private readonly customerId: string,
+    private readonly productIds: readonly string[],
   ) {}
 
   public static create(proposal: IOrderCandidateCreate): OrderCandidateModel {
     const { customerId, productIds } = proposal;
 
     return new OrderCandidateModel(customerId, productIds);
+  }
+
+  public toInsertQuery(): IOrderCandidateInsertQuery {
+    return { customerId: this.customerId };
   }
 
   public getOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
