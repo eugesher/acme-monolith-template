@@ -5,7 +5,7 @@ import type {
 
 export interface IUserReassignRolesRepositoryPort {
   existsUser(id: string): Promise<boolean>;
-  findRoles(ids: string[]): Promise<IUserReassignRolesStaffRoleRecord[]>;
+  findRoles(ids: readonly string[]): Promise<IUserReassignRolesStaffRoleRecord[]>;
   deleteUserRolesExcept(userId: string, roleIds: string[]): Promise<void>;
   insertUserRolesIgnore(queries: IUserReassignRolesStaffUserRoleInsertQuery[]): Promise<void>;
 }

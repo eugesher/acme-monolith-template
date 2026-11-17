@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { UserNotFoundException, UserStaffUserRolesModel } from '../../domain';
+import { UserNotFoundException, UserStaffUserReassignRolesModel } from '../../domain';
 import {
   USER_REASSIGN_ROLES_REPOSITORY_PORT,
   USER_TRANSACTION_PORT,
@@ -29,7 +29,7 @@ export class UserReassignRolesUseCase {
       throw new UserNotFoundException(userId);
     }
 
-    const userRoles = UserStaffUserRolesModel.create({ userId, roleIds });
+    const userRoles = UserStaffUserReassignRolesModel.create({ userId, roleIds });
     const storedRoles = await this.repository.findRoles(roleIds);
 
     userRoles.assertRoles(storedRoles);
@@ -44,7 +44,7 @@ export class UserReassignRolesUseCase {
   }
 
   private async reassign(
-    userRoles: UserStaffUserRolesModel,
+    userRoles: UserStaffUserReassignRolesModel,
     command: IUserReassignRolesCommand,
   ): Promise<void> {
     const { userId, roleIds } = command;

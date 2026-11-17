@@ -102,14 +102,15 @@ use case inserts it as is.
 model of its own.** `<Model>CandidateModel.create(proposal)` only holds the request, and the use
 case calls the checks in order, so the order is read in one place: `validate()` and `assert…` refuse
 a request, `normalizeEmail()` rewrites a field before `assertEmail()` checks it. `toInsertPayload()`
-answers the main row, `create<Children>(id)` the child rows under the issued id, and
-`toSnapshot(id)` answers the created row without reading it back. `RoleCandidateModel` writes
-`staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel` writes `staff_user` and
-`staff_user_roles`. When the answer needs a model of its own, the candidate hands its stored row
-instead: `AuthCustomerCandidateModel.toRegistered(id)` answers `IAuthCustomerRegisterReconstitute`,
-and `AuthCustomerRegisterModel` rebuilt from it answers the response, the record of the ledger and
-the line of the log, as `OrderPlaceModel` does from the record it reads after the insert;
-`RoleCandidateModel.toCreated(id)` hands the role to `RoleCreateModel` the same way.
+answers the main row and `create<Children>(id)` the child rows under the issued id:
+`RoleCandidateModel` writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel`
+writes `staff_user` and `staff_user_roles`. The answer comes without reading the row back: the
+candidate hands its stored row, and a model of the use case rebuilt from it answers the response,
+the record of the ledger and the line of the log, as `OrderPlaceModel` does from the record it reads
+after the insert. `AuthCustomerCandidateModel.toRegistered(id)` answers
+`IAuthCustomerRegisterReconstitute` for `AuthCustomerRegisterModel`,
+`UserStaffUserCandidateModel.toRegistered(id)` feeds `UserStaffUserRegisterModel`, and
+`RoleCandidateModel.toCreated(id)` feeds `RoleCreateModel`.
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an

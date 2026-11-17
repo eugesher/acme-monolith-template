@@ -3,7 +3,7 @@ import { SelectQueryBuilder } from 'typeorm';
 import type { StaffRole } from '@acme-core/entities';
 
 export class UserPersistenceStaffRoleBuilder extends SelectQueryBuilder<StaffRole> {
-  public forByIds(ids: string[]): this {
+  public forByIds(ids: readonly string[]): this {
     this.select([`${this.alias}.id`]).where(`${this.alias}.id IN (:...ids)`, { ids });
 
     return this;

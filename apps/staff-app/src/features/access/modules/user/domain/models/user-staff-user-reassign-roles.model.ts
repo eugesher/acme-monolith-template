@@ -1,22 +1,24 @@
 import { UserRoleNotFoundException } from '../exceptions/user-role-not-found.exception';
 import type {
-  IUserReassignRolesLoggerPayload,
-  IUserReassignRolesSnapshot,
+  IUserStaffUserReassignRolesCreate,
+  IUserStaffUserReassignRolesLoggerPayload,
+  IUserStaffUserReassignRolesSnapshot,
   IUserStaffUserRole,
-  IUserStaffUserRolesCreate,
   IUserStaffUserStoredRole,
 } from '../interfaces';
 
-export class UserStaffUserRolesModel {
+export class UserStaffUserReassignRolesModel {
   private constructor(
     private readonly userId: string,
     private readonly roleIds: readonly string[],
   ) {}
 
-  public static create(proposal: IUserStaffUserRolesCreate): UserStaffUserRolesModel {
+  public static create(
+    proposal: IUserStaffUserReassignRolesCreate,
+  ): UserStaffUserReassignRolesModel {
     const { userId, roleIds } = proposal;
 
-    return new UserStaffUserRolesModel(userId, roleIds);
+    return new UserStaffUserReassignRolesModel(userId, roleIds);
   }
 
   public assertRoles(storedRoles: IUserStaffUserStoredRole[]): void {
@@ -33,11 +35,11 @@ export class UserStaffUserRolesModel {
     return this.roleIds.map((roleId) => ({ userId: this.userId, roleId }));
   }
 
-  public toSnapshot(): IUserReassignRolesSnapshot {
-    return { id: this.userId, roleIds: [...this.roleIds] };
+  public toSnapshot(): IUserStaffUserReassignRolesSnapshot {
+    return { id: this.userId, roleIds: this.roleIds };
   }
 
-  public toLoggerPayload(): IUserReassignRolesLoggerPayload {
+  public toLoggerPayload(): IUserStaffUserReassignRolesLoggerPayload {
     const userRoles = this.roleIds.map((roleId) => ({ roleId }));
 
     return { id: this.userId, userRoles };

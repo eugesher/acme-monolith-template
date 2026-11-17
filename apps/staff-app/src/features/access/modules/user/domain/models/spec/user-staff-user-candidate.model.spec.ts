@@ -13,23 +13,6 @@ describe('UserStaffUserCandidateModel', () => {
     });
   });
 
-  describe('create', () => {
-    it.each(['editor', 'editor@', '@example.com', 'editor@example', 'ed itor@example.com'])(
-      'rejects the malformed email %s',
-      (email) => {
-        const create = (): UserStaffUserCandidateModel =>
-          UserStaffUserCandidateModel.create({ email, passwordHash: 'hash', roleIds: [] });
-
-        expect(create).toThrow(
-          expect.objectContaining({
-            code: IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
-            message: 'User email must be a well-formed address',
-          }) as Error,
-        );
-      },
-    );
-  });
-
   describe('assertPasswordStrength', () => {
     it('accepts a password of 12 characters', () => {
       const assert = (): void => UserStaffUserCandidateModel.assertPasswordStrength('123456789012');
@@ -49,6 +32,40 @@ describe('UserStaffUserCandidateModel', () => {
     });
   });
 
+  describe('normalizeEmail', () => {
+    it('trims the email and lowers its case', () => {
+      candidate.normalizeEmail();
+
+      expect(candidate.toInsertPayload()).toMatchObject({ email: 'editor@example.com' });
+    });
+  });
+
+  describe('assertEmail', () => {
+    it('accepts a well-formed email', () => {
+      candidate.normalizeEmail();
+
+      expect(() => candidate.assertEmail()).not.toThrow();
+    });
+
+    it.each(['editor', 'editor@', '@example.com', 'editor@example', 'ed itor@example.com'])(
+      'rejects the malformed email %s with AUTH_EMAIL_INVALID',
+      (email) => {
+        const malformed = UserStaffUserCandidateModel.create({
+          email,
+          passwordHash: 'hash',
+          roleIds: [],
+        });
+
+        expect(() => malformed.assertEmail()).toThrow(
+          expect.objectContaining({
+            code: IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
+            message: 'User email must be a well-formed address',
+          }) as Error,
+        );
+      },
+    );
+  });
+
   describe('distinctRoleIds', () => {
     it('answers every requested role once', () => {
       expect(candidate.distinctRoleIds).toEqual(['2', '3']);
@@ -56,7 +73,9 @@ describe('UserStaffUserCandidateModel', () => {
   });
 
   describe('toInsertPayload', () => {
-    it('answers an active user row with the normalized email', () => {
+    it('answers an active user row with no id until it is stored', () => {
+      candidate.normalizeEmail();
+
       expect(candidate.toInsertPayload()).toEqual({
         email: 'editor@example.com',
         passwordHash: 'hash',
@@ -86,15 +105,11 @@ describe('UserStaffUserCandidateModel', () => {
     });
   });
 
-  describe('toSnapshot', () => {
-    it('answers the registered user under the issued id with the normalized email', () => {
-      expect(candidate.toSnapshot('5')).toEqual({ id: '5', email: 'editor@example.com' });
-    });
-  });
+  describe('toRegistered', () => {
+    it('answers the stored user under the issued id with the normalized email', () => {
+      candidate.normalizeEmail();
 
-  describe('toLoggerPayload', () => {
-    it('answers the id of the registered user', () => {
-      expect(candidate.toLoggerPayload('5')).toEqual({ id: '5' });
+      expect(candidate.toRegistered('5')).toEqual({ id: '5', email: 'editor@example.com' });
     });
   });
 });

@@ -31,7 +31,7 @@ export class UserReassignRolesRepository
     return await this.staffUserRepository.existsBy({ id });
   }
 
-  public async findRoles(ids: string[]): Promise<IUserReassignRolesStaffRoleRecord[]> {
+  public async findRoles(ids: readonly string[]): Promise<IUserReassignRolesStaffRoleRecord[]> {
     if (ids.length === 0) {
       return [];
     }

@@ -47,7 +47,7 @@ export class UserRegisterRepository
     }
   }
 
-  public async findRoles(ids: string[]): Promise<IUserRegisterStaffRoleRecord[]> {
+  public async findRoles(ids: readonly string[]): Promise<IUserRegisterStaffRoleRecord[]> {
     if (ids.length === 0) {
       return [];
     }

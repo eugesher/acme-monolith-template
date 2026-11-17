@@ -1,12 +1,12 @@
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 
-import { UserStaffUserRolesModel } from '../user-staff-user-roles.model';
+import { UserStaffUserReassignRolesModel } from '../user-staff-user-reassign-roles.model';
 
-describe('UserStaffUserRolesModel', () => {
-  let userRoles: UserStaffUserRolesModel;
+describe('UserStaffUserReassignRolesModel', () => {
+  let userRoles: UserStaffUserReassignRolesModel;
 
   beforeEach(() => {
-    userRoles = UserStaffUserRolesModel.create({ userId: 'user-1', roleIds: ['2', '3'] });
+    userRoles = UserStaffUserReassignRolesModel.create({ userId: 'user-1', roleIds: ['2', '3'] });
   });
 
   describe('assertRoles', () => {

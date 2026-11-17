@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { UserEmailTakenException, UserStaffUserCandidateModel } from '../../domain';
+import {
+  UserEmailTakenException,
+  UserStaffUserCandidateModel,
+  UserStaffUserRegisterModel,
+} from '../../domain';
 import {
   USER_CREDENTIALS_PORT,
   USER_REGISTER_REPOSITORY_PORT,
@@ -33,15 +37,21 @@ export class UserRegisterUseCase {
 
     const passwordHash = await this.credentials.hashPassword(password);
     const userCandidate = UserStaffUserCandidateModel.create({ email, passwordHash, roleIds });
-    const userId = await this.transaction.run(() => this.insert(userCandidate));
-    const userLoggerPayload = userCandidate.toLoggerPayload(userId);
+
+    userCandidate.normalizeEmail();
+    userCandidate.assertEmail();
+
+    const user = await this.transaction.run(() => this.register(userCandidate));
+    const userLoggerPayload = user.toLoggerPayload();
 
     this.logger.info(userLoggerPayload, 'User registered');
 
-    return userCandidate.toSnapshot(userId);
+    return user.toSnapshot();
   }
 
-  private async insert(candidate: UserStaffUserCandidateModel): Promise<string> {
+  private async register(
+    candidate: UserStaffUserCandidateModel,
+  ): Promise<UserStaffUserRegisterModel> {
     const userInsertPayload = candidate.toInsertPayload();
     const insertResult = await this.repository.insertUser(userInsertPayload);
 
@@ -58,6 +68,8 @@ export class UserRegisterUseCase {
 
     await this.repository.insertUserRoles(userRoles);
 
-    return id;
+    const registeredUser = candidate.toRegistered(id);
+
+    return UserStaffUserRegisterModel.reconstitute(registeredUser);
   }
 }
