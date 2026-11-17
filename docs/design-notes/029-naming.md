@@ -17,7 +17,6 @@ A name says who or where; the action lives in the method or in the port.
 | token of a config value            | `<MODULE>_<PROPERTY>_TOKEN`, `<module>-<property>.token.ts`                             | `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`                         |
 | binding of an infrastructure class | `public static readonly provider: ClassProvider<I…Port>`                                | `OrderIdempotencyCoreAdapter.provider`                     |
 | provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                       | `ProductConfigOccRetryAttemptsProvider`                    |
-| abstract base class                | `<Name>Base`, `<name>.base.ts`                                                          | `AggregateRootBase`                                        |
 | type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                  | `replay-retry.options.ts`, `result.type.ts`                |
 | params of a helper method          | `I<Subject><Action>`, `interfaces/params/<subject>-<action>.interface.ts`               | `IPageWindowClamp`, `IPageBuild`                           |
 | snapshot of a helper method        | `I<Subject>`, `interfaces/snapshots/<subject>.interface.ts`                             | `IPageWindow`, `IPage`                                     |
@@ -71,11 +70,6 @@ never share a name. A property that already starts with the module name is not r
 `IDEMPOTENCY_KEY_TTL_HOURS` becomes `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`. The suffix sets the token
 apart from the `_PORT` tokens in the same `outbound` barrel. The description of the `Symbol` repeats
 the constant, and the file drops the suffix: `order-redis-command-timeout-ms.token.ts`.
-
-**A base class carries `Base`.** An abstract class that others extend ends its name with `Base`, as
-its file ends with `.base.ts`: `AggregateRootBase` in `libs/toolkit/src/ddd/aggregate-root.base.ts`.
-The suffix also keeps `EntityBase` apart from the `Entity` decorator of TypeORM. A base exception
-keeps the word in front of `Exception`: `QueueBaseException` in `queue-base.exception.ts`.
 
 **A lib without layers names a type file by its role where the type has one.** Modules and layered
 libs name an interface file by its role: `.command`, `.view`, `.options`. The types of

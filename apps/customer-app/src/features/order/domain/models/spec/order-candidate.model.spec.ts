@@ -12,14 +12,14 @@ describe('OrderCandidateModel', () => {
     });
   });
 
-  describe('getOrderProductCandidates', () => {
+  describe('getOrderProducts', () => {
     it('answers one order product per requested unit in the request order', () => {
       const candidate = OrderCandidateModel.create({
         customerId: 'customer-1',
         productIds: ['100', '103', '100'],
       });
 
-      expect(candidate.getOrderProductCandidates('610')).toEqual([
+      expect(candidate.getOrderProducts('610')).toEqual([
         { orderId: '610', productId: '100' },
         { orderId: '610', productId: '103' },
         { orderId: '610', productId: '100' },

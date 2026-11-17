@@ -1,7 +1,7 @@
 export interface IOrderProductSnapshot {
   id: string;
-  productId: string;
   product: {
+    id: string;
     sku: string;
     name: string;
   };

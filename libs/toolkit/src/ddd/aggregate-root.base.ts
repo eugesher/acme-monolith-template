@@ -1,7 +1,7 @@
 import { EntityBase } from './entity.base';
 import type { DomainEventBase } from './domain-event.base';
 
-export abstract class AggregateRootBase<TId> extends EntityBase<TId> {
+export abstract class AggregateRootBase<TId = string> extends EntityBase<TId> {
   private domainEvents: DomainEventBase<TId>[] = [];
 
   public pullDomainEvents(): DomainEventBase<TId>[] {

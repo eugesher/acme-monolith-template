@@ -8,7 +8,7 @@ import type {
   ITagSnapshot,
 } from '../interfaces';
 
-export class TagModel extends AggregateRootBase<string> {
+export class TagModel extends AggregateRootBase {
   public get name(): string {
     return this.currentName;
   }

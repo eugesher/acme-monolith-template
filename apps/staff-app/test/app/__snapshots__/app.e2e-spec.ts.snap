@@ -1668,10 +1668,10 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should read an order wit
         {
           "id": "603",
           "product": {
+            "id": "107",
             "name": "Deleted product",
             "sku": "SKU-0008",
           },
-          "productId": "107",
         },
       ],
     },
@@ -1690,18 +1690,18 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should read the order of
         {
           "id": "600",
           "product": {
+            "id": "100",
             "name": "Seeded reference product",
             "sku": "SKU-0001",
           },
-          "productId": "100",
         },
         {
           "id": "601",
           "product": {
+            "id": "106",
             "name": "Sold out product",
             "sku": "SKU-0007",
           },
-          "productId": "106",
         },
       ],
     },

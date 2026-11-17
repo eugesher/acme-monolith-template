@@ -62,7 +62,7 @@ describe('OrderPersistenceBuilder', () => {
       builder.forById('600');
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Order`.`id` AS `Order_id`, `Order`.`customerId` AS `Order_customerId`, `Order`.`createdAt` AS `Order_createdAt`, `OrderProduct`.`id` AS `OrderProduct_id`, `OrderProduct`.`productId` AS `OrderProduct_productId`, `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name` FROM `order` `Order` LEFT JOIN `order_product` `OrderProduct` ON `OrderProduct`.`order_id`=`Order`.`id` LEFT JOIN `product` `Product` ON `Product`.`id`=`OrderProduct`.`product_id` WHERE `Order`.`id` = ? ORDER BY `OrderProduct_id` ASC',
+        'SELECT `Order`.`id` AS `Order_id`, `Order`.`customerId` AS `Order_customerId`, `Order`.`createdAt` AS `Order_createdAt`, `OrderProduct`.`id` AS `OrderProduct_id`, `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name` FROM `order` `Order` LEFT JOIN `order_product` `OrderProduct` ON `OrderProduct`.`order_id`=`Order`.`id` LEFT JOIN `product` `Product` ON `Product`.`id`=`OrderProduct`.`product_id` WHERE `Order`.`id` = ? ORDER BY `OrderProduct_id` ASC',
         ['600'],
       ]);
     });

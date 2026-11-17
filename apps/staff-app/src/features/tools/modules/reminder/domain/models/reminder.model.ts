@@ -13,7 +13,7 @@ import type {
   IReminderSnapshot,
 } from '../interfaces';
 
-export class ReminderModel extends AggregateRootBase<string> {
+export class ReminderModel extends AggregateRootBase {
   public get dueOn(): string {
     return this.currentDueOn;
   }

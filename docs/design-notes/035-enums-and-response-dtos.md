@@ -63,14 +63,14 @@ The interfaces of a domain lie in two folders, by the side of the model or the e
 They follow the params and snapshots of a helper (see `029-naming.md`): a method of a model takes
 one params object, and every shape a model or an event answers is a snapshot.
 
-| Folder                         | Name                    | What it is                                                                                                                                                                                                                                        |
-| ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `domain/interfaces/params/`    | `I<Model>Reconstitute`  | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                                                                     |
-|                                | `I<Model>CandidateInit` | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                            |
-|                                | `I<Model><Action>`      | the edits an operation takes, `IProductUpdate` for `ProductModel.update(changes)`                                                                                                                                                                 |
-| `domain/interfaces/snapshots/` | `I<Model>Candidate`     | the row `initCandidate` answers for an insert                                                                                                                                                                                                     |
-|                                | `I<Model>Snapshot`      | the state a model answers with `toSnapshot()`                                                                                                                                                                                                     |
-|                                | `I<Subject>`            | another answer, by its noun: `ITagCommonSubjectTagsChanges` from `TagCommonSubjectTagsModel.replace`, `IOrderProductStockMovement` from `OrderModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
+| Folder                         | Name                    | What it is                                                                                                                                                                                                                                             |
+| ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `domain/interfaces/params/`    | `I<Model>Reconstitute`  | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                                                                          |
+|                                | `I<Model>CandidateInit` | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                                 |
+|                                | `I<Model><Action>`      | the edits an operation takes, `IProductUpdate` for `ProductModel.update(changes)`                                                                                                                                                                      |
+| `domain/interfaces/snapshots/` | `I<Model>Candidate`     | the row `initCandidate` answers for an insert                                                                                                                                                                                                          |
+|                                | `I<Model>Snapshot`      | the state a model answers with `toSnapshot()`                                                                                                                                                                                                          |
+|                                | `I<Subject>`            | another answer, by its noun: `ITagCommonSubjectTagsChanges` from `TagCommonSubjectTagsModel.replace`, `IOrderProductStockMovement` from `OrderPlaceModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
 
 The folder names the role, so the file repeats the name without `I` and ends with `.interface.ts`:
 `order-reconstitute.interface.ts` holds `IOrderReconstitute`, `role-candidate.interface.ts` holds
@@ -86,7 +86,7 @@ call, against data the use case already holds. An order is checked against rows 
 only after a lock (see `021-pessimistic-locking.md`), so `OrderCandidateModel.create(proposal)`
 holds the request, `validate()` refuses an empty one before any read, `distinctProductIds` names the
 rows to lock and read, `assertProducts` and `assertStockQuantities` check what was read, and
-`getOrderProductCandidates(orderId)` answers the rows to insert. Each check takes its own params,
+`getOrderProducts(orderId)` answers the rows to insert. Each check takes its own params,
 `IOrderCandidateActiveProduct` and `IOrderCandidateStockQuantity`.
 
 ## Read models
@@ -99,12 +99,20 @@ puts the snapshots on the page. A module that only reads has a domain for that a
 `LedgerListEntriesModel` in `apps/staff-app/src/features/ledger`, `ProductStockCoreOnHandModel` in
 `core/modules/src/product-stock`.
 
-**A read model is a plain class.** It records no events and takes no changes, so it does not extend
-`AggregateRootBase`, like `StaffAuthCoreSubjectModel`.
+**An aggregate shared by several use cases has a model per use case.** The aggregate is an abstract
+class in `domain/aggregates/<context>.aggregate.ts` that holds the state every use case reads and
+answers `toSnapshot()`: `OrderAggregate`. Each use case extends it with a model of its own, which
+adds only the state and the answers that use case needs: `OrderPlaceModel` adds the owner, the stock
+movements and the payloads of the ledger and the log, and `OrderGetOneModel` adds nothing. The
+aggregate extends `AggregateRootBase`, so a model of a use case that only reads extends it too.
+
+**Any other read model is a plain class.** A model with the columns of its own read records no
+events and takes no changes, so it does not extend `AggregateRootBase`, like
+`StaffAuthCoreSubjectModel`.
 
 **A list model carries the columns of the list.** A page of orders carries no products, so
-`OrderGetManyModel` rebuilds it, not `OrderModel`, whose record requires them. Both live in the
-domain of the order, the list model with `order-get-many-reconstitute.interface.ts` and
+`OrderGetManyModel` rebuilds it, not `OrderGetOneModel`, whose record requires them. Both live in
+the domain of the order, the list model with `order-get-many-reconstitute.interface.ts` and
 `order-get-many-snapshot.interface.ts`. Its `toSnapshot` is private: only `toViewData` calls it. A
 list model does not repeat the checks of the aggregate: it rebuilds what the aggregate stored.
 

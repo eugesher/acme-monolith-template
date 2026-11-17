@@ -3,7 +3,7 @@ import type { ProductStatusEnum } from '@acme-libs/kernel';
 
 import type { IProductLedgerRecord } from '../interfaces';
 
-export class ProductPublishedEvent extends DomainEventBase<string> {
+export class ProductPublishedEvent extends DomainEventBase {
   constructor(
     productId: string,
     public readonly sku: string,

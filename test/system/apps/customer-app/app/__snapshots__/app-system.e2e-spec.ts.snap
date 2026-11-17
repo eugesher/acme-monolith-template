@@ -65,26 +65,20 @@ exports[`App Order POST /api/orders should place the order, append its ledger en
             {
               "id": Any<String>,
               "product": {
-                "name": "Product to archive",
-                "sku": "SKU-0004",
+                "id": "103",
               },
-              "productId": "103",
             },
             {
               "id": Any<String>,
               "product": {
-                "name": "Product to archive",
-                "sku": "SKU-0004",
+                "id": "103",
               },
-              "productId": "103",
             },
             {
               "id": Any<String>,
               "product": {
-                "name": "Product to archive",
-                "sku": "SKU-0004",
+                "id": "103",
               },
-              "productId": "103",
             },
           ],
         },
@@ -175,26 +169,26 @@ exports[`App Order POST /api/orders should place the order, append its ledger en
         {
           "id": Any<String>,
           "product": {
+            "id": "103",
             "name": "Product to archive",
             "sku": "SKU-0004",
           },
-          "productId": "103",
         },
         {
           "id": Any<String>,
           "product": {
+            "id": "103",
             "name": "Product to archive",
             "sku": "SKU-0004",
           },
-          "productId": "103",
         },
         {
           "id": Any<String>,
           "product": {
+            "id": "103",
             "name": "Product to archive",
             "sku": "SKU-0004",
           },
-          "productId": "103",
         },
       ],
     },

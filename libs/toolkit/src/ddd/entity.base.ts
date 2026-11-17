@@ -1,4 +1,4 @@
-export abstract class EntityBase<TId> {
+export abstract class EntityBase<TId = string> {
   public get id(): TId {
     return this._id;
   }

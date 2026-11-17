@@ -4,8 +4,8 @@ export interface IOrderGetOneView {
   createdAt: string;
   orderProducts: {
     id: string;
-    productId: string;
     product: {
+      id: string;
       sku: string;
       name: string;
     };

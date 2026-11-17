@@ -24,7 +24,7 @@ export class OrderCandidateModel {
     return new OrderCandidateModel(customerId, productIds);
   }
 
-  public getOrderProductCandidates(orderId: string): IOrderCandidateOrderProduct[] {
+  public getOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
     return this.productIds.map((productId) => ({ orderId, productId }));
   }
 

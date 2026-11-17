@@ -34,20 +34,24 @@ export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
   }
 
   public forPlaced(orderId: string): this {
-    this.selectOrder().joinOrderProducts().joinProducts().whereId(orderId);
+    this.selectOrder()
+      .addSelect(`${this.alias}.customerId`)
+      .joinOrderProducts()
+      .joinProducts()
+      .whereId(orderId);
 
     return this;
   }
 
   private selectOrder(): this {
-    this.select([`${this.alias}.id`, `${this.alias}.customerId`, `${this.alias}.createdAt`]);
+    this.select([`${this.alias}.id`, `${this.alias}.createdAt`]);
 
     return this;
   }
 
   private joinOrderProducts(): this {
     this.leftJoin(`${this.alias}.orderProducts`, this.orderProductAlias)
-      .addSelect([`${this.orderProductAlias}.id`, `${this.orderProductAlias}.productId`])
+      .addSelect([`${this.orderProductAlias}.id`])
       .addOrderBy(`${this.orderProductAlias}.id`, 'ASC');
 
     return this;

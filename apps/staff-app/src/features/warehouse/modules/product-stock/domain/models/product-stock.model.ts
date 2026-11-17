@@ -4,7 +4,7 @@ import { ProductStockAddedEvent } from '../events/product-stock-added.event';
 import { ProductQuantityInvalidException } from '../exceptions/product-quantity-invalid.exception';
 import type { IProductStockReconstitute } from '../interfaces';
 
-export class ProductStockModel extends AggregateRootBase<string> {
+export class ProductStockModel extends AggregateRootBase {
   private static readonly ADD_MAX_QUANTITY = 100_000;
 
   private constructor(

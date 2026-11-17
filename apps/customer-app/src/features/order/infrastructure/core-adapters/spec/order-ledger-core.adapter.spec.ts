@@ -17,8 +17,8 @@ describe('OrderLedgerCoreAdapter', () => {
         payload: {
           customerId: 'customer-1',
           orderProducts: [
-            { id: '620', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
-            { id: '621', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+            { id: '620', product: { id: '100' } },
+            { id: '621', product: { id: '100' } },
           ],
         },
       });
@@ -32,8 +32,8 @@ describe('OrderLedgerCoreAdapter', () => {
         payload: {
           customerId: 'customer-1',
           orderProducts: [
-            { id: '620', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
-            { id: '621', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
+            { id: '620', product: { id: '100' } },
+            { id: '621', product: { id: '100' } },
           ],
         },
         occurredAt: '2026-01-05T08:00:00.000Z',

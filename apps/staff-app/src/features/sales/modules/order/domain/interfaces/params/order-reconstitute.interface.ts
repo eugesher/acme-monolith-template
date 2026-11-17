@@ -4,7 +4,6 @@ export interface IOrderReconstitute {
   createdAt: Date;
   orderProducts: {
     id: string;
-    productId: string;
-    product: { sku: string; name: string };
+    product: { id: string; sku: string; name: string };
   }[];
 }

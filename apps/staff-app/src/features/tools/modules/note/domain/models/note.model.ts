@@ -11,7 +11,7 @@ import type {
   INoteSnapshot,
 } from '../interfaces';
 
-export class NoteModel extends AggregateRootBase<string> {
+export class NoteModel extends AggregateRootBase {
   public get body(): string {
     return this.currentBody;
   }

@@ -5,12 +5,12 @@ describe('AggregateRootBase', () => {
   describe('pullDomainEvents', () => {
     it('drains the recorded events exactly once', () => {
       class ItemOpenedEvent extends DomainEventBase {
-        public constructor(aggregateId: number) {
+        public constructor(aggregateId: string) {
           super(aggregateId);
         }
       }
-      class ItemAggregate extends AggregateRootBase<number> {
-        public constructor(id: number) {
+      class ItemAggregate extends AggregateRootBase {
+        public constructor(id: string) {
           super(id);
         }
 
@@ -18,7 +18,7 @@ describe('AggregateRootBase', () => {
           this.addDomainEvent(new ItemOpenedEvent(this.id));
         }
       }
-      const item = new ItemAggregate(1);
+      const item = new ItemAggregate('1');
 
       item.open();
       item.open();
@@ -26,7 +26,7 @@ describe('AggregateRootBase', () => {
       const first = item.pullDomainEvents();
       const second = item.pullDomainEvents();
 
-      expect(first.map((event) => event.aggregateId)).toEqual([1, 1]);
+      expect(first.map((event) => event.aggregateId)).toEqual(['1', '1']);
       expect(second).toEqual([]);
     });
   });

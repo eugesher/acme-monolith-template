@@ -5,7 +5,7 @@ import {
   OrderCandidateModel,
   OrderIdempotencyKeyReusedException,
   OrderIdempotentRequestInFlightException,
-  OrderModel,
+  OrderPlaceModel,
 } from '../../domain';
 import {
   ORDER_IDEMPOTENCY_PORT,
@@ -74,7 +74,7 @@ export class OrderPlaceUseCase {
     }
   }
 
-  private async write(command: IOrderPlaceCommand): Promise<OrderModel> {
+  private async write(command: IOrderPlaceCommand): Promise<OrderPlaceModel> {
     const { customerId, idempotencyKey } = command;
 
     try {
@@ -86,7 +86,7 @@ export class OrderPlaceUseCase {
     }
   }
 
-  private async persist(command: IOrderPlaceCommand): Promise<OrderModel> {
+  private async persist(command: IOrderPlaceCommand): Promise<OrderPlaceModel> {
     const { customerId, productIds, idempotencyKey } = command;
 
     const orderCandidate = OrderCandidateModel.create({ customerId, productIds });
@@ -104,11 +104,11 @@ export class OrderPlaceUseCase {
 
     const orderId = await this.repository.insertOrder({ customerId: orderCandidate.customerId });
 
-    const orderProducts = orderCandidate.getOrderProductCandidates(orderId);
+    const orderProducts = orderCandidate.getOrderProducts(orderId);
     await this.repository.insertOrderProducts(orderProducts);
 
     const orderRecord = await this.repository.findPlaced(orderId);
-    const order = OrderModel.reconstitute(orderRecord);
+    const order = OrderPlaceModel.reconstitute(orderRecord);
 
     const movements = order.getProductStockMovements();
     await this.productStock.withdraw({ movements });

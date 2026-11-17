@@ -14,7 +14,7 @@ import type {
   IProductUpdate,
 } from '../interfaces';
 
-export class ProductModel extends AggregateRootBase<string> {
+export class ProductModel extends AggregateRootBase {
   public get name(): string {
     return this.currentName;
   }

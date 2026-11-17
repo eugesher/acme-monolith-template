@@ -466,10 +466,10 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
         {
           "id": "602",
           "product": {
+            "id": "100",
             "name": "Seeded reference product",
             "sku": "SKU-0001",
           },
-          "productId": "100",
         },
       ],
     },
@@ -487,10 +487,10 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
         {
           "id": "603",
           "product": {
+            "id": "107",
             "name": "Deleted product",
             "sku": "SKU-0008",
           },
-          "productId": "107",
         },
       ],
     },
@@ -579,18 +579,18 @@ exports[`App Order POST /api/orders should place an order of another customer un
         {
           "id": Any<String>,
           "product": {
+            "id": "100",
             "name": "Seeded reference product",
             "sku": "SKU-0001",
           },
-          "productId": "100",
         },
         {
           "id": Any<String>,
           "product": {
+            "id": "100",
             "name": "Seeded reference product",
             "sku": "SKU-0001",
           },
-          "productId": "100",
         },
       ],
     },
@@ -660,18 +660,14 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
           {
             "id": Any<String>,
             "product": {
-              "name": "Seeded reference product",
-              "sku": "SKU-0001",
+              "id": "100",
             },
-            "productId": "100",
           },
           {
             "id": Any<String>,
             "product": {
-              "name": "Seeded reference product",
-              "sku": "SKU-0001",
+              "id": "100",
             },
-            "productId": "100",
           },
         ],
       },
@@ -695,18 +691,18 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
         {
           "id": Any<String>,
           "product": {
+            "id": "100",
             "name": "Seeded reference product",
             "sku": "SKU-0001",
           },
-          "productId": "100",
         },
         {
           "id": Any<String>,
           "product": {
+            "id": "100",
             "name": "Seeded reference product",
             "sku": "SKU-0001",
           },
-          "productId": "100",
         },
       ],
     },

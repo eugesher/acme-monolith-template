@@ -1,6 +1,9 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
 class OrderResponseItemProductDto {
+  @ApiResponseProperty({ example: '100' })
+  public id: string;
+
   @ApiResponseProperty({ example: 'SKU-0001' })
   public sku: string;
 
@@ -11,9 +14,6 @@ class OrderResponseItemProductDto {
 class OrderResponseItemDto {
   @ApiResponseProperty({ example: '900' })
   public id: string;
-
-  @ApiResponseProperty({ example: '100' })
-  public productId: string;
 
   @ApiResponseProperty({ type: OrderResponseItemProductDto })
   public product: OrderResponseItemProductDto;

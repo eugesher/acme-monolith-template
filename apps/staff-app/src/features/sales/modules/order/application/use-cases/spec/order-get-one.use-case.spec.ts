@@ -9,7 +9,7 @@ describe('OrderGetOneUseCase', () => {
       id: '600',
       customerId: 'customer-1',
       createdAt: new Date('2026-01-03T00:00:00.000Z'),
-      orderProducts: [{ id: '600', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } }],
+      orderProducts: [{ id: '600', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } }],
     });
     useCase = new OrderGetOneUseCase({ findById });
   });
@@ -23,9 +23,7 @@ describe('OrderGetOneUseCase', () => {
         id: '600',
         customerId: 'customer-1',
         createdAt: '2026-01-03T00:00:00.000Z',
-        orderProducts: [
-          { id: '600', productId: '100', product: { sku: 'SKU-0001', name: 'Lamp' } },
-        ],
+        orderProducts: [{ id: '600', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } }],
       });
     });
 
