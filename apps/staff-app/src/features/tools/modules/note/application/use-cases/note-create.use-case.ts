@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { NoteModel } from '../../domain';
+import { NoteCreateModel } from '../../domain';
 import { NOTE_CREATE_REPOSITORY_PORT, type INoteCreateRepositoryPort } from '../../outbound';
 import type { INoteCreateCommand, INoteView } from '../interfaces';
 
@@ -16,11 +16,11 @@ export class NoteCreateUseCase {
 
   public async execute(command: INoteCreateCommand): Promise<INoteView> {
     const { subjectType, subjectId, body, authorId } = command;
-    const noteCandidate = NoteModel.initCandidate({ subjectType, subjectId, body, authorId });
+    const noteCandidate = NoteCreateModel.initCandidate({ subjectType, subjectId, body, authorId });
     const noteId = await this.repository.insert(noteCandidate);
     const noteRecord = await this.repository.findInserted(noteId);
-    const createdNote = NoteModel.reconstitute(noteRecord);
-    const noteLoggerPayload = createdNote.toCreateLoggerPayload();
+    const createdNote = NoteCreateModel.reconstitute(noteRecord);
+    const noteLoggerPayload = createdNote.toLoggerPayload();
 
     this.logger.info(noteLoggerPayload, 'Note created');
 

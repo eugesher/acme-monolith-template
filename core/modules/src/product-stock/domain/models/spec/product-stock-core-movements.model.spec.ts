@@ -26,9 +26,9 @@ describe('ProductStockCoreMovementsModel', () => {
     });
   });
 
-  describe('toInsertQueries', () => {
+  describe('toInsertPayloads', () => {
     it('answers one row per movement with the quantity under the sign of the kind', () => {
-      expect(stockMovements.toInsertQueries()).toEqual([
+      expect(stockMovements.toInsertPayloads()).toEqual([
         { productId: '103', quantity: -1, orderProductId: '620' },
         { productId: '100', quantity: -2, orderProductId: '621' },
         { productId: '103', quantity: -1, orderProductId: '622' },
@@ -36,11 +36,12 @@ describe('ProductStockCoreMovementsModel', () => {
     });
   });
 
-  describe('toProductStockIds', () => {
+  describe('toIds', () => {
     it('answers the id of every inserted row as a string', () => {
-      expect(
-        ProductStockCoreMovementsModel.toProductStockIds([{ id: 700 }, { id: '701' }]),
-      ).toEqual(['700', '701']);
+      expect(ProductStockCoreMovementsModel.toIds([{ id: 700 }, { id: '701' }])).toEqual([
+        '700',
+        '701',
+      ]);
     });
   });
 

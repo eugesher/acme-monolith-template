@@ -26,12 +26,7 @@ export class LedgerAppendUseCase {
 
   public async execute(command: ILedgerAppendCommand): Promise<void> {
     const { operationKey, subjectType, subjectId, action, payload, occurredAt } = command;
-    const receiveLoggerPayload = LedgerAppendEntryModel.toReceiveLoggerPayload(
-      operationKey,
-      action,
-    );
-
-    this.logger.info(receiveLoggerPayload, 'Ledger record received');
+    this.logger.info({ operationKey, action }, 'Ledger record received');
 
     const instant = LedgerAppendHelper.parseInstant(occurredAt, 'occurredAt');
     const correlationId = CorrelationContextHelper.current(LedgerAppendUseCase.name);
@@ -47,9 +42,9 @@ export class LedgerAppendUseCase {
     const appendOutcome = await this.append(entryCandidate);
     const { id, appended } = appendOutcome;
     const message = appended ? 'Ledger record appended' : 'Ledger record already appended';
-    const appendLoggerPayload = LedgerAppendEntryModel.toAppendLoggerPayload(id, entryCandidate);
+    const entryLoggerPayload = LedgerAppendEntryModel.toLoggerPayload(id, entryCandidate);
 
-    this.logger.info(appendLoggerPayload, message);
+    this.logger.info(entryLoggerPayload, message);
   }
 
   private async append(candidate: ILedgerAppendEntryCandidate): Promise<ILedgerAppendOutcomeView> {

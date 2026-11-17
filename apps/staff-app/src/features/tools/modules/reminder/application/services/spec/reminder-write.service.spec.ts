@@ -3,7 +3,11 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ReminderStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ReminderModel } from '../../../domain';
+import {
+  ReminderCompleteModel,
+  ReminderRescheduleModel,
+  type IReminderReconstitute,
+} from '../../../domain';
 import { ReminderWriteService } from '../reminder-write.service';
 import type { IReminderWriteUpdateQuery } from '../../../outbound';
 import type { ReminderAccessService } from '../reminder-access.service';
@@ -16,21 +20,24 @@ describe('ReminderWriteService', () => {
   let service: ReminderWriteService;
 
   beforeEach(() => {
-    loadOwned = jest.fn().mockImplementation(() =>
-      Promise.resolve(
-        ReminderModel.reconstitute({
-          id: '7',
-          ownerId: 'owner-1',
-          title: 'Call the bank',
-          body: '',
-          dueOn: '2026-11-05',
-          status: ReminderStatusEnum.PENDING,
-          version: 2,
-          createdAt: new Date('2026-01-01T00:00:00.000Z'),
-          updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-        }),
-      ),
-    );
+    loadOwned = jest
+      .fn()
+      .mockImplementation(
+        (_command: unknown, reconstitute: (record: IReminderReconstitute) => unknown) =>
+          Promise.resolve(
+            reconstitute({
+              id: '7',
+              ownerId: 'owner-1',
+              title: 'Call the bank',
+              body: '',
+              dueOn: '2026-11-05',
+              status: ReminderStatusEnum.PENDING,
+              version: 2,
+              createdAt: new Date('2026-01-01T00:00:00.000Z'),
+              updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+            }),
+          ),
+      );
     findById = jest.fn().mockResolvedValue({
       id: '7',
       ownerId: 'owner-1',
@@ -54,23 +61,30 @@ describe('ReminderWriteService', () => {
 
   describe('write', () => {
     it('saves the change against the version as read and answers the stored reminder', async () => {
-      const written = await service.write({ reminderId: '7', ownerId: 'owner-1' }, (reminder) =>
-        reminder.complete(),
+      const written = await service.write(
+        { reminderId: '7', ownerId: 'owner-1' },
+        ReminderCompleteModel.reconstitute,
+        (reminder) => reminder.complete(),
       );
       const [command] = update.mock.calls[0] as [IReminderWriteUpdateQuery];
 
-      expect(loadOwned).toHaveBeenCalledWith({ reminderId: '7', ownerId: 'owner-1' });
+      expect(loadOwned).toHaveBeenCalledWith(
+        { reminderId: '7', ownerId: 'owner-1' },
+        ReminderCompleteModel.reconstitute,
+      );
       expect(command.versionAsRead).toBe(2);
       expect(command.status).toBe('done');
       expect(command.version).toBe(3);
       expect(findById).toHaveBeenCalledWith('7');
-      expect(written.updatedAt).toEqual(new Date('2026-01-03T00:00:00.000Z'));
+      expect(written.toSnapshot().updatedAt).toBe('2026-01-03T00:00:00.000Z');
       expect(logger.info).not.toHaveBeenCalled();
     });
 
     it('writes nothing when the change leaves the version as read', async () => {
-      const written = await service.write({ reminderId: '7', ownerId: 'owner-1' }, (reminder) =>
-        reminder.reschedule('2026-11-05'),
+      const written = await service.write(
+        { reminderId: '7', ownerId: 'owner-1' },
+        ReminderRescheduleModel.reconstitute,
+        (reminder) => reminder.reschedule('2026-11-05'),
       );
 
       expect(update).not.toHaveBeenCalled();
@@ -81,8 +95,10 @@ describe('ReminderWriteService', () => {
     it('retries a lost race with a fresh read and logs the retry', async () => {
       update.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
-      const written = await service.write({ reminderId: '7', ownerId: 'owner-1' }, (reminder) =>
-        reminder.complete(),
+      const written = await service.write(
+        { reminderId: '7', ownerId: 'owner-1' },
+        ReminderCompleteModel.reconstitute,
+        (reminder) => reminder.complete(),
       );
 
       expect(loadOwned).toHaveBeenCalledTimes(2);
@@ -98,7 +114,11 @@ describe('ReminderWriteService', () => {
       update.mockResolvedValue(false);
 
       await expect(
-        service.write({ reminderId: '7', ownerId: 'owner-1' }, (reminder) => reminder.complete()),
+        service.write(
+          { reminderId: '7', ownerId: 'owner-1' },
+          ReminderCompleteModel.reconstitute,
+          (reminder) => reminder.complete(),
+        ),
       ).rejects.toMatchObject({
         code: 'VERSION_MISMATCH',
         message: 'Reminder 7 write lost the optimistic race after 5 attempts',
@@ -113,8 +133,10 @@ describe('ReminderWriteService', () => {
 
     it('does not retry a domain refusal', async () => {
       await expect(
-        service.write({ reminderId: '7', ownerId: 'owner-1' }, (reminder) =>
-          reminder.reschedule('2026-02-30'),
+        service.write(
+          { reminderId: '7', ownerId: 'owner-1' },
+          ReminderRescheduleModel.reconstitute,
+          (reminder) => reminder.reschedule('2026-02-30'),
         ),
       ).rejects.toMatchObject({ code: 'REMINDER_DUE_ON_INVALID' });
       expect(loadOwned).toHaveBeenCalledTimes(1);
@@ -125,7 +147,11 @@ describe('ReminderWriteService', () => {
       findById.mockResolvedValue(null);
 
       await expect(
-        service.write({ reminderId: '7', ownerId: 'owner-1' }, (reminder) => reminder.complete()),
+        service.write(
+          { reminderId: '7', ownerId: 'owner-1' },
+          ReminderCompleteModel.reconstitute,
+          (reminder) => reminder.complete(),
+        ),
       ).rejects.toMatchObject({
         code: 'REMINDER_NOT_FOUND',
         message: 'Reminder 7 was not found',

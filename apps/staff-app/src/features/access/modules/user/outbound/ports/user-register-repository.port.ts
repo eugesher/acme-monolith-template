@@ -7,7 +7,7 @@ import type {
 
 export interface IUserRegisterRepositoryPort {
   insertUser(query: IUserRegisterStaffUserInsertQuery): Promise<IUserRegisterStaffUserInsertRecord>;
-  findRoles(ids: string[]): Promise<IUserRegisterStaffRoleRecord[]>;
+  findRoles(ids: readonly string[]): Promise<IUserRegisterStaffRoleRecord[]>;
   insertUserRoles(queries: IUserRegisterStaffUserRoleInsertQuery[]): Promise<void>;
 }
 

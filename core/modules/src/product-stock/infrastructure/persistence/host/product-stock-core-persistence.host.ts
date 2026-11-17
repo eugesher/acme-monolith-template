@@ -7,12 +7,12 @@ import { ProductStockCorePersistenceBuilder } from '../builders/product-stock-co
 export abstract class ProductStockCorePersistenceHost {
   protected abstract readonly orm: IOrmPort;
 
-  protected get productRepository(): IHostedRepository<Product> {
-    return this.orm.getRepository(Product);
-  }
-
   protected get productStockRepository(): IHostedRepository<ProductStock> {
     return this.orm.getRepository(ProductStock);
+  }
+
+  protected get productRepository(): IHostedRepository<Product> {
+    return this.orm.getRepository(Product);
   }
 
   protected createProductBuilder(): ProductStockCorePersistenceProductBuilder {

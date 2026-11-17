@@ -21,7 +21,7 @@ export class NoteGetRevisionsUseCase {
   public async execute(command: INoteGetRevisionsCommand): Promise<INoteGetRevisionsView> {
     const { noteId, authorId } = command;
 
-    await this.accessService.loadOwned({ noteId, authorId });
+    await this.accessService.assertOwned({ noteId, authorId });
 
     const { limit, offset, page } = PaginationHelper.clampPageWindow({ query: command });
     const [records, total] = await this.repository.listForNote({ limit, offset, noteId });

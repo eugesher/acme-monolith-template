@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { ReminderDeleteModel } from '../../domain';
 import {
   REMINDER_DELETE_REPOSITORY_PORT,
   REMINDER_SUMMARY_PORT,
@@ -25,11 +26,14 @@ export class ReminderDeleteUseCase {
   public async execute(command: IReminderDeleteCommand): Promise<void> {
     const { reminderId, ownerId } = command;
 
-    const reminder = await this.accessService.loadOwned({ reminderId, ownerId });
+    const reminder = await this.accessService.loadOwned(
+      { reminderId, ownerId },
+      ReminderDeleteModel.reconstitute,
+    );
     await this.repository.softDelete(reminderId);
     await this.summary.invalidate(ownerId);
 
-    const reminderLoggerPayload = reminder.toDeleteLoggerPayload();
+    const reminderLoggerPayload = reminder.toLoggerPayload();
 
     this.logger.info(reminderLoggerPayload, 'Reminder deleted');
   }

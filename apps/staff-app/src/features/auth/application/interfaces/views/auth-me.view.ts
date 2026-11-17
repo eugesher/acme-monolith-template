@@ -1,5 +1,5 @@
 export interface IAuthMeView {
   id: string;
   email: string;
-  roles: string[];
+  roles: readonly string[];
 }

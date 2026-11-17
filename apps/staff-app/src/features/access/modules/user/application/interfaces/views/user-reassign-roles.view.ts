@@ -1,4 +1,4 @@
 export interface IUserReassignRolesView {
-  id: string;
-  roleIds: string[];
+  readonly id: string;
+  readonly roleIds: readonly string[];
 }

@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { ReminderModel, ReminderNotFoundException } from '../../domain';
+import { ReminderNotFoundException } from '../../domain';
 import {
   REMINDER_ACCESS_REPOSITORY_PORT,
+  type IReminderAccessRecord,
   type IReminderAccessRepositoryPort,
 } from '../../outbound';
 import type { IReminderAccessLoadOwnedCommand } from '../interfaces';
@@ -14,7 +15,10 @@ export class ReminderAccessService {
     private readonly repository: IReminderAccessRepositoryPort,
   ) {}
 
-  public async loadOwned(command: IReminderAccessLoadOwnedCommand): Promise<ReminderModel> {
+  public async loadOwned<TReminder>(
+    command: IReminderAccessLoadOwnedCommand,
+    reconstitute: (record: IReminderAccessRecord) => TReminder,
+  ): Promise<TReminder> {
     const { reminderId, ownerId } = command;
     const reminderRecord = await this.repository.findOwned({ reminderId, ownerId });
 
@@ -22,6 +26,6 @@ export class ReminderAccessService {
       throw new ReminderNotFoundException(reminderId);
     }
 
-    return ReminderModel.reconstitute(reminderRecord);
+    return reconstitute(reminderRecord);
   }
 }

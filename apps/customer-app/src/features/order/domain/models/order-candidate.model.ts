@@ -4,7 +4,7 @@ import { OrderStockInsufficientException } from '../exceptions/order-stock-insuf
 import type {
   IOrderCandidateActiveProduct,
   IOrderCandidateCreate,
-  IOrderCandidateInsertQuery,
+  IOrderCandidateInsertPayload,
   IOrderCandidateOrderProduct,
   IOrderCandidateStockQuantity,
 } from '../interfaces';
@@ -25,11 +25,11 @@ export class OrderCandidateModel {
     return new OrderCandidateModel(customerId, productIds);
   }
 
-  public toInsertQuery(): IOrderCandidateInsertQuery {
+  public toInsertPayload(): IOrderCandidateInsertPayload {
     return { customerId: this.customerId };
   }
 
-  public getOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
+  public createOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
     return this.productIds.map((productId) => ({ orderId, productId }));
   }
 

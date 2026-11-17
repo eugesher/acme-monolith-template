@@ -1,5 +1,6 @@
 import { ReminderStatusEnum } from '@acme-libs/kernel';
 
+import { ReminderDeleteModel } from '../../../domain';
 import { ReminderAccessService } from '../reminder-access.service';
 
 describe('ReminderAccessService', () => {
@@ -23,7 +24,10 @@ describe('ReminderAccessService', () => {
 
   describe('loadOwned', () => {
     it('answers the reminder of its owner', async () => {
-      const reminder = await service.loadOwned({ reminderId: '7', ownerId: 'owner-1' });
+      const reminder = await service.loadOwned(
+        { reminderId: '7', ownerId: 'owner-1' },
+        ReminderDeleteModel.reconstitute,
+      );
 
       expect(reminder.id).toBe('7');
       expect(findOwned).toHaveBeenCalledWith({ reminderId: '7', ownerId: 'owner-1' });
@@ -33,7 +37,10 @@ describe('ReminderAccessService', () => {
       findOwned.mockResolvedValue(null);
 
       await expect(
-        service.loadOwned({ reminderId: '7', ownerId: 'owner-1' }),
+        service.loadOwned(
+          { reminderId: '7', ownerId: 'owner-1' },
+          ReminderDeleteModel.reconstitute,
+        ),
       ).rejects.toMatchObject({
         code: 'REMINDER_NOT_FOUND',
         message: 'Reminder 7 was not found',

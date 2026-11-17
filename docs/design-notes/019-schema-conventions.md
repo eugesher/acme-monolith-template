@@ -12,8 +12,8 @@ composite key of its columns: `staff_user_roles (user_id, role_id)` and
 `PermissionCodeEnum`. The driver returns a `bigint` as a string, so an id is a `string` in
 TypeScript, and the bases of `libs/toolkit/src/ddd` take `string` for their id by default. The
 database issues the id on insert: the domain answers a candidate row without an id
-(`AuthCustomerModel.initCandidate` returns `IAuthCustomerCandidate`), and the repository returns the
-issued id (`AuthRegisterRepository.insert`).
+(`AuthCustomerCandidateModel.toInsertPayload()` answers `IAuthCustomerCandidateInsertPayload`), and
+the repository returns the issued id (`AuthRegisterRepository.insert`).
 
 **A quantity is a sum of signed movements.** `product_stock` stores one row per movement, and the
 value is `SUM(quantity)` over the rows of a key. No column holds the current value, so no update can
@@ -36,3 +36,9 @@ raw SQL, the migration and the seed write `` `order` `` with backticks.
 **A relation registers its target.** A foreign key makes TypeORM require the target entity in the
 entity list of every app that maps the source (see `018-entity-ownership-lint.md`). Example:
 `apps/processor-app/src/app/entities/index.ts`.
+
+**Every column of an entity is `public readonly`.** TypeORM fills an entity by assignment at run
+time, which `readonly` does not stop, and the code writes rows through literals in
+`insert().values()` and `update().set()`, which `readonly` allows. What it forbids is an assignment
+such as `product.name = …` on a loaded entity, which would change a row outside the domain. Example:
+`core/entities/src/product/product.entity.ts`.

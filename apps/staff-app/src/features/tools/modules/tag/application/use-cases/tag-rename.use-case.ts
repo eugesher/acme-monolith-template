@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { TagNameTakenException, type TagModel } from '../../domain';
+import { TagNameTakenException, TagRenameModel } from '../../domain';
 import {
   TAG_RENAME_REPOSITORY_PORT,
   TagRenameUpdateOutcomeEnum,
@@ -22,7 +22,7 @@ export class TagRenameUseCase {
 
   public async execute(command: ITagRenameCommand): Promise<ITagView> {
     const { tagId, name } = command;
-    const tag = await this.accessService.load({ tagId });
+    const tag = await this.accessService.load({ tagId }, TagRenameModel.reconstitute);
     const nameAsRead = tag.name;
 
     tag.rename(name);
@@ -33,21 +33,21 @@ export class TagRenameUseCase {
 
     await this.update(tag);
 
-    const renamed = await this.accessService.load({ tagId });
+    const renamed = await this.accessService.load({ tagId }, TagRenameModel.reconstitute);
 
-    const tagLoggerPayload = renamed.toRenameLoggerPayload();
+    const tagLoggerPayload = renamed.toLoggerPayload();
 
     this.logger.info(tagLoggerPayload, 'Tag renamed');
 
     return renamed.toSnapshot();
   }
 
-  private async update(tag: TagModel): Promise<void> {
-    const tagUpdateQuery = tag.toUpdateQuery();
-    const renameOutcome = await this.repository.update(tagUpdateQuery);
+  private async update(tag: TagRenameModel): Promise<void> {
+    const tagUpdatePayload = tag.toUpdatePayload();
+    const renameOutcome = await this.repository.update(tagUpdatePayload);
 
     if (renameOutcome === TagRenameUpdateOutcomeEnum.DUPLICATE) {
-      throw new TagNameTakenException(tagUpdateQuery.name);
+      throw new TagNameTakenException(tagUpdatePayload.name);
     }
   }
 }

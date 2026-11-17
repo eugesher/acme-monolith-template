@@ -2,18 +2,28 @@ import type { ILedgerListEntriesReconstitute, ILedgerListEntriesSnapshot } from 
 
 export class LedgerListEntriesModel {
   private constructor(
-    public readonly id: string,
-    public readonly operationKey: string,
-    public readonly subjectType: string,
-    public readonly subjectId: string,
-    public readonly action: string,
-    public readonly payload: Record<string, unknown>,
-    public readonly correlationId: string,
-    public readonly occurredAt: Date,
-    public readonly recordedAt: Date,
+    private readonly id: string,
+    private readonly operationKey: string,
+    private readonly subjectType: string,
+    private readonly subjectId: string,
+    private readonly action: string,
+    private readonly payload: Record<string, unknown>,
+    private readonly correlationId: string,
+    private readonly occurredAt: Date,
+    private readonly recordedAt: Date,
   ) {}
 
-  public static reconstitute(record: ILedgerListEntriesReconstitute): LedgerListEntriesModel {
+  public static toViewData(
+    records: ILedgerListEntriesReconstitute[],
+  ): ILedgerListEntriesSnapshot[] {
+    return records.map((record) => {
+      const ledgerEntry = LedgerListEntriesModel.reconstitute(record);
+
+      return ledgerEntry.toSnapshot();
+    });
+  }
+
+  private static reconstitute(record: ILedgerListEntriesReconstitute): LedgerListEntriesModel {
     const {
       id,
       operationKey,
@@ -37,16 +47,6 @@ export class LedgerListEntriesModel {
       occurredAt,
       recordedAt,
     );
-  }
-
-  public static toViewData(
-    records: ILedgerListEntriesReconstitute[],
-  ): ILedgerListEntriesSnapshot[] {
-    return records.map((record) => {
-      const ledgerEntry = LedgerListEntriesModel.reconstitute(record);
-
-      return ledgerEntry.toSnapshot();
-    });
   }
 
   private toSnapshot(): ILedgerListEntriesSnapshot {

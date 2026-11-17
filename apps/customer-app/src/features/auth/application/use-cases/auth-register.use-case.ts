@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import {
-  AuthCustomerModel,
+  AuthCustomerCandidateModel,
+  AuthCustomerRegisterModel,
   AuthEmailTakenException,
-  type IAuthCustomerCandidate,
 } from '../../domain';
 import {
   AUTH_CREDENTIALS_PORT,
@@ -33,28 +33,30 @@ export class AuthRegisterUseCase {
   public async execute(command: IAuthRegisterCommand): Promise<IAuthRegisterView> {
     const { email, password } = command;
 
-    AuthCustomerModel.assertPasswordStrength(password);
+    AuthCustomerCandidateModel.assertPasswordStrength(password);
 
     const passwordHash = await this.credentials.hashPassword(password);
-    const customerCandidate = AuthCustomerModel.initCandidate({ email, passwordHash });
-    const customerId = await this.insert(customerCandidate);
-    const customerLoggerPayload = AuthCustomerModel.toRegisterLoggerPayload(customerId);
-    const customerLedgerPayload = AuthCustomerModel.toRegisterLedgerPayload(customerId);
+    const customerCandidate = AuthCustomerCandidateModel.create({ email, passwordHash });
 
-    this.logger.info(customerLoggerPayload, 'Customer registered');
+    customerCandidate.normalizeEmail();
+    customerCandidate.assertEmail();
 
-    await this.ledger.recordRegistered(customerLedgerPayload);
-
-    return AuthCustomerModel.toRegisterSnapshot(customerId, customerCandidate);
-  }
-
-  private async insert(candidate: IAuthCustomerCandidate): Promise<string> {
-    const insertResult = await this.repository.insert(candidate);
+    const customerInsertPayload = customerCandidate.toInsertPayload();
+    const insertResult = await this.repository.insert(customerInsertPayload);
 
     if (insertResult.outcome === AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE) {
       throw new AuthEmailTakenException();
     }
 
-    return insertResult.id;
+    const registeredCustomer = customerCandidate.toRegistered(insertResult.id);
+    const customer = AuthCustomerRegisterModel.reconstitute(registeredCustomer);
+    const customerLoggerPayload = customer.toLoggerPayload();
+    const customerLedgerPayload = customer.toLedgerPayload();
+
+    this.logger.info(customerLoggerPayload, 'Customer registered');
+
+    await this.ledger.recordRegistered(customerLedgerPayload);
+
+    return customer.toSnapshot();
   }
 }

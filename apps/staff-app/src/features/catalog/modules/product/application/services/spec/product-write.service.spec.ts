@@ -3,7 +3,11 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ProductModel, ProductUpdatedEvent } from '../../../domain';
+import {
+  ProductUpdatedEvent,
+  ProductUpdateModel,
+  type IProductReconstitute,
+} from '../../../domain';
 import { ProductWriteService } from '../product-write.service';
 import type { ProductAccessService } from '../product-access.service';
 
@@ -15,19 +19,22 @@ describe('ProductWriteService', () => {
   let service: ProductWriteService;
 
   beforeEach(() => {
-    load = jest.fn().mockImplementation(() =>
-      Promise.resolve(
-        ProductModel.reconstitute({
-          id: '12',
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          status: ProductStatusEnum.ACTIVE,
-          version: 3,
-          createdAt: new Date('2026-01-01T00:00:00.000Z'),
-          updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-        }),
-      ),
-    );
+    load = jest
+      .fn()
+      .mockImplementation(
+        (_command: unknown, reconstitute: (record: IProductReconstitute) => unknown) =>
+          Promise.resolve(
+            reconstitute({
+              id: '12',
+              sku: 'SKU-0001',
+              name: 'Lamp',
+              status: ProductStatusEnum.ACTIVE,
+              version: 3,
+              createdAt: new Date('2026-01-01T00:00:00.000Z'),
+              updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+            }),
+          ),
+      );
     findById = jest.fn().mockResolvedValue({
       id: '12',
       sku: 'SKU-0001',
@@ -51,9 +58,10 @@ describe('ProductWriteService', () => {
     it('saves the change against the version as read and answers the stored product with the events', async () => {
       const written = await service.write(
         { productId: '12', expectedVersion: undefined },
+        ProductUpdateModel.reconstitute,
         (product) => product.update({ name: 'Desk lamp' }),
       );
-      expect(load).toHaveBeenCalledWith({ productId: '12' });
+      expect(load).toHaveBeenCalledWith({ productId: '12' }, ProductUpdateModel.reconstitute);
       expect(update).toHaveBeenCalledWith({
         id: '12',
         versionAsRead: 3,
@@ -62,15 +70,17 @@ describe('ProductWriteService', () => {
         version: 4,
       });
       expect(findById).toHaveBeenCalledWith('12');
-      expect(written.product.updatedAt).toEqual(new Date('2026-01-03T00:00:00.000Z'));
+      expect(written.product.toSnapshot().updatedAt).toBe('2026-01-03T00:00:00.000Z');
       expect(written.domainEvents).toHaveLength(1);
       expect(written.domainEvents[0]).toBeInstanceOf(ProductUpdatedEvent);
       expect(logger.info).not.toHaveBeenCalled();
     });
 
     it('writes nothing when the change leaves the version as read', async () => {
-      const written = await service.write({ productId: '12', expectedVersion: 3 }, (product) =>
-        product.update({ name: 'Lamp' }),
+      const written = await service.write(
+        { productId: '12', expectedVersion: 3 },
+        ProductUpdateModel.reconstitute,
+        (product) => product.update({ name: 'Lamp' }),
       );
 
       expect(update).not.toHaveBeenCalled();
@@ -84,6 +94,7 @@ describe('ProductWriteService', () => {
 
       const written = await service.write(
         { productId: '12', expectedVersion: undefined },
+        ProductUpdateModel.reconstitute,
         (product) => product.update({ name: 'Desk lamp' }),
       );
 
@@ -100,8 +111,10 @@ describe('ProductWriteService', () => {
       update.mockResolvedValue(false);
 
       await expect(
-        service.write({ productId: '12', expectedVersion: undefined }, (product) =>
-          product.update({ name: 'Desk lamp' }),
+        service.write(
+          { productId: '12', expectedVersion: undefined },
+          ProductUpdateModel.reconstitute,
+          (product) => product.update({ name: 'Desk lamp' }),
         ),
       ).rejects.toMatchObject({
         code: 'VERSION_MISMATCH',
@@ -119,8 +132,10 @@ describe('ProductWriteService', () => {
       update.mockResolvedValue(false);
 
       await expect(
-        service.write({ productId: '12', expectedVersion: 3 }, (product) =>
-          product.update({ name: 'Desk lamp' }),
+        service.write(
+          { productId: '12', expectedVersion: 3 },
+          ProductUpdateModel.reconstitute,
+          (product) => product.update({ name: 'Desk lamp' }),
         ),
       ).rejects.toMatchObject({
         code: 'VERSION_MISMATCH',
@@ -133,7 +148,11 @@ describe('ProductWriteService', () => {
       const mutate = jest.fn();
 
       await expect(
-        service.write({ productId: '12', expectedVersion: 2 }, mutate),
+        service.write(
+          { productId: '12', expectedVersion: 2 },
+          ProductUpdateModel.reconstitute,
+          mutate,
+        ),
       ).rejects.toMatchObject({ code: 'VERSION_MISMATCH', details: { currentVersion: 3 } });
       expect(mutate).not.toHaveBeenCalled();
       expect(update).not.toHaveBeenCalled();
@@ -141,8 +160,10 @@ describe('ProductWriteService', () => {
 
     it('does not retry a domain refusal', async () => {
       await expect(
-        service.write({ productId: '12', expectedVersion: undefined }, (product) =>
-          product.update({ name: ' ' }),
+        service.write(
+          { productId: '12', expectedVersion: undefined },
+          ProductUpdateModel.reconstitute,
+          (product) => product.update({ name: ' ' }),
         ),
       ).rejects.toMatchObject({ code: 'PRODUCT_NAME_INVALID' });
       expect(load).toHaveBeenCalledTimes(1);
@@ -156,8 +177,10 @@ describe('ProductWriteService', () => {
       findById.mockResolvedValue(null);
 
       await expect(
-        service.write({ productId: '12', expectedVersion: undefined }, (product) =>
-          product.update({ name: 'Desk lamp' }),
+        service.write(
+          { productId: '12', expectedVersion: undefined },
+          ProductUpdateModel.reconstitute,
+          (product) => product.update({ name: 'Desk lamp' }),
         ),
       ).rejects.toMatchObject({ code: 'PRODUCT_NOT_FOUND', message: 'Product 12 was not found' });
     });

@@ -7,7 +7,7 @@ import {
   type IProductCoreArchiveView,
 } from '@acme-core/contracts/product';
 
-import { ProductCoreModel } from '../../domain';
+import { ProductCoreArchiveModel } from '../../domain';
 import {
   PRODUCT_CORE_ARCHIVE_REPOSITORY_PORT,
   PRODUCT_CORE_CATALOG_CACHE_PORT,
@@ -40,12 +40,7 @@ export class ProductCoreArchiveUseCase {
     const { outcome, currentVersion } = archiveView;
 
     if (outcome === ProductCoreArchiveOutcomeEnum.ARCHIVED) {
-      const archiveLoggerPayload = ProductCoreModel.toArchiveLoggerPayload(
-        productId,
-        currentVersion,
-      );
-
-      this.logger.info(archiveLoggerPayload, 'Product archived');
+      this.logger.info({ id: productId, version: currentVersion }, 'Product archived');
     }
 
     return archiveView;
@@ -59,7 +54,7 @@ export class ProductCoreArchiveUseCase {
       return { outcome: ProductCoreArchiveOutcomeEnum.NOT_FOUND, currentVersion: undefined };
     }
 
-    const product = ProductCoreModel.reconstitute(productRecord);
+    const product = ProductCoreArchiveModel.reconstitute(productRecord);
 
     if (expectedVersion !== undefined && expectedVersion !== product.version) {
       return {
@@ -80,11 +75,11 @@ export class ProductCoreArchiveUseCase {
 
     product.archive();
 
-    const productUpdateQuery = product.toUpdateQuery(versionAsRead);
+    const productUpdatePayload = product.toUpdatePayload(versionAsRead);
 
-    await this.repository.update(productUpdateQuery);
+    await this.repository.update(productUpdatePayload);
 
-    const archiveLedgerPayload = product.toArchiveLedgerPayload(previousStatus);
+    const archiveLedgerPayload = product.toLedgerPayload(previousStatus);
 
     this.transaction.afterCommit(() => this.catalogCache.invalidate());
     this.transaction.afterCommit(() => this.ledger.recordArchived(archiveLedgerPayload));

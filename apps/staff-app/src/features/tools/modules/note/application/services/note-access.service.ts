@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { NoteModel, NoteNotFoundException } from '../../domain';
-import { NOTE_ACCESS_REPOSITORY_PORT, type INoteAccessRepositoryPort } from '../../outbound';
+import { NoteNotFoundException } from '../../domain';
+import {
+  NOTE_ACCESS_REPOSITORY_PORT,
+  type INoteAccessRecord,
+  type INoteAccessRepositoryPort,
+} from '../../outbound';
 import type { INoteAccessLoadOwnedCommand } from '../interfaces';
 
 @Injectable()
@@ -11,7 +15,20 @@ export class NoteAccessService {
     private readonly repository: INoteAccessRepositoryPort,
   ) {}
 
-  public async loadOwned(command: INoteAccessLoadOwnedCommand): Promise<NoteModel> {
+  public async loadOwned<TNote>(
+    command: INoteAccessLoadOwnedCommand,
+    reconstitute: (record: INoteAccessRecord) => TNote,
+  ): Promise<TNote> {
+    const noteRecord = await this.findOwned(command);
+
+    return reconstitute(noteRecord);
+  }
+
+  public async assertOwned(command: INoteAccessLoadOwnedCommand): Promise<void> {
+    await this.findOwned(command);
+  }
+
+  private async findOwned(command: INoteAccessLoadOwnedCommand): Promise<INoteAccessRecord> {
     const { noteId, authorId } = command;
     const noteRecord = await this.repository.findOwned({ noteId, authorId });
 
@@ -19,6 +36,6 @@ export class NoteAccessService {
       throw new NoteNotFoundException(noteId);
     }
 
-    return NoteModel.reconstitute(noteRecord);
+    return noteRecord;
   }
 }

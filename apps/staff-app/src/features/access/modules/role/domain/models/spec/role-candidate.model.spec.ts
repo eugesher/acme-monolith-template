@@ -12,31 +12,25 @@ describe('RoleCandidateModel', () => {
     });
   });
 
-  describe('toInsertQuery', () => {
+  describe('toInsertPayload', () => {
     it('answers the role row to insert', () => {
-      expect(candidate.toInsertQuery()).toEqual({ name: 'auditor' });
+      expect(candidate.toInsertPayload()).toEqual({ name: 'auditor' });
     });
   });
 
-  describe('getRolePermissions', () => {
+  describe('createRolePermissions', () => {
     it('answers one row of the role per permission code, without duplicates', () => {
-      expect(candidate.getRolePermissions('7')).toEqual([{ roleId: '7', code: 'ledger:read' }]);
+      expect(candidate.createRolePermissions('7')).toEqual([{ roleId: '7', code: 'ledger:read' }]);
     });
   });
 
-  describe('toSnapshot', () => {
+  describe('toCreated', () => {
     it('answers the created role under the issued id', () => {
-      expect(candidate.toSnapshot('7')).toEqual({
+      expect(candidate.toCreated('7')).toEqual({
         id: '7',
         name: 'auditor',
         permissionCodes: ['ledger:read'],
       });
-    });
-  });
-
-  describe('toLoggerPayload', () => {
-    it('answers the id of the created role', () => {
-      expect(candidate.toLoggerPayload('7')).toEqual({ id: '7' });
     });
   });
 });

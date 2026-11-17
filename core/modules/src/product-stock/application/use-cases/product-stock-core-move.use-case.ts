@@ -53,12 +53,12 @@ export class ProductStockCoreMoveUseCase {
     const sign = ProductStockCoreMoveUseCase.SIGNS[kind];
     const stockMovements = ProductStockCoreMovementsModel.create({ sign, movements });
     const productIds = stockMovements.distinctProductIds;
-    const movementRows = stockMovements.toInsertQueries();
+    const movementRows = stockMovements.toInsertPayloads();
 
     await this.repository.lockProducts(productIds);
 
     const insertedRows = await this.repository.insertMany(movementRows);
-    const productStockIds = ProductStockCoreMovementsModel.toProductStockIds(insertedRows);
+    const productStockIds = ProductStockCoreMovementsModel.toIds(insertedRows);
     const stockSums = await this.repository.sumStock(productIds);
     const onHand = ProductStockCoreOnHandModel.reconstitute({
       products: stockMovements.distinctProducts,

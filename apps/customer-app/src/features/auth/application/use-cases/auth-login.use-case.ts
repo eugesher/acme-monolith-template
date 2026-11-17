@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthCustomerModel, AuthInvalidCredentialsException } from '../../domain';
+import { AuthCustomerLoginModel, AuthInvalidCredentialsException } from '../../domain';
 import {
   AUTH_CREDENTIALS_PORT,
   AUTH_LOGIN_REPOSITORY_PORT,
@@ -23,9 +23,11 @@ export class AuthLoginUseCase {
 
   public async execute(command: IAuthLoginCommand): Promise<IAuthLoginView> {
     const { email, password } = command;
-    const normalizedEmail = AuthCustomerModel.normalizeEmail(email);
+    const normalizedEmail = AuthCustomerLoginModel.normalizeEmail(email);
+
     const customerRecord = await this.repository.findByEmail(normalizedEmail);
-    const customer = customerRecord ? AuthCustomerModel.reconstitute(customerRecord) : null;
+    const customer = customerRecord ? AuthCustomerLoginModel.reconstitute(customerRecord) : null;
+
     const passwordHash = customer?.passwordHash ?? null;
     const isPasswordValid = await this.credentials.verifyPassword({ passwordHash, password });
 
@@ -44,8 +46,7 @@ export class AuthLoginUseCase {
     customer.assertActive();
 
     const accessToken = await this.credentials.issueAccessToken(customer.id);
-
-    const customerLoggerPayload = customer.toLoginLoggerPayload();
+    const customerLoggerPayload = customer.toLoggerPayload();
 
     this.logger.info(customerLoggerPayload, 'Customer logged in');
 

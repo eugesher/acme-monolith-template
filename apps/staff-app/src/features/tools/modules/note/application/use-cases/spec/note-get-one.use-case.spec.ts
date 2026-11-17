@@ -1,4 +1,4 @@
-import { NoteModel } from '../../../domain';
+import { NoteGetOneModel } from '../../../domain';
 import { NoteGetOneUseCase } from '../note-get-one.use-case';
 import type { NoteAccessService } from '../../services/note-access.service';
 
@@ -8,7 +8,7 @@ describe('NoteGetOneUseCase', () => {
 
   beforeEach(() => {
     loadOwned = jest.fn().mockResolvedValue(
-      NoteModel.reconstitute({
+      NoteGetOneModel.reconstitute({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
@@ -27,7 +27,10 @@ describe('NoteGetOneUseCase', () => {
     it('answers the note', async () => {
       const view = await useCase.execute({ noteId: '7', authorId: 'admin-1' });
 
-      expect(loadOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
+      expect(loadOwned).toHaveBeenCalledWith(
+        { noteId: '7', authorId: 'admin-1' },
+        NoteGetOneModel.reconstitute,
+      );
       expect(view).toEqual({
         id: '7',
         subjectType: 'product',

@@ -12,25 +12,25 @@ describe('OrderCandidateModel', () => {
     });
   });
 
-  describe('toInsertQuery', () => {
+  describe('toInsertPayload', () => {
     it('answers the order row to insert for the customer', () => {
       const candidate = OrderCandidateModel.create({
         customerId: 'customer-1',
         productIds: ['100', '103', '100'],
       });
 
-      expect(candidate.toInsertQuery()).toEqual({ customerId: 'customer-1' });
+      expect(candidate.toInsertPayload()).toEqual({ customerId: 'customer-1' });
     });
   });
 
-  describe('getOrderProducts', () => {
+  describe('createOrderProducts', () => {
     it('answers one order product per requested unit in the request order', () => {
       const candidate = OrderCandidateModel.create({
         customerId: 'customer-1',
         productIds: ['100', '103', '100'],
       });
 
-      expect(candidate.getOrderProducts('610')).toEqual([
+      expect(candidate.createOrderProducts('610')).toEqual([
         { orderId: '610', productId: '100' },
         { orderId: '610', productId: '103' },
         { orderId: '610', productId: '100' },

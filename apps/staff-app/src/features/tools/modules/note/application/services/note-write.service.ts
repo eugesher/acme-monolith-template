@@ -3,7 +3,11 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { OccRetryHelper } from '@acme-libs/toolkit';
 
-import { NoteModel, NoteVersionMismatchException } from '../../domain';
+import {
+  NoteVersionMismatchException,
+  type INoteReconstitute,
+  type NoteAggregate,
+} from '../../domain';
 import { NOTE_OCC_RETRY_ATTEMPTS_TOKEN } from '../../outbound';
 import { NoteWriteConflictError } from '../errors/note-write-conflict.error';
 import { NoteAccessService } from './note-access.service';
@@ -28,18 +32,20 @@ export class NoteWriteService {
       maxAttempts: this.occRetryAttempts,
       isConflict: (error): error is NoteWriteConflictError =>
         error instanceof NoteWriteConflictError,
-      retryContext: (conflict) =>
-        NoteModel.toWriteRetryLoggerPayload(noteId, conflict.currentVersion),
-      exhaustedContext: () => NoteModel.toWriteExhaustedLoggerPayload(noteId),
+      retryContext: (conflict) => ({ id: noteId, version: conflict.currentVersion }),
+      exhaustedContext: () => ({ id: noteId }),
       onExhausted: (conflict, attempts) => {
         throw new NoteVersionMismatchException(noteId, attempts, conflict.currentVersion);
       },
     });
   }
 
-  public async reload(command: INoteWriteReloadCommand): Promise<NoteModel> {
+  public async reload<TNote extends NoteAggregate>(
+    command: INoteWriteReloadCommand,
+    reconstitute: (record: INoteReconstitute) => TNote,
+  ): Promise<TNote> {
     const { noteId, authorId, isSaved } = command;
-    const note = await this.accessService.loadOwned({ noteId, authorId });
+    const note = await this.accessService.loadOwned({ noteId, authorId }, reconstitute);
 
     if (!isSaved) {
       throw new NoteWriteConflictError(noteId, note.version);

@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ReminderStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ReminderModel } from '../../../domain';
+import { ReminderRescheduleModel } from '../../../domain';
 import { ReminderRescheduleUseCase } from '../reminder-reschedule.use-case';
 import type { ReminderWriteService } from '../../services/reminder-write.service';
 
@@ -15,7 +15,7 @@ describe('ReminderRescheduleUseCase', () => {
 
   beforeEach(() => {
     write = jest.fn().mockResolvedValue(
-      ReminderModel.reconstitute({
+      ReminderRescheduleModel.reconstitute({
         id: '7',
         ownerId: 'owner-1',
         title: 'Call the bank',
@@ -46,6 +46,7 @@ describe('ReminderRescheduleUseCase', () => {
 
       expect(write).toHaveBeenCalledWith(
         { reminderId: '7', ownerId: 'owner-1' },
+        ReminderRescheduleModel.reconstitute,
         expect.any(Function),
       );
       expect(invalidate).toHaveBeenCalledWith('owner-1');
@@ -70,7 +71,7 @@ describe('ReminderRescheduleUseCase', () => {
     });
 
     it('hands the write service a change that moves the due date', async () => {
-      const reminder = ReminderModel.reconstitute({
+      const reminder = ReminderRescheduleModel.reconstitute({
         id: '7',
         ownerId: 'owner-1',
         title: 'Call the bank',
@@ -84,11 +85,15 @@ describe('ReminderRescheduleUseCase', () => {
 
       await useCase.execute({ reminderId: '7', ownerId: 'owner-1', dueOn: '2026-11-12' });
 
-      const [, mutate] = write.mock.calls[0] as [unknown, (reminder: ReminderModel) => void];
+      const [, , mutate] = write.mock.calls[0] as [
+        unknown,
+        unknown,
+        (reminder: ReminderRescheduleModel) => void,
+      ];
 
       mutate(reminder);
 
-      expect(reminder.dueOn).toBe('2026-11-12');
+      expect(reminder.toSnapshot().dueOn).toBe('2026-11-12');
     });
 
     it('leaves the summary alone when the write is refused', async () => {

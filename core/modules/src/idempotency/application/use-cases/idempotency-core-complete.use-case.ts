@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { IIdempotencyCoreCompleteCommand } from '@acme-core/contracts/idempotency';
 
-import { IdempotencyCoreKeyModel } from '../../domain';
+import { IdempotencyCoreCompleteModel } from '../../domain';
 import {
   IDEMPOTENCY_CORE_COMPLETE_REPOSITORY_PORT,
   type IIdempotencyCoreCompleteRepositoryPort,
@@ -17,8 +17,12 @@ export class IdempotencyCoreCompleteUseCase {
 
   public async execute(command: IIdempotencyCoreCompleteCommand): Promise<void> {
     const { scope, key, response } = command;
-    const completeQuery = IdempotencyCoreKeyModel.toCompleteQuery({ scope, key, response });
+    const completeUpdatePayload = IdempotencyCoreCompleteModel.toUpdatePayload({
+      scope,
+      key,
+      response,
+    });
 
-    await this.repository.complete(completeQuery);
+    await this.repository.complete(completeUpdatePayload);
   }
 }

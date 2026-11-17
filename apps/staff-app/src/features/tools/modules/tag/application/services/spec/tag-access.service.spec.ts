@@ -1,4 +1,4 @@
-import { TagNotFoundException } from '../../../domain';
+import { TagNotFoundException, TagRenameModel } from '../../../domain';
 import { TagAccessService } from '../tag-access.service';
 
 describe('TagAccessService', () => {
@@ -16,8 +16,8 @@ describe('TagAccessService', () => {
   });
 
   describe('load', () => {
-    it('answers the model of the stored tag', async () => {
-      const tag = await service.load({ tagId: '300' });
+    it('answers the stored tag rebuilt by the model of the use case', async () => {
+      const tag = await service.load({ tagId: '300' }, TagRenameModel.reconstitute);
 
       expect(findById).toHaveBeenCalledWith('300');
       expect(tag.name).toBe('fragile');
@@ -26,7 +26,9 @@ describe('TagAccessService', () => {
     it('throws TagNotFoundException for an unknown tag', async () => {
       findById.mockResolvedValue(null);
 
-      await expect(service.load({ tagId: '999' })).rejects.toThrow(TagNotFoundException);
+      await expect(service.load({ tagId: '999' }, TagRenameModel.reconstitute)).rejects.toThrow(
+        TagNotFoundException,
+      );
     });
   });
 });

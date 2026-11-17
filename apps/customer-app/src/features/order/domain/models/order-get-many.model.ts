@@ -2,15 +2,9 @@ import type { IOrderGetManyReconstitute, IOrderGetManySnapshot } from '../interf
 
 export class OrderGetManyModel {
   private constructor(
-    public readonly id: string,
-    public readonly createdAt: Date,
+    private readonly id: string,
+    private readonly createdAt: Date,
   ) {}
-
-  public static reconstitute(record: IOrderGetManyReconstitute): OrderGetManyModel {
-    const { id, createdAt } = record;
-
-    return new OrderGetManyModel(id, createdAt);
-  }
 
   public static toViewData(records: IOrderGetManyReconstitute[]): IOrderGetManySnapshot[] {
     return records.map((record) => {
@@ -18,6 +12,12 @@ export class OrderGetManyModel {
 
       return order.toSnapshot();
     });
+  }
+
+  private static reconstitute(record: IOrderGetManyReconstitute): OrderGetManyModel {
+    const { id, createdAt } = record;
+
+    return new OrderGetManyModel(id, createdAt);
   }
 
   private toSnapshot(): IOrderGetManySnapshot {

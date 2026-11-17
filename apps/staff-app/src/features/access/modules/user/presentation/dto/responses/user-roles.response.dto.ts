@@ -5,5 +5,5 @@ export class UserRolesResponseDto {
   public id: string;
 
   @ApiResponseProperty({ example: ['2', '3'] })
-  public roleIds: string[];
+  public roleIds: readonly string[];
 }

@@ -55,12 +55,7 @@ export class OrderPlaceUseCase {
         throw new OrderIdempotencyKeyReusedException(idempotencyKey);
       }
       case OrderIdempotencyOutcomeEnum.REPLAY: {
-        const replayLoggerPayload = OrderPlaceModel.toReplayLoggerPayload(idempotencyKey);
-
-        this.logger.info(
-          replayLoggerPayload,
-          'Order placement replayed from the idempotency store',
-        );
+        this.logger.info({ idempotencyKey }, 'Order placement replayed from the idempotency store');
 
         return idempotencyClaim.storedResponse;
       }
@@ -107,10 +102,10 @@ export class OrderPlaceUseCase {
     orderCandidate.assertProducts(activeProducts);
     orderCandidate.assertStockQuantities(stockQuantities);
 
-    const orderInsertQuery = orderCandidate.toInsertQuery();
-    const orderId = await this.repository.insertOrder(orderInsertQuery);
+    const orderInsertPayload = orderCandidate.toInsertPayload();
+    const orderId = await this.repository.insertOrder(orderInsertPayload);
 
-    const orderProducts = orderCandidate.getOrderProducts(orderId);
+    const orderProducts = orderCandidate.createOrderProducts(orderId);
     await this.repository.insertOrderProducts(orderProducts);
 
     const orderRecord = await this.repository.findPlaced(orderId);

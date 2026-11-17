@@ -2,7 +2,7 @@ import type { PinoLogger } from 'nestjs-pino';
 
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { TagModel } from '../../../domain';
+import { TagDeleteModel } from '../../../domain';
 import { TagDeleteUseCase } from '../tag-delete.use-case';
 import type { TagAccessService } from '../../services/tag-access.service';
 
@@ -14,7 +14,7 @@ describe('TagDeleteUseCase', () => {
 
   beforeEach(() => {
     load = jest.fn().mockResolvedValue(
-      TagModel.reconstitute({
+      TagDeleteModel.reconstitute({
         id: '300',
         name: 'fragile',
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -34,7 +34,7 @@ describe('TagDeleteUseCase', () => {
     it('deletes an existing tag', async () => {
       await expect(useCase.execute({ tagId: '300' })).resolves.toBeUndefined();
 
-      expect(load).toHaveBeenCalledWith({ tagId: '300' });
+      expect(load).toHaveBeenCalledWith({ tagId: '300' }, TagDeleteModel.reconstitute);
       expect(remove).toHaveBeenCalledWith('300');
       expect(logger.info).toHaveBeenCalledWith({ id: '300' }, 'Tag deleted');
     });

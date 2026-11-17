@@ -6,24 +6,24 @@ import { IdempotencyStatusEnum } from '@acme-libs/kernel';
 @Index('uq_idempotency_scope_key', ['scope', 'idempotencyKey'], { unique: true })
 export class IdempotencyKey {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Column({ type: 'varchar', length: 64 })
-  public scope: string;
+  public readonly scope: string;
 
   @Column({ type: 'varchar', length: 128 })
-  public idempotencyKey: string;
+  public readonly idempotencyKey: string;
 
   @Column({ type: 'char', length: 64 })
-  public requestFingerprint: string;
+  public readonly requestFingerprint: string;
 
   @Column({ type: 'varchar', length: 16, default: IdempotencyStatusEnum.IN_FLIGHT })
-  public status: IdempotencyStatusEnum;
+  public readonly status: IdempotencyStatusEnum;
 
   @Column({ type: 'text', nullable: true })
-  public responseBody: string | null;
+  public readonly responseBody: string | null;
 
   @Index('idx_idempotency_created_at')
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 }

@@ -1,6 +1,6 @@
 export class ReminderWriteConflictError extends Error {
   constructor(
-    public readonly reminderId: string,
+    reminderId: string,
     public readonly currentVersion: number,
   ) {
     super(

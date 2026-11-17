@@ -1,0 +1,10 @@
+import type { ReminderStatusEnum } from '@acme-libs/kernel';
+
+export interface IReminderCreateCandidate {
+  ownerId: string;
+  title: string;
+  body: string;
+  dueOn: string;
+  status: ReminderStatusEnum;
+  version: number;
+}

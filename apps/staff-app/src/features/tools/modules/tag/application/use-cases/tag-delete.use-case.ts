@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { TagDeleteModel } from '../../domain';
 import { TAG_DELETE_REPOSITORY_PORT, type ITagDeleteRepositoryPort } from '../../outbound';
 import { TagAccessService } from '../services/tag-access.service';
 import type { ITagDeleteCommand } from '../interfaces';
@@ -18,10 +19,10 @@ export class TagDeleteUseCase {
   public async execute(command: ITagDeleteCommand): Promise<void> {
     const { tagId } = command;
 
-    const tag = await this.accessService.load({ tagId });
+    const tag = await this.accessService.load({ tagId }, TagDeleteModel.reconstitute);
     await this.repository.delete(tagId);
 
-    const tagLoggerPayload = tag.toDeleteLoggerPayload();
+    const tagLoggerPayload = tag.toLoggerPayload();
 
     this.logger.info(tagLoggerPayload, 'Tag deleted');
   }

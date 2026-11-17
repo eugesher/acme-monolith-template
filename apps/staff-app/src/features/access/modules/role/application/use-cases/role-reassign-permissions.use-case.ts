@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { AuthRoleNotFoundException, RoleModel } from '../../domain';
+import { RoleNotFoundException, RoleReassignPermissionsModel } from '../../domain';
 import {
   ROLE_REASSIGN_PERMISSIONS_REPOSITORY_PORT,
   ROLE_TRANSACTION_PORT,
@@ -23,22 +23,24 @@ export class RoleReassignPermissionsUseCase {
 
   public async execute(command: IRoleReassignPermissionsCommand): Promise<IRoleView> {
     const role = await this.transaction.run(() => this.reassign(command));
-    const roleLoggerPayload = role.toReassignPermissionsLoggerPayload();
+    const roleLoggerPayload = role.toLoggerPayload();
 
     this.logger.info(roleLoggerPayload, 'Role permissions reassigned');
 
     return role.toSnapshot();
   }
 
-  private async reassign(command: IRoleReassignPermissionsCommand): Promise<RoleModel> {
+  private async reassign(
+    command: IRoleReassignPermissionsCommand,
+  ): Promise<RoleReassignPermissionsModel> {
     const { roleId, permissionCodes } = command;
     const roleRecord = await this.repository.findRole(roleId);
 
     if (!roleRecord) {
-      throw new AuthRoleNotFoundException(roleId);
+      throw new RoleNotFoundException(roleId);
     }
 
-    const role = RoleModel.reconstitute(roleRecord);
+    const role = RoleReassignPermissionsModel.reconstitute(roleRecord);
 
     role.reassignPermissions(permissionCodes);
 

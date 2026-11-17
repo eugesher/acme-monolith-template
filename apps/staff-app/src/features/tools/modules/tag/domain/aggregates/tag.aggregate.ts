@@ -1,0 +1,36 @@
+import { AggregateRootBase } from '@acme-libs/toolkit';
+
+import { TagNameInvalidException } from '../exceptions/tag-name-invalid.exception';
+import type { ITagSnapshot } from '../interfaces';
+
+export abstract class TagAggregate extends AggregateRootBase {
+  private static readonly NAME_MAX_LENGTH = 64;
+
+  protected constructor(
+    id: string,
+    protected currentName: string,
+    protected readonly createdAt: Date,
+    protected readonly updatedAt: Date,
+  ) {
+    super(id);
+  }
+
+  public toSnapshot(): ITagSnapshot {
+    return {
+      id: this.id,
+      name: this.currentName,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
+
+  protected static validName(name: string): string {
+    const trimmedName = name.trim();
+
+    if (trimmedName.length === 0 || trimmedName.length > TagAggregate.NAME_MAX_LENGTH) {
+      throw new TagNameInvalidException(TagAggregate.NAME_MAX_LENGTH);
+    }
+
+    return trimmedName;
+  }
+}

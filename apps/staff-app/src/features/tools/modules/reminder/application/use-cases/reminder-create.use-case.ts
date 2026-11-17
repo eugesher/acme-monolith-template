@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { ReminderModel } from '../../domain';
+import { ReminderCreateModel } from '../../domain';
 import {
   REMINDER_CREATE_REPOSITORY_PORT,
   REMINDER_SUMMARY_PORT,
@@ -23,7 +23,7 @@ export class ReminderCreateUseCase {
 
   public async execute(command: IReminderCreateCommand): Promise<IReminderView> {
     const { ownerId, title, body, dueOn } = command;
-    const reminderCandidate = ReminderModel.initCandidate({
+    const reminderCandidate = ReminderCreateModel.initCandidate({
       ownerId,
       title,
       body: body ?? '',
@@ -31,11 +31,11 @@ export class ReminderCreateUseCase {
     });
     const reminderId = await this.repository.insert(reminderCandidate);
     const reminderRecord = await this.repository.findInserted(reminderId);
-    const createdReminder = ReminderModel.reconstitute(reminderRecord);
+    const createdReminder = ReminderCreateModel.reconstitute(reminderRecord);
 
     await this.summary.invalidate(ownerId);
 
-    const reminderLoggerPayload = createdReminder.toCreateLoggerPayload();
+    const reminderLoggerPayload = createdReminder.toLoggerPayload();
 
     this.logger.info(reminderLoggerPayload, 'Reminder created');
 

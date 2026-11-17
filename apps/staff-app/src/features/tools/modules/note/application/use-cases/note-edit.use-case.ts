@@ -3,7 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 
-import { NoteRevisionModel } from '../../domain';
+import { NoteEditModel } from '../../domain';
 import {
   NOTE_EDIT_REPOSITORY_PORT,
   NOTE_TRANSACTION_PORT,
@@ -36,7 +36,7 @@ export class NoteEditUseCase {
     const { noteId } = command;
     const editOutcome = await this.writeService.run({ noteId }, () => this.attempt(command));
     const message = editOutcome.edited ? 'Note edited' : 'Note edit was a no-op';
-    const noteLoggerPayload = editOutcome.note.toEditLoggerPayload();
+    const noteLoggerPayload = editOutcome.note.toLoggerPayload();
 
     this.logger.info(noteLoggerPayload, message);
 
@@ -45,7 +45,10 @@ export class NoteEditUseCase {
 
   private async attempt(command: INoteEditCommand): Promise<INoteEditOutcomeView> {
     const { noteId, body, editorId } = command;
-    const note = await this.accessService.loadOwned({ noteId, authorId: editorId });
+    const note = await this.accessService.loadOwned(
+      { noteId, authorId: editorId },
+      NoteEditModel.reconstitute,
+    );
     const versionAsRead = note.version;
     const bodyBefore = note.body;
 
@@ -58,33 +61,31 @@ export class NoteEditUseCase {
     const isSaved = await this.transaction.run(() =>
       this.save({ note, versionAsRead, bodyBefore, editorId }),
     );
-    const storedNote = await this.writeService.reload({
-      noteId,
-      authorId: editorId,
-      isSaved,
-    });
+    const storedNote = await this.writeService.reload(
+      { noteId, authorId: editorId, isSaved },
+      NoteEditModel.reconstitute,
+    );
 
     return { note: storedNote, edited: true };
   }
 
   private async save(command: INoteEditSaveCommand): Promise<boolean> {
     const { note, versionAsRead, bodyBefore, editorId } = command;
-    const noteUpdateQuery = note.toUpdateQuery(versionAsRead);
-    const isUpdated = await this.repository.update(noteUpdateQuery);
+    const noteUpdatePayload = note.toUpdatePayload(versionAsRead);
+    const isUpdated = await this.repository.update(noteUpdatePayload);
 
     if (!isUpdated) {
       return false;
     }
 
     const correlationId = CorrelationContextHelper.current(NoteEditUseCase.name);
-    const revisionCandidateInit = note.toRevisionCandidateInit({
+    const noteRevisionInsertPayload = note.toRevisionInsertPayload({
       bodyBefore,
       editorId,
       correlationId,
     });
-    const revision = NoteRevisionModel.initCandidate(revisionCandidateInit);
 
-    await this.repository.appendRevision(revision);
+    await this.repository.appendRevision(noteRevisionInsertPayload);
 
     return true;
   }

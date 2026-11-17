@@ -13,29 +13,29 @@ import {
 @Index('idx_note_subject', ['subjectType', 'subjectId'])
 export class Note {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Column({ type: 'varchar', length: 64 })
-  public subjectType: string;
+  public readonly subjectType: string;
 
   @Column({ type: 'varchar', length: 64 })
-  public subjectId: string;
+  public readonly subjectId: string;
 
   @Column({ type: 'text' })
-  public body: string;
+  public readonly body: string;
 
   @Index('idx_note_author')
   @Column({ type: 'bigint', unsigned: true })
-  public authorId: string;
+  public readonly authorId: string;
 
   @Column({ type: 'boolean', default: false })
-  public resolved: boolean;
+  public readonly resolved: boolean;
 
   @VersionColumn({ default: 1 })
-  public version: number;
+  public readonly version: number;
 
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
@@ -43,8 +43,8 @@ export class Note {
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public readonly updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', precision: 0, nullable: true })
-  public deletedAt: Date | null;
+  public readonly deletedAt: Date | null;
 }

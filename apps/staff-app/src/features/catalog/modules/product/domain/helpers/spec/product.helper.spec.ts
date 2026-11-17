@@ -1,14 +1,14 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
-import { ProductModel } from '../../models/product.model';
+import { ProductGetOneModel } from '../../models/product-get-one.model';
 import { ProductHelper } from '../product.helper';
 
 describe('ProductHelper', () => {
   describe('assertExpectedVersion', () => {
-    let product: ProductModel;
+    let product: ProductGetOneModel;
 
     beforeEach(() => {
-      product = ProductModel.reconstitute({
+      product = ProductGetOneModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Lamp',

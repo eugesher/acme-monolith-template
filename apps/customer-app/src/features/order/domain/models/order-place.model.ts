@@ -3,7 +3,6 @@ import type {
   IOrderPlaceLedgerPayload,
   IOrderPlaceLoggerPayload,
   IOrderPlaceReconstitute,
-  IOrderPlaceReplayLoggerPayload,
   IOrderProductReferenceSnapshot,
   IOrderProductSnapshot,
   IOrderProductStockMovement,
@@ -23,10 +22,6 @@ export class OrderPlaceModel extends OrderAggregate {
     const { id, customerId, createdAt, orderProducts } = record;
 
     return new OrderPlaceModel(id, orderProducts, createdAt, customerId);
-  }
-
-  public static toReplayLoggerPayload(idempotencyKey: string): IOrderPlaceReplayLoggerPayload {
-    return { idempotencyKey };
   }
 
   public getProductStockMovements(): IOrderProductStockMovement[] {

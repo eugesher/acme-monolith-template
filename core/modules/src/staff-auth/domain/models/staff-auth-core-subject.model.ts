@@ -7,10 +7,10 @@ import type {
 
 export class StaffAuthCoreSubjectModel {
   private constructor(
-    public readonly id: string,
-    public readonly email: string,
-    public readonly roles: readonly string[],
-    public readonly permissionCodes: readonly PermissionCodeEnum[],
+    private readonly id: string,
+    private readonly email: string,
+    private readonly roles: readonly string[],
+    private readonly permissionCodes: readonly PermissionCodeEnum[],
   ) {}
 
   public static reconstitute(record: IStaffAuthCoreSubjectReconstitute): StaffAuthCoreSubjectModel {
@@ -28,8 +28,8 @@ export class StaffAuthCoreSubjectModel {
     return {
       id: this.id,
       email: this.email,
-      roles: [...this.roles],
-      permissionCodes: [...this.permissionCodes],
+      roles: this.roles,
+      permissionCodes: this.permissionCodes,
     };
   }
 }

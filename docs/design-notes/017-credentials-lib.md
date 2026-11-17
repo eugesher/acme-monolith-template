@@ -48,7 +48,7 @@ signs `HS256` tokens with that `aud`.
 Modules that read the same table keep models of their own, narrowed to what each uses (see
 `024-code-placement.md`). Example: `UserStaffUserCandidateModel`
 (`apps/staff-app/src/features/access/modules/user/domain/models`), and `StaffAuthCoreSubjectModel`
-and `StaffAuthCoreUserModel` (`core/modules/src/staff-auth/domain/models`) all map `staff_user`.
+and `StaffAuthCoreLoginModel` (`core/modules/src/staff-auth/domain/models`) all map `staff_user`.
 
 ## A core module for the staff of two apps
 

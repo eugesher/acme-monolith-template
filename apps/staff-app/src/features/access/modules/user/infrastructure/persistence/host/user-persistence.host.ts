@@ -6,16 +6,16 @@ import { UserPersistenceStaffRoleBuilder } from '../builders/user-persistence-st
 export abstract class UserPersistenceHost {
   protected abstract readonly orm: IOrmPort;
 
-  protected get staffRoleRepository(): IHostedRepository<StaffRole> {
-    return this.orm.getRepository(StaffRole);
-  }
-
   protected get staffUserRepository(): IHostedRepository<StaffUser> {
     return this.orm.getRepository(StaffUser);
   }
 
   protected get staffUserRoleRepository(): IHostedRepository<StaffUserRole> {
     return this.orm.getRepository(StaffUserRole);
+  }
+
+  protected get staffRoleRepository(): IHostedRepository<StaffRole> {
+    return this.orm.getRepository(StaffRole);
   }
 
   protected createStaffRoleBuilder(): UserPersistenceStaffRoleBuilder {

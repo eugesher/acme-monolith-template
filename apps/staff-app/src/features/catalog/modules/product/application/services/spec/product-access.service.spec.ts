@@ -1,5 +1,6 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
+import { ProductGetOneModel } from '../../../domain';
 import { ProductAccessService } from '../product-access.service';
 
 describe('ProductAccessService', () => {
@@ -21,7 +22,7 @@ describe('ProductAccessService', () => {
 
   describe('load', () => {
     it('answers the product of the id', async () => {
-      const product = await service.load({ productId: '12' });
+      const product = await service.load({ productId: '12' }, ProductGetOneModel.reconstitute);
 
       expect(product.id).toBe('12');
       expect(findById).toHaveBeenCalledWith('12');
@@ -30,9 +31,26 @@ describe('ProductAccessService', () => {
     it('refuses a missing product with PRODUCT_NOT_FOUND', async () => {
       findById.mockResolvedValue(null);
 
-      await expect(service.load({ productId: '12' })).rejects.toMatchObject({
+      await expect(
+        service.load({ productId: '12' }, ProductGetOneModel.reconstitute),
+      ).rejects.toMatchObject({
         code: 'PRODUCT_NOT_FOUND',
         message: 'Product 12 was not found',
+      });
+    });
+  });
+
+  describe('assertExists', () => {
+    it('passes for a stored product', async () => {
+      await expect(service.assertExists({ productId: '12' })).resolves.toBeUndefined();
+      expect(findById).toHaveBeenCalledWith('12');
+    });
+
+    it('refuses a missing product with PRODUCT_NOT_FOUND', async () => {
+      findById.mockResolvedValue(null);
+
+      await expect(service.assertExists({ productId: '12' })).rejects.toMatchObject({
+        code: 'PRODUCT_NOT_FOUND',
       });
     });
   });

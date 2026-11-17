@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { ReminderRescheduleModel } from '../../domain';
 import { REMINDER_SUMMARY_PORT, type IReminderSummaryPort } from '../../outbound';
 import { ReminderWriteService } from '../services/reminder-write.service';
 import type { IReminderRescheduleCommand, IReminderView } from '../interfaces';
@@ -17,13 +18,15 @@ export class ReminderRescheduleUseCase {
 
   public async execute(command: IReminderRescheduleCommand): Promise<IReminderView> {
     const { reminderId, ownerId, dueOn } = command;
-    const writtenReminder = await this.writeService.write({ reminderId, ownerId }, (reminder) =>
-      reminder.reschedule(dueOn),
+    const writtenReminder = await this.writeService.write(
+      { reminderId, ownerId },
+      ReminderRescheduleModel.reconstitute,
+      (reminder) => reminder.reschedule(dueOn),
     );
 
     await this.summary.invalidate(ownerId);
 
-    const reminderLoggerPayload = writtenReminder.toRescheduleLoggerPayload();
+    const reminderLoggerPayload = writtenReminder.toLoggerPayload();
 
     this.logger.info(reminderLoggerPayload, 'Reminder rescheduled');
 

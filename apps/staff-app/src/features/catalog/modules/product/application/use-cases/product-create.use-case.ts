@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import {
+  ProductCreateModel,
   ProductIdempotencyKeyReusedException,
   ProductIdempotentRequestInFlightException,
-  ProductModel,
   ProductSkuTakenException,
-  type IProductCandidate,
+  type IProductCreateCandidate,
 } from '../../domain';
 import {
   PRODUCT_CREATE_REPOSITORY_PORT,
@@ -46,9 +46,7 @@ export class ProductCreateUseCase {
     });
 
     if (idempotencyClaim.outcome === ProductIdempotencyOutcomeEnum.REPLAY) {
-      const replayLoggerPayload = ProductModel.toCreateReplayLoggerPayload(idempotencyKey);
-
-      this.logger.info(replayLoggerPayload, 'Product creation replayed from the idempotency store');
+      this.logger.info({ idempotencyKey }, 'Product creation replayed from the idempotency store');
 
       return idempotencyClaim.storedResponse;
     }
@@ -62,8 +60,8 @@ export class ProductCreateUseCase {
     }
 
     const product = await this.write(command);
-    const productLedgerPayload = product.toCreateLedgerPayload();
-    const productLoggerPayload = product.toCreateLoggerPayload();
+    const productLedgerPayload = product.toLedgerPayload();
+    const productLoggerPayload = product.toLoggerPayload();
 
     await this.ledger.recordCreated(productLedgerPayload);
 
@@ -72,7 +70,7 @@ export class ProductCreateUseCase {
     return product.toSnapshot();
   }
 
-  private async write(command: IProductCreateCommand): Promise<ProductModel> {
+  private async write(command: IProductCreateCommand): Promise<ProductCreateModel> {
     const { staffUserId, idempotencyKey } = command;
 
     try {
@@ -84,7 +82,7 @@ export class ProductCreateUseCase {
     }
   }
 
-  private async create(command: IProductCreateCommand): Promise<ProductModel> {
+  private async create(command: IProductCreateCommand): Promise<ProductCreateModel> {
     const { sku, name } = command;
     const isSkuTaken = await this.repository.existsBySku(sku);
 
@@ -92,15 +90,15 @@ export class ProductCreateUseCase {
       throw new ProductSkuTakenException(sku);
     }
 
-    const productCandidate = ProductModel.initCandidate({ sku, name });
+    const productCandidate = ProductCreateModel.initCandidate({ sku, name });
 
     return await this.transaction.run(() => this.persist(productCandidate, command));
   }
 
   private async persist(
-    candidate: IProductCandidate,
+    candidate: IProductCreateCandidate,
     command: IProductCreateCommand,
-  ): Promise<ProductModel> {
+  ): Promise<ProductCreateModel> {
     const { staffUserId, idempotencyKey } = command;
     const insertResult = await this.repository.insert(candidate);
 
@@ -109,7 +107,7 @@ export class ProductCreateUseCase {
     }
 
     const productRecord = await this.repository.findInserted(insertResult.id);
-    const createdProduct = ProductModel.reconstitute(productRecord);
+    const createdProduct = ProductCreateModel.reconstitute(productRecord);
     const productView = createdProduct.toSnapshot();
 
     await this.idempotency.complete({ staffUserId, key: idempotencyKey, response: productView });

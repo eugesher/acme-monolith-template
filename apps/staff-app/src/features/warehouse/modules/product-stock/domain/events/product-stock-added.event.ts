@@ -5,8 +5,8 @@ import type { IProductStockLedgerRecord } from '../interfaces';
 export class ProductStockAddedEvent extends DomainEventBase {
   constructor(
     productId: string,
-    public readonly sku: string,
-    public readonly quantity: number,
+    private readonly sku: string,
+    private readonly quantity: number,
   ) {
     super(productId);
   }

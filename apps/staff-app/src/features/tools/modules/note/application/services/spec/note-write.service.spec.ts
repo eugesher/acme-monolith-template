@@ -2,7 +2,7 @@ import type { PinoLogger } from 'nestjs-pino';
 
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { NoteModel } from '../../../domain';
+import { NoteEditModel } from '../../../domain';
 import { NoteWriteConflictError } from '../../errors/note-write-conflict.error';
 import { NoteWriteService } from '../note-write.service';
 import type { NoteAccessService } from '../note-access.service';
@@ -14,7 +14,7 @@ describe('NoteWriteService', () => {
 
   beforeEach(() => {
     loadOwned = jest.fn().mockResolvedValue(
-      NoteModel.reconstitute({
+      NoteEditModel.reconstitute({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
@@ -86,16 +86,25 @@ describe('NoteWriteService', () => {
 
   describe('reload', () => {
     it('answers the stored note after a saved write', async () => {
-      const note = await service.reload({ noteId: '7', authorId: 'admin-1', isSaved: true });
+      const note = await service.reload(
+        { noteId: '7', authorId: 'admin-1', isSaved: true },
+        NoteEditModel.reconstitute,
+      );
 
-      expect(loadOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
+      expect(loadOwned).toHaveBeenCalledWith(
+        { noteId: '7', authorId: 'admin-1' },
+        NoteEditModel.reconstitute,
+      );
       expect(note.version).toBe(4);
-      expect(note.updatedAt).toEqual(new Date('2026-01-03T00:00:00.000Z'));
+      expect(note.toSnapshot().updatedAt).toBe('2026-01-03T00:00:00.000Z');
     });
 
     it('turns a lost race into a conflict carrying the stored version', async () => {
       await expect(
-        service.reload({ noteId: '7', authorId: 'admin-1', isSaved: false }),
+        service.reload(
+          { noteId: '7', authorId: 'admin-1', isSaved: false },
+          NoteEditModel.reconstitute,
+        ),
       ).rejects.toEqual(new NoteWriteConflictError('7', 4));
     });
   });

@@ -5,18 +5,18 @@ import { UserStatusEnum } from '@acme-libs/kernel';
 @Entity({ name: 'customer' })
 export class Customer {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Index('uq_customer_email', { unique: true })
   @Column({ type: 'varchar', length: 255 })
-  public email: string;
+  public readonly email: string;
 
   @Column({ type: 'varchar', length: 255 })
-  public passwordHash: string;
+  public readonly passwordHash: string;
 
   @Column({ type: 'varchar', length: 16, default: UserStatusEnum.ACTIVE })
-  public status: UserStatusEnum;
+  public readonly status: UserStatusEnum;
 
   @CreateDateColumn({ type: 'timestamp', precision: 0, default: () => 'CURRENT_TIMESTAMP' })
-  public createdAt: Date;
+  public readonly createdAt: Date;
 }

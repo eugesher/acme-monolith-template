@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ProductModel, ProductUpdatedEvent } from '../../../domain';
+import { ProductUpdatedEvent, ProductUpdateModel } from '../../../domain';
 import { ProductUpdateUseCase } from '../product-update.use-case';
 import type { ProductWriteService } from '../../services/product-write.service';
 
@@ -15,7 +15,7 @@ describe('ProductUpdateUseCase', () => {
 
   beforeEach(() => {
     write = jest.fn().mockResolvedValue({
-      product: ProductModel.reconstitute({
+      product: ProductUpdateModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Desk lamp',
@@ -45,6 +45,7 @@ describe('ProductUpdateUseCase', () => {
 
       expect(write).toHaveBeenCalledWith(
         { productId: '12', expectedVersion: 3 },
+        ProductUpdateModel.reconstitute,
         expect.any(Function),
       );
       expect(view).toEqual({
@@ -87,7 +88,7 @@ describe('ProductUpdateUseCase', () => {
     });
 
     it('hands the write service a change that updates the name of the product', async () => {
-      const product = ProductModel.reconstitute({
+      const product = ProductUpdateModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Lamp',
@@ -103,11 +104,15 @@ describe('ProductUpdateUseCase', () => {
         expectedVersion: undefined,
       });
 
-      const [, mutate] = write.mock.calls[0] as [unknown, (product: ProductModel) => void];
+      const [, , mutate] = write.mock.calls[0] as [
+        unknown,
+        unknown,
+        (product: ProductUpdateModel) => void,
+      ];
 
       mutate(product);
 
-      expect(product.name).toBe('Desk lamp');
+      expect(product.toSnapshot().name).toBe('Desk lamp');
     });
   });
 });

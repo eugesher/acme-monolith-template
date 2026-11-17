@@ -5,7 +5,7 @@ import type { AuthIdentityLoginOutcomeEnum } from '../../enums/auth-identity-log
 export interface IAuthIdentitySubjectView {
   id: string;
   email: string;
-  roles: string[];
+  roles: readonly string[];
 }
 
 export interface IAuthIdentityLoginView {

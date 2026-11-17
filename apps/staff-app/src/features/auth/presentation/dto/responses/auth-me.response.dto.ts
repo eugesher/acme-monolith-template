@@ -8,5 +8,5 @@ export class AuthMeResponseDto {
   public email: string;
 
   @ApiResponseProperty({ example: ['admin'] })
-  public roles: string[];
+  public roles: readonly string[];
 }

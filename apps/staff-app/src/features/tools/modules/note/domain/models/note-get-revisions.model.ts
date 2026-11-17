@@ -2,17 +2,25 @@ import type { INoteGetRevisionsReconstitute, INoteGetRevisionsSnapshot } from '.
 
 export class NoteGetRevisionsModel {
   private constructor(
-    public readonly id: string,
-    public readonly noteId: string,
-    public readonly noteVersion: number,
-    public readonly bodyBefore: string,
-    public readonly bodyAfter: string,
-    public readonly editorId: string,
-    public readonly correlationId: string,
-    public readonly recordedAt: Date,
+    private readonly id: string,
+    private readonly noteId: string,
+    private readonly noteVersion: number,
+    private readonly bodyBefore: string,
+    private readonly bodyAfter: string,
+    private readonly editorId: string,
+    private readonly correlationId: string,
+    private readonly recordedAt: Date,
   ) {}
 
-  public static reconstitute(record: INoteGetRevisionsReconstitute): NoteGetRevisionsModel {
+  public static toViewData(records: INoteGetRevisionsReconstitute[]): INoteGetRevisionsSnapshot[] {
+    return records.map((record) => {
+      const revision = NoteGetRevisionsModel.reconstitute(record);
+
+      return revision.toSnapshot();
+    });
+  }
+
+  private static reconstitute(record: INoteGetRevisionsReconstitute): NoteGetRevisionsModel {
     const { id, noteId, noteVersion, bodyBefore, bodyAfter, editorId, correlationId, recordedAt } =
       record;
 
@@ -26,14 +34,6 @@ export class NoteGetRevisionsModel {
       correlationId,
       recordedAt,
     );
-  }
-
-  public static toViewData(records: INoteGetRevisionsReconstitute[]): INoteGetRevisionsSnapshot[] {
-    return records.map((record) => {
-      const revision = NoteGetRevisionsModel.reconstitute(record);
-
-      return revision.toSnapshot();
-    });
   }
 
   private toSnapshot(): INoteGetRevisionsSnapshot {

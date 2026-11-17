@@ -7,12 +7,12 @@ import { StaffRole } from './staff-role.entity';
 @Entity({ name: 'staff_role_permissions' })
 export class StaffRolePermission {
   @PrimaryColumn({ type: 'bigint', unsigned: true })
-  public roleId: string;
+  public readonly roleId: string;
 
   @PrimaryColumn({ type: 'varchar', length: 64 })
-  public code: PermissionCodeEnum;
+  public readonly code: PermissionCodeEnum;
 
   @ManyToOne(() => StaffRole, (role) => role.rolePermissions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'role_id', foreignKeyConstraintName: 'fk_staff_role_permissions_role' })
-  public role: StaffRole;
+  public readonly role: StaffRole;
 }

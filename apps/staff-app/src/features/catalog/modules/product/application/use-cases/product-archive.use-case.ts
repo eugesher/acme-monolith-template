@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import {
   ProductAlreadyArchivedException,
+  ProductGetOneModel,
   ProductNotFoundException,
   ProductVersionMismatchException,
 } from '../../domain';
@@ -42,7 +43,7 @@ export class ProductArchiveUseCase {
       throw new ProductAlreadyArchivedException(productId);
     }
 
-    const product = await this.accessService.load({ productId });
+    const product = await this.accessService.load({ productId }, ProductGetOneModel.reconstitute);
 
     return product.toSnapshot();
   }

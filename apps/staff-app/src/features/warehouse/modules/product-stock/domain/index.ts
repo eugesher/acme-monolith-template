@@ -10,4 +10,4 @@ export * from './exceptions/product-quantity-invalid.exception';
 
 export * from './interfaces';
 
-export * from './models/product-stock.model';
+export * from './models/product-stock-add.model';

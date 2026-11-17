@@ -1,8 +1,8 @@
 export interface IOrderGetOneView {
-  id: string;
-  customerId: string;
-  createdAt: string;
-  orderProducts: {
+  readonly id: string;
+  readonly customerId: string;
+  readonly createdAt: string;
+  readonly orderProducts: readonly {
     id: string;
     product: {
       id: string;

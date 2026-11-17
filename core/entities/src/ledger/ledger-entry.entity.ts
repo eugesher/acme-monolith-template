@@ -4,31 +4,31 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 
 @Index('idx_ledger_subject', ['subjectType', 'subjectId'])
 export class LedgerEntry {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  public id: string;
+  public readonly id: string;
 
   @Index('uq_ledger_operation_key', { unique: true })
   @Column({ type: 'varchar', length: 128 })
-  public operationKey: string;
+  public readonly operationKey: string;
 
   @Column({ type: 'varchar', length: 64 })
-  public subjectType: string;
+  public readonly subjectType: string;
 
   @Column({ type: 'varchar', length: 64 })
-  public subjectId: string;
+  public readonly subjectId: string;
 
   @Column({ type: 'varchar', length: 64 })
-  public action: string;
+  public readonly action: string;
 
   @Column({ type: 'json' })
-  public payload: Record<string, unknown>;
+  public readonly payload: Record<string, unknown>;
 
   @Index('idx_ledger_correlation')
   @Column({ type: 'varchar', length: 64, default: '' })
-  public correlationId: string;
+  public readonly correlationId: string;
 
   @Column({ type: 'timestamp', precision: 3 })
-  public occurredAt: Date;
+  public readonly occurredAt: Date;
 
   @CreateDateColumn({ type: 'timestamp', precision: 3, default: () => 'CURRENT_TIMESTAMP(3)' })
-  public recordedAt: Date;
+  public readonly recordedAt: Date;
 }
