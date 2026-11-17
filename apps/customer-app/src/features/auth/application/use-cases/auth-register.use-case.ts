@@ -41,8 +41,14 @@ export class AuthRegisterUseCase {
     customerCandidate.normalizeEmail();
     customerCandidate.assertEmail();
 
-    const customerId = await this.insert(customerCandidate);
-    const registeredCustomer = customerCandidate.toRegistered(customerId);
+    const customerInsertPayload = customerCandidate.toInsertPayload();
+    const insertResult = await this.repository.insert(customerInsertPayload);
+
+    if (insertResult.outcome === AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE) {
+      throw new AuthEmailTakenException();
+    }
+
+    const registeredCustomer = customerCandidate.toRegistered(insertResult.id);
     const customer = AuthCustomerRegisterModel.reconstitute(registeredCustomer);
     const customerLoggerPayload = customer.toLoggerPayload();
     const customerLedgerPayload = customer.toLedgerPayload();
@@ -52,16 +58,5 @@ export class AuthRegisterUseCase {
     await this.ledger.recordRegistered(customerLedgerPayload);
 
     return customer.toSnapshot();
-  }
-
-  private async insert(candidate: AuthCustomerCandidateModel): Promise<string> {
-    const customerInsertPayload = candidate.toInsertPayload();
-    const insertResult = await this.repository.insert(customerInsertPayload);
-
-    if (insertResult.outcome === AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE) {
-      throw new AuthEmailTakenException();
-    }
-
-    return insertResult.id;
   }
 }
