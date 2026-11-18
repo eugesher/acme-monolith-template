@@ -8,4 +8,3 @@ export * from './health/health-readiness-status.enum';
 export * from './idempotency/idempotency-status.enum';
 export * from './identity/identity-exception-code.enum';
 export * from './identity/user-status.enum';
-export * from './reminder/reminder-status.enum';

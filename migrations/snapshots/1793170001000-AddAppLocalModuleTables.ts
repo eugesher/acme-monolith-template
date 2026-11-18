@@ -35,27 +35,9 @@ export class AddAppLocalModuleTables1793170001000 implements MigrationInterface 
           REFERENCES note (id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);
-
-    await queryRunner.query(`
-      CREATE TABLE reminder (
-        id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        owner_id   BIGINT UNSIGNED NOT NULL,
-        title      VARCHAR(255)  NOT NULL,
-        body       VARCHAR(2000) NOT NULL DEFAULT '',
-        due_on     DATE          NOT NULL,
-        status     ENUM('pending','done') NOT NULL DEFAULT 'pending',
-        version    INT           NOT NULL DEFAULT 1,
-        created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        deleted_at TIMESTAMP     NULL,
-        KEY idx_reminder_owner_status (owner_id, status),
-        KEY idx_reminder_due (due_on)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP TABLE IF EXISTS reminder');
     await queryRunner.query('DROP TABLE IF EXISTS note_revision');
     await queryRunner.query('DROP TABLE IF EXISTS note');
   }

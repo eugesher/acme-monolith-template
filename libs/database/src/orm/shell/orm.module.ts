@@ -54,7 +54,6 @@ export class OrmModule {
           logging,
           synchronize: false,
           timezone: 'Z',
-          dateStrings: ['DATE'],
           charset: 'utf8mb4',
           namingStrategy,
           poolSize,

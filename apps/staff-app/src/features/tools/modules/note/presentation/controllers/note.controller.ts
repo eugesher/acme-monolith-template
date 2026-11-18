@@ -1,11 +1,30 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseFilters } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseFilters,
+} from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { CurrentUser } from '@acme-libs/auth';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import {
   NoteCreateUseCase,
+  NoteDeleteUseCase,
   NoteEditUseCase,
   NoteGetManyUseCase,
   NoteGetOneUseCase,
@@ -35,6 +54,7 @@ export class NoteController {
     private readonly edit: NoteEditUseCase,
     private readonly resolve: NoteResolveUseCase,
     private readonly getRevisions: NoteGetRevisionsUseCase,
+    private readonly remove: NoteDeleteUseCase,
   ) {}
 
   @Post()
@@ -120,5 +140,18 @@ export class NoteController {
     const { page, limit } = query;
 
     return await this.getRevisions.execute({ noteId, authorId: user.id, page, limit });
+  }
+
+  @Delete(':noteId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete one of your notes' })
+  @ApiNoContentResponse()
+  public async handleDelete(
+    @Param() params: NoteIdParamDto,
+    @CurrentUser() user: IAuthCurrentUserView,
+  ): Promise<void> {
+    const { noteId } = params;
+
+    await this.remove.execute({ noteId, authorId: user.id });
   }
 }

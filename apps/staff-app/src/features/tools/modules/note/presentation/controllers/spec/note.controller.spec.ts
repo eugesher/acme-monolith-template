@@ -1,6 +1,7 @@
 import { NoteController } from '../note.controller';
 import type {
   NoteCreateUseCase,
+  NoteDeleteUseCase,
   NoteEditUseCase,
   NoteGetManyUseCase,
   NoteGetOneUseCase,
@@ -15,6 +16,7 @@ describe('NoteController', () => {
   let edit: jest.Mock;
   let resolve: jest.Mock;
   let getRevisions: jest.Mock;
+  let remove: jest.Mock;
   let controller: NoteController;
 
   beforeEach(() => {
@@ -24,6 +26,7 @@ describe('NoteController', () => {
     edit = jest.fn();
     resolve = jest.fn();
     getRevisions = jest.fn();
+    remove = jest.fn();
 
     controller = new NoteController(
       { execute: create } as unknown as NoteCreateUseCase,
@@ -32,6 +35,7 @@ describe('NoteController', () => {
       { execute: edit } as unknown as NoteEditUseCase,
       { execute: resolve } as unknown as NoteResolveUseCase,
       { execute: getRevisions } as unknown as NoteGetRevisionsUseCase,
+      { execute: remove } as unknown as NoteDeleteUseCase,
     );
   });
 
@@ -139,6 +143,17 @@ describe('NoteController', () => {
         page: 1,
         limit: 20,
       });
+    });
+  });
+
+  describe('handleDelete', () => {
+    it('deletes the note of the path for the caller', async () => {
+      remove.mockResolvedValue(undefined);
+
+      await expect(
+        controller.handleDelete({ noteId: '17' }, { id: 'user-1', email: 'ann@example.com' }),
+      ).resolves.toBeUndefined();
+      expect(remove).toHaveBeenCalledWith({ noteId: '17', authorId: 'user-1' });
     });
   });
 });

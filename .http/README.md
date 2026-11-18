@@ -26,15 +26,16 @@ Nine e2e cases are not one request:
 - the schema check of staff-app compares the migrated database with the entities and has no request;
 - the concurrent renames of a product send six requests at once,
   `catalog/product/update/06-concurrent` sends one;
-- the replays of a product create, a restock and an order send the same request twice, as
-  `staff-app/catalog/product/create/02-replay`, `staff-app/warehouse/product-stock/add/03-replay`
-  and `customer-app/order/place/02-replay` say;
+- the replays of a restock and an order send the same request twice, as
+  `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with
   two keys, as `customer-app/order/place/13-simultaneous` says;
 - two simultaneous registrations with one email send the same request twice at once, in
   `customer-app/auth/register/03-simultaneous` and `staff-app/access/user/register/02-simultaneous`;
 - the sign-up of a customer goes on to log in and read `me` with the new credentials, as
-  `auth/register/01-register` says.
+  `auth/register/01-register` says;
+- the soft delete of a note goes on to read the note and its revisions, as
+  `staff-app/tools/note/delete/01-delete` says.
 
 ## Environment
 
@@ -63,8 +64,9 @@ The expected result in a description holds for fresh seeds and the first run. Wr
 the fixtures, and a second run gets another answer: for example, a second create of the same user
 hits the taken email. Run `yarn test:e2e:infra:reseed` to start over.
 
-The e2e deletes the `acme:*` keys of Redis before every reminder case and leaves the keys of the
-Bull queue alone. When a description checks cache keys, delete the `acme:*` keys first.
+The e2e deletes the `acme:catalog:*` keys of Redis before every catalog case of customer-app and
+leaves the keys of the Bull queue alone. When a description checks cache keys, delete those keys
+first.
 
 ## Tokens
 

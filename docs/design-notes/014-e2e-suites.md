@@ -75,8 +75,8 @@ before the cases that write into it.
 
 **A feature class has one public method per endpoint**, named after the controller method, and the
 method wraps the `describe` of that endpoint. `ProductE2E.of(ctx)` builds it over the context. A
-feature that needs a hook before each case has `hooks()`, as `ReminderE2E` deletes the `acme:` keys
-from Redis.
+feature that needs a hook before each case has `hooks()`, as `CatalogE2E` of customer-app deletes
+the `acme:catalog:*` keys from Redis.
 
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
 `libs/testing/src/e2e/e2e.context.ts`, which holds only what all five contexts use: `init()`
@@ -89,10 +89,10 @@ in staff-app, ann, bob and carol in customer-app, admin and viewer in processor-
 cases read is a getter that throws before `init()`. The contexts of staff-app and customer-app also
 hold the Redis client, through `@acme-libs/testing`.
 
-**A reminder case clears the keys of the app, not the database.** The Bull queue of the ledger
-records lives in the same Redis, so `FLUSHDB` would drop its jobs and counters. `hooks()` deletes
-the `acme:*` keys before each case, and the cases list the `acme:*` keys only: a timer of Bull
-writes its own keys at any moment.
+**A catalog case clears its own keys, not the database.** The Bull queue of the ledger records lives
+in the same Redis, so `FLUSHDB` would drop its jobs and counters. `hooks()` deletes the
+`acme:catalog:*` keys before each case, and the cases list those keys only: a timer of Bull writes
+its own keys at any moment.
 
 **staff-app and customer-app read the job, not the ledger.** Neither processes the queue, so their
 contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-record`
@@ -131,8 +131,8 @@ asserts only the last call, so it passes either way.
 health suite of each app check the preflight of an allowed origin and the missing header for any
 other (see `037-http-edge.md`).
 
-**The suites run west of UTC.** `TZ=America/New_York` makes a date that drifts through a JavaScript
-`Date` come back a day early, so the reminder cases catch it.
+**The suites run west of UTC.** `TZ=America/New_York` shifts a value that drifts through the local
+getters of a JavaScript `Date`, so a case catches it.
 
 ## Root warnings
 

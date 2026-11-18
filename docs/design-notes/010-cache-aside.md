@@ -3,23 +3,23 @@
 A read is cached through a port of the module; every write that makes it stale drops it after the
 write.
 
-| Part      | Example                                                                                                     |
-| --------- | ----------------------------------------------------------------------------------------------------------- |
-| port      | `apps/staff-app/src/features/tools/modules/reminder/outbound/ports/reminder-summary.port.ts`                |
-| use case  | `apps/staff-app/src/features/tools/modules/reminder/application/use-cases/reminder-get-summary.use-case.ts` |
-| adapter   | `apps/staff-app/src/features/tools/modules/reminder/infrastructure/cache/reminder-summary-cache.adapter.ts` |
-| keys      | `libs/contracts/src/cache/keys/cache-keys.ts`                                                               |
-| cache lib | `libs/cache`, `CACHE_LIB_PORT` in `libs/contracts/src/cache/ports/cache-lib.port.ts`                        |
+| Part      | Example                                                                                         |
+| --------- | ----------------------------------------------------------------------------------------------- |
+| port      | `apps/customer-app/src/features/catalog/outbound/ports/catalog-cache.port.ts`                   |
+| use case  | `apps/customer-app/src/features/catalog/application/use-cases/catalog-product-list.use-case.ts` |
+| adapter   | `apps/customer-app/src/features/catalog/infrastructure/cache/catalog-cache.adapter.ts`          |
+| keys      | `libs/contracts/src/cache/keys/cache-keys.ts`                                                   |
+| cache lib | `libs/cache`, `CACHE_LIB_PORT` in `libs/contracts/src/cache/ports/cache-lib.port.ts`            |
 
 ## The use case computes, the port caches
 
 ```ts
-summary.read({ ownerId, compute: () => repository.summarize(ownerId) });
+cache.read({ page, limit, ttlMs: this.cacheTtlMs, compute: () => this.listPage(pageWindow) });
 ```
 
-The use case has no key, no TTL and no branch on a hit or a miss. The adapter has no repository: it
-calls `compute` on a miss through `CACHE_LIB_PORT.handleWrap`. The repository port belongs to the
-use case, so the rule of one repository per consumer holds.
+The use case has no key and no branch on a hit or a miss. The adapter has no repository: it calls
+`compute` on a miss through `CACHE_LIB_PORT.handleWrap`. The repository port belongs to the use
+case, so the rule of one repository per consumer holds.
 
 **`handleWrap` already shares one computation among concurrent misses of a key**, and computes
 without caching when Redis fails, so an adapter has no single-flight and no fallback of its own. It
@@ -61,27 +61,20 @@ must start before ioredis is loaded, so `main.ts` imports `@acme-libs/observabil
 
 ## Invalidation after the write
 
-Every use case that writes calls `invalidate` once its write has returned. A write that fails or is
-refused invalidates nothing. `handleDelByPrefix` logs a failure and answers 0 instead of throwing,
-so the use cases call it without a guard; a stale entry then expires on its TTL.
+Every writer drops the entry once its write has returned. The catalog is written in staff-app, so
+its droppers live there and in a core module (see `020-cross-app-cache-invalidation.md`). A write
+that fails or is refused drops nothing. `handleDelByPrefix` logs a failure and answers 0 instead of
+throwing, so the use cases call it without a guard; a stale entry then expires on its TTL.
 
-**Keys are versioned and prefixed** (`acme:<area>:v1:<scope>:`), so one `handleDelByPrefix` drops
-every facet of a scope and a change of the cached shape bumps the version instead of reading old
-values.
+**Keys are versioned and prefixed** (`acme:<area>:v1:`), so one `handleDelByPrefix` drops every page
+of the catalog and a change of the cached shape bumps the version instead of reading old values.
 
-**A paged list is a poor fit** when every write touches it: a key per page, limit and filter gives
-each write as many keys to drop as there are queries. `020-cross-app-cache-invalidation.md` shows
-the case where dropping every page is cheap.
-
-## `date` columns stay strings
-
-With `timezone: 'Z'`, mysql2 reads a `date` as midnight UTC, and TypeORM turns it back into a string
-with the local getters of the process, which shifts the day west of UTC. `OrmModule` of
-`libs/database` sets `dateStrings: ['DATE']` for every app, so the driver hands over `YYYY-MM-DD` as
-it is. Example column: `apps/staff-app/src/common/entities/reminder/reminder.entity.ts`.
+**A paged list fits only when dropping every page is cheap.** A key per page, limit and filter gives
+each write as many keys to drop as there are queries; the catalog has no filter and clamps its page
+window, so its keys stay few.
 
 ## Soft delete
 
 `softDelete` sets `deleted_at`, and TypeORM adds `deleted_at IS NULL` to every find and query
 builder on the entity, so a deleted row is gone for every read. Example:
-`apps/staff-app/src/features/tools/modules/reminder/infrastructure/persistence/repositories/reminder-delete.repository.ts`.
+`apps/staff-app/src/features/tools/modules/note/infrastructure/persistence/repositories/note-delete.repository.ts`.

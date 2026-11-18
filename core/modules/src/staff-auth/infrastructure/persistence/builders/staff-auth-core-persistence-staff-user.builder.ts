@@ -8,15 +8,6 @@ export class StaffAuthCorePersistenceStaffUserBuilder extends SelectQueryBuilder
   private readonly staffRoleAlias = StaffRole.name;
   private readonly staffRolePermissionAlias = StaffRolePermission.name;
 
-  public forByEmail(email: string): this {
-    this.select([`${this.alias}.id`, `${this.alias}.passwordHash`, `${this.alias}.status`]).where(
-      `${this.alias}.email = :email`,
-      { email },
-    );
-
-    return this;
-  }
-
   public forActiveById(id: string): this {
     this.select([`${this.alias}.id`, `${this.alias}.email`])
       .leftJoin(`${this.alias}.userRoles`, this.staffUserRoleAlias)

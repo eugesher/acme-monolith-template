@@ -311,18 +311,18 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('the module root MAY mount the credentials lib for the staff login', async () => {
+    it('the module root may NOT mount the credentials lib — no core module signs anyone in', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
         code: 'import { CredentialsLibModule } from "@acme-libs/credentials";',
-      }).toPassArchitectureLint();
+      }).toBreakRule('boundaries/dependencies');
     });
 
-    it('a lib adapter MAY take the credentials contract', async () => {
+    it('a lib adapter may NOT take the credentials contract — no core module signs anyone in', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/lib-adapters/__fixture__.ts',
         code: 'import { CREDENTIALS_LIB_PORT } from "@acme-libs/contracts/credentials";',
-      }).toPassArchitectureLint();
+      }).toBreakRule('boundaries/dependencies');
     });
 
     it.each([

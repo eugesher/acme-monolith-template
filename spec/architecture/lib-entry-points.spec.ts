@@ -251,7 +251,7 @@ describe('lib entry points', () => {
 
   it.each([
     'apps/staff-app/src/common/shared/auth/__fixture__.ts',
-    'apps/staff-app/src/features/reminder/infrastructure/cache/__fixture__.ts',
+    'apps/staff-app/src/features/product/infrastructure/cache/__fixture__.ts',
   ])('%s MAY import the cache contracts by their alias', async (file) => {
     await expect({
       file,
@@ -260,7 +260,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/reminder/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
   ])(
     '%s may NOT import the cache contracts by their alias, the application reads through its own port',
@@ -279,7 +279,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/reminder/infrastructure/cache/__fixture__.ts',
+    'apps/staff-app/src/features/product/infrastructure/cache/__fixture__.ts',
     'apps/staff-app/src/common/shared/auth/__fixture__.ts',
   ])('%s may NOT import the cache lib root, only the app root wires it', async (file) => {
     await expect({

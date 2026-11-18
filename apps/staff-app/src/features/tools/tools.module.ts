@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { NoteModule, ReminderModule, TagModule } from './modules';
+import { NoteModule, TagModule } from './modules';
 
 @Module({
-  imports: [NoteModule, ReminderModule, TagModule],
+  imports: [NoteModule, TagModule],
 })
 export class ToolsModule {}

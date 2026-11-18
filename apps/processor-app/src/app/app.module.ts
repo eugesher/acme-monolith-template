@@ -13,7 +13,7 @@ import { AppNameEnum } from '@acme-libs/kernel';
 import { LocalStorageSetupModule } from '@acme-libs/local-storage';
 import { LoggerSetupModule } from '@acme-libs/observability';
 import { BullSetupModule } from '@acme-libs/queue';
-import { AuthModule, HealthModule, QueueModule } from '@acme-processor/features';
+import { HealthModule, QueueModule } from '@acme-processor/features';
 import { IdempotencyModule, LedgerModule, ProductStockModule } from '@acme-processor/processors';
 
 import { entities } from './entities';
@@ -32,7 +32,6 @@ import { ConfigSetupModule, ScheduleSetupModule } from './setup';
     HttpSecurityModule.forRoot(),
     ThrottlerSetupModule.forRoot(),
     AuthGlobalModule,
-    AuthModule,
     HealthModule,
     QueueModule,
     IdempotencyModule,

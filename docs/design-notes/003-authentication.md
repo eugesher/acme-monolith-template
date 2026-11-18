@@ -1,15 +1,15 @@
 # 003 — Authentication
 
-Login and token signing live in an `auth` feature of each app, and staff-app and customer-app also
-read the current user there. `auth` also names the lib, its contract and the global module, so the
+Login and token signing live in an `auth` feature of staff-app and of customer-app, which also read
+the current user there. processor-app has no login: it takes the token of staff-app (see
+`023-processor-app.md`). `auth` also names the lib, its contract and the global module, so the
 classes of the global module carry the `AuthGlobal` prefix (see `002-global-auth-guards.md`) and the
 feature keeps the plain `Auth` prefix.
 
-| App           | Feature                                |
-| ------------- | -------------------------------------- |
-| staff-app     | `apps/staff-app/src/features/auth`     |
-| customer-app  | `apps/customer-app/src/features/auth`  |
-| processor-app | `apps/processor-app/src/features/auth` |
+| App          | Feature                               |
+| ------------ | ------------------------------------- |
+| staff-app    | `apps/staff-app/src/features/auth`    |
+| customer-app | `apps/customer-app/src/features/auth` |
 
 ## The full path, even for a thin feature
 
@@ -21,13 +21,10 @@ feature keeps the plain `Auth` prefix.
 | infrastructure | `infrastructure/persistence/repositories/auth-login.repository.ts`, `infrastructure/lib-adapters/auth-credentials-lib.adapter.ts` |
 | domain         | `domain/models/`, `domain/exceptions/base/auth-base.exception.ts`                                                                 |
 
-**A customer logs in inside the feature, the staff inside core.** No other module of customer-app
-logs anyone in, so its `AuthLoginUseCase` reads the customer, checks the password and signs the
-token itself. The staff log in to staff-app and to processor-app, so their login lives in the core
-module `staff-auth` as `StaffAuthCoreLoginUseCase` (see `024-code-placement.md` and
-`017-credentials-lib.md`). It answers an outcome, and `AuthLoginUseCase` of each app turns
-`invalid-credentials` and `user-inactive` into the exceptions of its feature (see
-`027-core-module-outcomes.md`), so the two apps answer a login the same way.
+**Each app logs its users in inside the feature.** No other module logs anyone in, so
+`AuthLoginUseCase` of each app reads the user, checks the password and signs the token itself (see
+`024-code-placement.md`). The staff log in only to staff-app, and processor-app takes that token, so
+one login serves both staff apps.
 
 **An unknown email costs as much as a wrong password.** Each login use case checks the password
 before it looks at whether the user was found, and passes `passwordHash: null` for an unknown email;
@@ -73,20 +70,20 @@ filter.
 
 ## One token per audience
 
-Each app signs and verifies with its `JWT_SECRET` and its audience: `staff` for staff-app and
-processor-app, which share the secret, and `customer` for customer-app, which has its own. A token
-of customer-app is refused by the staff apps with 401, and the other way round, even if the secrets
-were the same (see `002-global-auth-guards.md`). Login carries `@Public()`; without it the global
-JWT guard would answer 401 before the controller runs. The token carries only `sub`, `aud`, `iat`
-and `exp`, and its lifetime is `JWT_EXPIRES_IN`. Signing lives in `libs/credentials` (see
-`017-credentials-lib.md`).
+Each app verifies with its `JWT_SECRET` and its audience: `staff` for staff-app and processor-app,
+which share the secret, and `customer` for customer-app, which has its own. staff-app and
+customer-app sign with the same pair; processor-app signs nothing. A token of customer-app is
+refused by the staff apps with 401, and the other way round, even if the secrets were the same (see
+`002-global-auth-guards.md`). Login carries `@Public()`; without it the global JWT guard would
+answer 401 before the controller runs. The token carries only `sub`, `aud`, `iat` and `exp`, and its
+lifetime is `JWT_EXPIRES_IN`. Signing lives in `libs/credentials` (see `017-credentials-lib.md`).
 
 **A disabled account stops at once, a token of an active one only at expiry.** The guard re-reads
 the user on every request (see `002-global-auth-guards.md`), so a disabled account or a changed role
 applies to the next call. Nothing revokes the token of an active user: there is no logout and no
 list of issued tokens, so a leaked token works until `exp`. The lifetime bounds that window, and it
-is short where the token carries the most power: `12h` in staff-app and processor-app, a working day
-without a second login, and `7d` in customer-app.
+is short where the token carries the most power: `12h` for the staff, a working day without a second
+login, and `7d` in customer-app.
 
 ## Limits on the public routes
 
@@ -97,10 +94,10 @@ app.
 of `libs/http` mounts `ThrottleGuard`, a subclass of the `ThrottlerGuard` of `@nestjs/throttler`, as
 a global guard with two throttlers: `default` from `THROTTLE_TTL_MS` and `THROTTLE_LIMIT` on every
 route, and `auth` from `THROTTLE_AUTH_TTL_MS` and `THROTTLE_AUTH_LIMIT` on the routes marked
-`@AuthThrottle()`: login in the three apps and registration in customer-app. A request over a limit
-gets `429` with `{ statusCode, message: 'Too many requests' }` and a `Retry-After` header,
-`Retry-After-auth` for the second throttler. The guard counts per route and per client address; the
-address is `req.ip`, so behind a proxy it needs `HTTP_TRUST_PROXY_HOPS` (see
+`@AuthThrottle()`: login in staff-app and customer-app and registration in customer-app. A request
+over a limit gets `429` with `{ statusCode, message: 'Too many requests' }` and a `Retry-After`
+header, `Retry-After-auth` for the second throttler. The guard counts per route and per client
+address; the address is `req.ip`, so behind a proxy it needs `HTTP_TRUST_PROXY_HOPS` (see
 `036-production-stack.md`).
 
 **The guard throws an object body.** The `ThrottlerException` of the package carries a string, and

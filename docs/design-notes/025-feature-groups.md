@@ -6,7 +6,7 @@ code of its own.
 | Group       | Modules                      | Routes                                                  |
 | ----------- | ---------------------------- | ------------------------------------------------------- |
 | `access`    | `permission`, `role`, `user` | `/access/permissions`, `/access/roles`, `/access/users` |
-| `tools`     | `note`, `reminder`, `tag`    | `/tools/notes`, `/tools/reminders`, `/tools/tags`       |
+| `tools`     | `note`, `tag`                | `/tools/notes`, `/tools/tags`                           |
 | `catalog`   | `product`                    | `/catalog/products`                                     |
 | `sales`     | `order`                      | `/sales/orders`                                         |
 | `warehouse` | `product-stock`              | `/warehouse/product-stock`                              |

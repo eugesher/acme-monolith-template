@@ -2,8 +2,6 @@ export * from './enums/product-exception-code.enum';
 
 export * from './exceptions/base/product-base.exception';
 export * from './exceptions/product-already-archived.exception';
-export * from './exceptions/product-idempotency-key-reused.exception';
-export * from './exceptions/product-idempotent-request-in-flight.exception';
 export * from './exceptions/product-name-invalid.exception';
 export * from './exceptions/product-not-found.exception';
 export * from './exceptions/product-sku-invalid.exception';

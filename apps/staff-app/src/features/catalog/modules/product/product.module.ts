@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { HttpExceptionFilter } from '@acme-libs/http';
-import { IdempotencyCoreModule } from '@acme-core/modules/idempotency';
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 import { ProductCoreModule } from '@acme-core/modules/product';
 import { TagCommonModule } from '@acme-staff/common/modules';
@@ -24,7 +23,6 @@ import {
   ProductConfigOccRetryAttemptsProvider,
   ProductCreateRepository,
   ProductGetManyRepository,
-  ProductIdempotencyCoreAdapter,
   ProductLedgerCoreAdapter,
   ProductReplaceTagsRepository,
   ProductStatusCoreAdapter,
@@ -35,7 +33,7 @@ import {
 import { ProductController } from './presentation';
 
 @Module({
-  imports: [LedgerCoreModule, TagCommonModule, IdempotencyCoreModule, ProductCoreModule],
+  imports: [LedgerCoreModule, TagCommonModule, ProductCoreModule],
   controllers: [ProductController],
   providers: [
     HttpExceptionFilter,
@@ -56,7 +54,6 @@ import { ProductController } from './presentation';
     ProductWriteRepository.provider,
     ProductTagCommonAdapter.provider,
     ProductStatusCoreAdapter.provider,
-    ProductIdempotencyCoreAdapter.provider,
     ProductCatalogCacheAdapter.provider,
     ProductLedgerCoreAdapter.provider,
     ProductTransactionAdapter.provider,

@@ -2,7 +2,7 @@
 
 A closed set of values is an enum, never a union of string literals. A lone literal joins the enum
 it belongs to: the liveness answer is `HealthLivenessStatusEnum.OK`, a replayed claim is
-`ProductIdempotencyOutcomeEnum.REPLAY`.
+`ProductStockIdempotencyOutcomeEnum.REPLAY`.
 
 ## Where an enum lives
 

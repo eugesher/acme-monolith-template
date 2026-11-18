@@ -7,30 +7,10 @@ describe('CACHE_KEYS', () => {
     expect(key).toBe('acme:health:probe');
   });
 
-  it('keeps the health probe key out of every reminder summary prefix', () => {
+  it('keeps the health probe key out of the catalog prefix', () => {
     const key = CACHE_KEYS.healthProbe();
 
-    expect(key.startsWith(CACHE_KEYS.reminderSummaryPrefix(''))).toBe(false);
-  });
-
-  describe('reminderSummary', () => {
-    it('builds a versioned, namespaced key of the owner', () => {
-      const key = CACHE_KEYS.reminderSummary('owner-1');
-
-      expect(key).toBe('acme:reminders:summary:v1:owner-1:__all__');
-    });
-
-    it('starts with its prefix, so delByPrefix clears every facet of the owner', () => {
-      const prefix = CACHE_KEYS.reminderSummaryPrefix('owner-1');
-
-      expect(prefix).toBe('acme:reminders:summary:v1:owner-1:');
-    });
-
-    it('keys of different owners do not share a prefix', () => {
-      const key = CACHE_KEYS.reminderSummary('owner-10');
-
-      expect(key.startsWith(CACHE_KEYS.reminderSummaryPrefix('owner-1'))).toBe(false);
-    });
+    expect(key.startsWith(CACHE_KEYS.catalogPrefix())).toBe(false);
   });
 
   describe('catalogPage', () => {
@@ -44,12 +24,6 @@ describe('CACHE_KEYS', () => {
       const prefix = CACHE_KEYS.catalogPrefix();
 
       expect(prefix).toBe('acme:catalog:v1:');
-    });
-
-    it('keeps the catalog keys apart from the reminder summaries', () => {
-      const key = CACHE_KEYS.catalogPage(1, 20);
-
-      expect(key.startsWith(CACHE_KEYS.reminderSummaryPrefix(''))).toBe(false);
     });
   });
 });

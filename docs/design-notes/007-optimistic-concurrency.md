@@ -10,8 +10,7 @@ A row with a `version` column is changed through a write service that retries a 
 | retry helper      | `OccRetryHelper` in `libs/toolkit/src/concurrency/occ-retry.helper.ts`                                                    |
 | `If-Match`        | `apps/staff-app/src/common/shared/concurrency/decorators/if-match.decorator.ts`                                           |
 
-The same pattern serves `ReminderWriteService` and `NoteWriteService` in
-`apps/staff-app/src/features/tools/modules`.
+The same pattern serves `NoteWriteService` in `apps/staff-app/src/features/tools/modules/note`.
 
 ## One attempt
 

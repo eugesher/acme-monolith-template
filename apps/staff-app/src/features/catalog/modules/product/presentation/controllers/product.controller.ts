@@ -7,12 +7,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser, RequiresPermission } from '@acme-libs/auth';
-import { IdempotencyKey } from '@acme-libs/http';
+import { RequiresPermission } from '@acme-libs/auth';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 import { IfMatch } from '@acme-staff/common/shared';
 import type { Maybe } from '@acme-libs/toolkit';
-import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import {
   ProductArchiveUseCase,
@@ -53,18 +51,12 @@ export class ProductController {
 
   @Post()
   @RequiresPermission(PermissionCodeEnum.PRODUCT_WRITE)
-  @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'At most 128 characters' })
-  @ApiOperation({ summary: 'Create a product (idempotent)' })
+  @ApiOperation({ summary: 'Create a product' })
   @ApiCreatedResponse({ type: ProductResponseDto })
-  public async handleCreate(
-    @CurrentUser() user: IAuthCurrentUserView,
-    @Body() body: ProductCreateRequestDto,
-    @IdempotencyKey() idempotencyKey: string,
-  ): Promise<ProductResponseDto> {
-    const { id: staffUserId } = user;
+  public async handleCreate(@Body() body: ProductCreateRequestDto): Promise<ProductResponseDto> {
     const { sku, name } = body;
 
-    return await this.create.execute({ sku, name, staffUserId, idempotencyKey });
+    return await this.create.execute({ sku, name });
   }
 
   @Get()

@@ -35,6 +35,8 @@ export class ConfigSchema {
   };
   public static readonly AUTH: Joi.SchemaMap = {
     JWT_SECRET: Joi.string().min(32).required(),
+  };
+  public static readonly CREDENTIALS: Joi.SchemaMap = {
     JWT_EXPIRES_IN: Joi.string()
       .pattern(/^[1-9]\d*[smhdwy]$/)
       .required(),

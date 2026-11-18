@@ -82,19 +82,18 @@ the rows another feature's tests read. Unrelated tables may use one range. A row
 gets the next `AUTO_INCREMENT` value after the highest seeded id, and tests find it through
 `MAX(id)` read before the call, never by a literal.
 
-| Feature  | Tables                   | Range   |
-| -------- | ------------------------ | ------- |
-| access   | `staff_role`             | 1–99    |
-| access   | `staff_user`             | 1–99    |
-| auth     | `customer`               | 101–199 |
-| product  | `product`                | 100–199 |
-| note     | `note`, `note_revision`  | 200–299 |
-| reminder | `reminder`               | 300–399 |
-| ledger   | `ledger_entry`           | 400–499 |
-| tag      | `tag`                    | 300–399 |
-| tag      | `subject_tag`            | 400–499 |
-| order    | `order`, `order_product` | 600–699 |
-| stock    | `product_stock`          | 700–799 |
+| Feature | Tables                   | Range   |
+| ------- | ------------------------ | ------- |
+| access  | `staff_role`             | 1–99    |
+| access  | `staff_user`             | 1–99    |
+| auth    | `customer`               | 101–199 |
+| product | `product`                | 100–199 |
+| note    | `note`, `note_revision`  | 200–299 |
+| ledger  | `ledger_entry`           | 400–499 |
+| tag     | `tag`                    | 300–399 |
+| tag     | `subject_tag`            | 400–499 |
+| order   | `order`, `order_product` | 600–699 |
+| stock   | `product_stock`          | 700–799 |
 
 ## Observability
 

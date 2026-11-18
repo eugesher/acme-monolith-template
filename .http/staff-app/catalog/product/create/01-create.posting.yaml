@@ -1,8 +1,8 @@
 name: 01-create
 description: |-
-  e2e: Catalog › Product › POST /api/catalog/products › should create a draft, record the key and the ledger entry under the correlation id
+  e2e: Catalog › Product › POST /api/catalog/products › should create a draft and queue the ledger record under the correlation id
 
-  Expect: 201 Created; product, a completed idempotency_key row and a ledger entry product-created with correlation_id e2e-product-create
+  Expect: 201 Created; product and a ledger entry product-created with correlation_id e2e-product-create
   User: editor@example.com (token signed by scripts.py)
 method: POST
 url: $STAFF_APP_BASE_URL/catalog/products
@@ -17,8 +17,6 @@ auth:
   bearer_token:
     token: $token
 headers:
-  - name: Idempotency-Key
-    value: e2e-create-key
   - name: x-correlation-id
     value: e2e-product-create
   - name: Content-Type

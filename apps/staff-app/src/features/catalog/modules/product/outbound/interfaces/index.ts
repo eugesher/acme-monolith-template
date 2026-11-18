@@ -1,4 +1,3 @@
-export * from './commands/product-idempotency.command';
 export * from './commands/product-ledger.command';
 export * from './commands/product-status.command';
 export * from './commands/product-tag.command';
@@ -13,6 +12,5 @@ export * from './records/product-get-many.record';
 export * from './records/product-replace-tags.record';
 export * from './records/product-write.record';
 
-export * from './views/product-idempotency.view';
 export * from './views/product-status.view';
 export * from './views/product-tag.view';

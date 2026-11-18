@@ -356,4 +356,44 @@ export class NoteE2E {
       });
     });
   }
+
+  public handleDelete(): void {
+    describe('DELETE /api/tools/notes/:noteId', () => {
+      it('should soft-delete a note and hide it from every read', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .delete('/api/tools/notes/200')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .expect(HttpStatus.NO_CONTENT);
+        const getOneResponse = await request(this.ctx.app.getHttpServer())
+          .get('/api/tools/notes/200')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .expect(HttpStatus.NOT_FOUND);
+        const getRevisionsResponse = await request(this.ctx.app.getHttpServer())
+          .get('/api/tools/notes/200/revisions')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .expect(HttpStatus.NOT_FOUND);
+
+        expect({
+          response: { body: response.body },
+          getOne: { body: getOneResponse.body },
+          getRevisions: { body: getRevisionsResponse.body },
+          db: { note: await this.ctx.dataSource.query('SELECT * FROM note WHERE id = 200') },
+        }).toMatchSnapshot({
+          db: { note: [{ updated_at: expect.any(Date), deleted_at: expect.any(Date) }] },
+        });
+      });
+
+      it('should hide the note of another staff user with 404 and delete nothing', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .delete('/api/tools/notes/204')
+          .auth(this.ctx.viewerToken, { type: 'bearer' })
+          .expect(HttpStatus.NOT_FOUND);
+
+        expect({
+          response: { body: response.body },
+          db: { note: await this.ctx.dataSource.query('SELECT * FROM note WHERE id = 204') },
+        }).toMatchSnapshot();
+      });
+    });
+  }
 }
