@@ -1,11 +1,11 @@
+import { Inject } from '@nestjs/common';
+
+import { ORM_PORT, type IHostedRepository, type IOrmPort } from '@acme-libs/contracts/database';
 import { StaffRole, StaffUser, StaffUserRole } from '@acme-core/entities';
-import type { IHostedRepository, IOrmPort } from '@acme-libs/contracts/database';
 
 import { UserPersistenceStaffRoleBuilder } from '../builders/user-persistence-staff-role.builder';
 
 export abstract class UserPersistenceHost {
-  protected abstract readonly orm: IOrmPort;
-
   protected get staffUserRepository(): IHostedRepository<StaffUser> {
     return this.orm.getRepository(StaffUser);
   }
@@ -17,6 +17,11 @@ export abstract class UserPersistenceHost {
   protected get staffRoleRepository(): IHostedRepository<StaffRole> {
     return this.orm.getRepository(StaffRole);
   }
+
+  constructor(
+    @Inject(ORM_PORT)
+    protected readonly orm: IOrmPort,
+  ) {}
 
   protected createStaffRoleBuilder(): UserPersistenceStaffRoleBuilder {
     return new UserPersistenceStaffRoleBuilder(

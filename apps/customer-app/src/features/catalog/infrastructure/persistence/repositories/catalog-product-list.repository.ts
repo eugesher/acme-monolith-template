@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   CATALOG_PRODUCT_LIST_REPOSITORY_PORT,
@@ -19,13 +17,6 @@ export class CatalogProductListRepository
     provide: CATALOG_PRODUCT_LIST_REPOSITORY_PORT,
     useClass: CatalogProductListRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async list(query: ICatalogProductListQuery): Promise<ICatalogProductListRecord> {
     return await this.createProductBuilder().forList(query).getManyAndCount();

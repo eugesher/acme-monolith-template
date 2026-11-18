@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   LEDGER_LIST_ENTRIES_REPOSITORY_PORT,
@@ -19,13 +17,6 @@ export class LedgerListEntriesRepository
     provide: LEDGER_LIST_ENTRIES_REPOSITORY_PORT,
     useClass: LedgerListEntriesRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async list(query: ILedgerListEntriesQuery): Promise<ILedgerListEntriesRecord> {
     return await this.createLedgerEntryBuilder().forList(query).getManyAndCount();

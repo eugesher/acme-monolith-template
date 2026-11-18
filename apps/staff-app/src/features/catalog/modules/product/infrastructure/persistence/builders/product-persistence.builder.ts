@@ -11,18 +11,6 @@ export class ProductPersistenceBuilder extends SelectQueryBuilder<Product> {
     return this;
   }
 
-  public forExistsBySku(sku: string): this {
-    this.where(`${this.alias}.sku = :sku`, { sku });
-
-    return this;
-  }
-
-  public forInserted(productId: string): this {
-    this.selectProduct().whereId(productId);
-
-    return this;
-  }
-
   public forList(query: IProductGetManyListQuery): this {
     const { limit, offset, productIds } = query;
 

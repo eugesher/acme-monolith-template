@@ -24,11 +24,11 @@ describe('ProductCorePersistenceBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forId', () => {
+  describe('forById', () => {
     it('selects the product with the time of its last update', () => {
       const builder = new ProductCorePersistenceBuilder(baseBuilder);
 
-      builder.forId('100');
+      builder.forById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL )',

@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   AUTH_REGISTER_REPOSITORY_PORT,
@@ -22,31 +21,20 @@ export class AuthRegisterRepository
     useClass: AuthRegisterRepository,
   };
 
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
-
   public async insert(
     query: IAuthRegisterCustomerInsertQuery,
   ): Promise<IAuthRegisterCustomerInsertRecord> {
-    try {
-      const insertResult = await this.customerRepository.insert(query);
-      const [customerRow] = insertResult.generatedMaps as {
-        id: number | string;
-        createdAt: Date;
-      }[];
-      const { id, createdAt } = customerRow;
+    const insertedRows = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.customerRepository.insertReturning([query]),
+    );
 
-      return { outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED, id: String(id), createdAt };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (insertedRows === null) {
+      return { outcome: AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE };
     }
+
+    const [customerRow] = insertedRows;
+    const { id, createdAt } = customerRow;
+
+    return { outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED, id, createdAt };
   }
 }

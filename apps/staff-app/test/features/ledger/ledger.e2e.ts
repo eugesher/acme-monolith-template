@@ -2,7 +2,12 @@ import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
+import {
+  LEDGER_CORE_PORT,
+  LedgerCoreActionEnum,
+  LedgerCoreSubjectTypeEnum,
+  type ILedgerCorePort,
+} from '@acme-core/contracts/ledger';
 
 import type { AppE2EContext } from '../../context/app-e2e.context';
 
@@ -43,9 +48,9 @@ export class LedgerE2E {
         const ledger = this.ctx.moduleFixture.get<ILedgerCorePort>(LEDGER_CORE_PORT);
         const record = {
           operationKey: 'e2e-enqueue:1',
-          subjectType: 'product',
+          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
           subjectId: '100',
-          action: 'ProductCreated',
+          action: LedgerCoreActionEnum.PRODUCT_CREATED,
           payload: { name: 'Twice' },
           occurredAt: '2026-01-05T08:00:00.000Z',
         };

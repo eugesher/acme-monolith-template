@@ -44,46 +44,6 @@ describe('ProductPersistenceBuilder', () => {
     });
   });
 
-  describe('forExistsBySku', () => {
-    it('filters the products by sku', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-
-      builder.forExistsBySku('SKU-0001');
-
-      expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`createdAt` AS `Product_createdAt`, `Product`.`updatedAt` AS `Product_updatedAt`, `Product`.`deletedAt` AS `Product_deletedAt` FROM `product` `Product` WHERE ( `Product`.`sku` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
-        ['SKU-0001'],
-      ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-      const chained = builder.forExistsBySku('SKU-0001');
-
-      expect(chained).toBe(builder);
-    });
-  });
-
-  describe('forInserted', () => {
-    it('selects the inserted product by id', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-
-      builder.forInserted('100');
-
-      expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`createdAt` AS `Product_createdAt`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
-        ['100'],
-      ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-      const chained = builder.forInserted('100');
-
-      expect(chained).toBe(builder);
-    });
-  });
-
   describe('forList', () => {
     it('selects every product newest first inside the page window', () => {
       const builder = new ProductPersistenceBuilder(baseBuilder);

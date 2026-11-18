@@ -7,7 +7,7 @@ describe('ProductStockCoreLockUseCase', () => {
 
   beforeEach(() => {
     lockProducts = jest.fn().mockResolvedValue([{ id: '100' }, { id: '103' }]);
-    sumStock = jest.fn().mockResolvedValue([{ productId: '100', quantity: '8' }]);
+    sumStock = jest.fn().mockResolvedValue([{ productId: '100', quantity: 8 }]);
     useCase = new ProductStockCoreLockUseCase({ lockProducts, sumStock });
   });
 

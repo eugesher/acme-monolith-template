@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   NOTE_GET_MANY_REPOSITORY_PORT,
@@ -19,13 +17,6 @@ export class NoteGetManyRepository
     provide: NOTE_GET_MANY_REPOSITORY_PORT,
     useClass: NoteGetManyRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async list(query: INoteGetManyListQuery): Promise<INoteGetManyRecord> {
     return await this.createNoteBuilder().forList(query).getManyAndCount();

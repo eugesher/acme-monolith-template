@@ -2,6 +2,7 @@ import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { HealthDependencyStatusEnum } from '@acme-libs/kernel';
+import { DeadlineHelper } from '@acme-libs/toolkit';
 import { CACHE_KEYS, CACHE_LIB_PORT, type ICacheLibPort } from '@acme-libs/contracts/cache';
 import type {
   IHealthLibDependenciesView,
@@ -39,23 +40,16 @@ export class HealthLibDependencyProbeAdapter implements IHealthLibDependencyProb
 
   private static async timed(probe: () => Promise<unknown>): Promise<IHealthLibDependencyView> {
     const startedAt = Date.now();
-    let timer: NodeJS.Timeout | undefined;
-
-    const timeout = new Promise<never>((_, reject) => {
-      timer = setTimeout(
-        () => reject(new Error('probe timed out')),
-        HealthLibDependencyProbeAdapter.TIMEOUT_MS,
-      );
-    });
 
     try {
-      await Promise.race([probe(), timeout]);
+      await DeadlineHelper.race(probe, {
+        timeoutMs: HealthLibDependencyProbeAdapter.TIMEOUT_MS,
+        message: 'probe timed out',
+      });
 
       return { status: HealthDependencyStatusEnum.OK, latencyMs: Date.now() - startedAt };
     } catch {
       return { status: HealthDependencyStatusEnum.ERROR, latencyMs: null };
-    } finally {
-      clearTimeout(timer);
     }
   }
 }

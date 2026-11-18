@@ -14,7 +14,7 @@ export class ProductStockCoreOnHandModel {
       const productId = product.id;
       const stockSum = stockSums.find((candidate) => candidate.productId === productId);
 
-      return { productId, quantity: Number(stockSum?.quantity ?? 0) };
+      return { productId, quantity: stockSum?.quantity ?? 0 };
     });
 
     return new ProductStockCoreOnHandModel(stockOnHand);

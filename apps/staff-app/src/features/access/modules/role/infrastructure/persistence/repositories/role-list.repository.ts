@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   ROLE_LIST_REPOSITORY_PORT,
@@ -15,13 +13,6 @@ export class RoleListRepository extends RolePersistenceHost implements IRoleList
     provide: ROLE_LIST_REPOSITORY_PORT,
     useClass: RoleListRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async list(): Promise<IRoleListRecord[]> {
     return await this.createStaffRoleBuilder().forList().getMany();

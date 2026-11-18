@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper, type Nullable } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
@@ -23,34 +22,23 @@ export class IdempotencyCoreClaimRepository
     useClass: IdempotencyCoreClaimRepository,
   };
 
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
-
   public async insert(
     query: IIdempotencyCoreClaimInsertQuery,
   ): Promise<IdempotencyCoreClaimInsertOutcomeEnum> {
-    try {
-      await this.idempotencyKeyRepository.insert(query);
+    const insertResult = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.idempotencyKeyRepository.insert(query),
+    );
 
-      return IdempotencyCoreClaimInsertOutcomeEnum.INSERTED;
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return IdempotencyCoreClaimInsertOutcomeEnum.DUPLICATE;
-      }
-
-      throw error;
+    if (insertResult === null) {
+      return IdempotencyCoreClaimInsertOutcomeEnum.DUPLICATE;
     }
+
+    return IdempotencyCoreClaimInsertOutcomeEnum.INSERTED;
   }
 
   public async findByKey(
     query: IIdempotencyCoreClaimFindQuery,
   ): Promise<Nullable<IIdempotencyCoreClaimRecord>> {
-    const { scope, key } = query;
-
-    return await this.createIdempotencyKeyBuilder().forByKey(scope, key).getOne();
+    return await this.createIdempotencyKeyBuilder().forByKey(query).getOne();
   }
 }

@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   PRODUCT_STOCK_CORE_MOVE_REPOSITORY_PORT,
@@ -20,22 +18,9 @@ export class ProductStockCoreMoveRepository
     useClass: ProductStockCoreMoveRepository,
   };
 
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
-
   public async insertMany(
     queries: IProductStockCoreMoveInsertQuery[],
   ): Promise<IProductStockCoreMoveInsertRecord[]> {
-    if (queries.length === 0) {
-      return [];
-    }
-
-    const insertResult = await this.productStockRepository.insert(queries);
-
-    return insertResult.generatedMaps as IProductStockCoreMoveInsertRecord[];
+    return await this.productStockRepository.insertReturning(queries);
   }
 }

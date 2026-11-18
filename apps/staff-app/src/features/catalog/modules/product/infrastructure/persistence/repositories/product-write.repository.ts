@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   PRODUCT_WRITE_REPOSITORY_PORT,
@@ -18,13 +16,6 @@ export class ProductWriteRepository
     provide: PRODUCT_WRITE_REPOSITORY_PORT,
     useClass: ProductWriteRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async update(query: IProductWriteUpdateQuery): Promise<boolean> {
     const { id, versionAsRead, name, status, version } = query;

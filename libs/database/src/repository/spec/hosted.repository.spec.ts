@@ -36,4 +36,30 @@ describe('HostedRepository', () => {
       expect(id).toBe('9007199254740993');
     });
   });
+
+  describe('insertReturning', () => {
+    it('inserts the rows and answers the id of each as a string with its creation time', async () => {
+      insert.mockResolvedValue({
+        generatedMaps: [
+          { id: 12, createdAt: new Date('2026-01-05T08:00:00.000Z') },
+          { id: '9007199254740993', createdAt: new Date('2026-01-05T08:00:01.000Z') },
+        ],
+      });
+
+      const insertedRows = await repository.insertReturning([{ name: 'Lamp' }, { name: 'Desk' }]);
+
+      expect(insertedRows).toEqual([
+        { id: '12', createdAt: new Date('2026-01-05T08:00:00.000Z') },
+        { id: '9007199254740993', createdAt: new Date('2026-01-05T08:00:01.000Z') },
+      ]);
+      expect(insert).toHaveBeenCalledWith([{ name: 'Lamp' }, { name: 'Desk' }]);
+    });
+
+    it('answers no rows and sends no statement for an empty list', async () => {
+      const insertedRows = await repository.insertReturning([]);
+
+      expect(insertedRows).toEqual([]);
+      expect(insert).not.toHaveBeenCalled();
+    });
+  });
 });

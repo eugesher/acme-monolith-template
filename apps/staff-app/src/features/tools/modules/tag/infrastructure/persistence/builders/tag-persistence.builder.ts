@@ -11,12 +11,6 @@ export class TagPersistenceBuilder extends SelectQueryBuilder<Tag> {
     return this;
   }
 
-  public forInserted(tagId: string): this {
-    this.selectTag().where(`${this.alias}.id = :tagId`, { tagId });
-
-    return this;
-  }
-
   public forList(query: ITagGetManyQuery): this {
     const { limit, offset } = query;
 

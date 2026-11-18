@@ -37,10 +37,10 @@ describe('ProductStockCoreMovementsModel', () => {
   });
 
   describe('toRows', () => {
-    it('answers every inserted row with its id as a string and its creation time', () => {
+    it('answers every inserted row with its id and its creation time', () => {
       expect(
         ProductStockCoreMovementsModel.toRows([
-          { id: 700, createdAt: new Date('2026-01-05T08:00:00.000Z') },
+          { id: '700', createdAt: new Date('2026-01-05T08:00:00.000Z') },
           { id: '701', createdAt: new Date('2026-01-05T08:00:00.000Z') },
         ]),
       ).toEqual([

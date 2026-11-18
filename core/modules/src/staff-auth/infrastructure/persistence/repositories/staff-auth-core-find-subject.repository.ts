@@ -1,6 +1,5 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import {
@@ -19,13 +18,6 @@ export class StaffAuthCoreFindSubjectRepository
     provide: STAFF_AUTH_CORE_FIND_SUBJECT_REPOSITORY_PORT,
     useClass: StaffAuthCoreFindSubjectRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async findActiveById(
     id: string,

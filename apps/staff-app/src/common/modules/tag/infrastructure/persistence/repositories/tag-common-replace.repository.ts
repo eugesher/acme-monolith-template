@@ -1,7 +1,5 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 import { In } from 'typeorm';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   TAG_COMMON_REPLACE_REPOSITORY_PORT,
@@ -23,13 +21,6 @@ export class TagCommonReplaceRepository
     provide: TAG_COMMON_REPLACE_REPOSITORY_PORT,
     useClass: TagCommonReplaceRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async lockTags(tagIds: string[]): Promise<ITagCommonReplaceTagRecord[]> {
     if (tagIds.length === 0) {

@@ -50,7 +50,7 @@ export class UserReassignRolesUseCase {
     const { userId, roleIds } = command;
     const userRoleInsertQueries = userRoles.getUserRoles();
 
-    await this.repository.deleteUserRolesExcept(userId, roleIds);
+    await this.repository.deleteUserRolesExcept({ userId, roleIds });
     await this.repository.insertUserRolesIgnore(userRoleInsertQueries);
   }
 }

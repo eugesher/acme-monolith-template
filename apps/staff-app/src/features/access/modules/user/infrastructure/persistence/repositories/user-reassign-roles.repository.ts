@@ -1,11 +1,11 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
+import { In, Not } from 'typeorm';
 
 import {
   USER_REASSIGN_ROLES_REPOSITORY_PORT,
   type IUserReassignRolesRepositoryPort,
   type IUserReassignRolesStaffRoleRecord,
+  type IUserReassignRolesStaffUserRoleDeleteQuery,
   type IUserReassignRolesStaffUserRoleInsertQuery,
 } from '../../../outbound';
 import { UserPersistenceHost } from '../host/user-persistence.host';
@@ -20,13 +20,6 @@ export class UserReassignRolesRepository
     useClass: UserReassignRolesRepository,
   };
 
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
-
   public async existsUser(id: string): Promise<boolean> {
     return await this.staffUserRepository.existsBy({ id });
   }
@@ -39,18 +32,18 @@ export class UserReassignRolesRepository
     return await this.createStaffRoleBuilder().forByIds(ids).getMany();
   }
 
-  public async deleteUserRolesExcept(userId: string, roleIds: string[]): Promise<void> {
+  public async deleteUserRolesExcept(
+    query: IUserReassignRolesStaffUserRoleDeleteQuery,
+  ): Promise<void> {
+    const { userId, roleIds } = query;
+
     if (roleIds.length === 0) {
       await this.staffUserRoleRepository.delete({ userId });
 
       return;
     }
 
-    await this.staffUserRoleRepository
-      .createQueryBuilder()
-      .delete()
-      .where('user_id = :userId AND role_id NOT IN (:...roleIds)', { userId, roleIds })
-      .execute();
+    await this.staffUserRoleRepository.delete({ userId, roleId: Not(In(roleIds)) });
   }
 
   public async insertUserRolesIgnore(

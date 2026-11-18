@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   TAG_CREATE_REPOSITORY_PORT,
@@ -20,28 +19,19 @@ export class TagCreateRepository extends TagPersistenceHost implements ITagCreat
     useClass: TagCreateRepository,
   };
 
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
-
   public async insert(query: ITagCreateQuery): Promise<ITagCreateInsertRecord> {
-    try {
-      const tagId = await this.tagRepository.insertOne(query);
+    const tagId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.tagRepository.insertOne(query),
+    );
 
-      return { outcome: TagCreateInsertOutcomeEnum.INSERTED, id: tagId };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: TagCreateInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (tagId === null) {
+      return { outcome: TagCreateInsertOutcomeEnum.DUPLICATE };
     }
+
+    return { outcome: TagCreateInsertOutcomeEnum.INSERTED, id: tagId };
   }
 
   public async findInserted(tagId: string): Promise<ITagCreateRecord> {
-    return await this.createTagBuilder().forInserted(tagId).getOneOrFail();
+    return await this.createTagBuilder().forById(tagId).getOneOrFail();
   }
 }

@@ -31,7 +31,7 @@ export class ProductStockCoreMovementsModel {
   public static toRows(
     rows: IProductStockCoreMovementsInsertedRow[],
   ): IProductStockCoreMovementsRow[] {
-    return rows.map((row) => ({ id: String(row.id), createdAt: row.createdAt.toISOString() }));
+    return rows.map((row) => ({ id: row.id, createdAt: row.createdAt.toISOString() }));
   }
 
   public toInsertPayloads(): IProductStockCoreMovementsInsertPayload[] {

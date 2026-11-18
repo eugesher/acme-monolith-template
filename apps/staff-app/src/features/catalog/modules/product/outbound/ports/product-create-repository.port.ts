@@ -5,7 +5,6 @@ import type {
 } from '../interfaces';
 
 export interface IProductCreateRepositoryPort {
-  existsBySku(sku: string): Promise<boolean>;
   insert(query: IProductCreateInsertQuery): Promise<IProductCreateInsertRecord>;
   findInserted(productId: string): Promise<IProductCreateRecord>;
 }

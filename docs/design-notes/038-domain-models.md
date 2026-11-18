@@ -20,11 +20,12 @@ what the model answers.
 The record of the ledger carries the subject, the payload and the time of the change as the database
 stored it; the adapter of the port adds the operation key, the type of the subject and the action
 (see `022-enqueue-after-commit.md`). A row that was inserted gives its `createdAt`: product and
-order read it back, and the registration and a restock take it from the insert: TypeORM reads the
-defaults of an inserted row back into `generatedMaps` (`AuthRegisterRepository.insert`, core
-`ProductStockCoreMoveRepository.insertMany`, whose rows core `handleMove` answers). A row that was
-updated gives its `updatedAt` from a read after the update: the product write service reads the
-product again, and the core archive reads it with `findById`. No adapter stamps the time itself.
+order read it back, and the registration and a restock take it from the insert: `insertReturning` of
+the hosted repository answers the `createdAt` that TypeORM reads back into `generatedMaps` (see
+`034-orm-lib.md`; `AuthRegisterRepository.insert`, core `ProductStockCoreMoveRepository.insertMany`,
+whose rows core `handleMove` answers). A row that was updated gives its `updatedAt` from a read
+after the update: the product write service reads the product again, and the core archive reads it
+with `findById`. No adapter stamps the time itself.
 
 **Without an instance, a static method answers.** An idempotency key has only its scope and key, so
 `IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` names the fields of the log line. A

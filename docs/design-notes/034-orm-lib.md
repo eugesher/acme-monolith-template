@@ -2,11 +2,11 @@
 
 The connection of an app and the repositories its modules read through live in `libs/database`:
 
-| Part          | Entry                         | What it gives the app                                              |
-| ------------- | ----------------------------- | ------------------------------------------------------------------ |
-| `orm/`        | `OrmModule.forRoot(entities)` | the TypeORM connection, the transactions, global `ORM_PORT`        |
-| `repository/` | `HostedRepository`            | the repository a module gets: TypeORM `Repository` and `insertOne` |
-| `naming/`     | `SnakeNamingStrategy`         | snake_case names of tables and columns, for the app and its e2e    |
+| Part          | Entry                         | What it gives the app                                             |
+| ------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `orm/`        | `OrmModule.forRoot(entities)` | the TypeORM connection, the transactions, global `ORM_PORT`       |
+| `repository/` | `HostedRepository`            | the repository a module gets: six TypeORM methods and two inserts |
+| `naming/`     | `SnakeNamingStrategy`         | snake_case names of tables and columns, for the app and its e2e   |
 
 `AppModule` hands `OrmModule.forRoot` the entities of `app/entities` and nothing else (see
 `012-app-bootstrap.md`).
@@ -67,15 +67,42 @@ interface IOrmPort {
 ```
 
 `ORM_PORT` and `IHostedRepository` live in `@acme-libs/contracts/database`, the only contracts that
-may import `typeorm`. A repository injects the port and reads through it:
+may import `typeorm`. The persistence host of a module injects the port in its constructor, and
+every repository of the module reads through it:
 
 ```ts
-@Inject(ORM_PORT)
-protected readonly orm: IOrmPort,
+export abstract class ProductPersistenceHost {
+  constructor(
+    @Inject(ORM_PORT)
+    protected readonly orm: IOrmPort,
+  ) {}
+}
 ```
 
-The port exposes `getRepository` alone, so a repository can neither open a transaction nor reach the
-`DataSource`.
+**A repository declares no constructor.** It extends the host, directly or through a base
+repository, and carries only its `provider` and its methods. Nest reads the parameters of a class
+through its prototype chain: TypeScript and the SWC loader of the build put `design:paramtypes` and
+the token of `@Inject` on the host, and a class without a constructor has none of its own, so the
+repository gets `ORM_PORT` from the host. A repository that needs another dependency declares its
+own constructor and hands `orm` to `super`.
+
+The port exposes `getRepository` alone, and the repository it answers has no manager, so a
+repository can neither open a transaction nor reach the `DataSource` directly.
+
+**The repository a module gets is narrow.** `IHostedRepository` picks `createQueryBuilder`,
+`insert`, `update`, `delete`, `softDelete` and `existsBy` from the TypeORM `Repository` and adds
+`insertOne` and `insertReturning`. `manager`, `query`, `save` and the `find` methods stay out, so a
+repository sends no raw SQL and reads through the builders of its persistence host. A method a
+repository starts to need is added to the pick. The builder that `createQueryBuilder` answers still
+holds the connection: the pick closes the direct path, not every path.
+
+**The driver stays in the lib.** mysql2 answers a `bigint` id as a number or a string and a `SUM` as
+a `DECIMAL` string. `insertOne` answers the generated id as a string. `insertReturning(entities)`
+answers `{ id, createdAt }` for every inserted row, the id as a string and `createdAt` as TypeORM
+read it back into `generatedMaps`, and sends nothing for an empty list; it is for an entity with a
+`CreateDateColumn`. A raw row is converted by the repository that reads it: core
+`ProductStockCoreBaseRepository.sumStock` turns the sum into a number. Nothing past a repository
+sees `number | string`.
 
 ## Who sees the lib
 
