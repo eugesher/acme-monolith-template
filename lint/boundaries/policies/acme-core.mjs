@@ -1,5 +1,6 @@
 import {
   baseLibs,
+  coreDomain,
   from,
   fromFile,
   layerOf,
@@ -16,13 +17,14 @@ const layer = layerOf('acme-core:modules', ['module']);
 const ownContracts = to('acme-core:contracts', own('module'));
 
 export const acmeCore = [
-  from('acme-core:modules:domain', [layer('domain'), baseLibs()]),
+  from('acme-core:modules:domain', [layer('domain'), coreDomain, baseLibs()]),
   from('acme-core:modules:outbound', [layer('outbound'), ownContracts, baseLibs()]),
   fromFile('acme-core:modules:outbound', persistenceInterfaces, [to('acme-core:entities')]),
   from('acme-core:modules:application', [
     layer('domain'),
     layer('outbound'),
     layer('application'),
+    coreDomain,
     ownContracts,
     baseLibs('observability'),
     packages('nestjs-pino'),
@@ -76,5 +78,6 @@ export const acmeCore = [
   ]),
   from('acme-core:modules:index', [layer('shell')]),
   from('acme-core:contracts', [ownContracts, baseLibs()]),
+  from('acme-core:domain', [coreDomain, baseLibs()]),
   from('acme-core:entities', [to('acme-core:entities'), libs('kernel'), packages('typeorm')]),
 ];

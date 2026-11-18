@@ -1,4 +1,5 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
+import { EmailValue } from '@acme-core/domain';
 
 import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
 import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
@@ -9,18 +10,18 @@ import type {
 } from '../interfaces';
 
 export class AuthCustomerCandidateModel {
-  private static readonly EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private static readonly MIN_PASSWORD_LENGTH = 12;
 
   private constructor(
-    private email: string,
+    private readonly email: EmailValue,
     private readonly passwordHash: string,
   ) {}
 
   public static create(proposal: IAuthCustomerCandidateCreate): AuthCustomerCandidateModel {
     const { email, passwordHash } = proposal;
+    const customerEmail = EmailValue.create(email);
 
-    return new AuthCustomerCandidateModel(email, passwordHash);
+    return new AuthCustomerCandidateModel(customerEmail, passwordHash);
   }
 
   public static assertPasswordStrength(password: string): void {
@@ -29,21 +30,21 @@ export class AuthCustomerCandidateModel {
     }
   }
 
-  public normalizeEmail(): void {
-    this.email = this.email.trim().toLowerCase();
-  }
-
   public assertEmail(): void {
-    if (!AuthCustomerCandidateModel.EMAIL_PATTERN.test(this.email)) {
+    if (!this.email.isValid()) {
       throw new AuthEmailInvalidException();
     }
   }
 
   public toInsertPayload(): IAuthCustomerCandidateInsertPayload {
-    return { email: this.email, passwordHash: this.passwordHash, status: UserStatusEnum.ACTIVE };
+    return {
+      email: this.email.address,
+      passwordHash: this.passwordHash,
+      status: UserStatusEnum.ACTIVE,
+    };
   }
 
   public toRegistered(id: string): IAuthCustomerRegisterReconstitute {
-    return { id, email: this.email };
+    return { id, email: this.email.address };
   }
 }

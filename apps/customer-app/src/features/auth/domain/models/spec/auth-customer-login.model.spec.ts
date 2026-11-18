@@ -19,14 +19,6 @@ describe('AuthCustomerLoginModel', () => {
     });
   });
 
-  describe('normalizeEmail', () => {
-    it('trims the email and lowers its case', () => {
-      const email = AuthCustomerLoginModel.normalizeEmail('  Ann@Example.COM ');
-
-      expect(email).toBe('ann@example.com');
-    });
-  });
-
   describe('toLoggerPayload', () => {
     it('answers the id of the customer who logged in', () => {
       const customer = AuthCustomerLoginModel.reconstitute({

@@ -107,13 +107,13 @@ it as the row to insert: `ProductCreateModel.initCandidate(proposal)` answers
 **A candidate written to several tables, checked in steps, or answered without reading it back is a
 model of its own.** `<Model>CandidateModel.create(proposal)` only holds the request, and the use
 case calls the checks in order, so the order is read in one place: `validate()` and `assert…` refuse
-a request, `normalizeEmail()` rewrites a field before `assertEmail()` checks it. `toInsertPayload()`
-answers the main row and `create<Children>(id)` the child rows under the issued id:
-`RoleCandidateModel` writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel`
-writes `staff_user` and `staff_user_roles`. The answer comes without reading the row back: the
-candidate hands its stored row, and a model of the use case rebuilt from it answers the response,
-the record of the ledger and the line of the log, as `OrderPlaceModel` does from the record it reads
-after the insert. `AuthCustomerCandidateModel.toRegistered(id)` answers
+a request, `assertEmail()` checks the email the candidate holds as a value object.
+`toInsertPayload()` answers the main row and `create<Children>(id)` the child rows under the issued
+id: `RoleCandidateModel` writes `staff_role` and `staff_role_permissions`,
+`UserStaffUserCandidateModel` writes `staff_user` and `staff_user_roles`. The answer comes without
+reading the row back: the candidate hands its stored row, and a model of the use case rebuilt from
+it answers the response, the record of the ledger and the line of the log, as `OrderPlaceModel` does
+from the record it reads after the insert. `AuthCustomerCandidateModel.toRegistered(id)` answers
 `IAuthCustomerRegisterReconstitute` for `AuthCustomerRegisterModel`,
 `UserStaffUserCandidateModel.toRegistered(id)` feeds `UserStaffUserRegisterModel`, and
 `RoleCandidateModel.toCreated(id)` feeds `RoleCreateModel`.
@@ -174,8 +174,19 @@ case that only checks the entity exists asks for no model: `NoteAccessService.as
 
 **Use cases that share no state have models without an aggregate.** The login reads the hash and the
 status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and
-`AuthCustomerRegisterModel` stand alone. A rule both sides need is copied until an aggregate holds
-it: the candidate and the login model each normalize the email.
+`AuthCustomerRegisterModel` stand alone.
+
+**A value with one rule for every module is a value object of `core/domain`.** `EmailValue` of
+`@acme-core/domain` extends `ValueObject` of `libs/domain`: `EmailValue.create(email)` trims the
+email and lowers its case, so no email exists unnormalized, and `isValid()` answers whether its form
+holds. It answers a boolean, not an exception, as core refuses in no module's words (see
+`027-core-module-outcomes.md`): a candidate holds it and refuses with an exception of its own
+module, `AuthCustomerCandidateModel.assertEmail()` with `AuthEmailInvalidException` and
+`UserStaffUserCandidateModel.assertEmail()` with `UserEmailInvalidException`. The domain checks the
+form only where it writes an email; a login only builds the value before the read,
+`repository.findByEmail(customerEmail.address)`, as a malformed email finds no user and answers what
+an unknown email answers. The domain and the application of a feature, a processor, a common or a
+core module may import the core domain; the other layers may not.
 
 ## Access
 

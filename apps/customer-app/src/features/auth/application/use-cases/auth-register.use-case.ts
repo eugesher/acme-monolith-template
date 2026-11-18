@@ -38,7 +38,6 @@ export class AuthRegisterUseCase {
     const passwordHash = await this.credentials.hashPassword(password);
     const customerCandidate = AuthCustomerCandidateModel.create({ email, passwordHash });
 
-    customerCandidate.normalizeEmail();
     customerCandidate.assertEmail();
 
     const customerInsertPayload = customerCandidate.toInsertPayload();

@@ -19,10 +19,6 @@ export class AuthCustomerLoginModel {
     return new AuthCustomerLoginModel(id, passwordHash, status);
   }
 
-  public static normalizeEmail(email: string): string {
-    return email.trim().toLowerCase();
-  }
-
   public toLoggerPayload(): IAuthCustomerLoginLoggerPayload {
     return { id: this.id };
   }

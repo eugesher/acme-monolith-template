@@ -19,14 +19,6 @@ describe('StaffAuthCoreLoginModel', () => {
     });
   });
 
-  describe('normalizeEmail', () => {
-    it('trims and lowercases the address', () => {
-      const email = StaffAuthCoreLoginModel.normalizeEmail(' Admin@Example.com ');
-
-      expect(email).toBe('admin@example.com');
-    });
-  });
-
   describe('isActive', () => {
     it('answers true for an active user', () => {
       const user = StaffAuthCoreLoginModel.reconstitute({

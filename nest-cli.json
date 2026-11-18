@@ -163,6 +163,15 @@
         "tsConfigPath": "core/contracts/tsconfig.lib.json"
       }
     },
+    "core-domain": {
+      "type": "library",
+      "root": "core/domain",
+      "entryFile": "index",
+      "sourceRoot": "core/domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "core/domain/tsconfig.lib.json"
+      }
+    },
     "core-entities": {
       "type": "library",
       "root": "core/entities",

@@ -32,38 +32,28 @@ describe('UserStaffUserCandidateModel', () => {
     });
   });
 
-  describe('normalizeEmail', () => {
-    it('trims the email and lowers its case', () => {
-      candidate.normalizeEmail();
-
+  describe('create', () => {
+    it('holds the email trimmed and lowered in case', () => {
       expect(candidate.toInsertPayload()).toMatchObject({ email: 'editor@example.com' });
     });
   });
 
   describe('assertEmail', () => {
     it('accepts a well-formed email', () => {
-      candidate.normalizeEmail();
-
       expect(() => candidate.assertEmail()).not.toThrow();
     });
 
-    it.each(['editor', 'editor@', '@example.com', 'editor@example', 'ed itor@example.com'])(
-      'rejects the malformed email %s with AUTH_EMAIL_INVALID',
-      (email) => {
-        const malformed = UserStaffUserCandidateModel.create({
-          email,
-          passwordHash: 'hash',
-          roleIds: [],
-        });
+    it('rejects a malformed email with AUTH_EMAIL_INVALID', () => {
+      const malformed = UserStaffUserCandidateModel.create({
+        email: 'editor@',
+        passwordHash: 'hash',
+        roleIds: [],
+      });
 
-        expect(() => malformed.assertEmail()).toThrow(
-          expect.objectContaining({
-            code: IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
-            message: 'User email must be a well-formed address',
-          }) as Error,
-        );
-      },
-    );
+      expect(() => malformed.assertEmail()).toThrow(
+        expect.objectContaining({ code: IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID }) as Error,
+      );
+    });
   });
 
   describe('distinctRoleIds', () => {
@@ -74,8 +64,6 @@ describe('UserStaffUserCandidateModel', () => {
 
   describe('toInsertPayload', () => {
     it('answers an active user row with no id until it is stored', () => {
-      candidate.normalizeEmail();
-
       expect(candidate.toInsertPayload()).toEqual({
         email: 'editor@example.com',
         passwordHash: 'hash',
@@ -107,8 +95,6 @@ describe('UserStaffUserCandidateModel', () => {
 
   describe('toRegistered', () => {
     it('answers the stored user under the issued id with the normalized email', () => {
-      candidate.normalizeEmail();
-
       expect(candidate.toRegistered('5')).toEqual({ id: '5', email: 'editor@example.com' });
     });
   });

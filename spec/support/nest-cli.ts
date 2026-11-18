@@ -30,8 +30,8 @@ const projectOfAlias = (alias: string): string | null => {
     return `core-${core[1]}-${core[2]}`;
   }
 
-  if (alias === '@acme-core/entities') {
-    return 'core-entities';
+  if (alias === '@acme-core/domain' || alias === '@acme-core/entities') {
+    return alias.replace('@acme-core/', 'core-');
   }
 
   if (libContracts) {

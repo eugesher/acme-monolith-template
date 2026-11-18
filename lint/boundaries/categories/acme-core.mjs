@@ -27,5 +27,6 @@ export const acmeCore = [
   ['acme-core:modules:shell', 'core/modules/src/*/shell/**', ['module']],
   ['acme-core:modules:index', 'core/modules/src/*/index.ts', ['module']],
   ['acme-core:contracts', 'core/contracts/src/*/**', ['module']],
+  ['acme-core:domain', 'core/domain/src/**', []],
   ['acme-core:entities', 'core/entities/src/**', []],
 ];

@@ -5,6 +5,7 @@ import {
   fromSpec,
   layerOf,
   baseLibs,
+  coreDomain,
   libContracts,
   own,
   packages,
@@ -15,7 +16,7 @@ import {
 const layer = layerOf('acme-app:common:modules', ['app', 'module']);
 
 export const commonModules = [
-  from('acme-app:common:modules:domain', [layer('domain'), baseLibs()]),
+  from('acme-app:common:modules:domain', [layer('domain'), coreDomain, baseLibs()]),
   from('acme-app:common:modules:outbound', [layer('outbound'), baseLibs()]),
   fromFile('acme-app:common:modules:outbound', persistenceInterfaces, [
     to('acme-core:entities'),
@@ -25,6 +26,7 @@ export const commonModules = [
     layer('domain'),
     layer('outbound'),
     layer('application'),
+    coreDomain,
     appContracts,
     baseLibs('observability'),
     packages('nestjs-pino'),

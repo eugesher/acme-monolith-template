@@ -44,6 +44,8 @@
       "@acme-staff/features/*": ["./apps/staff-app/src/features/*"],
       "@acme-core/contracts": ["./core/contracts/src"],
       "@acme-core/contracts/*": ["./core/contracts/src/*"],
+      "@acme-core/domain": ["./core/domain/src"],
+      "@acme-core/domain/*": ["./core/domain/src/*"],
       "@acme-core/entities": ["./core/entities/src"],
       "@acme-core/entities/*": ["./core/entities/src/*"],
       "@acme-core/modules": ["./core/modules/src"],
