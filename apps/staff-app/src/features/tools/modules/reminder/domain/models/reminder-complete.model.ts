@@ -12,10 +12,10 @@ export class ReminderCompleteModel extends ReminderAggregate {
     this.assertPending();
 
     this.currentStatus = ReminderStatusEnum.DONE;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toLoggerPayload(): IReminderCompleteLoggerPayload {
-    return { id: this.id, version: this.currentVersion };
+    return { id: this.id, version: this.version };
   }
 }

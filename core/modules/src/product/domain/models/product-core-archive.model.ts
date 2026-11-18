@@ -1,3 +1,4 @@
+import { VersionedEntity } from '@acme-libs/domain';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
 import type {
@@ -6,13 +7,9 @@ import type {
   IProductCoreArchiveUpdatePayload,
 } from '../interfaces';
 
-export class ProductCoreArchiveModel {
+export class ProductCoreArchiveModel extends VersionedEntity {
   public get status(): ProductStatusEnum {
     return this.currentStatus;
-  }
-
-  public get version(): number {
-    return this.currentVersion;
   }
 
   public get isArchived(): boolean {
@@ -20,11 +17,13 @@ export class ProductCoreArchiveModel {
   }
 
   private constructor(
-    private readonly id: string,
+    id: string,
     private readonly sku: string,
     private currentStatus: ProductStatusEnum,
-    private currentVersion: number,
-  ) {}
+    version: number,
+  ) {
+    super(id, version);
+  }
 
   public static reconstitute(record: IProductCoreArchiveReconstitute): ProductCoreArchiveModel {
     const { id, sku, status, version } = record;
@@ -38,7 +37,7 @@ export class ProductCoreArchiveModel {
     }
 
     this.currentStatus = ProductStatusEnum.ARCHIVED;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toUpdatePayload(versionAsRead: number): IProductCoreArchiveUpdatePayload {

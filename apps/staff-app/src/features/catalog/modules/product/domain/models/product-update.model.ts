@@ -24,10 +24,10 @@ export class ProductUpdateModel extends ProductAggregate {
     }
 
     this.currentName = validName;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toLoggerPayload(): IProductUpdateLoggerPayload {
-    return { id: this.id, version: this.currentVersion };
+    return { id: this.id, version: this.version };
   }
 }

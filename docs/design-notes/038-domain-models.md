@@ -164,6 +164,15 @@ and `OrderGetOneModel` adds nothing. The aggregate extends `Entity` of `libs/dom
 a use case that only reads extends it too. No model records domain events: a change reaches the
 ledger through `toLedgerPayload()`, as every other shape that leaves the use case.
 
+**A versioned aggregate extends `VersionedEntity`.** `ProductAggregate`, `NoteAggregate`,
+`ReminderAggregate` and the core `ProductCoreArchiveModel` take their `version` from
+`VersionedEntity` of `libs/domain`: the public `version`, `bumpVersion()` for a change,
+`isExpectedVersion(expectedVersion)` for `If-Match` and the static `isValidVersion(version)`. The
+base throws nothing, so an aggregate checks the stored version with `isValidVersion` and refuses
+with an exception of its module, `ProductVersionInvalidException`, and
+`ProductAggregate.assertExpectedVersion` refuses a stale `If-Match` with
+`ProductVersionMismatchException`; the core module answers the mismatch as an outcome.
+
 **A shared service takes the model of the caller.** The access and write services of an entity serve
 several use cases, so the caller passes the static `reconstitute` of its model and gets that model
 back: `accessService.load({ tagId }, TagRenameModel.reconstitute)`,

@@ -25,7 +25,7 @@ export class NoteEditModel extends NoteAggregate {
     }
 
     this.currentBody = validBody;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toRevisionInsertPayload(
@@ -35,7 +35,7 @@ export class NoteEditModel extends NoteAggregate {
 
     return {
       noteId: this.id,
-      noteVersion: this.currentVersion,
+      noteVersion: this.version,
       bodyBefore,
       bodyAfter: this.currentBody,
       editorId,
@@ -44,6 +44,6 @@ export class NoteEditModel extends NoteAggregate {
   }
 
   public toLoggerPayload(): INoteEditLoggerPayload {
-    return { id: this.id, authorId: this.authorId, version: this.currentVersion };
+    return { id: this.id, authorId: this.authorId, version: this.version };
   }
 }

@@ -18,7 +18,7 @@ The same pattern serves `ReminderWriteService` and `NoteWriteService` in
 `ProductWriteService.write(command, mutate)` is the only way to change a stored row. Every attempt:
 
 1. loads the aggregate fresh through the access service;
-2. checks the `If-Match` version with `ProductHelper.assertExpectedVersion`;
+2. checks the `If-Match` version with `product.assertExpectedVersion(expectedVersion)`;
 3. applies `mutate` in memory;
 4. saves with `UPDATE … WHERE id = ? AND version = <as read>`.
 

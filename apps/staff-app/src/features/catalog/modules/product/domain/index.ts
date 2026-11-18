@@ -14,8 +14,6 @@ export * from './exceptions/product-version-mismatch.exception';
 
 export * from './aggregates/product.aggregate';
 
-export * from './helpers/product.helper';
-
 export * from './interfaces';
 
 export * from './models/product-create.model';

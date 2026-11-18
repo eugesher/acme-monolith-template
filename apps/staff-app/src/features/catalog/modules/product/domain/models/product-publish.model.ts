@@ -22,7 +22,7 @@ export class ProductPublishModel extends ProductAggregate {
 
     this.previousStatus = this.currentStatus;
     this.currentStatus = ProductStatusEnum.ACTIVE;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toLedgerPayload(): Maybe<IProductPublishLedgerPayload> {
@@ -32,7 +32,7 @@ export class ProductPublishModel extends ProductAggregate {
 
     return {
       subjectId: this.id,
-      version: this.currentVersion,
+      version: this.version,
       payload: { sku: this.sku, previousStatus: this.previousStatus },
     };
   }

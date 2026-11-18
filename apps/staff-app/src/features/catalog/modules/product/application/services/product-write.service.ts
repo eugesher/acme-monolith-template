@@ -4,7 +4,6 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { OccRetryHelper } from '@acme-libs/toolkit';
 
 import {
-  ProductHelper,
   ProductNotFoundException,
   ProductVersionMismatchException,
   type IProductReconstitute,
@@ -65,7 +64,7 @@ export class ProductWriteService {
     const { productId, expectedVersion } = command;
     const product = await this.accessService.load({ productId }, reconstitute);
 
-    ProductHelper.assertExpectedVersion(product, expectedVersion);
+    product.assertExpectedVersion(expectedVersion);
 
     const versionAsRead = product.version;
 

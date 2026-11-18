@@ -16,10 +16,10 @@ export class ReminderRescheduleModel extends ReminderAggregate {
     }
 
     this.currentDueOn = validDueOn;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toLoggerPayload(): IReminderRescheduleLoggerPayload {
-    return { id: this.id, dueOn: this.currentDueOn, version: this.currentVersion };
+    return { id: this.id, dueOn: this.currentDueOn, version: this.version };
   }
 }

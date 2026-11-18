@@ -1,4 +1,4 @@
-import { Entity } from '@acme-libs/domain';
+import { VersionedEntity } from '@acme-libs/domain';
 import { ReminderStatusEnum } from '@acme-libs/kernel';
 
 import { ReminderAlreadyDoneException } from '../exceptions/reminder-already-done.exception';
@@ -12,17 +12,12 @@ import type {
   IReminderUpdatePayload,
 } from '../interfaces';
 
-export abstract class ReminderAggregate extends Entity {
-  public get version(): number {
-    return this.currentVersion;
-  }
-
+export abstract class ReminderAggregate extends VersionedEntity {
   protected readonly ownerId: string;
   protected readonly title: string;
   protected readonly body: string;
   protected currentDueOn: string;
   protected currentStatus: ReminderStatusEnum;
-  protected currentVersion: number;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
@@ -31,16 +26,16 @@ export abstract class ReminderAggregate extends Entity {
   private static readonly DUE_ON_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
   protected constructor(record: IReminderReconstitute) {
-    super(record.id);
+    const { id, ownerId, title, body, dueOn, status, version, createdAt, updatedAt } = record;
+    const validVersion = ReminderAggregate.validVersion(version);
 
-    const { ownerId, title, body, dueOn, status, version, createdAt, updatedAt } = record;
+    super(id, validVersion);
 
     this.ownerId = ownerId;
     this.title = ReminderAggregate.validTitle(title);
     this.body = ReminderAggregate.validBody(body);
     this.currentDueOn = ReminderAggregate.validDueOn(dueOn);
     this.currentStatus = status;
-    this.currentVersion = ReminderAggregate.validVersion(version);
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -53,7 +48,7 @@ export abstract class ReminderAggregate extends Entity {
       body: this.body,
       dueOn: this.currentDueOn,
       status: this.currentStatus,
-      version: this.currentVersion,
+      version: this.version,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
@@ -65,7 +60,7 @@ export abstract class ReminderAggregate extends Entity {
       versionAsRead,
       dueOn: this.currentDueOn,
       status: this.currentStatus,
-      version: this.currentVersion,
+      version: this.version,
     };
   }
 
@@ -113,7 +108,7 @@ export abstract class ReminderAggregate extends Entity {
   }
 
   private static validVersion(version: number): number {
-    if (!Number.isInteger(version) || version < 1) {
+    if (!VersionedEntity.isValidVersion(version)) {
       throw new ReminderVersionInvalidException(version);
     }
 

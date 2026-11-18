@@ -24,10 +24,10 @@ common-module spec imports the kernel; both are code the lint checks.
 
 `baseLibs(...names)` is `libs('kernel', 'toolkit', 'domain', ...names)`. The kernel is the
 vocabulary, the toolkit is the technique of every layer and the domain lib holds the bases of the
-domain models and exceptions (`Entity`, `ValueObject`, `DomainException`), so each layer gets all
-three whether or not one of its files imports them. The names after them are what the layer adds:
-`baseLibs('observability')` for an application layer, `baseLibs('ledger', 'queue')` for the module
-root of a core module.
+domain models and exceptions (`Entity`, `VersionedEntity`, `ValueObject`, `DomainException`), so
+each layer gets all three whether or not one of its files imports them. The names after them are
+what the layer adds: `baseLibs('observability')` for an application layer,
+`baseLibs('ledger', 'queue')` for the module root of a core module.
 
 `main.ts` and the core entities are the exceptions: they list their libs one by one.
 

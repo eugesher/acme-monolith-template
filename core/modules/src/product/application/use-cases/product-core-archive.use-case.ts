@@ -56,7 +56,7 @@ export class ProductCoreArchiveUseCase {
 
     const product = ProductCoreArchiveModel.reconstitute(productRecord);
 
-    if (expectedVersion !== undefined && expectedVersion !== product.version) {
+    if (!product.isExpectedVersion(expectedVersion)) {
       return {
         outcome: ProductCoreArchiveOutcomeEnum.VERSION_MISMATCH,
         currentVersion: product.version,
