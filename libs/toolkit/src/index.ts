@@ -5,6 +5,8 @@ export * from './idempotency/body-fingerprint.helper';
 export * from './pagination/interfaces/snapshots/page-window.interface';
 export * from './pagination/interfaces/snapshots/page.interface';
 export * from './pagination/pagination.helper';
+export * from './resilience/deadline.helper';
+export * from './resilience/deadline.options';
 export * from './resilience/replay-retry.helper';
 export * from './resilience/replay-retry.options';
 export * from './result/result.helper';

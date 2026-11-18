@@ -1,4 +1,5 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { In, Not } from 'typeorm';
 
 import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
@@ -46,11 +47,7 @@ export class UserReassignRolesRepository
       return;
     }
 
-    await this.staffUserRoleRepository
-      .createQueryBuilder()
-      .delete()
-      .where('user_id = :userId AND role_id NOT IN (:...roleIds)', { userId, roleIds })
-      .execute();
+    await this.staffUserRoleRepository.delete({ userId, roleId: Not(In(roleIds)) });
   }
 
   public async insertUserRolesIgnore(

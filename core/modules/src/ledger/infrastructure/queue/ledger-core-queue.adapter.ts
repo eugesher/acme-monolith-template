@@ -2,6 +2,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { Queue } from 'bull';
 
+import { DeadlineHelper } from '@acme-libs/toolkit';
 import {
   LEDGER_RECORD_QUEUE,
   type ILedgerRecordProcessorPayload,
@@ -29,25 +30,14 @@ export class LedgerCoreQueueAdapter implements ILedgerCoreQueuePort {
     const { record, timeoutMs } = command;
     const { operationKey, subjectType, subjectId, action, payload, occurredAt, correlationId } =
       record;
-    let timer: NodeJS.Timeout | undefined;
 
-    const timeout = new Promise<never>((_, reject) => {
-      timer = setTimeout(
-        () => reject(new Error(`Enqueue timed out after ${timeoutMs} ms`)),
-        timeoutMs,
-      );
-    });
-
-    try {
-      await Promise.race([
+    await DeadlineHelper.race(
+      () =>
         this.queue.add(
           { operationKey, subjectType, subjectId, action, payload, occurredAt, correlationId },
           { jobId: operationKey },
         ),
-        timeout,
-      ]);
-    } finally {
-      clearTimeout(timer);
-    }
+      { timeoutMs, message: `Enqueue timed out after ${timeoutMs} ms` },
+    );
   }
 }

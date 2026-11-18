@@ -2,6 +2,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { Queue } from 'bull';
 
+import { DeadlineHelper } from '@acme-libs/toolkit';
 import {
   PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
   type IProductStockPostSubtractPayload,
@@ -27,19 +28,10 @@ export class ProductStockCorePostSubtractQueueAdapter implements IProductStockCo
 
   public async enqueue(command: IProductStockCorePostSubtractEnqueueCommand): Promise<void> {
     const { productIds, correlationId, timeoutMs } = command;
-    let timer: NodeJS.Timeout | undefined;
 
-    const timeout = new Promise<never>((_, reject) => {
-      timer = setTimeout(
-        () => reject(new Error(`Enqueue timed out after ${timeoutMs} ms`)),
-        timeoutMs,
-      );
+    await DeadlineHelper.race(() => this.queue.add({ productIds, correlationId }), {
+      timeoutMs,
+      message: `Enqueue timed out after ${timeoutMs} ms`,
     });
-
-    try {
-      await Promise.race([this.queue.add({ productIds, correlationId }), timeout]);
-    } finally {
-      clearTimeout(timer);
-    }
   }
 }
