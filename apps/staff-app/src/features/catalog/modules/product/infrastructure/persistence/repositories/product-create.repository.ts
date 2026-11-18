@@ -22,10 +22,6 @@ export class ProductCreateRepository
     useClass: ProductCreateRepository,
   };
 
-  public async existsBySku(sku: string): Promise<boolean> {
-    return await this.createProductBuilder().forExistsBySku(sku).getExists();
-  }
-
   public async insert(query: IProductCreateInsertQuery): Promise<IProductCreateInsertRecord> {
     const productId = await MysqlErrorHelper.catchDuplicateKey(() =>
       this.productRepository.insertOne(query),
@@ -39,6 +35,6 @@ export class ProductCreateRepository
   }
 
   public async findInserted(productId: string): Promise<IProductCreateRecord> {
-    return await this.createProductBuilder().forInserted(productId).getOneOrFail();
+    return await this.createProductBuilder().forById(productId).getOneOrFail();
   }
 }

@@ -24,12 +24,6 @@ export class ProductCreateUseCase {
 
   public async execute(command: IProductCreateCommand): Promise<IProductView> {
     const { sku, name } = command;
-    const isSkuTaken = await this.repository.existsBySku(sku);
-
-    if (isSkuTaken) {
-      throw new ProductSkuTakenException(sku);
-    }
-
     const productCandidate = ProductCreateModel.initCandidate({ sku, name });
     const insertResult = await this.repository.insert(productCandidate);
 

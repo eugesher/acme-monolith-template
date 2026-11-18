@@ -32,6 +32,6 @@ export class TagCreateRepository extends TagPersistenceHost implements ITagCreat
   }
 
   public async findInserted(tagId: string): Promise<ITagCreateRecord> {
-    return await this.createTagBuilder().forInserted(tagId).getOneOrFail();
+    return await this.createTagBuilder().forById(tagId).getOneOrFail();
   }
 }

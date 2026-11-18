@@ -3,7 +3,7 @@ import { SelectQueryBuilder } from 'typeorm';
 import type { Product } from '@acme-core/entities';
 
 export class ProductCorePersistenceBuilder extends SelectQueryBuilder<Product> {
-  public forId(productId: string): this {
+  public forById(productId: string): this {
     this.select([
       `${this.alias}.id`,
       `${this.alias}.sku`,
@@ -16,6 +16,6 @@ export class ProductCorePersistenceBuilder extends SelectQueryBuilder<Product> {
   }
 
   public forLockById(productId: string): this {
-    return this.forId(productId).setLock('pessimistic_write');
+    return this.forById(productId).setLock('pessimistic_write');
   }
 }

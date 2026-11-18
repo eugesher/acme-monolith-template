@@ -8,7 +8,6 @@ import { ProductCreateUseCase } from '../product-create.use-case';
 import type { IProductLedgerPort } from '../../../outbound';
 
 describe('ProductCreateUseCase', () => {
-  let existsBySku: jest.Mock;
   let insert: jest.Mock;
   let findInserted: jest.Mock;
   let recordCreated: jest.Mock;
@@ -16,7 +15,6 @@ describe('ProductCreateUseCase', () => {
   let useCase: ProductCreateUseCase;
 
   beforeEach(() => {
-    existsBySku = jest.fn().mockResolvedValue(false);
     insert = jest
       .fn()
       .mockResolvedValue({ outcome: ProductCreateInsertOutcomeEnum.INSERTED, id: '12' });
@@ -32,7 +30,7 @@ describe('ProductCreateUseCase', () => {
     recordCreated = jest.fn().mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
     useCase = new ProductCreateUseCase(
-      { existsBySku, insert, findInserted },
+      { insert, findInserted },
       { recordCreated } as unknown as IProductLedgerPort,
       logger as unknown as PinoLogger,
     );
@@ -42,7 +40,6 @@ describe('ProductCreateUseCase', () => {
     it('creates a draft and answers the stored row', async () => {
       const view = await useCase.execute({ sku: 'SKU-0001', name: 'Lamp' });
 
-      expect(existsBySku).toHaveBeenCalledWith('SKU-0001');
       expect(insert).toHaveBeenCalledWith({
         sku: 'SKU-0001',
         name: 'Lamp',
@@ -75,17 +72,7 @@ describe('ProductCreateUseCase', () => {
       expect(logger.info).toHaveBeenCalledWith({ id: '12', sku: 'SKU-0001' }, 'Product created');
     });
 
-    it('refuses a taken sku with PRODUCT_SKU_TAKEN before the insert', async () => {
-      existsBySku.mockResolvedValue(true);
-
-      await expect(useCase.execute({ sku: 'SKU-0001', name: 'Lamp' })).rejects.toMatchObject({
-        code: 'PRODUCT_SKU_TAKEN',
-        message: 'Product sku SKU-0001 is already registered',
-      });
-      expect(insert).not.toHaveBeenCalled();
-    });
-
-    it('refuses a sku taken by a concurrent insert with PRODUCT_SKU_TAKEN', async () => {
+    it('refuses a taken sku with PRODUCT_SKU_TAKEN', async () => {
       insert.mockResolvedValue({ outcome: ProductCreateInsertOutcomeEnum.DUPLICATE });
 
       await expect(useCase.execute({ sku: 'SKU-0001', name: 'Lamp' })).rejects.toMatchObject({

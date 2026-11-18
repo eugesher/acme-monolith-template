@@ -31,6 +31,6 @@ export class ProductCoreArchiveRepository
   }
 
   public async findById(productId: string): Promise<IProductCoreArchiveRecord> {
-    return await this.createProductBuilder().forId(productId).getOneOrFail();
+    return await this.createProductBuilder().forById(productId).getOneOrFail();
   }
 }
