@@ -78,3 +78,9 @@ window, so its keys stay few.
 `softDelete` sets `deleted_at`, and TypeORM adds `deleted_at IS NULL` to every find and query
 builder on the entity, so a deleted row is gone for every read. Example:
 `apps/staff-app/src/features/tools/modules/note/infrastructure/persistence/repositories/note-delete.repository.ts`.
+
+**A read that must see a deleted row says so.** `withDeleted()` lifts the filter for the whole
+query, the main alias and every join. The order builders call it so that the lines of an order keep
+a product deleted after the order: staff `OrderPersistenceBuilder.forById` and customer
+`OrderPersistenceBuilder.forOwned`. `order` has no `deleted_at`, so only the joined product is
+affected. Seed product 107 is soft-deleted, and the e2e of both apps read an order that holds it.
