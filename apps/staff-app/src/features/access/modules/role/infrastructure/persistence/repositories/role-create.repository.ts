@@ -30,17 +30,15 @@ export class RoleCreateRepository extends RolePersistenceHost implements IRoleCr
   public async insertRole(
     query: IRoleCreateStaffRoleInsertQuery,
   ): Promise<IRoleCreateStaffRoleInsertRecord> {
-    try {
-      const roleId = await this.staffRoleRepository.insertOne(query);
+    const roleId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.staffRoleRepository.insertOne(query),
+    );
 
-      return { outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: roleId };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: RoleCreateStaffRoleInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (roleId === null) {
+      return { outcome: RoleCreateStaffRoleInsertOutcomeEnum.DUPLICATE };
     }
+
+    return { outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: roleId };
   }
 
   public async insertRolePermissions(

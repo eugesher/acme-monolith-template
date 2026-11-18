@@ -2,11 +2,11 @@ import { ProductStockCoreOnHandModel } from '../product-stock-core-on-hand.model
 
 describe('ProductStockCoreOnHandModel', () => {
   describe('toSnapshot', () => {
-    it('answers the on-hand of every product in the order of the products, as a number', () => {
+    it('answers the on-hand of every product in the order of the products', () => {
       const onHand = ProductStockCoreOnHandModel.reconstitute({
         products: [{ id: '103' }, { id: '100' }],
         stockSums: [
-          { productId: '100', quantity: '8' },
+          { productId: '100', quantity: 8 },
           { productId: '103', quantity: 2 },
         ],
       });
@@ -20,7 +20,7 @@ describe('ProductStockCoreOnHandModel', () => {
     it('answers zero for a product without stock rows', () => {
       const onHand = ProductStockCoreOnHandModel.reconstitute({
         products: [{ id: '100' }, { id: '103' }],
-        stockSums: [{ productId: '100', quantity: '8' }],
+        stockSums: [{ productId: '100', quantity: 8 }],
       });
 
       expect(onHand.toSnapshot()).toEqual([

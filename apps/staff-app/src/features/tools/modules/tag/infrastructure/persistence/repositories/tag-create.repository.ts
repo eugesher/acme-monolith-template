@@ -28,17 +28,15 @@ export class TagCreateRepository extends TagPersistenceHost implements ITagCreat
   }
 
   public async insert(query: ITagCreateQuery): Promise<ITagCreateInsertRecord> {
-    try {
-      const tagId = await this.tagRepository.insertOne(query);
+    const tagId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.tagRepository.insertOne(query),
+    );
 
-      return { outcome: TagCreateInsertOutcomeEnum.INSERTED, id: tagId };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: TagCreateInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (tagId === null) {
+      return { outcome: TagCreateInsertOutcomeEnum.DUPLICATE };
     }
+
+    return { outcome: TagCreateInsertOutcomeEnum.INSERTED, id: tagId };
   }
 
   public async findInserted(tagId: string): Promise<ITagCreateRecord> {

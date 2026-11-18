@@ -35,17 +35,15 @@ export class ProductCreateRepository
   }
 
   public async insert(query: IProductCreateInsertQuery): Promise<IProductCreateInsertRecord> {
-    try {
-      const productId = await this.productRepository.insertOne(query);
+    const productId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.productRepository.insertOne(query),
+    );
 
-      return { outcome: ProductCreateInsertOutcomeEnum.INSERTED, id: productId };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: ProductCreateInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (productId === null) {
+      return { outcome: ProductCreateInsertOutcomeEnum.DUPLICATE };
     }
+
+    return { outcome: ProductCreateInsertOutcomeEnum.INSERTED, id: productId };
   }
 
   public async findInserted(productId: string): Promise<IProductCreateRecord> {

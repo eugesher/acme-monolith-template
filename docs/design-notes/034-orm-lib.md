@@ -2,11 +2,11 @@
 
 The connection of an app and the repositories its modules read through live in `libs/database`:
 
-| Part          | Entry                         | What it gives the app                                              |
-| ------------- | ----------------------------- | ------------------------------------------------------------------ |
-| `orm/`        | `OrmModule.forRoot(entities)` | the TypeORM connection, the transactions, global `ORM_PORT`        |
-| `repository/` | `HostedRepository`            | the repository a module gets: TypeORM `Repository` and `insertOne` |
-| `naming/`     | `SnakeNamingStrategy`         | snake_case names of tables and columns, for the app and its e2e    |
+| Part          | Entry                         | What it gives the app                                             |
+| ------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `orm/`        | `OrmModule.forRoot(entities)` | the TypeORM connection, the transactions, global `ORM_PORT`       |
+| `repository/` | `HostedRepository`            | the repository a module gets: six TypeORM methods and two inserts |
+| `naming/`     | `SnakeNamingStrategy`         | snake_case names of tables and columns, for the app and its e2e   |
 
 `AppModule` hands `OrmModule.forRoot` the entities of `app/entities` and nothing else (see
 `012-app-bootstrap.md`).
@@ -74,8 +74,23 @@ may import `typeorm`. A repository injects the port and reads through it:
 protected readonly orm: IOrmPort,
 ```
 
-The port exposes `getRepository` alone, so a repository can neither open a transaction nor reach the
-`DataSource`.
+The port exposes `getRepository` alone, and the repository it answers has no manager, so a
+repository can neither open a transaction nor reach the `DataSource` directly.
+
+**The repository a module gets is narrow.** `IHostedRepository` picks `createQueryBuilder`,
+`insert`, `update`, `delete`, `softDelete` and `existsBy` from the TypeORM `Repository` and adds
+`insertOne` and `insertReturning`. `manager`, `query`, `save` and the `find` methods stay out, so a
+repository sends no raw SQL and reads through the builders of its persistence host. A method a
+repository starts to need is added to the pick. The builder that `createQueryBuilder` answers still
+holds the connection: the pick closes the direct path, not every path.
+
+**The driver stays in the lib.** mysql2 answers a `bigint` id as a number or a string and a `SUM` as
+a `DECIMAL` string. `insertOne` answers the generated id as a string. `insertReturning(entities)`
+answers `{ id, createdAt }` for every inserted row, the id as a string and `createdAt` as TypeORM
+read it back into `generatedMaps`, and sends nothing for an empty list; it is for an entity with a
+`CreateDateColumn`. A raw row is converted by the repository that reads it: core
+`ProductStockCoreBaseRepository.sumStock` turns the sum into a number. Nothing past a repository
+sees `number | string`.
 
 ## Who sees the lib
 

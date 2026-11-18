@@ -36,18 +36,15 @@ export class LedgerAppendRepository
     record: ILedgerAppendEntryInsertQuery,
   ): Promise<ILedgerAppendEntryInsertRecord> {
     const payload = record.payload as QueryDeepPartialEntity<LedgerEntry>['payload'];
+    const entryId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.ledgerEntryRepository.insertOne({ ...record, payload }),
+    );
 
-    try {
-      const entryId = await this.ledgerEntryRepository.insertOne({ ...record, payload });
-
-      return { outcome: LedgerAppendEntryInsertOutcomeEnum.INSERTED, id: entryId };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: LedgerAppendEntryInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (entryId === null) {
+      return { outcome: LedgerAppendEntryInsertOutcomeEnum.DUPLICATE };
     }
+
+    return { outcome: LedgerAppendEntryInsertOutcomeEnum.INSERTED, id: entryId };
   }
 
   public async findByOperationKey(operationKey: string): Promise<ILedgerAppendEntryRecord> {

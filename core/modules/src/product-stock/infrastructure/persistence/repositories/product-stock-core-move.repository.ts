@@ -30,12 +30,6 @@ export class ProductStockCoreMoveRepository
   public async insertMany(
     queries: IProductStockCoreMoveInsertQuery[],
   ): Promise<IProductStockCoreMoveInsertRecord[]> {
-    if (queries.length === 0) {
-      return [];
-    }
-
-    const insertResult = await this.productStockRepository.insert(queries);
-
-    return insertResult.generatedMaps as IProductStockCoreMoveInsertRecord[];
+    return await this.productStockRepository.insertReturning(queries);
   }
 }

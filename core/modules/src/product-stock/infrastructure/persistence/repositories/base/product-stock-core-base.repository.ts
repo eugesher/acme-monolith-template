@@ -20,8 +20,10 @@ export abstract class ProductStockCoreBaseRepository extends ProductStockCorePer
       return [];
     }
 
-    return await this.createProductStockBuilder()
+    const sumRows = await this.createProductStockBuilder()
       .forSumStock(productIds)
-      .getRawMany<IProductStockCoreLockSumRecord>();
+      .getRawMany<{ productId: string; quantity: string }>();
+
+    return sumRows.map((row) => ({ productId: row.productId, quantity: Number(row.quantity) }));
   }
 }

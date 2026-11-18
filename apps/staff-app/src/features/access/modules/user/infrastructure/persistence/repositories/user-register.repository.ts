@@ -34,17 +34,15 @@ export class UserRegisterRepository
   public async insertUser(
     query: IUserRegisterStaffUserInsertQuery,
   ): Promise<IUserRegisterStaffUserInsertRecord> {
-    try {
-      const userId = await this.staffUserRepository.insertOne(query);
+    const userId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.staffUserRepository.insertOne(query),
+    );
 
-      return { outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED, id: userId };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: UserRegisterStaffUserInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (userId === null) {
+      return { outcome: UserRegisterStaffUserInsertOutcomeEnum.DUPLICATE };
     }
+
+    return { outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED, id: userId };
   }
 
   public async findRoles(ids: readonly string[]): Promise<IUserRegisterStaffRoleRecord[]> {

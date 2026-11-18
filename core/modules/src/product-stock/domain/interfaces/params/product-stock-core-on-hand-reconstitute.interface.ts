@@ -1,6 +1,6 @@
 interface IProductStockCoreOnHandReconstituteStockSum {
   productId: string;
-  quantity: number | string;
+  quantity: number;
 }
 
 export interface IProductStockCoreOnHandReconstitute {

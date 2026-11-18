@@ -23,9 +23,7 @@ describe('OrmGetRepositoryUseCase', () => {
     const result = useCase.execute(Item);
 
     expect(result).toBeInstanceOf(HostedRepository);
-    expect(result.target).toBe(Item);
-    expect(result.manager).toBe(manager);
-    expect(result.queryRunner).toBe(queryRunner);
+    expect(result).toMatchObject({ target: Item, manager, queryRunner });
     expect(getRepository).toHaveBeenCalledWith(Item);
   });
 });

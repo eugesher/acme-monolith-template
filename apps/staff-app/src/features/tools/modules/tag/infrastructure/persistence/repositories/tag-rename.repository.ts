@@ -28,16 +28,14 @@ export class TagRenameRepository extends TagPersistenceHost implements ITagRenam
   public async update(query: ITagRenameQuery): Promise<TagRenameUpdateOutcomeEnum> {
     const { id, name } = query;
 
-    try {
-      await this.tagRepository.update({ id }, { name });
+    const updateResult = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.tagRepository.update({ id }, { name }),
+    );
 
-      return TagRenameUpdateOutcomeEnum.UPDATED;
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return TagRenameUpdateOutcomeEnum.DUPLICATE;
-      }
-
-      throw error;
+    if (updateResult === null) {
+      return TagRenameUpdateOutcomeEnum.DUPLICATE;
     }
+
+    return TagRenameUpdateOutcomeEnum.UPDATED;
   }
 }

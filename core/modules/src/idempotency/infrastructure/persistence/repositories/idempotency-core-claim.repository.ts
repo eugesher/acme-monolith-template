@@ -33,17 +33,15 @@ export class IdempotencyCoreClaimRepository
   public async insert(
     query: IIdempotencyCoreClaimInsertQuery,
   ): Promise<IdempotencyCoreClaimInsertOutcomeEnum> {
-    try {
-      await this.idempotencyKeyRepository.insert(query);
+    const insertResult = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.idempotencyKeyRepository.insert(query),
+    );
 
-      return IdempotencyCoreClaimInsertOutcomeEnum.INSERTED;
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return IdempotencyCoreClaimInsertOutcomeEnum.DUPLICATE;
-      }
-
-      throw error;
+    if (insertResult === null) {
+      return IdempotencyCoreClaimInsertOutcomeEnum.DUPLICATE;
     }
+
+    return IdempotencyCoreClaimInsertOutcomeEnum.INSERTED;
   }
 
   public async findByKey(

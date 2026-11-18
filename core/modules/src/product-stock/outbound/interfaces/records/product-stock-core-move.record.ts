@@ -1,13 +1,10 @@
-import type { Product } from '@acme-core/entities';
+import type { Product, ProductStock } from '@acme-core/entities';
 
 export type IProductStockCoreMoveProductRecord = Pick<Product, 'id'>;
 
-export interface IProductStockCoreMoveInsertRecord {
-  id: number | string;
-  createdAt: Date;
-}
+export type IProductStockCoreMoveInsertRecord = Pick<ProductStock, 'id' | 'createdAt'>;
 
 export interface IProductStockCoreMoveSumRecord {
   productId: string;
-  quantity: number | string;
+  quantity: number;
 }

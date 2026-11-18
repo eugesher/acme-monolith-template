@@ -34,4 +34,34 @@ describe('MysqlErrorHelper', () => {
       expect(MysqlErrorHelper.isDuplicateKey(error)).toBe(false);
     });
   });
+
+  describe('catchDuplicateKey', () => {
+    it('answers what the statement answered', async () => {
+      const statement = jest.fn().mockResolvedValue('12');
+
+      const statementResult = await MysqlErrorHelper.catchDuplicateKey(statement);
+
+      expect(statementResult).toBe('12');
+      expect(statement).toHaveBeenCalledTimes(1);
+    });
+
+    it('answers null when the statement hits a duplicate key', async () => {
+      const driverError = Object.assign(new Error('Duplicate entry'), { errno: 1062 });
+      const statement = jest
+        .fn()
+        .mockRejectedValue(new QueryFailedError('INSERT', [], driverError));
+
+      const statementResult = await MysqlErrorHelper.catchDuplicateKey(statement);
+
+      expect(statementResult).toBeNull();
+    });
+
+    it('passes any other error through', async () => {
+      const driverError = Object.assign(new Error('Deadlock'), { errno: 1213 });
+      const deadlock = new QueryFailedError('UPDATE', [], driverError);
+      const statement = jest.fn().mockRejectedValue(deadlock);
+
+      await expect(MysqlErrorHelper.catchDuplicateKey(statement)).rejects.toBe(deadlock);
+    });
+  });
 });

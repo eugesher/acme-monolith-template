@@ -1,4 +1,4 @@
 export interface IProductStockCoreMovementsInsertedRow {
-  id: number | string;
+  id: string;
   createdAt: Date;
 }

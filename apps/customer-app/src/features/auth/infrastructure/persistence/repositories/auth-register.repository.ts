@@ -32,21 +32,17 @@ export class AuthRegisterRepository
   public async insert(
     query: IAuthRegisterCustomerInsertQuery,
   ): Promise<IAuthRegisterCustomerInsertRecord> {
-    try {
-      const insertResult = await this.customerRepository.insert(query);
-      const [customerRow] = insertResult.generatedMaps as {
-        id: number | string;
-        createdAt: Date;
-      }[];
-      const { id, createdAt } = customerRow;
+    const insertedRows = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.customerRepository.insertReturning([query]),
+    );
 
-      return { outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED, id: String(id), createdAt };
-    } catch (error) {
-      if (MysqlErrorHelper.isDuplicateKey(error)) {
-        return { outcome: AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE };
-      }
-
-      throw error;
+    if (insertedRows === null) {
+      return { outcome: AuthRegisterCustomerInsertOutcomeEnum.DUPLICATE };
     }
+
+    const [customerRow] = insertedRows;
+    const { id, createdAt } = customerRow;
+
+    return { outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED, id, createdAt };
   }
 }
