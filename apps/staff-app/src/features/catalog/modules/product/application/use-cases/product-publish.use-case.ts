@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
-import { ProductPublishedEvent, ProductPublishModel } from '../../domain';
+import { ProductPublishModel } from '../../domain';
 import {
   PRODUCT_CATALOG_CACHE_PORT,
   PRODUCT_LEDGER_PORT,
@@ -30,12 +30,15 @@ export class ProductPublishUseCase {
       ProductPublishModel.reconstitute,
       (product) => product.publish(),
     );
-    const { product, domainEvents } = writeResult;
-    const publishedEvents = domainEvents.filter((event) => event instanceof ProductPublishedEvent);
-    const ledgerRecords = publishedEvents.map((event) => event.toLedgerRecord());
+    const { product, answer: previousStatus } = writeResult;
 
     await this.catalogCache.invalidate();
-    await this.ledger.recordEvents({ ledgerRecords });
+
+    if (previousStatus) {
+      const productLedgerPayload = product.toLedgerPayload(previousStatus);
+
+      await this.ledger.recordPublished(productLedgerPayload);
+    }
 
     const productLoggerPayload = product.toLoggerPayload();
 

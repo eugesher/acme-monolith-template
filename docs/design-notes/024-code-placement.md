@@ -45,7 +45,12 @@ are.
 
 **Each module keeps its own model**, narrowed to what it uses, even over one table (see
 `017-credentials-lib.md`). A shared model would be a facade method in disguise: a change for one
-caller would ripple into the others. The copies share the table and the kernel enums, nothing else.
+caller would ripple into the others. The copies share the table, the kernel enums and the value
+objects of `core/domain`, nothing else.
+
+**A value object is shared, a model is not.** A model narrows a table to what one caller uses, while
+a value object such as `EmailValue` carries one rule that every module applies the same way, so
+`core/domain` holds it once and each module refuses in its own words (see `038-domain-models.md`).
 
 **The names say where a symbol lives.** A symbol of a common module carries `Common`, a symbol of a
 core module carries `Core` (`StaffAuthCoreModule`, `STAFF_AUTH_CORE_PORT`), and a feature symbol

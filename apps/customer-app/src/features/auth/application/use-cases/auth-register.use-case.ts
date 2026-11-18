@@ -38,7 +38,6 @@ export class AuthRegisterUseCase {
     const passwordHash = await this.credentials.hashPassword(password);
     const customerCandidate = AuthCustomerCandidateModel.create({ email, passwordHash });
 
-    customerCandidate.normalizeEmail();
     customerCandidate.assertEmail();
 
     const customerInsertPayload = customerCandidate.toInsertPayload();
@@ -48,7 +47,10 @@ export class AuthRegisterUseCase {
       throw new AuthEmailTakenException();
     }
 
-    const registeredCustomer = customerCandidate.toRegistered(insertResult.id);
+    const registeredCustomer = customerCandidate.toRegistered(
+      insertResult.id,
+      insertResult.createdAt,
+    );
     const customer = AuthCustomerRegisterModel.reconstitute(registeredCustomer);
     const customerLoggerPayload = customer.toLoggerPayload();
     const customerLedgerPayload = customer.toLedgerPayload();

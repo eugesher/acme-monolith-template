@@ -17,9 +17,14 @@ what the model answers.
 | a record of the ledger | `toLedgerPayload()`                                            | `ProductCreateModel.toLedgerPayload()`             |
 | a line of the log      | `toLoggerPayload()`                                            | `ReminderRescheduleModel.toLoggerPayload()`        |
 
-The record of the ledger carries the subject, the payload and, where the model knows it, the time it
-was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
-and the action (see `022-enqueue-after-commit.md`).
+The record of the ledger carries the subject, the payload and the time of the change as the database
+stored it; the adapter of the port adds the operation key, the type of the subject and the action
+(see `022-enqueue-after-commit.md`). A row that was inserted gives its `createdAt`: product and
+order read it back, and the registration and a restock take it from the insert: TypeORM reads the
+defaults of an inserted row back into `generatedMaps` (`AuthRegisterRepository.insert`, core
+`ProductStockCoreMoveRepository.insertMany`, whose rows core `handleMove` answers). A row that was
+updated gives its `updatedAt` from a read after the update: the product write service reads the
+product again, and the core archive reads it with `findById`. No adapter stamps the time itself.
 
 **Without an instance, a static method answers.** An idempotency key has only its scope and key, so
 `IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` names the fields of the log line. A
@@ -34,7 +39,7 @@ Aggregates below).
 
 **A name does not repeat its class.** The class already names the context and the use case, so the
 method names only what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
-`TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toIds`. A child
+`TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toRows`. A child
 entity keeps its name, `createOrderProducts`. A model in another context takes it in front:
 `StaffAuthCoreLoginModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
 
@@ -65,23 +70,23 @@ named as the params of a helper (see `029-naming.md`): `IIdempotencyCoreReleaseL
 
 ## Domain interfaces
 
-The interfaces of a domain lie in two folders, by the side of the model or the event they are on.
-They follow the params and snapshots of a helper (see `029-naming.md`): a method of a model takes
-one params object, and every shape a model or an event answers is a snapshot.
+The interfaces of a domain lie in two folders, by the side of the model they are on. They follow the
+params and snapshots of a helper (see `029-naming.md`): a method of a model takes one params object,
+and every shape a model answers is a snapshot.
 
-| Folder                         | Name                                             | What it is                                                                                                                                                                                                                                                           |
-| ------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `domain/interfaces/params/`    | `I<Model>Reconstitute`                           | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                                                                                        |
-|                                | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                                                                                               |
-|                                | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductUpdateModel.update(changes)`                                                                                                                                                                              |
-|                                | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                                                                                                |
-|                                | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteEditRevisionInsertPayloadBuild`                                                                                                                                                                              |
-| `domain/interfaces/snapshots/` | `I<Model>Candidate`                              | the row `initCandidate` answers for an insert                                                                                                                                                                                                                        |
-|                                | `I<Model>Snapshot`                               | the state a model answers with `toSnapshot()`                                                                                                                                                                                                                        |
-|                                | `I<Model>InsertPayload`, `I<Model>UpdatePayload` | the row to write, `IRoleCandidateInsertPayload`, `INoteUpdatePayload`; `Query` stays the kind of an outbound interface                                                                                                                                               |
-|                                | `I<Model><UseCase>LedgerPayload`                 | the record of the ledger, `IProductCreateLedgerPayload`                                                                                                                                                                                                              |
-|                                | `I<Model><UseCase>LoggerPayload`                 | the line of the log, `IProductUpdateLoggerPayload`                                                                                                                                                                                                                   |
-|                                | `I<Subject>`                                     | another answer, by its noun: `ITagCommonSubjectTagsReplaceChanges` from `TagCommonSubjectTagsReplaceModel.replace`, `IOrderProductStockMovement` from `OrderPlaceModel.getProductStockMovements`, `IProductLedgerRecord` from `ProductPublishedEvent.toLedgerRecord` |
+| Folder                         | Name                                             | What it is                                                                                                                                                                                       |
+| ------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `domain/interfaces/params/`    | `I<Model>Reconstitute`                           | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                    |
+|                                | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                           |
+|                                | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductUpdateModel.update(changes)`                                                                                                          |
+|                                | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                            |
+|                                | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteEditRevisionInsertPayloadBuild`                                                                                                          |
+| `domain/interfaces/snapshots/` | `I<Model>Candidate`                              | the row `initCandidate` answers for an insert                                                                                                                                                    |
+|                                | `I<Model>Snapshot`                               | the state a model answers with `toSnapshot()`                                                                                                                                                    |
+|                                | `I<Model>InsertPayload`, `I<Model>UpdatePayload` | the row to write, `IRoleCandidateInsertPayload`, `INoteUpdatePayload`; `Query` stays the kind of an outbound interface                                                                           |
+|                                | `I<Model><UseCase>LedgerPayload`                 | the record of the ledger, `IProductCreateLedgerPayload`                                                                                                                                          |
+|                                | `I<Model><UseCase>LoggerPayload`                 | the line of the log, `IProductUpdateLoggerPayload`                                                                                                                                               |
+|                                | `I<Subject>`                                     | another answer, by its noun: `ITagCommonSubjectTagsReplaceChanges` from `TagCommonSubjectTagsReplaceModel.replace`, `IOrderProductStockMovement` from `OrderPlaceModel.getProductStockMovements` |
 
 The folder names the role, so the file repeats the name without `I` and ends with `.interface.ts`:
 `order-reconstitute.interface.ts` holds `IOrderReconstitute`,
@@ -107,23 +112,24 @@ it as the row to insert: `ProductCreateModel.initCandidate(proposal)` answers
 **A candidate written to several tables, checked in steps, or answered without reading it back is a
 model of its own.** `<Model>CandidateModel.create(proposal)` only holds the request, and the use
 case calls the checks in order, so the order is read in one place: `validate()` and `assert…` refuse
-a request, `normalizeEmail()` rewrites a field before `assertEmail()` checks it. `toInsertPayload()`
-answers the main row and `create<Children>(id)` the child rows under the issued id:
-`RoleCandidateModel` writes `staff_role` and `staff_role_permissions`, `UserStaffUserCandidateModel`
-writes `staff_user` and `staff_user_roles`. The answer comes without reading the row back: the
-candidate hands its stored row, and a model of the use case rebuilt from it answers the response,
-the record of the ledger and the line of the log, as `OrderPlaceModel` does from the record it reads
-after the insert. `AuthCustomerCandidateModel.toRegistered(id)` answers
+a request, `assertEmail()` checks the email the candidate holds as a value object.
+`toInsertPayload()` answers the main row and `create<Children>(id)` the child rows under the issued
+id: `RoleCandidateModel` writes `staff_role` and `staff_role_permissions`,
+`UserStaffUserCandidateModel` writes `staff_user` and `staff_user_roles`. The answer comes without
+reading the row back: the candidate hands its stored row, and a model of the use case rebuilt from
+it answers the response, the record of the ledger and the line of the log, as `OrderPlaceModel` does
+from the record it reads after the insert. `AuthCustomerCandidateModel.toRegistered(id)` answers
 `IAuthCustomerRegisterReconstitute` for `AuthCustomerRegisterModel`,
 `UserStaffUserCandidateModel.toRegistered(id)` feeds `UserStaffUserRegisterModel`, and
 `RoleCandidateModel.toCreated(id)` feeds `RoleCreateModel`.
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an
-empty request before any read, `distinctProductIds` names the rows to lock and read,
-`assertProducts` and `assertStockQuantities` check what was read, `toInsertPayload()` and
-`createOrderProducts(orderId)` answer the rows to insert. Each check takes its own params,
-`IOrderCandidateActiveProduct` and `IOrderCandidateStockQuantity`.
+empty request before any read, `distinctProductIds` names the rows to lock and read, counted once in
+`create` and handed `readonly` to the lock of core and the read, `assertProducts` and
+`assertStockQuantities` check what was read, `toInsertPayload()` and `createOrderProducts(orderId)`
+answer the rows to insert. Each check takes its own params, `IOrderCandidateActiveProduct` and
+`IOrderCandidateStockQuantity`.
 
 ## Read models
 
@@ -136,8 +142,8 @@ puts the snapshots on the page. A module that only reads has a domain for that a
 `core/modules/src/product-stock`.
 
 **A read model is a plain class unless it is a model of an aggregate.** A model with the columns of
-its own read records no events and takes no changes, so it does not extend `AggregateRootBase`, like
-`StaffAuthCoreSubjectModel`.
+its own read takes no changes and keeps no identity, so it does not extend `Entity` of
+`libs/domain`, like `StaffAuthCoreSubjectModel`.
 
 **A list model carries the columns of the list.** A page of orders carries no products, so
 `OrderGetManyModel` rebuilds it, not `OrderGetOneModel`, whose record requires them. Both live in
@@ -160,8 +166,18 @@ of its fields and the answers they share, `toSnapshot()` and `toUpdatePayload(ve
 constructor, so a model of a use case rebuilds itself with `new <Model>(record)`. Each use case
 extends it with a model of its own, which adds only the state and the answers that use case needs:
 `OrderPlaceModel` adds the owner, the stock movements and the payloads of the ledger and the log,
-and `OrderGetOneModel` adds nothing. The aggregate extends `AggregateRootBase`, so a model of a use
-case that only reads extends it too.
+and `OrderGetOneModel` adds nothing. The aggregate extends `Entity` of `libs/domain`, so a model of
+a use case that only reads extends it too. No model records domain events: a change reaches the
+ledger through `toLedgerPayload()`, as every other shape that leaves the use case.
+
+**A versioned aggregate extends `VersionedEntity`.** `ProductAggregate`, `NoteAggregate`,
+`ReminderAggregate` and the core `ProductCoreArchiveModel` take their `version` from
+`VersionedEntity` of `libs/domain`: the public `version`, `bumpVersion()` for a change,
+`isExpectedVersion(expectedVersion)` for `If-Match` and the static `isValidVersion(version)`. The
+base throws nothing, so an aggregate checks the stored version with `isValidVersion` and refuses
+with an exception of its module, `ProductVersionInvalidException`, and
+`ProductAggregate.assertExpectedVersion` refuses a stale `If-Match` with
+`ProductVersionMismatchException`; the core module answers the mismatch as an outcome.
 
 **A shared service takes the model of the caller.** The access and write services of an entity serve
 several use cases, so the caller passes the static `reconstitute` of its model and gets that model
@@ -170,18 +186,41 @@ back: `accessService.load({ tagId }, TagRenameModel.reconstitute)`,
 `reconstitute` declares `this: void`, as it names its class rather than `this`, and the write
 service bounds the model by the aggregate, whose `version` and `toUpdatePayload` it needs. A use
 case that only checks the entity exists asks for no model: `NoteAccessService.assertOwned`,
-`ProductAccessService.assertExists`.
+`ProductAccessService.assertExists`. The product write service hands back what `mutate` answers next
+to the stored model: `ProductPublishModel.publish()` answers the status the product left, and the
+stored model answers `toLedgerPayload(previousStatus)` with its new version and `updatedAt` (see
+`007-optimistic-concurrency.md`).
 
 **Use cases that share no state have models without an aggregate.** The login reads the hash and the
 status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and
-`AuthCustomerRegisterModel` stand alone. A rule both sides need is copied until an aggregate holds
-it: the candidate and the login model each normalize the email.
+`AuthCustomerRegisterModel` stand alone.
+
+**A value with one rule for every module is a value object of `core/domain`.** `EmailValue` of
+`@acme-core/domain` extends `ValueObject` of `libs/domain`: `EmailValue.create(email)` trims the
+email and lowers its case, so no email exists unnormalized, and `isValid()` answers whether its form
+holds. It answers a boolean, not an exception, as core refuses in no module's words (see
+`027-core-module-outcomes.md`): a candidate holds it and refuses with an exception of its own
+module, `AuthCustomerCandidateModel.assertEmail()` with `AuthEmailInvalidException` and
+`UserStaffUserCandidateModel.assertEmail()` with `UserEmailInvalidException`. The domain checks the
+form only where it writes an email; a login only builds the value before the read,
+`repository.findByEmail(customerEmail.address)`, as a malformed email finds no user and answers what
+an unknown email answers. The domain and the application of a feature, a processor, a common or a
+core module may import the core domain; the other layers may not.
+
+**A value with a rule of one module is a value object of that module.** It lives in
+`domain/values/<context>-<value>.value.ts` and extends `ValueObject` the same way:
+`ReminderDueOnValue` of the reminder answers `isFormatted()` and `isCalendarDate()`, and
+`ReminderAggregate.validDueOn` refuses either with `ReminderDueOnInvalidException`; the aggregate
+holds the value, so `ReminderRescheduleModel.reschedule` compares two dates with `equals`.
+`LedgerInstantValue` of the processor ledger answers `hasExplicitZone()`, `isValid()` and
+`toDate()`, and `LedgerAppendEntryModel.initCandidate` refuses with `LedgerInstantInvalidException`.
+A value object answers booleans and leaves the refusal to the model, so its checks read as steps.
 
 ## Access
 
 **A member is as open as its readers.** A field or a method that only its class reads is private:
-the fields of a list model, the fields of an event that only its `toLedgerRecord` reads. A field the
-use case decides on stays public, as `AuthCustomerLoginModel.passwordHash` for the check of the
-password. An id that an error only puts in its message is a plain parameter of the constructor, not
-a field. The getters of the repositories in a persistence host stay protected for the repositories
-that extend it (see `034-orm-lib.md`).
+the fields of a list model, the fields of `AuthCustomerRegisterModel` that only its answers read. A
+field the use case decides on stays public, as `AuthCustomerLoginModel.passwordHash` for the check
+of the password. An id that an error only puts in its message is a plain parameter of the
+constructor, not a field. The getters of the repositories in a persistence host stay protected for
+the repositories that extend it (see `034-orm-lib.md`).

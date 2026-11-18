@@ -163,6 +163,15 @@
         "tsConfigPath": "core/contracts/tsconfig.lib.json"
       }
     },
+    "core-domain": {
+      "type": "library",
+      "root": "core/domain",
+      "entryFile": "index",
+      "sourceRoot": "core/domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "core/domain/tsconfig.lib.json"
+      }
+    },
     "core-entities": {
       "type": "library",
       "root": "core/entities",
@@ -224,6 +233,15 @@
       "sourceRoot": "libs/database/src",
       "compilerOptions": {
         "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "domain": {
+      "type": "library",
+      "root": "libs/domain",
+      "entryFile": "index",
+      "sourceRoot": "libs/domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/domain/tsconfig.lib.json"
       }
     },
     "health": {

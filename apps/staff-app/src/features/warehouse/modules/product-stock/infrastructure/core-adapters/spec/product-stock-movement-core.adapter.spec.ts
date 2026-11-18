@@ -8,7 +8,7 @@ describe('ProductStockMovementCoreAdapter', () => {
   beforeEach(() => {
     handleLock = jest.fn().mockResolvedValue([{ productId: '12', quantity: 10 }]);
     handleMove = jest.fn().mockResolvedValue({
-      productStockIds: ['700'],
+      productStocks: [{ id: '700', createdAt: '2026-01-05T08:00:00.000Z' }],
       stock: [{ productId: '12', quantity: 15 }],
     });
     adapter = new ProductStockMovementCoreAdapter({ handleLock, handleMove });
@@ -36,7 +36,11 @@ describe('ProductStockMovementCoreAdapter', () => {
         kind: 'add',
         movements: [{ productId: '12', quantity: 5, orderProductId: null }],
       });
-      expect(view).toEqual({ productStockId: '700', quantity: 15 });
+      expect(view).toEqual({
+        productStockId: '700',
+        createdAt: '2026-01-05T08:00:00.000Z',
+        quantity: 15,
+      });
     });
   });
 });

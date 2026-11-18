@@ -1,4 +1,4 @@
-import { AggregateRootBase } from '@acme-libs/toolkit';
+import { VersionedEntity } from '@acme-libs/domain';
 
 import { NoteBodyInvalidException } from '../exceptions/note-body-invalid.exception';
 import { NoteResolvedException } from '../exceptions/note-resolved.exception';
@@ -6,17 +6,12 @@ import { NoteSubjectInvalidException } from '../exceptions/note-subject-invalid.
 import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
 
-export abstract class NoteAggregate extends AggregateRootBase {
-  public get version(): number {
-    return this.currentVersion;
-  }
-
+export abstract class NoteAggregate extends VersionedEntity {
   protected readonly subjectType: string;
   protected readonly subjectId: string;
   protected readonly authorId: string;
   protected currentBody: string;
   protected currentResolved: boolean;
-  protected currentVersion: number;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
@@ -25,17 +20,17 @@ export abstract class NoteAggregate extends AggregateRootBase {
   private static readonly BODY_MAX_LENGTH = 4000;
 
   protected constructor(record: INoteReconstitute) {
-    super(record.id);
-
-    const { subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
+    const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
       record;
+    const validVersion = NoteAggregate.validVersion(version);
+
+    super(id, validVersion);
 
     this.subjectType = NoteAggregate.validSubjectType(subjectType);
     this.subjectId = NoteAggregate.validSubjectId(subjectId);
     this.authorId = authorId;
     this.currentBody = NoteAggregate.validBody(body);
     this.currentResolved = resolved;
-    this.currentVersion = NoteAggregate.validVersion(version);
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -48,7 +43,7 @@ export abstract class NoteAggregate extends AggregateRootBase {
       body: this.currentBody,
       authorId: this.authorId,
       resolved: this.currentResolved,
-      version: this.currentVersion,
+      version: this.version,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
@@ -60,7 +55,7 @@ export abstract class NoteAggregate extends AggregateRootBase {
       versionAsRead,
       body: this.currentBody,
       resolved: this.currentResolved,
-      version: this.currentVersion,
+      version: this.version,
     };
   }
 
@@ -106,7 +101,7 @@ export abstract class NoteAggregate extends AggregateRootBase {
   }
 
   private static validVersion(version: number): number {
-    if (!Number.isInteger(version) || version < 1) {
+    if (!VersionedEntity.isValidVersion(version)) {
       throw new NoteVersionInvalidException(version);
     }
 

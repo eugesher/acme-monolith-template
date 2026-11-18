@@ -37,4 +37,8 @@ export class ProductCoreArchiveRepository
 
     await this.productRepository.update({ id, version: versionAsRead }, { status, version });
   }
+
+  public async findById(productId: string): Promise<IProductCoreArchiveRecord> {
+    return await this.createProductBuilder().forId(productId).getOneOrFail();
+  }
 }

@@ -5,7 +5,9 @@ import type {
 } from '../../../../outbound';
 
 export abstract class ProductStockCoreBaseRepository extends ProductStockCorePersistenceHost {
-  public async lockProducts(productIds: string[]): Promise<IProductStockCoreLockProductRecord[]> {
+  public async lockProducts(
+    productIds: readonly string[],
+  ): Promise<IProductStockCoreLockProductRecord[]> {
     if (productIds.length === 0) {
       return [];
     }
@@ -13,7 +15,7 @@ export abstract class ProductStockCoreBaseRepository extends ProductStockCorePer
     return await this.createProductBuilder().forLockProducts(productIds).getMany();
   }
 
-  public async sumStock(productIds: string[]): Promise<IProductStockCoreLockSumRecord[]> {
+  public async sumStock(productIds: readonly string[]): Promise<IProductStockCoreLockSumRecord[]> {
     if (productIds.length === 0) {
       return [];
     }

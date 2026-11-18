@@ -25,6 +25,10 @@ export const libsDeepImports = {
             message,
           },
           {
+            group: ['@acme-core/domain/**'],
+            message: 'outside specs the core domain is imported by its root, @acme-core/domain',
+          },
+          {
             group: ['@acme-core/entities/**'],
             message: 'outside specs the entities are imported by their root, @acme-core/entities',
           },

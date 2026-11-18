@@ -10,8 +10,8 @@ and every column that references one has the same type, so a join never casts. A
 composite key of its columns: `staff_user_roles (user_id, role_id)` and
 `staff_role_permissions (role_id, code)`, where `code` is a `VARCHAR(64)` holding a value of
 `PermissionCodeEnum`. The driver returns a `bigint` as a string, so an id is a `string` in
-TypeScript, and the bases of `libs/toolkit/src/ddd` take `string` for their id by default. The
-database issues the id on insert: the domain answers a candidate row without an id
+TypeScript, and the bases of `libs/domain` take `string` for their id by default. The database
+issues the id on insert: the domain answers a candidate row without an id
 (`AuthCustomerCandidateModel.toInsertPayload()` answers `IAuthCustomerCandidateInsertPayload`), and
 the repository returns the issued id (`AuthRegisterRepository.insert`).
 

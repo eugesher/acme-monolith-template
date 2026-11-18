@@ -5,7 +5,6 @@ import {
   ProductIdempotencyKeyReusedException,
   ProductIdempotentRequestInFlightException,
   ProductNotFoundException,
-  ProductStockAddedEvent,
   ProductStockAddModel,
 } from '../../domain';
 import {
@@ -67,11 +66,9 @@ export class ProductStockAddUseCase {
     }
 
     const writeResult = await this.write(command);
-    const { stockOnHand, productStockId, domainEvents } = writeResult;
-    const addedEvents = domainEvents.filter((event) => event instanceof ProductStockAddedEvent);
-    const ledgerRecords = addedEvents.map((event) => event.toLedgerRecord(productStockId));
+    const { stockOnHand, productStockId, productStockLedgerPayload } = writeResult;
 
-    await this.ledger.recordEvents({ ledgerRecords });
+    await this.ledger.recordAdded(productStockLedgerPayload);
 
     const addLoggerPayload = ProductStockAddModel.toLoggerPayload({
       productStockId,
@@ -110,13 +107,13 @@ export class ProductStockAddUseCase {
 
     productStock.add(quantity);
 
-    const domainEvents = productStock.pullDomainEvents();
     const added = await this.movement.add({ productId, quantity });
-    const { productStockId } = added;
+    const { productStockId, createdAt } = added;
     const stockOnHand = productStock.toOnHandSnapshot(added.quantity);
+    const productStockLedgerPayload = productStock.toLedgerPayload({ productStockId, createdAt });
 
     await this.idempotency.complete({ staffUserId, key: idempotencyKey, response: stockOnHand });
 
-    return { stockOnHand, productStockId, domainEvents };
+    return { stockOnHand, productStockId, productStockLedgerPayload };
   }
 }

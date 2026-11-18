@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { EmailValue } from '@acme-core/domain';
+
 import { AuthCustomerLoginModel, AuthInvalidCredentialsException } from '../../domain';
 import {
   AUTH_CREDENTIALS_PORT,
@@ -23,9 +25,9 @@ export class AuthLoginUseCase {
 
   public async execute(command: IAuthLoginCommand): Promise<IAuthLoginView> {
     const { email, password } = command;
-    const normalizedEmail = AuthCustomerLoginModel.normalizeEmail(email);
+    const customerEmail = EmailValue.create(email);
 
-    const customerRecord = await this.repository.findByEmail(normalizedEmail);
+    const customerRecord = await this.repository.findByEmail(customerEmail.address);
     const customer = customerRecord ? AuthCustomerLoginModel.reconstitute(customerRecord) : null;
 
     const passwordHash = customer?.passwordHash ?? null;

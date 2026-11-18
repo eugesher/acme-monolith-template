@@ -10,10 +10,10 @@ export class NoteResolveModel extends NoteAggregate {
     this.assertOpen();
 
     this.currentResolved = true;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toLoggerPayload(): INoteResolveLoggerPayload {
-    return { id: this.id, version: this.currentVersion };
+    return { id: this.id, version: this.version };
   }
 }

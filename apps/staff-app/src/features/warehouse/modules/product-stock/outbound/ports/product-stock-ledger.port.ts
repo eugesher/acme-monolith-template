@@ -1,7 +1,7 @@
-import type { IProductStockLedgerRecordEventsCommand } from '../interfaces';
+import type { IProductStockLedgerRecordAddedCommand } from '../interfaces';
 
 export interface IProductStockLedgerPort {
-  recordEvents(command: IProductStockLedgerRecordEventsCommand): Promise<void>;
+  recordAdded(command: IProductStockLedgerRecordAddedCommand): Promise<void>;
 }
 
 export const PRODUCT_STOCK_LEDGER_PORT = Symbol('PRODUCT_STOCK_LEDGER_PORT');

@@ -11,15 +11,15 @@ export class ReminderRescheduleModel extends ReminderAggregate {
 
     const validDueOn = ReminderRescheduleModel.validDueOn(dueOn);
 
-    if (validDueOn === this.currentDueOn) {
+    if (validDueOn.equals(this.currentDueOn)) {
       return;
     }
 
     this.currentDueOn = validDueOn;
-    this.currentVersion += 1;
+    this.bumpVersion();
   }
 
   public toLoggerPayload(): IReminderRescheduleLoggerPayload {
-    return { id: this.id, dueOn: this.currentDueOn, version: this.currentVersion };
+    return { id: this.id, dueOn: this.currentDueOn.isoDate, version: this.version };
   }
 }

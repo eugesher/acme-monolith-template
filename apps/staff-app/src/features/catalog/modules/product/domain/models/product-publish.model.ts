@@ -1,32 +1,38 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
+import type { Maybe } from '@acme-libs/toolkit';
 
 import { ProductAggregate } from '../aggregates/product.aggregate';
-import { ProductPublishedEvent } from '../events/product-published.event';
-import type { IProductPublishLoggerPayload, IProductReconstitute } from '../interfaces';
+import type {
+  IProductPublishLedgerPayload,
+  IProductPublishLoggerPayload,
+  IProductReconstitute,
+} from '../interfaces';
 
 export class ProductPublishModel extends ProductAggregate {
   public static reconstitute(this: void, record: IProductReconstitute): ProductPublishModel {
     return new ProductPublishModel(record);
   }
 
-  public publish(): void {
+  public publish(): Maybe<ProductStatusEnum> {
     if (this.currentStatus === ProductStatusEnum.ACTIVE) {
-      return;
+      return undefined;
     }
 
     const previousStatus = this.currentStatus;
 
     this.currentStatus = ProductStatusEnum.ACTIVE;
-    this.currentVersion += 1;
+    this.bumpVersion();
 
-    const publishedEvent = new ProductPublishedEvent(
-      this.id,
-      this.sku,
-      this.currentVersion,
-      previousStatus,
-    );
+    return previousStatus;
+  }
 
-    this.addDomainEvent(publishedEvent);
+  public toLedgerPayload(previousStatus: ProductStatusEnum): IProductPublishLedgerPayload {
+    return {
+      subjectId: this.id,
+      version: this.version,
+      occurredAt: this.updatedAt.toISOString(),
+      payload: { sku: this.sku, previousStatus },
+    };
   }
 
   public toLoggerPayload(): IProductPublishLoggerPayload {

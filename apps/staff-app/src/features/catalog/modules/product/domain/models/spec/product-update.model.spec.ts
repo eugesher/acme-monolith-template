@@ -1,6 +1,5 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
-import { ProductUpdatedEvent } from '../../events/product-updated.event';
 import { ProductUpdateModel } from '../product-update.model';
 
 describe('ProductUpdateModel', () => {
@@ -19,20 +18,11 @@ describe('ProductUpdateModel', () => {
       });
     });
 
-    it('renames, bumps the version and records the change with the previous name', () => {
+    it('renames and bumps the version', () => {
       product.update({ name: '  Desk lamp ' });
-
-      const events = product.pullDomainEvents();
 
       expect(product.toSnapshot().name).toBe('Desk lamp');
       expect(product.version).toBe(4);
-      expect(events).toHaveLength(1);
-      expect(events[0]).toBeInstanceOf(ProductUpdatedEvent);
-      expect(events[0]).toMatchObject({
-        aggregateId: '12',
-        changes: { name: 'Desk lamp' },
-        previous: { name: 'Lamp' },
-      });
     });
 
     it('changes nothing without a name', () => {
@@ -40,14 +30,12 @@ describe('ProductUpdateModel', () => {
 
       expect(product.toSnapshot().name).toBe('Lamp');
       expect(product.version).toBe(3);
-      expect(product.pullDomainEvents()).toEqual([]);
     });
 
     it('changes nothing when the trimmed name is the current one', () => {
       product.update({ name: ' Lamp ' });
 
       expect(product.version).toBe(3);
-      expect(product.pullDomainEvents()).toEqual([]);
     });
 
     it('refuses a blank name with PRODUCT_NAME_INVALID', () => {
@@ -72,7 +60,6 @@ describe('ProductUpdateModel', () => {
       product.update({ name: 'Desk' });
 
       expect(product.toSnapshot()).toMatchObject({ status: 'archived', version: 6 });
-      expect(product.pullDomainEvents()).toHaveLength(1);
     });
   });
 

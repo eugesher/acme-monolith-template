@@ -21,8 +21,7 @@ export class ProductCoreLedgerCoreAdapter implements IProductCoreLedgerPort {
   ) {}
 
   public async recordArchived(command: IProductCoreLedgerRecordArchivedCommand): Promise<void> {
-    const { subjectId, version, payload } = command;
-    const occurredAt = new Date().toISOString();
+    const { subjectId, version, occurredAt, payload } = command;
 
     await this.ledger.handleEnqueue({
       operationKey: `product-archived:${subjectId}:${version}`,

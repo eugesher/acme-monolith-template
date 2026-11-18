@@ -1,3 +1,7 @@
+import { LedgerActionRequiredException } from '../exceptions/ledger-action-required.exception';
+import { LedgerInstantInvalidException } from '../exceptions/ledger-instant-invalid.exception';
+import { LedgerOperationKeyRequiredException } from '../exceptions/ledger-operation-key-required.exception';
+import { LedgerInstantValue } from '../values/ledger-instant.value';
 import type {
   ILedgerAppendEntryCandidate,
   ILedgerAppendEntryCandidateInit,
@@ -14,15 +18,24 @@ export class LedgerAppendEntryModel {
     const verb = action.trim();
 
     if (key.length === 0) {
-      throw new Error('LedgerEntry.operationKey is required');
+      throw new LedgerOperationKeyRequiredException();
     }
 
     if (verb.length === 0) {
-      throw new Error('LedgerEntry.action is required');
+      throw new LedgerActionRequiredException();
     }
 
-    if (Number.isNaN(occurredAt.getTime())) {
-      throw new Error('LedgerEntry.occurredAt must be a valid instant');
+    const instant = LedgerInstantValue.create(occurredAt);
+
+    if (!instant.hasExplicitZone()) {
+      throw new LedgerInstantInvalidException(
+        occurredAt,
+        `occurredAt must be an ISO-8601 instant with an explicit timezone offset, got ${occurredAt}`,
+      );
+    }
+
+    if (!instant.isValid()) {
+      throw new LedgerInstantInvalidException(occurredAt);
     }
 
     return {
@@ -32,7 +45,7 @@ export class LedgerAppendEntryModel {
       action: verb,
       payload,
       correlationId,
-      occurredAt,
+      occurredAt: instant.toDate(),
     };
   }
 

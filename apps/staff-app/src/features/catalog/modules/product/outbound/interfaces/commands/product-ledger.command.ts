@@ -1,13 +1,4 @@
-export interface IProductLedgerRecordEventsCommand {
-  ledgerRecords: {
-    operationKey: string;
-    subjectType: string;
-    subjectId: string;
-    action: string;
-    payload: Record<string, unknown>;
-    occurredAt: string;
-  }[];
-}
+import type { ProductStatusEnum } from '@acme-libs/kernel';
 
 export interface IProductLedgerRecordCreatedCommand {
   subjectId: string;
@@ -15,5 +6,15 @@ export interface IProductLedgerRecordCreatedCommand {
   payload: {
     sku: string;
     name: string;
+  };
+}
+
+export interface IProductLedgerRecordPublishedCommand {
+  subjectId: string;
+  version: number;
+  occurredAt: string;
+  payload: {
+    sku: string;
+    previousStatus: ProductStatusEnum;
   };
 }

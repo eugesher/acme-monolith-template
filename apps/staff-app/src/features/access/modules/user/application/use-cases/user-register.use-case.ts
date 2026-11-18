@@ -38,7 +38,6 @@ export class UserRegisterUseCase {
     const passwordHash = await this.credentials.hashPassword(password);
     const userCandidate = UserStaffUserCandidateModel.create({ email, passwordHash, roleIds });
 
-    userCandidate.normalizeEmail();
     userCandidate.assertEmail();
 
     const user = await this.transaction.run(() => this.register(userCandidate));

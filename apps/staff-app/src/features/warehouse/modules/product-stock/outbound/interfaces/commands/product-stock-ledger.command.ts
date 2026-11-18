@@ -1,10 +1,9 @@
-export interface IProductStockLedgerRecordEventsCommand {
-  ledgerRecords: {
-    operationKey: string;
-    subjectType: string;
-    subjectId: string;
-    action: string;
-    payload: Record<string, unknown>;
-    occurredAt: string;
-  }[];
+export interface IProductStockLedgerRecordAddedCommand {
+  productStockId: string;
+  subjectId: string;
+  occurredAt: string;
+  payload: {
+    sku: string;
+    quantity: number;
+  };
 }

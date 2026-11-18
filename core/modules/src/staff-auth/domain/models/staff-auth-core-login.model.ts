@@ -18,10 +18,6 @@ export class StaffAuthCoreLoginModel {
     return new StaffAuthCoreLoginModel(id, passwordHash, status);
   }
 
-  public static normalizeEmail(email: string): string {
-    return email.trim().toLowerCase();
-  }
-
   public isActive(): boolean {
     return this.status === UserStatusEnum.ACTIVE;
   }

@@ -36,6 +36,6 @@ export class ProductStockCoreMoveRepository
 
     const insertResult = await this.productStockRepository.insert(queries);
 
-    return insertResult.identifiers as IProductStockCoreMoveInsertRecord[];
+    return insertResult.generatedMaps as IProductStockCoreMoveInsertRecord[];
   }
 }

@@ -36,11 +36,16 @@ describe('ProductStockCoreMovementsModel', () => {
     });
   });
 
-  describe('toIds', () => {
-    it('answers the id of every inserted row as a string', () => {
-      expect(ProductStockCoreMovementsModel.toIds([{ id: 700 }, { id: '701' }])).toEqual([
-        '700',
-        '701',
+  describe('toRows', () => {
+    it('answers every inserted row with its id as a string and its creation time', () => {
+      expect(
+        ProductStockCoreMovementsModel.toRows([
+          { id: 700, createdAt: new Date('2026-01-05T08:00:00.000Z') },
+          { id: '701', createdAt: new Date('2026-01-05T08:00:00.000Z') },
+        ]),
+      ).toEqual([
+        { id: '700', createdAt: '2026-01-05T08:00:00.000Z' },
+        { id: '701', createdAt: '2026-01-05T08:00:00.000Z' },
       ]);
     });
   });

@@ -1,20 +1,17 @@
-import { AggregateRootBase } from '@acme-libs/toolkit';
+import { VersionedEntity } from '@acme-libs/domain';
 import type { ProductStatusEnum } from '@acme-libs/kernel';
+import type { Maybe } from '@acme-libs/toolkit';
 
 import { ProductNameInvalidException } from '../exceptions/product-name-invalid.exception';
 import { ProductSkuInvalidException } from '../exceptions/product-sku-invalid.exception';
 import { ProductVersionInvalidException } from '../exceptions/product-version-invalid.exception';
+import { ProductVersionMismatchException } from '../exceptions/product-version-mismatch.exception';
 import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
 
-export abstract class ProductAggregate extends AggregateRootBase {
-  public get version(): number {
-    return this.currentVersion;
-  }
-
+export abstract class ProductAggregate extends VersionedEntity {
   protected readonly sku: string;
   protected currentName: string;
   protected currentStatus: ProductStatusEnum;
-  protected currentVersion: number;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
@@ -22,14 +19,14 @@ export abstract class ProductAggregate extends AggregateRootBase {
   private static readonly NAME_MAX_LENGTH = 255;
 
   protected constructor(record: IProductReconstitute) {
-    super(record.id);
+    const { id, sku, name, status, version, createdAt, updatedAt } = record;
+    const validVersion = ProductAggregate.validVersion(version);
 
-    const { sku, name, status, version, createdAt, updatedAt } = record;
+    super(id, validVersion);
 
     this.sku = ProductAggregate.validSku(sku);
     this.currentName = ProductAggregate.validName(name);
     this.currentStatus = status;
-    this.currentVersion = ProductAggregate.validVersion(version);
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -40,7 +37,7 @@ export abstract class ProductAggregate extends AggregateRootBase {
       sku: this.sku,
       name: this.currentName,
       status: this.currentStatus,
-      version: this.currentVersion,
+      version: this.version,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
@@ -52,8 +49,20 @@ export abstract class ProductAggregate extends AggregateRootBase {
       versionAsRead,
       name: this.currentName,
       status: this.currentStatus,
-      version: this.currentVersion,
+      version: this.version,
     };
+  }
+
+  public assertExpectedVersion(expectedVersion: Maybe<number>): void {
+    if (this.isExpectedVersion(expectedVersion)) {
+      return;
+    }
+
+    throw new ProductVersionMismatchException(
+      this.id,
+      this.version,
+      `Product ${this.id}: If-Match version ${String(expectedVersion)} does not match the current version ${this.version}`,
+    );
   }
 
   protected static validSku(sku: string): string {
@@ -75,7 +84,7 @@ export abstract class ProductAggregate extends AggregateRootBase {
   }
 
   private static validVersion(version: number): number {
-    if (!Number.isInteger(version) || version < 1) {
+    if (!VersionedEntity.isValidVersion(version)) {
       throw new ProductVersionInvalidException(version);
     }
 

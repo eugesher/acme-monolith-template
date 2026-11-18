@@ -5,18 +5,16 @@ describe('AuthLedgerCoreAdapter', () => {
   let adapter: AuthLedgerCoreAdapter;
 
   beforeEach(() => {
-    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     handleEnqueue = jest.fn().mockResolvedValue(undefined);
     adapter = new AuthLedgerCoreAdapter({ handleEnqueue });
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   describe('recordRegistered', () => {
     it('enqueues the registration under the operation key and correlation id', async () => {
-      await adapter.recordRegistered({ subjectId: 'customer-1' });
+      await adapter.recordRegistered({
+        subjectId: 'customer-1',
+        occurredAt: '2026-01-05T08:00:00.000Z',
+      });
 
       expect(handleEnqueue).toHaveBeenCalledTimes(1);
       expect(handleEnqueue).toHaveBeenCalledWith({

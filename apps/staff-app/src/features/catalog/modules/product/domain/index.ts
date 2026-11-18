@@ -1,8 +1,5 @@
 export * from './enums/product-exception-code.enum';
 
-export * from './events/product-published.event';
-export * from './events/product-updated.event';
-
 export * from './exceptions/base/product-base.exception';
 export * from './exceptions/product-already-archived.exception';
 export * from './exceptions/product-idempotency-key-reused.exception';
@@ -16,8 +13,6 @@ export * from './exceptions/product-version-invalid.exception';
 export * from './exceptions/product-version-mismatch.exception';
 
 export * from './aggregates/product.aggregate';
-
-export * from './helpers/product.helper';
 
 export * from './interfaces';
 

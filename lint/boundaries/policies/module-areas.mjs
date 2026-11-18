@@ -1,5 +1,6 @@
 import {
   baseLibs,
+  coreDomain,
   from,
   fromFile,
   fromSpec,
@@ -24,7 +25,7 @@ const areaPolicies = (area, sharedFacing) => {
         module: '{{ from.file.captured.module }}/modules/*',
       }),
     ]),
-    from(`${prefix}:domain`, [layer('domain'), baseLibs()]),
+    from(`${prefix}:domain`, [layer('domain'), coreDomain, baseLibs()]),
     from(`${prefix}:outbound`, [layer('outbound'), baseLibs(), ...sharedFacing.outbound]),
     fromFile(`${prefix}:outbound`, persistenceInterfaces, [
       to('acme-core:entities'),
@@ -34,6 +35,7 @@ const areaPolicies = (area, sharedFacing) => {
       layer('domain'),
       layer('outbound'),
       layer('application'),
+      coreDomain,
       ...sharedFacing.application,
       baseLibs('observability'),
       packages('nestjs-pino'),

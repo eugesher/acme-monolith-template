@@ -22,10 +22,12 @@ common-module spec imports the kernel; both are code the lint checks.
 
 ### `policies/selectors.mjs` — the base libs
 
-`baseLibs(...names)` is `libs('kernel', 'toolkit', ...names)`. The kernel is the vocabulary and the
-toolkit is the technique of every layer, so each layer gets both whether or not one of its files
-imports them. The names after them are what the layer adds: `baseLibs('observability')` for an
-application layer, `baseLibs('ledger', 'queue')` for the module root of a core module.
+`baseLibs(...names)` is `libs('kernel', 'toolkit', 'domain', ...names)`. The kernel is the
+vocabulary, the toolkit is the technique of every layer and the domain lib holds the bases of the
+domain models and exceptions (`Entity`, `VersionedEntity`, `ValueObject`, `DomainException`), so
+each layer gets all three whether or not one of its files imports them. The names after them are
+what the layer adds: `baseLibs('observability')` for an application layer,
+`baseLibs('ledger', 'queue')` for the module root of a core module.
 
 `main.ts` and the core entities are the exceptions: they list their libs one by one.
 
@@ -85,8 +87,8 @@ its domain.
 
 **Outbound does not see the domain.** A port speaks types of its own: a command lists the fields its
 adapter reads, and the use case hands it what the model answers, which fits by shape
-(`IOrderProductStockWithdrawCommand.movements`, `IProductLedgerRecordEventsCommand.ledgerRecords`).
-A domain type in a command would let infrastructure, which may not import the domain, hold domain
+(`IOrderProductStockWithdrawCommand.movements`, `IProductLedgerRecordPublishedCommand.payload`). A
+domain type in a command would let infrastructure, which may not import the domain, hold domain
 objects and call their methods. The features, core modules and common modules specs each refuse the
 edge.
 
@@ -152,7 +154,7 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   it. The http lib reads `MysqlErrorHelper` from the toolkit too.
 - **`toolkit/src/database` may import `typeorm`.** `MysqlErrorHelper` checks for a TypeORM
   `QueryFailedError`. The edge is scoped to that folder by the `file` capture of the lib category,
-  so the rest of the toolkit sees only `crypto` and the kernel sees no package.
+  so the rest of the toolkit sees only `crypto`, and the domain lib and the kernel see no package.
 - **The database contracts name TypeORM.** The ORM port returns a TypeORM `Repository`, so the
   contracts of `database` may import `typeorm`; the other contracts see only the base libs.
 - **No module registers entities.** The entities of an app are listed once in `app/entities` and

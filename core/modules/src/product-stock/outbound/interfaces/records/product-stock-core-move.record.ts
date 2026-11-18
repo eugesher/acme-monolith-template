@@ -4,6 +4,7 @@ export type IProductStockCoreMoveProductRecord = Pick<Product, 'id'>;
 
 export interface IProductStockCoreMoveInsertRecord {
   id: number | string;
+  createdAt: Date;
 }
 
 export interface IProductStockCoreMoveSumRecord {

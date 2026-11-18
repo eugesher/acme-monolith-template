@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { EmailValue } from '@acme-core/domain';
 import {
   StaffAuthCoreLoginOutcomeEnum,
   type IStaffAuthCoreLoginCommand,
@@ -28,8 +29,8 @@ export class StaffAuthCoreLoginUseCase {
 
   public async execute(command: IStaffAuthCoreLoginCommand): Promise<IStaffAuthCoreLoginView> {
     const { email, password } = command;
-    const normalizedEmail = StaffAuthCoreLoginModel.normalizeEmail(email);
-    const userRecord = await this.repository.findByEmail(normalizedEmail);
+    const userEmail = EmailValue.create(email);
+    const userRecord = await this.repository.findByEmail(userEmail.address);
     const user = userRecord ? StaffAuthCoreLoginModel.reconstitute(userRecord) : null;
     const passwordHash = user?.passwordHash ?? null;
     const isPasswordValid = await this.credentials.verifyPassword({ passwordHash, password });

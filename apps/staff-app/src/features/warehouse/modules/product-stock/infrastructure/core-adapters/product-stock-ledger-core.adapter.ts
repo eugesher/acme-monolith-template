@@ -5,7 +5,7 @@ import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/led
 import {
   PRODUCT_STOCK_LEDGER_PORT,
   type IProductStockLedgerPort,
-  type IProductStockLedgerRecordEventsCommand,
+  type IProductStockLedgerRecordAddedCommand,
 } from '../../outbound';
 
 @Injectable()
@@ -20,11 +20,16 @@ export class ProductStockLedgerCoreAdapter implements IProductStockLedgerPort {
     private readonly ledger: ILedgerCorePort,
   ) {}
 
-  public async recordEvents(command: IProductStockLedgerRecordEventsCommand): Promise<void> {
-    const { ledgerRecords } = command;
+  public async recordAdded(command: IProductStockLedgerRecordAddedCommand): Promise<void> {
+    const { productStockId, subjectId, occurredAt, payload } = command;
 
-    for (const ledgerRecord of ledgerRecords) {
-      await this.ledger.handleEnqueue(ledgerRecord);
-    }
+    await this.ledger.handleEnqueue({
+      operationKey: `product-restocked:${productStockId}`,
+      subjectType: 'product',
+      subjectId,
+      action: 'ProductRestocked',
+      payload,
+      occurredAt,
+    });
   }
 }

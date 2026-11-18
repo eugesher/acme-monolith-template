@@ -1,5 +1,5 @@
 export interface IOrderProductStockLockCommand {
-  productIds: string[];
+  productIds: readonly string[];
 }
 
 export interface IOrderProductStockWithdrawCommand {

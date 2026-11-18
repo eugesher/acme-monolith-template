@@ -18,3 +18,5 @@ export * from './models/reminder-create.model';
 export * from './models/reminder-delete.model';
 export * from './models/reminder-get-many.model';
 export * from './models/reminder-reschedule.model';
+
+export * from './values/reminder-due-on.value';

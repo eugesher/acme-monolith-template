@@ -56,7 +56,7 @@ export class ProductCoreArchiveUseCase {
 
     const product = ProductCoreArchiveModel.reconstitute(productRecord);
 
-    if (expectedVersion !== undefined && expectedVersion !== product.version) {
+    if (!product.isExpectedVersion(expectedVersion)) {
       return {
         outcome: ProductCoreArchiveOutcomeEnum.VERSION_MISMATCH,
         currentVersion: product.version,
@@ -79,11 +79,16 @@ export class ProductCoreArchiveUseCase {
 
     await this.repository.update(productUpdatePayload);
 
-    const archiveLedgerPayload = product.toLedgerPayload(previousStatus);
+    const archivedRecord = await this.repository.findById(productId);
+    const archivedProduct = ProductCoreArchiveModel.reconstitute(archivedRecord);
+    const archiveLedgerPayload = archivedProduct.toLedgerPayload(previousStatus);
 
     this.transaction.afterCommit(() => this.catalogCache.invalidate());
     this.transaction.afterCommit(() => this.ledger.recordArchived(archiveLedgerPayload));
 
-    return { outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED, currentVersion: product.version };
+    return {
+      outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED,
+      currentVersion: archivedProduct.version,
+    };
   }
 }

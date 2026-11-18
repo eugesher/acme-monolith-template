@@ -3,7 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { ProductUpdatedEvent, ProductUpdateModel } from '../../../domain';
+import { ProductUpdateModel } from '../../../domain';
 import { ProductUpdateUseCase } from '../product-update.use-case';
 import type { ProductWriteService } from '../../services/product-write.service';
 
@@ -24,7 +24,7 @@ describe('ProductUpdateUseCase', () => {
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
         updatedAt: new Date('2026-01-03T00:00:00.000Z'),
       }),
-      domainEvents: [new ProductUpdatedEvent('12', { name: 'Desk lamp' }, { name: 'Lamp' })],
+      answer: undefined,
     });
     invalidate = jest.fn().mockResolvedValue(undefined);
     logger = makePinoLoggerMock();

@@ -22,7 +22,6 @@ describe('ProductGetOneModel', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-02T00:00:00.000Z',
       });
-      expect(product.pullDomainEvents()).toEqual([]);
     });
 
     it.each([
@@ -112,6 +111,39 @@ describe('ProductGetOneModel', () => {
         status: 'active',
         version: 3,
       });
+    });
+  });
+
+  describe('assertExpectedVersion', () => {
+    let product: ProductGetOneModel;
+
+    beforeEach(() => {
+      product = ProductGetOneModel.reconstitute({
+        id: '12',
+        sku: 'SKU-0001',
+        name: 'Lamp',
+        status: ProductStatusEnum.ACTIVE,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+      });
+    });
+
+    it.each([
+      ['no If-Match', undefined],
+      ['the current version', 3],
+    ])('accepts %s', (_, expectedVersion) => {
+      expect(() => product.assertExpectedVersion(expectedVersion)).not.toThrow();
+    });
+
+    it('refuses another version with VERSION_MISMATCH and the current version', () => {
+      expect(() => product.assertExpectedVersion(2)).toThrow(
+        expect.objectContaining({
+          code: 'VERSION_MISMATCH',
+          message: 'Product 12: If-Match version 2 does not match the current version 3',
+          details: { currentVersion: 3 },
+        }) as Error,
+      );
     });
   });
 });

@@ -1,9 +1,9 @@
-import { AggregateRootBase } from '@acme-libs/toolkit';
+import { Entity } from '@acme-libs/domain';
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import type { IRoleSnapshot } from '../interfaces';
 
-export abstract class RoleAggregate extends AggregateRootBase {
+export abstract class RoleAggregate extends Entity {
   protected constructor(
     id: string,
     protected readonly name: string,

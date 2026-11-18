@@ -10,19 +10,21 @@ import type {
 } from '../interfaces';
 
 export class OrderCandidateModel {
-  public get distinctProductIds(): string[] {
-    return [...new Set(this.productIds)];
+  public get distinctProductIds(): readonly string[] {
+    return this.uniqueProductIds;
   }
 
   private constructor(
     private readonly customerId: string,
     private readonly productIds: readonly string[],
+    private readonly uniqueProductIds: readonly string[],
   ) {}
 
   public static create(proposal: IOrderCandidateCreate): OrderCandidateModel {
     const { customerId, productIds } = proposal;
+    const uniqueProductIds = [...new Set(productIds)];
 
-    return new OrderCandidateModel(customerId, productIds);
+    return new OrderCandidateModel(customerId, productIds, uniqueProductIds);
   }
 
   public toInsertPayload(): IOrderCandidateInsertPayload {
@@ -50,7 +52,7 @@ export class OrderCandidateModel {
   }
 
   public assertStockQuantities(stockQuantities: IOrderCandidateStockQuantity[]): void {
-    for (const productId of this.distinctProductIds) {
+    for (const productId of this.uniqueProductIds) {
       const requestedQuantity = this.productIds.filter((id) => id === productId).length;
       const productStock = stockQuantities.find((candidate) => candidate.productId === productId);
       const available = productStock?.quantity ?? 0;

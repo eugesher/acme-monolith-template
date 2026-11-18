@@ -1,4 +1,5 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
+import { EmailValue } from '@acme-core/domain';
 
 import { UserEmailInvalidException } from '../exceptions/user-email-invalid.exception';
 import { UserPasswordTooWeakException } from '../exceptions/user-password-too-weak.exception';
@@ -16,19 +17,19 @@ export class UserStaffUserCandidateModel {
     return this.roleIds;
   }
 
-  private static readonly EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private static readonly MIN_PASSWORD_LENGTH = 12;
 
   private constructor(
-    private email: string,
+    private readonly email: EmailValue,
     private readonly passwordHash: string,
     private readonly roleIds: readonly string[],
   ) {}
 
   public static create(proposal: IUserStaffUserCandidateCreate): UserStaffUserCandidateModel {
     const { email, passwordHash, roleIds } = proposal;
+    const userEmail = EmailValue.create(email);
 
-    return new UserStaffUserCandidateModel(email, passwordHash, [...new Set(roleIds)]);
+    return new UserStaffUserCandidateModel(userEmail, passwordHash, [...new Set(roleIds)]);
   }
 
   public static assertPasswordStrength(password: string): void {
@@ -37,18 +38,18 @@ export class UserStaffUserCandidateModel {
     }
   }
 
-  public normalizeEmail(): void {
-    this.email = this.email.trim().toLowerCase();
-  }
-
   public assertEmail(): void {
-    if (!UserStaffUserCandidateModel.EMAIL_PATTERN.test(this.email)) {
+    if (!this.email.isValid()) {
       throw new UserEmailInvalidException();
     }
   }
 
   public toInsertPayload(): IUserStaffUserCandidateInsertPayload {
-    return { email: this.email, passwordHash: this.passwordHash, status: UserStatusEnum.ACTIVE };
+    return {
+      email: this.email.address,
+      passwordHash: this.passwordHash,
+      status: UserStatusEnum.ACTIVE,
+    };
   }
 
   public assertRoles(storedRoles: IUserStaffUserStoredRole[]): void {
@@ -66,6 +67,6 @@ export class UserStaffUserCandidateModel {
   }
 
   public toRegistered(id: string): IUserStaffUserRegisterReconstitute {
-    return { id, email: this.email };
+    return { id, email: this.email.address };
   }
 }

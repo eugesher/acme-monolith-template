@@ -430,6 +430,13 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
+    it('the src of the domain lib is not a domain layer', async () => {
+      await expect({
+        file: 'libs/auth/src/__fixture__.ts',
+        code: 'import { x } from "../../domain/src";',
+      }).toPassArchitectureLint();
+    });
+
     it('an import inside the domain layer MAY use a direct file path', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/domain/exceptions/__fixture__.ts',

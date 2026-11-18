@@ -1,9 +1,8 @@
-import type { DomainEventBase } from '@acme-libs/toolkit';
-
+import type { IProductStockAddLedgerPayload } from '../../../domain';
 import type { IProductStockAddView } from './product-stock-add.view';
 
 export interface IProductStockAddWriteView {
   stockOnHand: IProductStockAddView;
   productStockId: string;
-  domainEvents: DomainEventBase[];
+  productStockLedgerPayload: IProductStockAddLedgerPayload;
 }
