@@ -4,8 +4,6 @@ import type { HttpExceptionFilter } from '@acme-libs/http';
 
 import {
   ProductAlreadyArchivedException,
-  ProductIdempotencyKeyReusedException,
-  ProductIdempotentRequestInFlightException,
   ProductNameInvalidException,
   ProductNotFoundException,
   ProductSkuInvalidException,
@@ -45,17 +43,7 @@ describe('ProductHttpExceptionFilter', () => {
     ['PRODUCT_NOT_FOUND', 404, new ProductNotFoundException('100', 'domain message')],
     ['PRODUCT_ALREADY_ARCHIVED', 409, new ProductAlreadyArchivedException('100', 'domain message')],
     ['PRODUCT_SKU_TAKEN', 409, new ProductSkuTakenException('SKU-0001', 'domain message')],
-    [
-      'PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT',
-      409,
-      new ProductIdempotentRequestInFlightException('key-1', 'domain message'),
-    ],
     ['VERSION_MISMATCH', 409, new ProductVersionMismatchException('100', 4, 'domain message')],
-    [
-      'PRODUCT_IDEMPOTENCY_KEY_REUSED',
-      422,
-      new ProductIdempotencyKeyReusedException('key-1', 'domain message'),
-    ],
     ['PRODUCT_TAG_NOT_FOUND', 422, new ProductTagNotFoundException(['999'], 'domain message')],
   ])(
     'maps %s to %i with the code and the domain message in the body',

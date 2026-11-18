@@ -7,7 +7,7 @@ describe('AuthMeUseCase', () => {
 
   beforeEach(() => {
     findSubject = jest.fn();
-    useCase = new AuthMeUseCase({ findSubject, login: jest.fn() });
+    useCase = new AuthMeUseCase({ findSubject });
   });
 
   describe('execute', () => {

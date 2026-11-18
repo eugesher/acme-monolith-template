@@ -17,9 +17,9 @@ export class ConfigSetupModule {
         ...ConfigSchema.REDIS,
         ...ConfigSchema.QUEUE,
         ...ConfigSchema.AUTH,
+        ...ConfigSchema.CREDENTIALS,
         ...ConfigSchema.HTTP,
         ...ConfigSchema.OBSERVABILITY,
-        CACHE_TTL_MS_DEFAULT: Joi.number().integer().positive().required(),
         OCC_RETRY_ATTEMPTS: Joi.number().integer().min(1).required(),
       }),
     };

@@ -3,17 +3,6 @@
 exports[`App Catalog Product POST /api/catalog/products should create a draft and append its ledger entry under the correlation id 1`] = `
 {
   "db": {
-    "idempotency_key": [
-      {
-        "created_at": Any<Date>,
-        "id": Any<String>,
-        "idempotency_key": "system-create-key",
-        "request_fingerprint": "ada84541ce1421e476e6537286b71ef98d9f760768c0338cb8e1fd5062c446bc",
-        "response_body": Any<String>,
-        "scope": "staff:2",
-        "status": "completed",
-      },
-    ],
     "ledger_entry": [
       {
         "action": "ProductCreated",

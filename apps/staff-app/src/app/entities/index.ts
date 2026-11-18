@@ -11,7 +11,7 @@ import {
   StaffUser,
   StaffUserRole,
 } from '@acme-core/entities';
-import { Note, NoteRevision, Reminder, SubjectTag, Tag } from '@acme-staff/common/entities';
+import { Note, NoteRevision, SubjectTag, Tag } from '@acme-staff/common/entities';
 
 export const entities = [
   Customer,
@@ -23,7 +23,6 @@ export const entities = [
   OrderProduct,
   Product,
   ProductStock,
-  Reminder,
   StaffRole,
   StaffRolePermission,
   StaffUser,

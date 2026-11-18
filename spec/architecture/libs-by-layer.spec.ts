@@ -136,7 +136,7 @@ describe('libs by layer', () => {
   it.each([
     'import { CurrentUser, RequiresPermission } from "@acme-libs/auth";',
     'import { PermissionCodeEnum } from "@acme-libs/kernel";',
-    'import { ReminderStatusEnum } from "@acme-libs/kernel";',
+    'import { IdempotencyStatusEnum } from "@acme-libs/kernel";',
   ])(
     'customer-app presentation may NOT take %s — a customer holds no roles or permissions',
     async (code) => {

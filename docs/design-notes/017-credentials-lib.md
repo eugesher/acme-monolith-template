@@ -47,20 +47,19 @@ signs `HS256` tokens with that `aud`.
 
 Modules that read the same table keep models of their own, narrowed to what each uses (see
 `024-code-placement.md`). Example: `UserStaffUserCandidateModel`
-(`apps/staff-app/src/features/access/modules/user/domain/models`), and `StaffAuthCoreSubjectModel`
-and `StaffAuthCoreLoginModel` (`core/modules/src/staff-auth/domain/models`) all map `staff_user`.
+(`apps/staff-app/src/features/access/modules/user/domain/models`), `AuthStaffUserLoginModel`
+(`apps/staff-app/src/features/auth/domain/models`) and `StaffAuthCoreSubjectModel`
+(`core/modules/src/staff-auth/domain/models`) all map `staff_user`.
 
-## A core module for the staff of two apps
+## A core module for the staff subject of two apps
 
-staff-app and processor-app both sign the staff in and check the subject of every request, so both
-live in `core/modules/src/staff-auth` behind `STAFF_AUTH_CORE_PORT`
-(`core/contracts/src/staff-auth`): `handleFindSubject` for the guard and `GET /auth/me`,
-`handleLogin` for the login. Each app reaches it through `AuthIdentityCoreAdapter` in its `auth`
-feature and `AuthGlobalSubjectCoreAdapter` in its global module. The login checks the password and
-signs the token behind `StaffAuthCoreCredentialsLibAdapter`, and `StaffAuthCoreModule` mounts
-`CredentialsLibModule.register(AuthAudienceEnum.STAFF)`, so both apps sign the same staff token.
-Only the lib adapter and the module root of a core module reach the credentials; its application
-layer sees the port alone.
+staff-app and processor-app both check the subject of every request, so the check lives in
+`core/modules/src/staff-auth` behind `STAFF_AUTH_CORE_PORT` (`core/contracts/src/staff-auth`):
+`handleFindSubject` for the guard of both apps and for `GET /auth/me` of staff-app. staff-app
+reaches it through `AuthIdentityCoreAdapter` in its `auth` feature, and both apps through
+`AuthGlobalSubjectCoreAdapter` in their global module. Only staff-app signs the staff in: its `auth`
+feature checks the password and signs the token behind `AuthCredentialsLibAdapter`, and
+processor-app takes that token. No core module reaches the credentials.
 
 ## Table naming
 

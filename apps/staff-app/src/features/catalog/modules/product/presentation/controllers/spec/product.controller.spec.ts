@@ -44,22 +44,13 @@ describe('ProductController', () => {
   });
 
   describe('handleCreate', () => {
-    it('creates the product of the body for the caller under the idempotency key', async () => {
+    it('creates the product of the body', async () => {
       create.mockResolvedValue({ id: '12', sku: 'SKU-1001' });
 
-      const response = await controller.handleCreate(
-        { id: 'staff-1', email: 'editor@example.com' },
-        { sku: 'SKU-1001', name: 'Lamp' },
-        'key-1',
-      );
+      const response = await controller.handleCreate({ sku: 'SKU-1001', name: 'Lamp' });
 
       expect(response).toEqual({ id: '12', sku: 'SKU-1001' });
-      expect(create).toHaveBeenCalledWith({
-        sku: 'SKU-1001',
-        name: 'Lamp',
-        staffUserId: 'staff-1',
-        idempotencyKey: 'key-1',
-      });
+      expect(create).toHaveBeenCalledWith({ sku: 'SKU-1001', name: 'Lamp' });
     });
   });
 

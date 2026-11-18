@@ -1,0 +1,23 @@
+name: 02-taken-sku
+description: |-
+  e2e: Catalog › Product › POST /api/catalog/products › should refuse a taken sku with 409
+
+  Expect: 409 Conflict, code PRODUCT_SKU_TAKEN
+  User: editor@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/catalog/products
+body:
+  content: |-
+    {
+      "sku": "SKU-0001",
+      "name": "Taken sku"
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

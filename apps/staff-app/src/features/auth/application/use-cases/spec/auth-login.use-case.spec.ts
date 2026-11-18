@@ -1,50 +1,98 @@
-import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
+import type { PinoLogger } from 'nestjs-pino';
+
+import { IdentityExceptionCodeEnum, UserStatusEnum } from '@acme-libs/kernel';
+import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { AuthLoginUseCase } from '../auth-login.use-case';
 
 describe('AuthLoginUseCase', () => {
-  let login: jest.Mock;
+  let repository: { findByEmail: jest.Mock };
+  let credentials: { issueAccessToken: jest.Mock; verifyPassword: jest.Mock };
+  let logger: PinoLoggerMock;
   let useCase: AuthLoginUseCase;
 
   beforeEach(() => {
-    login = jest.fn().mockResolvedValue({
-      outcome: 'logged-in',
-      userId: 'user-1',
-      accessToken: 'access-token',
-    });
-    useCase = new AuthLoginUseCase({ findSubject: jest.fn(), login });
+    repository = {
+      findByEmail: jest.fn().mockResolvedValue({
+        id: 'user-1',
+        passwordHash: 'hash',
+        status: UserStatusEnum.ACTIVE,
+      }),
+    };
+    credentials = {
+      issueAccessToken: jest.fn().mockResolvedValue('access-token'),
+      verifyPassword: jest.fn().mockResolvedValue(true),
+    };
+    logger = makePinoLoggerMock();
+    useCase = new AuthLoginUseCase(repository, credentials, logger as unknown as PinoLogger);
   });
 
-  it('answers the access token of a login', async () => {
-    const view = await useCase.execute({ email: 'editor@example.com', password: 'correct-horse' });
+  describe('execute', () => {
+    it('answers the access token of the right password', async () => {
+      const view = await useCase.execute({
+        email: ' Editor@Example.com ',
+        password: 'correct-horse',
+      });
 
-    expect(view).toEqual({ accessToken: 'access-token' });
-    expect(login).toHaveBeenCalledWith({ email: 'editor@example.com', password: 'correct-horse' });
-  });
-
-  it('rejects invalid credentials', async () => {
-    login.mockResolvedValue({
-      outcome: 'invalid-credentials',
-      userId: undefined,
-      accessToken: undefined,
+      expect(view).toEqual({ accessToken: 'access-token' });
+      expect(repository.findByEmail).toHaveBeenCalledWith('editor@example.com');
+      expect(credentials.verifyPassword).toHaveBeenCalledWith({
+        passwordHash: 'hash',
+        password: 'correct-horse',
+      });
+      expect(credentials.issueAccessToken).toHaveBeenCalledWith('user-1');
+      expect(logger.info).toHaveBeenCalledWith({ id: 'user-1' }, 'User logged in');
     });
 
-    const execution = useCase.execute({ email: 'ghost@example.com', password: 'correct-horse' });
+    it('refuses an unknown email after the same password check and as a wrong password', async () => {
+      repository.findByEmail.mockResolvedValue(null);
 
-    await expect(execution).rejects.toMatchObject({
-      code: IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
-      message: 'Invalid credentials',
+      const execution = useCase.execute({ email: 'ghost@example.com', password: 'correct-horse' });
+
+      await expect(execution).rejects.toMatchObject({
+        code: IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
+        message: 'Invalid credentials',
+      });
+      expect(credentials.verifyPassword).toHaveBeenCalledWith({
+        passwordHash: null,
+        password: 'correct-horse',
+      });
+      expect(logger.warn).toHaveBeenCalledWith('Login failed: unknown email');
     });
-  });
 
-  it('rejects a disabled user with its id', async () => {
-    login.mockResolvedValue({ outcome: 'user-inactive', userId: 'user-1', accessToken: undefined });
+    it('refuses a wrong password', async () => {
+      credentials.verifyPassword.mockResolvedValue(false);
 
-    const execution = useCase.execute({ email: 'editor@example.com', password: 'correct-horse' });
+      const execution = useCase.execute({ email: 'editor@example.com', password: 'wrong-horse' });
 
-    await expect(execution).rejects.toMatchObject({
-      code: IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
-      message: 'User user-1 is disabled',
+      await expect(execution).rejects.toMatchObject({
+        code: IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
+      });
+      expect(credentials.issueAccessToken).not.toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalledWith(
+        { userId: 'user-1' },
+        'Login failed: wrong password',
+      );
+    });
+
+    it('refuses a disabled user with its id after checking the password', async () => {
+      repository.findByEmail.mockResolvedValue({
+        id: 'user-1',
+        passwordHash: 'hash',
+        status: UserStatusEnum.DISABLED,
+      });
+
+      const execution = useCase.execute({
+        email: 'editor@example.com',
+        password: 'correct-horse',
+      });
+
+      await expect(execution).rejects.toMatchObject({
+        code: IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
+        message: 'User user-1 is disabled',
+      });
+      expect(credentials.verifyPassword).toHaveBeenCalled();
+      expect(credentials.issueAccessToken).not.toHaveBeenCalled();
     });
   });
 });

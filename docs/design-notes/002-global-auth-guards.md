@@ -91,12 +91,12 @@ price is a join, and a gated request saves its second read.
 
 **One secret and one audience per app.** The guard verifies with `JWT_SECRET` of the app, the secret
 its `auth` feature signs the access token with. staff-app and processor-app serve the same staff and
-share the secret, so a staff token works in both and either app signs one in. customer-app has its
-own secret, so its tokens fail the signature check in the staff apps.
+share the secret, so the token staff-app signs works in both; processor-app has no login of its own.
+customer-app has its own secret, so its tokens fail the signature check in the staff apps.
 
 **The audience is code, not configuration.** `customer.id` and `staff_user.id` both count from 1, so
 a secret shared by mistake would let customer 5 in as staff user 5. Each app passes
-`AuthAudienceEnum` of `libs/kernel` to `AuthJwtModule.forRoot()` and to
+`AuthAudienceEnum` of `libs/kernel` to `AuthJwtModule.forRoot()`, and staff-app and customer-app to
 `CredentialsLibModule.register()`: `staff` in staff-app and processor-app, `customer` in
 customer-app. The token carries it as `aud`, and the guard accepts only `HS256` and the audience of
 its app. An env variable could repeat the mistake of the secret; a constant in the module import

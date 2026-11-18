@@ -15,10 +15,10 @@ stays in core; a method of it that one app calls moves into that app, and the re
 
 | Module               | Methods                                               | Callers                                                                                  |
 | -------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| core `idempotency`   | `handleClaim`, `handleComplete`, `handleRelease`      | staff `product`, staff `product-stock`, customer `order`                                 |
+| core `idempotency`   | `handleClaim`, `handleComplete`, `handleRelease`      | staff `product-stock`, customer `order`                                                  |
 | core `product`       | `handleArchive`                                       | staff `product`, the processor `product-stock`                                           |
 | core `product-stock` | `handleLock`, `handleMove`                            | staff `product-stock`, customer `order`, `handleLock` also the processor `product-stock` |
-| core `staff-auth`    | `handleFindSubject`, `handleLogin`                    | `app/global/auth` and `auth` of staff-app and of processor-app                           |
+| core `staff-auth`    | `handleFindSubject`                                   | `app/global/auth` of staff-app and of processor-app, `auth` of staff-app                 |
 | common `tag`         | `handleFind`, `handleReplace`, `handleFindSubjectIds` | staff `product`, staff `order`                                                           |
 
 Everything else sits with its only caller, for example:
@@ -29,6 +29,7 @@ Everything else sits with its only caller, for example:
 | the read of `ledger_entry`                           | `apps/staff-app/src/features/ledger`            |
 | the delete of expired idempotency keys               | `apps/processor-app/src/processors/idempotency` |
 | the password check and the token of a customer login | `apps/customer-app/src/features/auth`           |
+| the password check and the token of a staff login    | `apps/staff-app/src/features/auth`              |
 | the create, list, rename and delete of tags          | `apps/staff-app/src/features/tools/modules/tag` |
 
 ## Why per method

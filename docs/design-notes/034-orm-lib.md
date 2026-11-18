@@ -25,8 +25,7 @@ The part has the shape of `libs/cache` (see `010-cache-aside.md`):
 `forRoot(entities)` returns a global module that binds `OrmFacade` under `ORM_PORT` and imports the
 connection from the private `forRootAsync(entities)`, which returns `TypeOrmModule.forRootAsync`
 with the options built from the `DATABASE_*` variables, `DATABASE_LOGGING` and `DATABASE_SSL_CA`:
-MySQL, no `synchronize`, `timezone: 'Z'`, `dateStrings: ['DATE']` (see `010-cache-aside.md`),
-`utf8mb4` and `SnakeNamingStrategy`.
+MySQL, no `synchronize`, `timezone: 'Z'`, `utf8mb4` and `SnakeNamingStrategy`.
 
 **The pool is bounded twice.** `DATABASE_POOL_SIZE` becomes `poolSize`, the `connectionLimit` of the
 mysql2 pool. `DATABASE_POOL_QUEUE_LIMIT` becomes `extra.queueLimit`, the number of queries that may

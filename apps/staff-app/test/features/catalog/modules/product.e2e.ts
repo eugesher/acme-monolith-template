@@ -77,14 +77,13 @@ export class ProductE2E {
 
   public handleCreate(): void {
     describe('POST /api/catalog/products', () => {
-      it('should create a draft, record the key and queue the ledger record under the correlation id', async () => {
+      it('should create a draft and queue the ledger record under the correlation id', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query(
           'SELECT MAX(id) AS lastId FROM product',
         );
 
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/catalog/products')
-          .set('Idempotency-Key', 'e2e-create-key')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000014')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ sku: 'E2E-0001', name: 'Created product' })
@@ -98,10 +97,6 @@ export class ProductE2E {
             product: await this.ctx.dataSource.query(
               'SELECT * FROM product WHERE id > ? ORDER BY id',
               [lastId],
-            ),
-            idempotency_key: await this.ctx.dataSource.query(
-              'SELECT * FROM idempotency_key WHERE idempotency_key = ? ORDER BY id',
-              ['e2e-create-key'],
             ),
           },
           ledger_record_queue: records.filter((record) => record.subjectId === response.body.id),
@@ -123,13 +118,6 @@ export class ProductE2E {
                 updated_at: expect.any(Date),
               },
             ],
-            idempotency_key: [
-              {
-                id: expect.any(String),
-                response_body: expect.any(String),
-                created_at: expect.any(Date),
-              },
-            ],
           },
           ledger_record_queue: [
             {
@@ -149,105 +137,11 @@ export class ProductE2E {
           ],
         });
         expect(Number(response.body.id)).toBeGreaterThan(Number(lastId));
-        expect(JSON.parse(actual.db.idempotency_key[0].response_body)).toEqual(response.body);
       });
 
-      it('should replay the same response for the same key and body without a second product', async () => {
-        const first = await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products')
-          .set('Idempotency-Key', 'e2e-replay-key')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ sku: 'E2E-0002', name: 'Replayed product' })
-          .expect(HttpStatus.CREATED);
-
+      it('should refuse a taken sku with 409', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/catalog/products')
-          .set('Idempotency-Key', 'e2e-replay-key')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ sku: 'E2E-0002', name: 'Replayed product' })
-          .expect(HttpStatus.CREATED);
-
-        const records = await this.ctx.takeLedgerRecords();
-
-        expect(response.body).toEqual(first.body);
-        expect({
-          db: {
-            product: await this.ctx.dataSource.query(
-              'SELECT sku, name FROM product WHERE sku = ? ORDER BY id',
-              ['E2E-0002'],
-            ),
-          },
-          ledger_record_queue: records.map((record) => record.action),
-        }).toMatchSnapshot();
-      });
-
-      it('should refuse the same key with another body with 422', async () => {
-        await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products')
-          .set('Idempotency-Key', 'e2e-reuse-key')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ sku: 'E2E-0003', name: 'First body' })
-          .expect(HttpStatus.CREATED);
-
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products')
-          .set('Idempotency-Key', 'e2e-reuse-key')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ sku: 'E2E-0004', name: 'Another body' })
-          .expect(HttpStatus.UNPROCESSABLE_ENTITY);
-
-        await this.ctx.takeLedgerRecords();
-
-        expect({
-          response: { body: response.body },
-          db: {
-            product: await this.ctx.dataSource.query(
-              'SELECT sku, name FROM product WHERE sku IN (?, ?) ORDER BY id',
-              ['E2E-0003', 'E2E-0004'],
-            ),
-          },
-        }).toMatchSnapshot();
-      });
-
-      it('should refuse a create without a key with 400', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ sku: 'E2E-0005', name: 'Refused product' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({
-          response: { body: response.body },
-          db: {
-            product: await this.ctx.dataSource.query('SELECT id FROM product WHERE sku = ?', [
-              'E2E-0005',
-            ]),
-          },
-        }).toMatchSnapshot();
-      });
-
-      it('should refuse a key of 129 characters with 400', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products')
-          .set('Idempotency-Key', 'k'.repeat(129))
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ sku: 'E2E-0005', name: 'Refused product' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({
-          response: { body: response.body },
-          db: {
-            product: await this.ctx.dataSource.query('SELECT id FROM product WHERE sku = ?', [
-              'E2E-0005',
-            ]),
-          },
-        }).toMatchSnapshot();
-      });
-
-      it('should refuse a taken sku with 409 and release the key', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products')
-          .set('Idempotency-Key', 'e2e-taken-sku-key')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ sku: 'SKU-0001', name: 'Taken sku' })
           .expect(HttpStatus.CONFLICT);
@@ -258,10 +152,6 @@ export class ProductE2E {
             product: await this.ctx.dataSource.query('SELECT id, name FROM product WHERE sku = ?', [
               'SKU-0001',
             ]),
-            idempotency_key: await this.ctx.dataSource.query(
-              'SELECT status FROM idempotency_key WHERE idempotency_key = ?',
-              ['e2e-taken-sku-key'],
-            ),
           },
         }).toMatchSnapshot();
       });

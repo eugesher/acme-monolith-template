@@ -15,7 +15,6 @@ export class ProductE2E {
       it('should create a draft and append its ledger entry under the correlation id', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/catalog/products')
-          .set('Idempotency-Key', 'system-create-key')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000020')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ sku: 'SYS-0001', name: 'Created product' })
@@ -27,10 +26,6 @@ export class ProductE2E {
             product: await this.ctx.dataSource.query('SELECT * FROM product WHERE sku = ?', [
               'SYS-0001',
             ]),
-            idempotency_key: await this.ctx.dataSource.query(
-              'SELECT * FROM idempotency_key WHERE idempotency_key = ?',
-              ['system-create-key'],
-            ),
             ledger_entry: await this.ctx.pollUntil<Record<string, unknown>[]>(
               () =>
                 this.ctx.dataSource.query('SELECT * FROM ledger_entry WHERE correlation_id = ?', [
@@ -57,13 +52,6 @@ export class ProductE2E {
                 updated_at: expect.any(Date),
               },
             ],
-            idempotency_key: [
-              {
-                id: expect.any(String),
-                response_body: expect.any(String),
-                created_at: expect.any(Date),
-              },
-            ],
             ledger_entry: [
               {
                 id: expect.any(String),
@@ -86,7 +74,6 @@ export class ProductE2E {
             ],
           },
         });
-        expect(JSON.parse(actual.db.idempotency_key[0].response_body)).toEqual(response.body);
       });
     });
   }

@@ -472,34 +472,37 @@ describe('common modules (common/modules/<module>)', () => {
   });
 
   describe('core by app', () => {
-    it.each(['staff-app', 'customer-app', 'processor-app'])(
-      '%s MAY import the port of any core module in its core adapters',
-      async (app) => {
-        await expect({
-          file: `apps/${app}/src/features/auth/infrastructure/core-adapters/__fixture__.ts`,
-          code: 'import { STAFF_AUTH_CORE_PORT } from "@acme-core/contracts/staff-auth";',
-        }).toPassArchitectureLint();
-      },
-    );
+    it.each([
+      ['staff-app', 'auth'],
+      ['customer-app', 'auth'],
+      ['processor-app', 'queue'],
+    ])('%s MAY import the port of any core module in its core adapters', async (app, feature) => {
+      await expect({
+        file: `apps/${app}/src/features/${feature}/infrastructure/core-adapters/__fixture__.ts`,
+        code: 'import { STAFF_AUTH_CORE_PORT } from "@acme-core/contracts/staff-auth";',
+      }).toPassArchitectureLint();
+    });
 
-    it.each(['staff-app', 'customer-app', 'processor-app'])(
-      '%s MAY import any core entity in its persistence',
-      async (app) => {
-        await expect({
-          file: `apps/${app}/src/features/auth/infrastructure/persistence/__fixture__.ts`,
-          code: 'import { Customer, StaffUser } from "@acme-core/entities";',
-        }).toPassArchitectureLint();
-      },
-    );
+    it.each([
+      ['staff-app', 'auth'],
+      ['customer-app', 'auth'],
+      ['processor-app', 'queue'],
+    ])('%s MAY import any core entity in its persistence', async (app, feature) => {
+      await expect({
+        file: `apps/${app}/src/features/${feature}/infrastructure/persistence/__fixture__.ts`,
+        code: 'import { Customer, StaffUser } from "@acme-core/entities";',
+      }).toPassArchitectureLint();
+    });
 
-    it.each(['staff-app', 'customer-app', 'processor-app'])(
-      '%s MAY mount any core module',
-      async (app) => {
-        await expect({
-          file: `apps/${app}/src/features/auth/auth.module.ts`,
-          code: 'import { StaffAuthCoreModule } from "@acme-core/modules/staff-auth";',
-        }).toPassArchitectureLint();
-      },
-    );
+    it.each([
+      ['staff-app', 'auth'],
+      ['customer-app', 'auth'],
+      ['processor-app', 'queue'],
+    ])('%s MAY mount any core module', async (app, feature) => {
+      await expect({
+        file: `apps/${app}/src/features/${feature}/${feature}.module.ts`,
+        code: 'import { StaffAuthCoreModule } from "@acme-core/modules/staff-auth";',
+      }).toPassArchitectureLint();
+    });
   });
 });

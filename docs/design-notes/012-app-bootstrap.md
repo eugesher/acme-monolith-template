@@ -2,9 +2,8 @@
 
 staff-app, customer-app and processor-app are three deployables over one module graph: each has its
 own `main.ts`, its own `AppModule` and its own port, and all three read the same database and Redis.
-staff-app and customer-app serve the HTTP API; processor-app serves the health probes, the staff
-login and the failed jobs of its queues, and runs the queue processors and the schedules (see
-`023-processor-app.md`).
+staff-app and customer-app serve the HTTP API; processor-app serves the health probes and the failed
+jobs of its queues, and runs the queue processors and the schedules (see `023-processor-app.md`).
 
 ## main.ts
 
@@ -47,12 +46,14 @@ missing or invalid variable stops the app at boot, and a Redis without `REDIS_PA
 
 **The schema of an app is assembled from fragments.** `ConfigSchema` of `libs/config` holds one
 fragment per concern, each the rules of its variables: `APP`, `DATABASE`, `REDIS`, `QUEUE`, `AUTH`,
-`HTTP` and `OBSERVABILITY`. `ConfigSetupModule` spreads the fragments every app reads into
-`Joi.object` and adds the keys of its own modules after them: `CACHE_TTL_MS_DEFAULT` and
-`OCC_RETRY_ATTEMPTS` in staff-app and customer-app, the `IDEMPOTENCY_*` variables in processor-app.
-A rule that changes for every app changes once, and the schema of an app still lists exactly what
-the app reads. A key in two fragments would be overwritten silently by the spread, so the spec of
-`ConfigSchema` checks that every key appears once.
+`CREDENTIALS`, `HTTP` and `OBSERVABILITY`. `AUTH` holds the secret every app checks a token with,
+`CREDENTIALS` the lifetime and the argon2 costs that only an app that signs users in reads, so
+processor-app spreads `AUTH` alone. `ConfigSetupModule` spreads the fragments an app reads into
+`Joi.object` and adds the keys of its own modules after them: `OCC_RETRY_ATTEMPTS` in staff-app and
+customer-app, `CACHE_TTL_MS_DEFAULT` in customer-app, the `IDEMPOTENCY_*` variables in
+processor-app. A rule that changes for every app changes once, and the schema of an app still lists
+exactly what the app reads. A key in two fragments would be overwritten silently by the spread, so
+the spec of `ConfigSchema` checks that every key appears once.
 
 `ConfigSetupModule` loads `env/apps/<app>/.env`, or `env/apps/<app>/.env.test` under
 `NODE_ENV=test`. Each file sits next to its example. `migrations/config/data-source.ts` chooses
@@ -145,9 +146,9 @@ gets a valid id too. A client that sends another format loses the end-to-end cor
 request.
 
 The entity list of each app holds exactly the entities of the modules it mounts. customer-app has no
-`Reminder` and no `LedgerEntry`: it writes to the ledger through the queue and mounts no core
-ledger. It has `IdempotencyKey`, because the `order` feature mounts the core idempotency module. The
-entity list of processor-app is in `023-processor-app.md`.
+`Note` and no `LedgerEntry`: it writes to the ledger through the queue and mounts no core ledger. It
+has `IdempotencyKey`, because the `order` feature mounts the core idempotency module. The entity
+list of processor-app is in `023-processor-app.md`.
 
 ## Logs
 

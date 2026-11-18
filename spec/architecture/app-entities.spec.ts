@@ -56,7 +56,7 @@ describe('app entities (@acme-<app>/common/entities)', () => {
   it('an app entity MAY import typeorm, the kernel lib, the core entities and its siblings', async () => {
     await expect({
       file: 'apps/staff-app/src/common/entities/note/__fixture__.ts',
-      code: 'import { Entity } from "typeorm";\nimport { ReminderStatusEnum } from "@acme-libs/kernel";\nimport { Product } from "@acme-core/entities";\nimport { NoteRevision } from "./note-revision.entity";',
+      code: 'import { Entity } from "typeorm";\nimport { ProductStatusEnum } from "@acme-libs/kernel";\nimport { Product } from "@acme-core/entities";\nimport { NoteRevision } from "./note-revision.entity";',
     }).toPassArchitectureLint();
   });
 

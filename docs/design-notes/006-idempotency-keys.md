@@ -3,7 +3,7 @@
 `core/modules/src/idempotency` keeps the `idempotency_key` table: which `Idempotency-Key` a client
 has used, for which request body, and what the first request answered. It is a core module because
 features of two apps claim keys while serving writes, for example
-`apps/staff-app/src/features/catalog/modules/product/application/use-cases/product-create.use-case.ts`.
+`apps/staff-app/src/features/warehouse/modules/product-stock/application/use-cases/product-stock-add.use-case.ts`.
 Its contract `core/contracts/src/idempotency` has one port:
 
 | Port                    | Facade                  | Consumer                                  |
@@ -34,7 +34,6 @@ key of another, and a staff user never meets the key of a customer.
 | Caller                | Scope                    |
 | --------------------- | ------------------------ |
 | customer `order`      | `customer:<customer id>` |
-| staff `product`       | `staff:<staff user id>`  |
 | staff `product-stock` | `staff:<staff user id>`  |
 
 **The core-adapter builds the scope.** A feature port takes the id of the owner, `customerId` or
@@ -89,7 +88,7 @@ The key model refuses an empty key and a key longer than the 128-character colum
 ## In one transaction with the write
 
 The caller completes the key as the last write of its own transaction (see
-`product-create.use-case.ts`), so the stored answer and the write commit together. The caller's
+`product-stock-add.use-case.ts`), so the stored answer and the write commit together. The caller's
 `try` holds only the work up to the commit: a failure there releases the key, so an honest retry can
 take it again. The ledger record and the log come after the `try`, so a failure after the commit
 never calls `release` and leaves the completed key, and the retry is a replay.

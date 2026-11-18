@@ -6,6 +6,7 @@ export * from './params/note-reconstitute.interface';
 
 export * from './snapshots/note-create-candidate.interface';
 export * from './snapshots/note-create-logger-payload.interface';
+export * from './snapshots/note-delete-logger-payload.interface';
 export * from './snapshots/note-edit-logger-payload.interface';
 export * from './snapshots/note-edit-revision-insert-payload.interface';
 export * from './snapshots/note-get-many-snapshot.interface';

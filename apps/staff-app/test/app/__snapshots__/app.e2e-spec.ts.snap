@@ -928,20 +928,9 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should updat
 }
 `;
 
-exports[`App Catalog Product POST /api/catalog/products should create a draft, record the key and queue the ledger record under the correlation id 1`] = `
+exports[`App Catalog Product POST /api/catalog/products should create a draft and queue the ledger record under the correlation id 1`] = `
 {
   "db": {
-    "idempotency_key": [
-      {
-        "created_at": Any<Date>,
-        "id": Any<String>,
-        "idempotency_key": "e2e-create-key",
-        "request_fingerprint": "82a8511f3c67094f4f710211c50d8c6c1efb4b4438480ab3b50ea2e78d7915fd",
-        "response_body": Any<String>,
-        "scope": "staff:2",
-        "status": "completed",
-      },
-    ],
     "product": [
       {
         "created_at": Any<Date>,
@@ -983,40 +972,9 @@ exports[`App Catalog Product POST /api/catalog/products should create a draft, r
 }
 `;
 
-exports[`App Catalog Product POST /api/catalog/products should refuse a create without a key with 400 1`] = `
+exports[`App Catalog Product POST /api/catalog/products should refuse a taken sku with 409 1`] = `
 {
   "db": {
-    "product": [],
-  },
-  "response": {
-    "body": {
-      "code": "IDEMPOTENCY_KEY_REQUIRED",
-      "message": "The Idempotency-Key header is required for this operation",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product POST /api/catalog/products should refuse a key of 129 characters with 400 1`] = `
-{
-  "db": {
-    "product": [],
-  },
-  "response": {
-    "body": {
-      "code": "IDEMPOTENCY_KEY_INVALID",
-      "message": "The Idempotency-Key header must be at most 128 characters",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product POST /api/catalog/products should refuse a taken sku with 409 and release the key 1`] = `
-{
-  "db": {
-    "idempotency_key": [],
     "product": [
       {
         "id": "100",
@@ -1031,42 +989,6 @@ exports[`App Catalog Product POST /api/catalog/products should refuse a taken sk
       "statusCode": 409,
     },
   },
-}
-`;
-
-exports[`App Catalog Product POST /api/catalog/products should refuse the same key with another body with 422 1`] = `
-{
-  "db": {
-    "product": [
-      {
-        "name": "First body",
-        "sku": "E2E-0003",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "PRODUCT_IDEMPOTENCY_KEY_REUSED",
-      "message": "Idempotency-Key e2e-reuse-key was already used with a different request body",
-      "statusCode": 422,
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product POST /api/catalog/products should replay the same response for the same key and body without a second product 1`] = `
-{
-  "db": {
-    "product": [
-      {
-        "name": "Replayed product",
-        "sku": "E2E-0002",
-      },
-    ],
-  },
-  "ledger_record_queue": [
-    "ProductCreated",
-  ],
 }
 `;
 
@@ -1889,6 +1811,72 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should replace the 
 }
 `;
 
+exports[`App Tools Note DELETE /api/tools/notes/:noteId should hide the note of another staff user with 404 and delete nothing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Edited with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "message": "Note 204 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note DELETE /api/tools/notes/:noteId should soft-delete a note and hide it from every read 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Customer called twice; refunded manually.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": Any<Date>,
+        "id": "200",
+        "resolved": 0,
+        "subject_id": "100",
+        "subject_type": "product",
+        "updated_at": Any<Date>,
+        "version": 3,
+      },
+    ],
+  },
+  "getOne": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "message": "Note 200 was not found",
+      "statusCode": 404,
+    },
+  },
+  "getRevisions": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "message": "Note 200 was not found",
+      "statusCode": 404,
+    },
+  },
+  "response": {
+    "body": {},
+  },
+}
+`;
+
 exports[`App Tools Note GET /api/tools/notes should filter by resolution 1`] = `
 {
   "response": {
@@ -2434,362 +2422,6 @@ exports[`App Tools Note POST /api/tools/notes should create an unresolved note o
 }
 `;
 
-exports[`App Tools Reminder DELETE /api/tools/reminders/:reminderId should soft-delete a reminder and drop the cached summary 1`] = `
-{
-  "cache": {
-    "keys": [],
-  },
-  "db": {
-    "reminder": [
-      {
-        "body": "",
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": Any<Date>,
-        "due_on": "2026-08-01",
-        "id": "304",
-        "owner_id": "1",
-        "status": "pending",
-        "title": "Cancel the trial",
-        "updated_at": Any<Date>,
-        "version": 2,
-      },
-    ],
-  },
-  "response": {
-    "body": {},
-  },
-}
-`;
-
-exports[`App Tools Reminder GET /api/tools/reminders should filter by status 1`] = `
-{
-  "response": {
-    "body": {
-      "count": 1,
-      "data": [
-        {
-          "body": "",
-          "createdAt": "2026-01-01T00:00:00.000Z",
-          "dueOn": "2026-04-01",
-          "id": "302",
-          "ownerId": "1",
-          "status": "done",
-          "title": "Book the venue",
-          "updatedAt": "2026-01-01T00:00:00.000Z",
-          "version": 2,
-        },
-      ],
-      "page": 1,
-      "pageCount": 1,
-      "total": 1,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder GET /api/tools/reminders should list the own reminders of the caller, soonest first, without deleted ones 1`] = `
-{
-  "response": {
-    "body": {
-      "count": 5,
-      "data": [
-        {
-          "body": "",
-          "createdAt": "2026-01-01T00:00:00.000Z",
-          "dueOn": "2026-04-01",
-          "id": "302",
-          "ownerId": "1",
-          "status": "done",
-          "title": "Book the venue",
-          "updatedAt": "2026-01-01T00:00:00.000Z",
-          "version": 2,
-        },
-        {
-          "body": "",
-          "createdAt": "2026-01-01T00:00:00.000Z",
-          "dueOn": "2026-05-15",
-          "id": "301",
-          "ownerId": "1",
-          "status": "pending",
-          "title": "Pay the invoice",
-          "updatedAt": "2026-01-01T00:00:00.000Z",
-          "version": 1,
-        },
-        {
-          "body": "",
-          "createdAt": "2026-01-01T00:00:00.000Z",
-          "dueOn": "2026-06-01",
-          "id": "300",
-          "ownerId": "1",
-          "status": "pending",
-          "title": "Renew the subscription",
-          "updatedAt": "2026-01-01T00:00:00.000Z",
-          "version": 1,
-        },
-        {
-          "body": "",
-          "createdAt": "2026-01-01T00:00:00.000Z",
-          "dueOn": "2026-08-01",
-          "id": "304",
-          "ownerId": "1",
-          "status": "pending",
-          "title": "Cancel the trial",
-          "updatedAt": "2026-01-01T00:00:00.000Z",
-          "version": 1,
-        },
-        {
-          "body": "",
-          "createdAt": "2026-01-01T00:00:00.000Z",
-          "dueOn": "2026-09-01",
-          "id": "305",
-          "ownerId": "1",
-          "status": "pending",
-          "title": "Water the plants",
-          "updatedAt": "2026-01-01T00:00:00.000Z",
-          "version": 1,
-        },
-      ],
-      "page": 1,
-      "pageCount": 1,
-      "total": 5,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder GET /api/tools/reminders/summary should answer the cached summary 1`] = `
-{
-  "response": {
-    "body": {
-      "nextDueOn": "2030-01-01",
-      "pending": 99,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder GET /api/tools/reminders/summary should compute the summary of the caller and cache it 1`] = `
-{
-  "cache": {
-    "keys": [
-      "acme:reminders:summary:v1:1:__all__",
-    ],
-    "values": {
-      "acme:reminders:summary:v1:1:__all__": "{"pending":4,"nextDueOn":"2026-05-15"}",
-    },
-  },
-  "response": {
-    "body": {
-      "nextDueOn": "2026-05-15",
-      "pending": 4,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder PATCH /api/tools/reminders/:reminderId/done should answer 404 for a deleted reminder 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "REMINDER_NOT_FOUND",
-      "message": "Reminder 306 was not found",
-      "statusCode": 404,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder PATCH /api/tools/reminders/:reminderId/done should complete a reminder and drop the cached summary 1`] = `
-{
-  "cache": {
-    "keys": [],
-  },
-  "db": {
-    "reminder": [
-      {
-        "body": "",
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "due_on": "2026-05-15",
-        "id": "301",
-        "owner_id": "1",
-        "status": "done",
-        "title": "Pay the invoice",
-        "updated_at": Any<Date>,
-        "version": 2,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "body": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "dueOn": "2026-05-15",
-      "id": "301",
-      "ownerId": "1",
-      "status": "done",
-      "title": "Pay the invoice",
-      "updatedAt": Any<String>,
-      "version": 2,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder PATCH /api/tools/reminders/:reminderId/done should hide the reminder of another staff user with 404 1`] = `
-{
-  "db": {
-    "reminder": [
-      {
-        "body": "",
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "due_on": "2026-06-01",
-        "id": "300",
-        "owner_id": "1",
-        "status": "pending",
-        "title": "Renew the subscription",
-        "updated_at": 2026-01-01T00:00:00.000Z,
-        "version": 1,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "REMINDER_NOT_FOUND",
-      "message": "Reminder 300 was not found",
-      "statusCode": 404,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder PATCH /api/tools/reminders/:reminderId/done should refuse a done reminder with 409 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "REMINDER_ALREADY_DONE",
-      "message": "Reminder 302 is already done",
-      "statusCode": 409,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder PATCH /api/tools/reminders/:reminderId/done should refuse an id that is not a number with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "error": "Bad Request",
-      "message": [
-        "reminderId must be a positive integer",
-      ],
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder PATCH /api/tools/reminders/:reminderId/due-on should move a reminder to the date sent and drop the cached summary 1`] = `
-{
-  "cache": {
-    "keys": [],
-  },
-  "db": {
-    "reminder": [
-      {
-        "body": "",
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "due_on": "2026-10-01",
-        "id": "305",
-        "owner_id": "1",
-        "status": "pending",
-        "title": "Water the plants",
-        "updated_at": Any<Date>,
-        "version": 2,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "body": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "dueOn": "2026-10-01",
-      "id": "305",
-      "ownerId": "1",
-      "status": "pending",
-      "title": "Water the plants",
-      "updatedAt": Any<String>,
-      "version": 2,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder POST /api/tools/reminders should create a pending reminder on the date sent and drop the cached summary 1`] = `
-{
-  "cache": {
-    "keys": [],
-  },
-  "db": {
-    "reminder": [
-      {
-        "body": "",
-        "created_at": Any<Date>,
-        "deleted_at": null,
-        "due_on": "2026-06-01",
-        "id": Any<String>,
-        "owner_id": "1",
-        "status": "pending",
-        "title": "Renew the domain",
-        "updated_at": Any<Date>,
-        "version": 1,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "body": "",
-      "createdAt": Any<String>,
-      "dueOn": "2026-06-01",
-      "id": Any<String>,
-      "ownerId": "1",
-      "status": "pending",
-      "title": "Renew the domain",
-      "updatedAt": Any<String>,
-      "version": 1,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder POST /api/tools/reminders should refuse a date that does not exist with 400 from the model 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "REMINDER_DUE_ON_INVALID",
-      "message": "Reminder.dueOn is not a real calendar date: 2026-02-30",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Tools Reminder POST /api/tools/reminders should refuse an instant with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "error": "Bad Request",
-      "message": [
-        "dueOn must be a calendar date formatted YYYY-MM-DD",
-      ],
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Tools Tag DELETE /api/tools/tags/:tagId should answer an unknown tag with 404 1`] = `
 {
   "response": {
@@ -3114,6 +2746,18 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       "code": "PRODUCT_NOT_FOUND",
       "message": "Product 999 was not found",
       "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a key of 129 characters with 400 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "IDEMPOTENCY_KEY_INVALID",
+      "message": "The Idempotency-Key header must be at most 128 characters",
+      "statusCode": 400,
     },
   },
 }

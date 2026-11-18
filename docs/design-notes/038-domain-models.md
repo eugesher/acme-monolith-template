@@ -15,7 +15,7 @@ what the model answers.
 | a row to insert        | `toInsertPayload()`, `create<Children>(id)` for its child rows | `RoleCandidateModel.createRolePermissions(roleId)` |
 | a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteEditModel.toUpdatePayload(versionAsRead)`     |
 | a record of the ledger | `toLedgerPayload()`                                            | `ProductCreateModel.toLedgerPayload()`             |
-| a line of the log      | `toLoggerPayload()`                                            | `ReminderRescheduleModel.toLoggerPayload()`        |
+| a line of the log      | `toLoggerPayload()`                                            | `NoteResolveModel.toLoggerPayload()`               |
 
 The record of the ledger carries the subject, the payload and the time of the change as the database
 stored it; the adapter of the port adds the operation key, the type of the subject and the action
@@ -41,7 +41,7 @@ Aggregates below).
 method names only what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
 `TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toRows`. A child
 entity keeps its name, `createOrderProducts`. A model in another context takes it in front:
-`StaffAuthCoreLoginModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
+`StaffAuthCoreSubjectModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
 
 **A line of the log names the fields of the entity.** `{ id, sku }`, not `{ productId, sku }`, and
 `{ subjectType, subjectId, subjectTags: [{ tagId }] }` for the tags of a subject. A value derived
@@ -161,28 +161,28 @@ the order of the products, zero for a product without rows.
 **The models of the use cases of one entity share an aggregate.** The aggregate is an abstract class
 in `domain/aggregates/<context>.aggregate.ts` that holds the state every use case reads, the checks
 of its fields and the answers they share, `toSnapshot()` and `toUpdatePayload(versionAsRead)`:
-`OrderAggregate`, `RoleAggregate`, `ProductAggregate`, `NoteAggregate`, `ReminderAggregate`,
-`TagAggregate`. An aggregate of many columns takes the record whole and checks it in its
-constructor, so a model of a use case rebuilds itself with `new <Model>(record)`. Each use case
-extends it with a model of its own, which adds only the state and the answers that use case needs:
-`OrderPlaceModel` adds the owner, the stock movements and the payloads of the ledger and the log,
-and `OrderGetOneModel` adds nothing. The aggregate extends `Entity` of `libs/domain`, so a model of
-a use case that only reads extends it too. No model records domain events: a change reaches the
-ledger through `toLedgerPayload()`, as every other shape that leaves the use case.
+`OrderAggregate`, `RoleAggregate`, `ProductAggregate`, `NoteAggregate`, `TagAggregate`. An aggregate
+of many columns takes the record whole and checks it in its constructor, so a model of a use case
+rebuilds itself with `new <Model>(record)`. Each use case extends it with a model of its own, which
+adds only the state and the answers that use case needs: `OrderPlaceModel` adds the owner, the stock
+movements and the payloads of the ledger and the log, and `OrderGetOneModel` adds nothing. The
+aggregate extends `Entity` of `libs/domain`, so a model of a use case that only reads extends it
+too. No model records domain events: a change reaches the ledger through `toLedgerPayload()`, as
+every other shape that leaves the use case.
 
-**A versioned aggregate extends `VersionedEntity`.** `ProductAggregate`, `NoteAggregate`,
-`ReminderAggregate` and the core `ProductCoreArchiveModel` take their `version` from
-`VersionedEntity` of `libs/domain`: the public `version`, `bumpVersion()` for a change,
-`isExpectedVersion(expectedVersion)` for `If-Match` and the static `isValidVersion(version)`. The
-base throws nothing, so an aggregate checks the stored version with `isValidVersion` and refuses
-with an exception of its module, `ProductVersionInvalidException`, and
-`ProductAggregate.assertExpectedVersion` refuses a stale `If-Match` with
-`ProductVersionMismatchException`; the core module answers the mismatch as an outcome.
+**A versioned aggregate extends `VersionedEntity`.** `ProductAggregate`, `NoteAggregate` and the
+core `ProductCoreArchiveModel` take their `version` from `VersionedEntity` of `libs/domain`: the
+public `version`, `bumpVersion()` for a change, `isExpectedVersion(expectedVersion)` for `If-Match`
+and the static `isValidVersion(version)`. The base throws nothing, so an aggregate checks the stored
+version with `isValidVersion` and refuses with an exception of its module,
+`ProductVersionInvalidException`, and `ProductAggregate.assertExpectedVersion` refuses a stale
+`If-Match` with `ProductVersionMismatchException`; the core module answers the mismatch as an
+outcome.
 
 **A shared service takes the model of the caller.** The access and write services of an entity serve
 several use cases, so the caller passes the static `reconstitute` of its model and gets that model
 back: `accessService.load({ tagId }, TagRenameModel.reconstitute)`,
-`writeService.write(command, ReminderCompleteModel.reconstitute, (reminder) => reminder.complete())`.
+`writeService.write(command, ProductPublishModel.reconstitute, (product) => product.publish())`.
 `reconstitute` declares `this: void`, as it names its class rather than `this`, and the write
 service bounds the model by the aggregate, whose `version` and `toUpdatePayload` it needs. A use
 case that only checks the entity exists asks for no model: `NoteAccessService.assertOwned`,
@@ -209,9 +209,6 @@ core module may import the core domain; the other layers may not.
 
 **A value with a rule of one module is a value object of that module.** It lives in
 `domain/values/<context>-<value>.value.ts` and extends `ValueObject` the same way:
-`ReminderDueOnValue` of the reminder answers `isFormatted()` and `isCalendarDate()`, and
-`ReminderAggregate.validDueOn` refuses either with `ReminderDueOnInvalidException`; the aggregate
-holds the value, so `ReminderRescheduleModel.reschedule` compares two dates with `equals`.
 `LedgerInstantValue` of the processor ledger answers `hasExplicitZone()`, `isValid()` and
 `toDate()`, and `LedgerAppendEntryModel.initCandidate` refuses with `LedgerInstantInvalidException`.
 A value object answers booleans and leaves the refusal to the model, so its checks read as steps.

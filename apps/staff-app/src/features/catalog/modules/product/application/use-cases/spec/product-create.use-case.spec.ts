@@ -11,11 +11,7 @@ describe('ProductCreateUseCase', () => {
   let existsBySku: jest.Mock;
   let insert: jest.Mock;
   let findInserted: jest.Mock;
-  let claim: jest.Mock;
-  let complete: jest.Mock;
-  let release: jest.Mock;
   let recordCreated: jest.Mock;
-  let run: jest.Mock;
   let logger: PinoLoggerMock;
   let useCase: ProductCreateUseCase;
 
@@ -33,39 +29,19 @@ describe('ProductCreateUseCase', () => {
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
-    claim = jest.fn().mockResolvedValue({ outcome: 'claimed' });
-    complete = jest.fn().mockResolvedValue(undefined);
-    release = jest.fn().mockResolvedValue(undefined);
     recordCreated = jest.fn().mockResolvedValue(undefined);
-    run = jest.fn().mockImplementation((work: () => Promise<unknown>) => work());
     logger = makePinoLoggerMock();
     useCase = new ProductCreateUseCase(
       { existsBySku, insert, findInserted },
-      { claim, complete, release },
       { recordCreated } as unknown as IProductLedgerPort,
-      { run },
       logger as unknown as PinoLogger,
     );
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('execute', () => {
-    it('claims the key on the logical body, creates the product and completes the key in one transaction', async () => {
-      const view = await useCase.execute({
-        sku: 'SKU-0001',
-        name: 'Lamp',
-        staffUserId: 'staff-1',
-        idempotencyKey: 'key-1',
-      });
+    it('creates a draft and answers the stored row', async () => {
+      const view = await useCase.execute({ sku: 'SKU-0001', name: 'Lamp' });
 
-      expect(claim).toHaveBeenCalledWith({
-        staffUserId: 'staff-1',
-        key: 'key-1',
-        body: { sku: 'SKU-0001', name: 'Lamp' },
-      });
       expect(existsBySku).toHaveBeenCalledWith('SKU-0001');
       expect(insert).toHaveBeenCalledWith({
         sku: 'SKU-0001',
@@ -83,160 +59,41 @@ describe('ProductCreateUseCase', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
       });
-      expect(complete).toHaveBeenCalledWith({
-        staffUserId: 'staff-1',
-        key: 'key-1',
-        response: view,
-      });
-      expect(run).toHaveBeenCalledTimes(1);
-      expect(release).not.toHaveBeenCalled();
     });
 
-    it('enqueues the creation record under the stored id after the commit and logs it', async () => {
-      await useCase.execute({
-        sku: 'SKU-0001',
-        name: 'Lamp',
-        staffUserId: 'staff-1',
-        idempotencyKey: 'key-1',
-      });
+    it('enqueues the creation record under the stored id and logs it', async () => {
+      await useCase.execute({ sku: 'SKU-0001', name: 'Lamp' });
 
       expect(recordCreated).toHaveBeenCalledWith({
         subjectId: '12',
         occurredAt: '2026-01-01T00:00:00.000Z',
         payload: { sku: 'SKU-0001', name: 'Lamp' },
       });
-      expect(run.mock.invocationCallOrder[0]).toBeLessThan(
+      expect(findInserted.mock.invocationCallOrder[0]).toBeLessThan(
         recordCreated.mock.invocationCallOrder[0],
       );
       expect(logger.info).toHaveBeenCalledWith({ id: '12', sku: 'SKU-0001' }, 'Product created');
     });
 
-    it('answers a replay with the stored response and does nothing else', async () => {
-      claim.mockResolvedValue({
-        outcome: 'replay',
-        storedResponse: { id: '12', sku: 'SKU-0001' },
-      });
-
-      const view = await useCase.execute({
-        sku: 'SKU-0001',
-        name: 'Lamp',
-        staffUserId: 'staff-1',
-        idempotencyKey: 'key-1',
-      });
-
-      expect(view).toEqual({ id: '12', sku: 'SKU-0001' });
-      expect(insert).not.toHaveBeenCalled();
-      expect(recordCreated).not.toHaveBeenCalled();
-      expect(logger.info).toHaveBeenCalledWith(
-        { idempotencyKey: 'key-1' },
-        'Product creation replayed from the idempotency store',
-      );
-    });
-
-    it.each([
-      [
-        'in-flight',
-        'PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT',
-        'Idempotency-Key key-1 is still being processed, retry shortly',
-      ],
-      [
-        'mismatch',
-        'PRODUCT_IDEMPOTENCY_KEY_REUSED',
-        'Idempotency-Key key-1 was already used with a different request body',
-      ],
-    ])('refuses an %s key with %s and keeps the key', async (outcome, code, message) => {
-      claim.mockResolvedValue({ outcome });
-
-      await expect(
-        useCase.execute({
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          staffUserId: 'staff-1',
-          idempotencyKey: 'key-1',
-        }),
-      ).rejects.toMatchObject({ code, message });
-      expect(insert).not.toHaveBeenCalled();
-      expect(release).not.toHaveBeenCalled();
-    });
-
-    it('refuses a taken sku with PRODUCT_SKU_TAKEN and releases the key', async () => {
+    it('refuses a taken sku with PRODUCT_SKU_TAKEN before the insert', async () => {
       existsBySku.mockResolvedValue(true);
 
-      await expect(
-        useCase.execute({
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          staffUserId: 'staff-1',
-          idempotencyKey: 'key-1',
-        }),
-      ).rejects.toMatchObject({
+      await expect(useCase.execute({ sku: 'SKU-0001', name: 'Lamp' })).rejects.toMatchObject({
         code: 'PRODUCT_SKU_TAKEN',
         message: 'Product sku SKU-0001 is already registered',
       });
       expect(insert).not.toHaveBeenCalled();
-      expect(release).toHaveBeenCalledWith({ staffUserId: 'staff-1', key: 'key-1' });
     });
 
-    it('refuses a sku taken by a concurrent insert with PRODUCT_SKU_TAKEN and releases the key', async () => {
+    it('refuses a sku taken by a concurrent insert with PRODUCT_SKU_TAKEN', async () => {
       insert.mockResolvedValue({ outcome: ProductCreateInsertOutcomeEnum.DUPLICATE });
 
-      await expect(
-        useCase.execute({
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          staffUserId: 'staff-1',
-          idempotencyKey: 'key-1',
-        }),
-      ).rejects.toMatchObject({
+      await expect(useCase.execute({ sku: 'SKU-0001', name: 'Lamp' })).rejects.toMatchObject({
         code: 'PRODUCT_SKU_TAKEN',
         message: 'Product sku SKU-0001 is already registered',
       });
       expect(findInserted).not.toHaveBeenCalled();
-      expect(release).toHaveBeenCalledWith({ staffUserId: 'staff-1', key: 'key-1' });
-    });
-
-    it('releases the key when the transaction fails and rethrows', async () => {
-      complete.mockRejectedValue(new Error('lock wait timeout'));
-
-      await expect(
-        useCase.execute({
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          staffUserId: 'staff-1',
-          idempotencyKey: 'key-1',
-        }),
-      ).rejects.toThrow('lock wait timeout');
-      expect(release).toHaveBeenCalledWith({ staffUserId: 'staff-1', key: 'key-1' });
       expect(recordCreated).not.toHaveBeenCalled();
-    });
-
-    it('rejects with the failure of the release when the key cannot be released', async () => {
-      complete.mockRejectedValue(new Error('lock wait timeout'));
-      release.mockRejectedValue(new Error('connection lost'));
-
-      await expect(
-        useCase.execute({
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          staffUserId: 'staff-1',
-          idempotencyKey: 'key-1',
-        }),
-      ).rejects.toThrow('connection lost');
-    });
-
-    it('keeps the completed key when the ledger fails after the commit and rethrows', async () => {
-      recordCreated.mockRejectedValue(new Error('ledger down'));
-
-      await expect(
-        useCase.execute({
-          sku: 'SKU-0001',
-          name: 'Lamp',
-          staffUserId: 'staff-1',
-          idempotencyKey: 'key-1',
-        }),
-      ).rejects.toThrow('ledger down');
-      expect(complete).toHaveBeenCalledTimes(1);
-      expect(release).not.toHaveBeenCalled();
     });
   });
 });
