@@ -19,7 +19,7 @@ export class ReminderCreateModel extends ReminderAggregate {
       ownerId,
       title: validTitle,
       body: validBody,
-      dueOn: validDueOn,
+      dueOn: validDueOn.isoDate,
       status: ReminderStatusEnum.PENDING,
       version: 1,
     };

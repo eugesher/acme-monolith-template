@@ -200,6 +200,15 @@ form only where it writes an email; a login only builds the value before the rea
 an unknown email answers. The domain and the application of a feature, a processor, a common or a
 core module may import the core domain; the other layers may not.
 
+**A value with a rule of one module is a value object of that module.** It lives in
+`domain/values/<context>-<value>.value.ts` and extends `ValueObject` the same way:
+`ReminderDueOnValue` of the reminder answers `isFormatted()` and `isCalendarDate()`, and
+`ReminderAggregate.validDueOn` refuses either with `ReminderDueOnInvalidException`; the aggregate
+holds the value, so `ReminderRescheduleModel.reschedule` compares two dates with `equals`.
+`LedgerInstantValue` of the processor ledger answers `hasExplicitZone()`, `isValid()` and
+`toDate()`, and `LedgerAppendEntryModel.initCandidate` refuses with `LedgerInstantInvalidException`.
+A value object answers booleans and leaves the refusal to the model, so its checks read as steps.
+
 ## Access
 
 **A member is as open as its readers.** A field or a method that only its class reads is private:

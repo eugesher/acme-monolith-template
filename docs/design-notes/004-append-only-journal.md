@@ -40,9 +40,9 @@ subject and an empty payload; the email stays in the `customer` table.
 
 ## Time and correlation
 
-**An instant must carry its zone.** `LedgerAppendHelper.parseInstant` refuses `2026-01-01T00:00:00`,
-because `Date` would read it in the server's zone. With `Z` or an offset, every server stores the
-same instant.
+**An instant must carry its zone.** `LedgerAppendEntryModel.initCandidate` refuses
+`2026-01-01T00:00:00` through `LedgerInstantValue.hasExplicitZone()`, because `Date` would read it
+in the server's zone. With `Z` or an offset, every server stores the same instant.
 
 **The correlation id comes from the context.** The job carries the id of the request that produced
 it, the processor opens the context with that id, and `LedgerAppendUseCase` reads it with

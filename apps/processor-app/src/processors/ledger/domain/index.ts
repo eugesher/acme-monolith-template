@@ -5,8 +5,8 @@ export * from './exceptions/ledger-action-required.exception';
 export * from './exceptions/ledger-instant-invalid.exception';
 export * from './exceptions/ledger-operation-key-required.exception';
 
-export * from './helpers/ledger-append.helper';
-
 export * from './interfaces';
 
 export * from './models/ledger-append-entry.model';
+
+export * from './values/ledger-instant.value';

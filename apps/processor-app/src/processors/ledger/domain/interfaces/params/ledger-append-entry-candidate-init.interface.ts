@@ -5,5 +5,5 @@ export interface ILedgerAppendEntryCandidateInit {
   action: string;
   payload: Record<string, unknown>;
   correlationId: string;
-  occurredAt: Date;
+  occurredAt: string;
 }

@@ -8,7 +8,7 @@ Bull queue `ledger-record` enters it, not an HTTP request, and it has no control
 | ---------------------------- | -------------------------------------------------------------------------------- |
 | `presentation/processors`    | `LedgerAppendProcessor`: `@Process` for a job, `@OnQueueFailed` for a failed one |
 | `application`                | `LedgerAppendUseCase`, `LedgerAppendReportFailureUseCase`                        |
-| `domain`                     | `LedgerAppendEntryModel`, `LedgerAppendHelper`                                   |
+| `domain`                     | `LedgerAppendEntryModel`, `LedgerInstantValue`                                   |
 | `outbound`                   | `LEDGER_APPEND_REPOSITORY_PORT`                                                  |
 | `infrastructure/persistence` | `LedgerAppendRepository` over `ledger_entry`                                     |
 

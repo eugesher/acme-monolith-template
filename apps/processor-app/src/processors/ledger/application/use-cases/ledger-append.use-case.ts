@@ -3,11 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 
-import {
-  LedgerAppendEntryModel,
-  LedgerAppendHelper,
-  type ILedgerAppendEntryCandidate,
-} from '../../domain';
+import { LedgerAppendEntryModel, type ILedgerAppendEntryCandidate } from '../../domain';
 import {
   LEDGER_APPEND_REPOSITORY_PORT,
   LedgerAppendEntryInsertOutcomeEnum,
@@ -28,7 +24,6 @@ export class LedgerAppendUseCase {
     const { operationKey, subjectType, subjectId, action, payload, occurredAt } = command;
     this.logger.info({ operationKey, action }, 'Ledger record received');
 
-    const instant = LedgerAppendHelper.parseInstant(occurredAt, 'occurredAt');
     const correlationId = CorrelationContextHelper.current(LedgerAppendUseCase.name);
     const entryCandidate = LedgerAppendEntryModel.initCandidate({
       operationKey,
@@ -37,7 +32,7 @@ export class LedgerAppendUseCase {
       action,
       payload,
       correlationId,
-      occurredAt: instant,
+      occurredAt,
     });
     const appendOutcome = await this.append(entryCandidate);
     const { id, appended } = appendOutcome;

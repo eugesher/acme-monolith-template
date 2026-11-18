@@ -3,7 +3,7 @@ import type { ILedgerAppendEntryCandidate } from '../../interfaces';
 
 describe('LedgerAppendEntryModel', () => {
   describe('initCandidate', () => {
-    it('trims the operation key and the action', () => {
+    it('trims the operation key and the action and reads the instant in UTC', () => {
       const candidate = LedgerAppendEntryModel.initCandidate({
         operationKey: '  product-archived:12 ',
         subjectType: 'product',
@@ -11,7 +11,7 @@ describe('LedgerAppendEntryModel', () => {
         action: ' ProductArchived ',
         payload: { previousStatus: 'active' },
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
-        occurredAt: new Date('2026-01-01T00:00:00.000Z'),
+        occurredAt: '2026-01-01T03:00:00+03:00',
       });
 
       expect(candidate).toEqual({
@@ -43,12 +43,20 @@ describe('LedgerAppendEntryModel', () => {
         'LedgerEntry.action is required',
       ],
       [
-        'an invalid instant',
+        'a local time without a zone, which would be read in the server zone',
         'product-archived:12',
         'ProductArchived',
-        'nope',
+        '2026-01-01T00:00:00',
         'LEDGER_INSTANT_INVALID',
-        'LedgerEntry.occurredAt must be a valid instant',
+        'occurredAt must be an ISO-8601 instant with an explicit timezone offset, got 2026-01-01T00:00:00',
+      ],
+      [
+        'a zoned value that is not a date',
+        'product-archived:12',
+        'ProductArchived',
+        'not-a-dateZ',
+        'LEDGER_INSTANT_INVALID',
+        'occurredAt is not a valid instant: not-a-dateZ',
       ],
     ])('rejects %s with %s', (_case, operationKey, action, occurredAt, code, message) => {
       const initCandidate = (): ILedgerAppendEntryCandidate =>
@@ -59,7 +67,7 @@ describe('LedgerAppendEntryModel', () => {
           action,
           payload: {},
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
-          occurredAt: new Date(occurredAt),
+          occurredAt,
         });
 
       expect(initCandidate).toThrow(expect.objectContaining({ code, message }) as Error);
@@ -75,7 +83,7 @@ describe('LedgerAppendEntryModel', () => {
         action: 'ProductArchived',
         payload: {},
         correlationId: 'correlation-1',
-        occurredAt: new Date('2026-01-05T08:00:00.000Z'),
+        occurredAt: '2026-01-05T08:00:00.000Z',
       });
 
       expect(LedgerAppendEntryModel.toLoggerPayload('4210', candidate)).toEqual({

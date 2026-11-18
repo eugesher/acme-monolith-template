@@ -6,6 +6,7 @@ import { ReminderBodyInvalidException } from '../exceptions/reminder-body-invali
 import { ReminderDueOnInvalidException } from '../exceptions/reminder-due-on-invalid.exception';
 import { ReminderTitleInvalidException } from '../exceptions/reminder-title-invalid.exception';
 import { ReminderVersionInvalidException } from '../exceptions/reminder-version-invalid.exception';
+import { ReminderDueOnValue } from '../values/reminder-due-on.value';
 import type {
   IReminderReconstitute,
   IReminderSnapshot,
@@ -16,14 +17,13 @@ export abstract class ReminderAggregate extends VersionedEntity {
   protected readonly ownerId: string;
   protected readonly title: string;
   protected readonly body: string;
-  protected currentDueOn: string;
+  protected currentDueOn: ReminderDueOnValue;
   protected currentStatus: ReminderStatusEnum;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
   private static readonly TITLE_MAX_LENGTH = 255;
   private static readonly BODY_MAX_LENGTH = 2000;
-  private static readonly DUE_ON_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
   protected constructor(record: IReminderReconstitute) {
     const { id, ownerId, title, body, dueOn, status, version, createdAt, updatedAt } = record;
@@ -46,7 +46,7 @@ export abstract class ReminderAggregate extends VersionedEntity {
       ownerId: this.ownerId,
       title: this.title,
       body: this.body,
-      dueOn: this.currentDueOn,
+      dueOn: this.currentDueOn.isoDate,
       status: this.currentStatus,
       version: this.version,
       createdAt: this.createdAt.toISOString(),
@@ -58,7 +58,7 @@ export abstract class ReminderAggregate extends VersionedEntity {
     return {
       id: this.id,
       versionAsRead,
-      dueOn: this.currentDueOn,
+      dueOn: this.currentDueOn.isoDate,
       status: this.currentStatus,
       version: this.version,
     };
@@ -84,21 +84,21 @@ export abstract class ReminderAggregate extends VersionedEntity {
     return trimmedBody;
   }
 
-  protected static validDueOn(dueOn: string): string {
-    if (!ReminderAggregate.DUE_ON_PATTERN.test(dueOn)) {
+  protected static validDueOn(dueOn: string): ReminderDueOnValue {
+    const dueOnValue = ReminderDueOnValue.create(dueOn);
+
+    if (!dueOnValue.isFormatted()) {
       throw new ReminderDueOnInvalidException(dueOn);
     }
 
-    const parsedDueOn = new Date(`${dueOn}T00:00:00.000Z`);
-
-    if (Number.isNaN(parsedDueOn.getTime()) || parsedDueOn.toISOString().slice(0, 10) !== dueOn) {
+    if (!dueOnValue.isCalendarDate()) {
       throw new ReminderDueOnInvalidException(
         dueOn,
         `Reminder.dueOn is not a real calendar date: ${dueOn}`,
       );
     }
 
-    return dueOn;
+    return dueOnValue;
   }
 
   protected assertPending(): void {
