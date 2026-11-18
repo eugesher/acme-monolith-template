@@ -12,6 +12,7 @@ describe('ProductCoreArchiveModel', () => {
           sku: 'SKU-0001',
           status,
           version: 3,
+          updatedAt: new Date('2026-01-05T08:00:00.000Z'),
         });
 
         product.archive();
@@ -28,6 +29,7 @@ describe('ProductCoreArchiveModel', () => {
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,
         version: 5,
+        updatedAt: new Date('2026-01-05T08:00:00.000Z'),
       });
 
       product.archive();
@@ -46,6 +48,7 @@ describe('ProductCoreArchiveModel', () => {
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,
         version: 4,
+        updatedAt: new Date('2026-01-05T08:00:00.000Z'),
       });
     });
 
@@ -58,10 +61,11 @@ describe('ProductCoreArchiveModel', () => {
       });
     });
 
-    it('answers the archive as a ledger record with the status it left', () => {
+    it('answers the archive as a ledger record at the time of the update with the status it left', () => {
       expect(product.toLedgerPayload(ProductStatusEnum.ACTIVE)).toEqual({
         subjectId: '12',
         version: 4,
+        occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', previousStatus: 'active' },
       });
     });

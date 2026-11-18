@@ -58,7 +58,7 @@ export class ProductStockCoreMoveUseCase {
     await this.repository.lockProducts(productIds);
 
     const insertedRows = await this.repository.insertMany(movementRows);
-    const productStockIds = ProductStockCoreMovementsModel.toIds(insertedRows);
+    const productStocks = ProductStockCoreMovementsModel.toProductStocks(insertedRows);
     const stockSums = await this.repository.sumStock(productIds);
     const onHand = ProductStockCoreOnHandModel.reconstitute({
       products: stockMovements.distinctProducts,
@@ -79,7 +79,7 @@ export class ProductStockCoreMoveUseCase {
       );
     }
 
-    return { productStockIds, stock: stockOnHand };
+    return { productStocks, stock: stockOnHand };
   }
 
   private async announceSubtract(

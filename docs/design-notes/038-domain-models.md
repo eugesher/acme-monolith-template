@@ -17,9 +17,14 @@ what the model answers.
 | a record of the ledger | `toLedgerPayload()`                                            | `ProductCreateModel.toLedgerPayload()`             |
 | a line of the log      | `toLoggerPayload()`                                            | `ReminderRescheduleModel.toLoggerPayload()`        |
 
-The record of the ledger carries the subject, the payload and, where the model knows it, the time it
-was created (`createdAt`); the adapter of the port adds the operation key, the type of the subject
-and the action (see `022-enqueue-after-commit.md`).
+The record of the ledger carries the subject, the payload and the time of the change as the database
+stored it; the adapter of the port adds the operation key, the type of the subject and the action
+(see `022-enqueue-after-commit.md`). A row that was inserted gives its `createdAt`: product and
+order read it back, and the registration and a restock take it from the insert: TypeORM reads the
+defaults of an inserted row back into `generatedMaps` (`AuthRegisterRepository.insert`, core
+`ProductStockCoreMoveRepository.insertMany`, whose rows core `handleMove` answers). A row that was
+updated gives its `updatedAt` from a read after the update: the product write service reads the
+product again, and the core archive reads it with `findById`. No adapter stamps the time itself.
 
 **Without an instance, a static method answers.** An idempotency key has only its scope and key, so
 `IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` names the fields of the log line. A
@@ -182,8 +187,9 @@ back: `accessService.load({ tagId }, TagRenameModel.reconstitute)`,
 service bounds the model by the aggregate, whose `version` and `toUpdatePayload` it needs. A use
 case that only checks the entity exists asks for no model: `NoteAccessService.assertOwned`,
 `ProductAccessService.assertExists`. The product write service hands back what `mutate` answers next
-to the stored model, so the publish answers `ProductPublishModel.toLedgerPayload()` from the changed
-model although the service reads the row again (see `007-optimistic-concurrency.md`).
+to the stored model: `ProductPublishModel.publish()` answers the status the product left, and the
+stored model answers `toLedgerPayload(previousStatus)` with its new version and `updatedAt` (see
+`007-optimistic-concurrency.md`).
 
 **Use cases that share no state have models without an aggregate.** The login reads the hash and the
 status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and
@@ -213,8 +219,8 @@ A value object answers booleans and leaves the refusal to the model, so its chec
 ## Access
 
 **A member is as open as its readers.** A field or a method that only its class reads is private:
-the fields of a list model, the status `ProductPublishModel` left that only its `toLedgerPayload`
-reads. A field the use case decides on stays public, as `AuthCustomerLoginModel.passwordHash` for
-the check of the password. An id that an error only puts in its message is a plain parameter of the
+the fields of a list model, the fields of `AuthCustomerRegisterModel` that only its answers read. A
+field the use case decides on stays public, as `AuthCustomerLoginModel.passwordHash` for the check
+of the password. An id that an error only puts in its message is a plain parameter of the
 constructor, not a field. The getters of the repositories in a persistence host stay protected for
 the repositories that extend it (see `034-orm-lib.md`).

@@ -10,6 +10,7 @@ describe('ProductCoreArchiveUseCase', () => {
   let hooks: (() => Promise<void>)[];
   let lockById: jest.Mock;
   let update: jest.Mock;
+  let findById: jest.Mock;
   let recordArchived: jest.Mock;
   let invalidate: jest.Mock;
   let run: jest.Mock;
@@ -25,8 +26,16 @@ describe('ProductCoreArchiveUseCase', () => {
       sku: 'SKU-0001',
       status: ProductStatusEnum.ACTIVE,
       version: 3,
+      updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
     update = jest.fn(() => Promise.resolve(void outcomes.push('update')));
+    findById = jest.fn().mockResolvedValue({
+      id: '12',
+      sku: 'SKU-0001',
+      status: ProductStatusEnum.ARCHIVED,
+      version: 4,
+      updatedAt: new Date('2026-01-05T08:00:00.000Z'),
+    });
     recordArchived = jest.fn(() => Promise.resolve(void outcomes.push('record')));
     invalidate = jest.fn(() => Promise.resolve(void outcomes.push('invalidate')));
     run = jest.fn(async (work: () => Promise<unknown>) => {
@@ -43,7 +52,7 @@ describe('ProductCoreArchiveUseCase', () => {
     afterCommit = jest.fn((hook: () => Promise<void>) => hooks.push(hook));
     logger = makePinoLoggerMock();
     useCase = new ProductCoreArchiveUseCase(
-      { lockById, update },
+      { lockById, update, findById },
       { invalidate },
       { recordArchived },
       { run, afterCommit },
@@ -66,13 +75,16 @@ describe('ProductCoreArchiveUseCase', () => {
       expect(logger.info).toHaveBeenCalledWith({ id: '12', version: 4 }, 'Product archived');
     });
 
-    it('drops the cached catalog and records the archive in the ledger only after the commit', async () => {
+    it('drops the cached catalog and records the archive at the time of the update only after the commit', async () => {
       await useCase.execute({ productId: '12', expectedVersion: undefined });
 
       expect(outcomes).toEqual(['update', 'commit', 'invalidate', 'record']);
+      expect(update.mock.invocationCallOrder[0]).toBeLessThan(findById.mock.invocationCallOrder[0]);
+      expect(findById).toHaveBeenCalledWith('12');
       expect(recordArchived).toHaveBeenCalledWith({
         subjectId: '12',
         version: 4,
+        occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', previousStatus: 'active' },
       });
     });
@@ -101,6 +113,7 @@ describe('ProductCoreArchiveUseCase', () => {
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,
         version: 5,
+        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       });
 
       const view = await useCase.execute({ productId: '12', expectedVersion: undefined });

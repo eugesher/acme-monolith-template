@@ -15,9 +15,12 @@ describe('ProductStockAddModel', () => {
 
       stock.add(5);
 
-      expect(stock.toLedgerPayload('700')).toEqual({
+      expect(
+        stock.toLedgerPayload({ productStockId: '700', createdAt: '2026-01-05T08:00:00.000Z' }),
+      ).toEqual({
         productStockId: '700',
         subjectId: '12',
+        occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
     });

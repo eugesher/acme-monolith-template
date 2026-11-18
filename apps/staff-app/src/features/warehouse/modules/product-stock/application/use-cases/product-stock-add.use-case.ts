@@ -108,9 +108,9 @@ export class ProductStockAddUseCase {
     productStock.add(quantity);
 
     const added = await this.movement.add({ productId, quantity });
-    const { productStockId } = added;
+    const { productStockId, createdAt } = added;
     const stockOnHand = productStock.toOnHandSnapshot(added.quantity);
-    const productStockLedgerPayload = productStock.toLedgerPayload(productStockId);
+    const productStockLedgerPayload = productStock.toLedgerPayload({ productStockId, createdAt });
 
     await this.idempotency.complete({ staffUserId, key: idempotencyKey, response: stockOnHand });
 

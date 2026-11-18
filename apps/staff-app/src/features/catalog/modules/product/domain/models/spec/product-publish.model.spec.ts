@@ -4,7 +4,7 @@ import { ProductPublishModel } from '../product-publish.model';
 
 describe('ProductPublishModel', () => {
   describe('publish', () => {
-    it('publishes a draft and bumps the version', () => {
+    it('publishes a draft, bumps the version and answers the status it left', () => {
       const product = ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
@@ -15,10 +15,11 @@ describe('ProductPublishModel', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       });
 
-      product.publish();
+      const previousStatus = product.publish();
 
       expect(product.toSnapshot().status).toBe('active');
       expect(product.version).toBe(2);
+      expect(previousStatus).toBe('draft');
     });
 
     it('changes nothing on an active product', () => {
@@ -32,10 +33,11 @@ describe('ProductPublishModel', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       });
 
-      product.publish();
+      const previousStatus = product.publish();
 
       expect(product.toSnapshot().status).toBe('active');
       expect(product.version).toBe(3);
+      expect(previousStatus).toBeUndefined();
     });
   });
 
@@ -58,40 +60,23 @@ describe('ProductPublishModel', () => {
   });
 
   describe('toLedgerPayload', () => {
-    it('answers the publication under the new version with the status it left', () => {
-      const product = ProductPublishModel.reconstitute({
-        id: '12',
-        sku: 'SKU-0001',
-        name: 'Lamp',
-        status: ProductStatusEnum.ARCHIVED,
-        version: 5,
-        createdAt: new Date('2026-01-01T00:00:00.000Z'),
-        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-      });
-
-      product.publish();
-
-      expect(product.toLedgerPayload()).toEqual({
-        subjectId: '12',
-        version: 6,
-        payload: { sku: 'SKU-0001', previousStatus: 'archived' },
-      });
-    });
-
-    it('answers nothing when the product was already active', () => {
+    it('answers the publication under its version at the time of the update with the status it left', () => {
       const product = ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
         name: 'Lamp',
         status: ProductStatusEnum.ACTIVE,
-        version: 3,
+        version: 6,
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
-        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-05T08:00:00.000Z'),
       });
 
-      product.publish();
-
-      expect(product.toLedgerPayload()).toBeUndefined();
+      expect(product.toLedgerPayload(ProductStatusEnum.ARCHIVED)).toEqual({
+        subjectId: '12',
+        version: 6,
+        occurredAt: '2026-01-05T08:00:00.000Z',
+        payload: { sku: 'SKU-0001', previousStatus: 'archived' },
+      });
     });
   });
 

@@ -28,17 +28,15 @@ export class ProductPublishUseCase {
     const writeResult = await this.writeService.write(
       { productId, expectedVersion },
       ProductPublishModel.reconstitute,
-      (product) => {
-        product.publish();
-
-        return product.toLedgerPayload();
-      },
+      (product) => product.publish(),
     );
-    const { product, answer: productLedgerPayload } = writeResult;
+    const { product, answer: previousStatus } = writeResult;
 
     await this.catalogCache.invalidate();
 
-    if (productLedgerPayload) {
+    if (previousStatus) {
+      const productLedgerPayload = product.toLedgerPayload(previousStatus);
+
       await this.ledger.recordPublished(productLedgerPayload);
     }
 

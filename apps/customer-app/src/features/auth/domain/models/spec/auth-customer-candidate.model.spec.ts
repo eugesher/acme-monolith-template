@@ -68,15 +68,16 @@ describe('AuthCustomerCandidateModel', () => {
   });
 
   describe('toRegistered', () => {
-    it('answers the stored customer under the issued id with the email of the candidate', () => {
+    it('answers the stored customer under the issued id and time with the email of the candidate', () => {
       const candidate = AuthCustomerCandidateModel.create({
         email: 'eve@example.com',
         passwordHash: 'hash',
       });
 
-      expect(candidate.toRegistered('105')).toEqual({
+      expect(candidate.toRegistered('105', new Date('2026-01-05T08:00:00.000Z'))).toEqual({
         id: '105',
         email: 'eve@example.com',
+        createdAt: new Date('2026-01-05T08:00:00.000Z'),
       });
     });
   });

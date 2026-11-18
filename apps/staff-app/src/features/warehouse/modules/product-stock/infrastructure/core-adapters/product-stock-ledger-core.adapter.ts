@@ -21,8 +21,7 @@ export class ProductStockLedgerCoreAdapter implements IProductStockLedgerPort {
   ) {}
 
   public async recordAdded(command: IProductStockLedgerRecordAddedCommand): Promise<void> {
-    const { productStockId, subjectId, payload } = command;
-    const occurredAt = new Date().toISOString();
+    const { productStockId, subjectId, occurredAt, payload } = command;
 
     await this.ledger.handleEnqueue({
       operationKey: `product-restocked:${productStockId}`,

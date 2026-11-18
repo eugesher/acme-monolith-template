@@ -1,3 +1,4 @@
+export * from './params/product-stock-add-ledger-payload-build.interface';
 export * from './params/product-stock-add-logger-payload-build.interface';
 export * from './params/product-stock-add-reconstitute.interface';
 

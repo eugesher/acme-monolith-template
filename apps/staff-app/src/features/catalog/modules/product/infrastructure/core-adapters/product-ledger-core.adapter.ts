@@ -35,8 +35,7 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
   }
 
   public async recordPublished(command: IProductLedgerRecordPublishedCommand): Promise<void> {
-    const { subjectId, version, payload } = command;
-    const occurredAt = new Date().toISOString();
+    const { subjectId, version, occurredAt, payload } = command;
 
     await this.ledger.handleEnqueue({
       operationKey: `product-published:${subjectId}:${version}`,

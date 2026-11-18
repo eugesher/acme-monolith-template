@@ -21,14 +21,15 @@ export class ProductCoreArchiveModel extends VersionedEntity {
     private readonly sku: string,
     private currentStatus: ProductStatusEnum,
     version: number,
+    private readonly updatedAt: Date,
   ) {
     super(id, version);
   }
 
   public static reconstitute(record: IProductCoreArchiveReconstitute): ProductCoreArchiveModel {
-    const { id, sku, status, version } = record;
+    const { id, sku, status, version, updatedAt } = record;
 
-    return new ProductCoreArchiveModel(id, sku, status, version);
+    return new ProductCoreArchiveModel(id, sku, status, version, updatedAt);
   }
 
   public archive(): void {
@@ -48,6 +49,7 @@ export class ProductCoreArchiveModel extends VersionedEntity {
     return {
       subjectId: this.id,
       version: this.version,
+      occurredAt: this.updatedAt.toISOString(),
       payload: { sku: this.sku, previousStatus },
     };
   }

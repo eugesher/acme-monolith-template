@@ -47,7 +47,10 @@ export class AuthRegisterUseCase {
       throw new AuthEmailTakenException();
     }
 
-    const registeredCustomer = customerCandidate.toRegistered(insertResult.id);
+    const registeredCustomer = customerCandidate.toRegistered(
+      insertResult.id,
+      insertResult.createdAt,
+    );
     const customer = AuthCustomerRegisterModel.reconstitute(registeredCustomer);
     const customerLoggerPayload = customer.toLoggerPayload();
     const customerLedgerPayload = customer.toLedgerPayload();

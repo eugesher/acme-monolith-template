@@ -5,20 +5,16 @@ describe('ProductStockLedgerCoreAdapter', () => {
   let adapter: ProductStockLedgerCoreAdapter;
 
   beforeEach(() => {
-    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     handleEnqueue = jest.fn().mockResolvedValue(undefined);
     adapter = new ProductStockLedgerCoreAdapter({ handleEnqueue });
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   describe('recordAdded', () => {
-    it('enqueues a restock under the stock row, stamped now', async () => {
+    it('enqueues a restock under the stock row at the time of the row', async () => {
       await adapter.recordAdded({
         productStockId: '700',
         subjectId: '12',
+        occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
 

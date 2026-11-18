@@ -20,9 +20,11 @@ describe('AuthRegisterUseCase', () => {
   beforeEach(() => {
     recordRegistered = jest.fn().mockResolvedValue(undefined);
     repository = {
-      insert: jest
-        .fn()
-        .mockResolvedValue({ outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED, id: '105' }),
+      insert: jest.fn().mockResolvedValue({
+        outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED,
+        id: '105',
+        createdAt: new Date('2026-01-05T08:00:00.000Z'),
+      }),
     };
     credentials = {
       issueAccessToken: jest.fn(),
@@ -96,7 +98,10 @@ describe('AuthRegisterUseCase', () => {
   it('records the registered customer in the ledger', async () => {
     await useCase.execute({ email: 'Eve@Example.com', password: 'correct-horse-battery' });
 
-    expect(recordRegistered).toHaveBeenCalledWith({ subjectId: '105' });
+    expect(recordRegistered).toHaveBeenCalledWith({
+      subjectId: '105',
+      occurredAt: '2026-01-05T08:00:00.000Z',
+    });
   });
 
   it('lets a failed ledger record reject', async () => {

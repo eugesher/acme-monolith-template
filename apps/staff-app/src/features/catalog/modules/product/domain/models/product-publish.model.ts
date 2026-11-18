@@ -9,31 +9,29 @@ import type {
 } from '../interfaces';
 
 export class ProductPublishModel extends ProductAggregate {
-  private previousStatus: Maybe<ProductStatusEnum>;
-
   public static reconstitute(this: void, record: IProductReconstitute): ProductPublishModel {
     return new ProductPublishModel(record);
   }
 
-  public publish(): void {
+  public publish(): Maybe<ProductStatusEnum> {
     if (this.currentStatus === ProductStatusEnum.ACTIVE) {
-      return;
-    }
-
-    this.previousStatus = this.currentStatus;
-    this.currentStatus = ProductStatusEnum.ACTIVE;
-    this.bumpVersion();
-  }
-
-  public toLedgerPayload(): Maybe<IProductPublishLedgerPayload> {
-    if (this.previousStatus === undefined) {
       return undefined;
     }
 
+    const previousStatus = this.currentStatus;
+
+    this.currentStatus = ProductStatusEnum.ACTIVE;
+    this.bumpVersion();
+
+    return previousStatus;
+  }
+
+  public toLedgerPayload(previousStatus: ProductStatusEnum): IProductPublishLedgerPayload {
     return {
       subjectId: this.id,
       version: this.version,
-      payload: { sku: this.sku, previousStatus: this.previousStatus },
+      occurredAt: this.updatedAt.toISOString(),
+      payload: { sku: this.sku, previousStatus },
     };
   }
 

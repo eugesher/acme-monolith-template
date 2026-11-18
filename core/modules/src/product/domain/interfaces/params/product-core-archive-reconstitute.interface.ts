@@ -5,4 +5,5 @@ export interface IProductCoreArchiveReconstitute {
   sku: string;
   status: ProductStatusEnum;
   version: number;
+  updatedAt: Date;
 }

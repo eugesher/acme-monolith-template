@@ -52,13 +52,14 @@ because only staff features read the header.
 
 `mutate` may answer a value, and the service hands it back next to the stored model,
 `{ product, answer }`. The service reads the row again after the save, so a fact that only the
-changed model knows reaches the use case through the answer: `ProductPublishModel.publish()` holds
-the status the product left, and the use case answers `product.toLedgerPayload()` from the change. A
-product that was already active answers nothing, and the use case records nothing. The use case
-hands the payload to `IProductLedgerPort.recordPublished`, whose adapter adds the operation key, the
-action and the time and enqueues the record on the `ledger-record` queue (see
-`022-enqueue-after-commit.md` and `004-append-only-journal.md`). The models record no domain events:
-each fact has one reader, the ledger, and the use case calls it directly.
+changed model knows reaches the use case through the answer: `ProductPublishModel.publish()` answers
+the status the product left, or nothing for a product that was already active. The stored model
+answers the record, `product.toLedgerPayload(previousStatus)`, with its new version and the
+`updatedAt` the database gave the update, and the use case records nothing when the answer is empty.
+`IProductLedgerPort.recordPublished` adds the operation key and the action and enqueues the record
+on the `ledger-record` queue (see `022-enqueue-after-commit.md` and `004-append-only-journal.md`).
+The models record no domain events: each fact has one reader, the ledger, and the use case calls it
+directly.
 
 ## `PATCH` edits fields, `PUT` sets a state
 

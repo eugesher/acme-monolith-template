@@ -12,6 +12,7 @@ export interface IProductLedgerRecordCreatedCommand {
 export interface IProductLedgerRecordPublishedCommand {
   subjectId: string;
   version: number;
+  occurredAt: string;
   payload: {
     sku: string;
     previousStatus: ProductStatusEnum;

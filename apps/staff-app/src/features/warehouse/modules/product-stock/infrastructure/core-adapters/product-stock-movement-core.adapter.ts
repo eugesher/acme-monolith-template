@@ -40,9 +40,13 @@ export class ProductStockMovementCoreAdapter implements IProductStockMovementPor
       kind: ProductStockCoreMovementKindEnum.ADD,
       movements: [{ productId, quantity, orderProductId: null }],
     });
-    const [productStockId] = moveView.productStockIds;
+    const [productStock] = moveView.productStocks;
     const [onHand] = moveView.stock;
 
-    return { productStockId, quantity: onHand.quantity };
+    return {
+      productStockId: productStock.id,
+      createdAt: productStock.createdAt,
+      quantity: onHand.quantity,
+    };
   }
 }

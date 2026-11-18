@@ -26,11 +26,7 @@ describe('ProductPublishUseCase', () => {
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
         updatedAt: new Date('2026-01-03T00:00:00.000Z'),
       }),
-      answer: {
-        subjectId: '12',
-        version: 2,
-        payload: { sku: 'SKU-0001', previousStatus: ProductStatusEnum.DRAFT },
-      },
+      answer: ProductStatusEnum.DRAFT,
     });
     recordPublished = jest.fn().mockResolvedValue(undefined);
     invalidate = jest.fn().mockResolvedValue(undefined);
@@ -44,7 +40,7 @@ describe('ProductPublishUseCase', () => {
   });
 
   describe('execute', () => {
-    it('publishes, records the publication in the ledger and answers the stored product', async () => {
+    it('publishes, records the publication of the stored product in the ledger and answers it', async () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: 1 });
 
       expect(write).toHaveBeenCalledWith(
@@ -55,6 +51,7 @@ describe('ProductPublishUseCase', () => {
       expect(recordPublished).toHaveBeenCalledWith({
         subjectId: '12',
         version: 2,
+        occurredAt: '2026-01-03T00:00:00.000Z',
         payload: { sku: 'SKU-0001', previousStatus: 'draft' },
       });
       expect(view).toEqual({
@@ -110,7 +107,7 @@ describe('ProductPublishUseCase', () => {
       expect(recordPublished).not.toHaveBeenCalled();
     });
 
-    it('hands the write service a change that publishes the product and answers its ledger payload', async () => {
+    it('hands the write service a change that publishes the product and answers the status it left', async () => {
       const product = ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
@@ -132,11 +129,7 @@ describe('ProductPublishUseCase', () => {
       const answer = mutate(product);
 
       expect(product.toSnapshot().status).toBe('active');
-      expect(answer).toEqual({
-        subjectId: '12',
-        version: 2,
-        payload: { sku: 'SKU-0001', previousStatus: 'draft' },
-      });
+      expect(answer).toBe('draft');
     });
   });
 });

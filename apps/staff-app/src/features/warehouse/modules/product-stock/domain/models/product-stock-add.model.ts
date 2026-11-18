@@ -3,6 +3,7 @@ import { Entity } from '@acme-libs/domain';
 import { ProductQuantityInvalidException } from '../exceptions/product-quantity-invalid.exception';
 import type {
   IProductStockAddLedgerPayload,
+  IProductStockAddLedgerPayloadBuild,
   IProductStockAddLoggerPayload,
   IProductStockAddLoggerPayloadBuild,
   IProductStockAddReconstitute,
@@ -39,10 +40,15 @@ export class ProductStockAddModel extends Entity {
     this.addedQuantity = ProductStockAddModel.validQuantity(quantity);
   }
 
-  public toLedgerPayload(productStockId: string): IProductStockAddLedgerPayload {
+  public toLedgerPayload(
+    params: IProductStockAddLedgerPayloadBuild,
+  ): IProductStockAddLedgerPayload {
+    const { productStockId, createdAt } = params;
+
     return {
       productStockId,
       subjectId: this.id,
+      occurredAt: createdAt,
       payload: { sku: this.sku, quantity: this.addedQuantity },
     };
   }

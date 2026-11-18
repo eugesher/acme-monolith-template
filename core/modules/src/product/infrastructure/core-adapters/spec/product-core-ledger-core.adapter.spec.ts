@@ -7,13 +7,8 @@ describe('ProductCoreLedgerCoreAdapter', () => {
   let adapter: ProductCoreLedgerCoreAdapter;
 
   beforeEach(() => {
-    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     handleEnqueue = jest.fn().mockResolvedValue(undefined);
     adapter = new ProductCoreLedgerCoreAdapter({ handleEnqueue });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
   });
 
   describe('recordArchived', () => {
@@ -21,6 +16,7 @@ describe('ProductCoreLedgerCoreAdapter', () => {
       await adapter.recordArchived({
         subjectId: '12',
         version: 4,
+        occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', previousStatus: ProductStatusEnum.ACTIVE },
       });
 

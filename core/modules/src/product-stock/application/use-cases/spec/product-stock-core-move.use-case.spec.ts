@@ -17,7 +17,11 @@ describe('ProductStockCoreMoveUseCase', () => {
 
   beforeEach(() => {
     lockProducts = jest.fn().mockResolvedValue([{ id: '100' }, { id: '103' }]);
-    insertMany = jest.fn().mockResolvedValue([{ id: 700 }, { id: 701 }, { id: 702 }]);
+    insertMany = jest.fn().mockResolvedValue([
+      { id: 700, createdAt: new Date('2026-01-05T08:00:00.000Z') },
+      { id: 701, createdAt: new Date('2026-01-05T08:00:00.000Z') },
+      { id: 702, createdAt: new Date('2026-01-05T08:00:00.000Z') },
+    ]);
     sumStock = jest.fn().mockResolvedValue([
       { productId: '100', quantity: '6' },
       { productId: '103', quantity: 2 },
@@ -54,7 +58,11 @@ describe('ProductStockCoreMoveUseCase', () => {
       ]);
       expect(sumStock).toHaveBeenCalledWith(['100', '103']);
       expect(view).toEqual({
-        productStockIds: ['700', '701', '702'],
+        productStocks: [
+          { id: '700', createdAt: '2026-01-05T08:00:00.000Z' },
+          { id: '701', createdAt: '2026-01-05T08:00:00.000Z' },
+          { id: '702', createdAt: '2026-01-05T08:00:00.000Z' },
+        ],
         stock: [
           { productId: '100', quantity: 6 },
           { productId: '103', quantity: 2 },

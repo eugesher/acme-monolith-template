@@ -44,7 +44,7 @@ export class AuthCustomerCandidateModel {
     };
   }
 
-  public toRegistered(id: string): IAuthCustomerRegisterReconstitute {
-    return { id, email: this.email.address };
+  public toRegistered(id: string, createdAt: Date): IAuthCustomerRegisterReconstitute {
+    return { id, email: this.email.address, createdAt };
   }
 }
