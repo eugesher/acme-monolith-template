@@ -1,9 +1,9 @@
-import { AggregateRoot } from '@acme-libs/domain';
+import { Entity } from '@acme-libs/domain';
 
 import { TagNameInvalidException } from '../exceptions/tag-name-invalid.exception';
 import type { ITagSnapshot } from '../interfaces';
 
-export abstract class TagAggregate extends AggregateRoot {
+export abstract class TagAggregate extends Entity {
   private static readonly NAME_MAX_LENGTH = 64;
 
   protected constructor(

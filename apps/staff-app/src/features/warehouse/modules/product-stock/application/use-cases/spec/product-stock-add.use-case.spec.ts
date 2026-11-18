@@ -11,34 +11,29 @@ describe('ProductStockAddUseCase', () => {
   let claim: jest.Mock;
   let complete: jest.Mock;
   let release: jest.Mock;
-  let recordEvents: jest.Mock;
+  let recordAdded: jest.Mock;
   let run: jest.Mock;
   let logger: PinoLoggerMock;
   let useCase: ProductStockAddUseCase;
 
   beforeEach(() => {
-    jest.useFakeTimers({ now: new Date('2026-01-05T08:00:00.000Z') });
     findById = jest.fn().mockResolvedValue({ id: '12', sku: 'SKU-0001' });
     lock = jest.fn().mockResolvedValue(undefined);
     add = jest.fn().mockResolvedValue({ productStockId: '700', quantity: 15 });
     claim = jest.fn().mockResolvedValue({ outcome: 'claimed' });
     complete = jest.fn().mockResolvedValue(undefined);
     release = jest.fn().mockResolvedValue(undefined);
-    recordEvents = jest.fn().mockResolvedValue(undefined);
+    recordAdded = jest.fn().mockResolvedValue(undefined);
     run = jest.fn().mockImplementation((work: () => Promise<unknown>) => work());
     logger = makePinoLoggerMock();
     useCase = new ProductStockAddUseCase(
       { findById },
       { lock, add },
       { claim, complete, release },
-      { recordEvents },
+      { recordAdded },
       { run },
       logger as unknown as PinoLogger,
     );
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
   });
 
   describe('execute', () => {
@@ -69,7 +64,7 @@ describe('ProductStockAddUseCase', () => {
       expect(release).not.toHaveBeenCalled();
     });
 
-    it('enqueues the ledger record under the stock row after the commit and logs it', async () => {
+    it('records the restock under the stock row in the ledger after the commit and logs it', async () => {
       await useCase.execute({
         productId: '12',
         quantity: 5,
@@ -77,21 +72,12 @@ describe('ProductStockAddUseCase', () => {
         idempotencyKey: 'key-1',
       });
 
-      expect(recordEvents).toHaveBeenCalledWith({
-        ledgerRecords: [
-          {
-            operationKey: 'product-restocked:700',
-            subjectType: 'product',
-            subjectId: '12',
-            action: 'ProductRestocked',
-            payload: { sku: 'SKU-0001', quantity: 5 },
-            occurredAt: '2026-01-05T08:00:00.000Z',
-          },
-        ],
+      expect(recordAdded).toHaveBeenCalledWith({
+        productStockId: '700',
+        subjectId: '12',
+        payload: { sku: 'SKU-0001', quantity: 5 },
       });
-      expect(run.mock.invocationCallOrder[0]).toBeLessThan(
-        recordEvents.mock.invocationCallOrder[0],
-      );
+      expect(run.mock.invocationCallOrder[0]).toBeLessThan(recordAdded.mock.invocationCallOrder[0]);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '700', productId: '12', quantity: 5 },
         'Product restocked',
@@ -113,7 +99,7 @@ describe('ProductStockAddUseCase', () => {
 
       expect(view).toEqual({ productId: '12', quantity: 10 });
       expect(lock).not.toHaveBeenCalled();
-      expect(recordEvents).not.toHaveBeenCalled();
+      expect(recordAdded).not.toHaveBeenCalled();
       expect(logger.info).toHaveBeenCalledWith(
         { idempotencyKey: 'key-1' },
         'Product restock replayed from the idempotency store',
@@ -176,11 +162,11 @@ describe('ProductStockAddUseCase', () => {
         }),
       ).rejects.toThrow('lock wait timeout');
       expect(release).toHaveBeenCalledWith({ staffUserId: 'staff-1', key: 'key-1' });
-      expect(recordEvents).not.toHaveBeenCalled();
+      expect(recordAdded).not.toHaveBeenCalled();
     });
 
     it('keeps the completed key when the ledger fails after the commit and rethrows', async () => {
-      recordEvents.mockRejectedValue(new Error('ledger down'));
+      recordAdded.mockRejectedValue(new Error('ledger down'));
 
       await expect(
         useCase.execute({

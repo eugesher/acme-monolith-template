@@ -3,11 +3,7 @@ import type { PinoLogger } from 'nestjs-pino';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import {
-  ProductUpdatedEvent,
-  ProductUpdateModel,
-  type IProductReconstitute,
-} from '../../../domain';
+import { ProductUpdateModel, type IProductReconstitute } from '../../../domain';
 import { ProductWriteService } from '../product-write.service';
 import type { ProductAccessService } from '../product-access.service';
 
@@ -55,11 +51,15 @@ describe('ProductWriteService', () => {
   });
 
   describe('write', () => {
-    it('saves the change against the version as read and answers the stored product with the events', async () => {
+    it('saves the change against the version as read and answers the stored product with the answer of the change', async () => {
       const written = await service.write(
         { productId: '12', expectedVersion: undefined },
         ProductUpdateModel.reconstitute,
-        (product) => product.update({ name: 'Desk lamp' }),
+        (product) => {
+          product.update({ name: 'Desk lamp' });
+
+          return product.toLoggerPayload();
+        },
       );
       expect(load).toHaveBeenCalledWith({ productId: '12' }, ProductUpdateModel.reconstitute);
       expect(update).toHaveBeenCalledWith({
@@ -71,8 +71,7 @@ describe('ProductWriteService', () => {
       });
       expect(findById).toHaveBeenCalledWith('12');
       expect(written.product.toSnapshot().updatedAt).toBe('2026-01-03T00:00:00.000Z');
-      expect(written.domainEvents).toHaveLength(1);
-      expect(written.domainEvents[0]).toBeInstanceOf(ProductUpdatedEvent);
+      expect(written.answer).toEqual({ id: '12', version: 4 });
       expect(logger.info).not.toHaveBeenCalled();
     });
 
@@ -86,7 +85,7 @@ describe('ProductWriteService', () => {
       expect(update).not.toHaveBeenCalled();
       expect(findById).not.toHaveBeenCalled();
       expect(written.product.version).toBe(3);
-      expect(written.domainEvents).toEqual([]);
+      expect(written.answer).toBeUndefined();
     });
 
     it('retries a lost race with a fresh read and logs the retry', async () => {

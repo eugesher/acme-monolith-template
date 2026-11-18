@@ -1,27 +1,25 @@
-import { ProductStockAddedEvent } from '../../events/product-stock-added.event';
 import { ProductStockAddModel } from '../product-stock-add.model';
 
 describe('ProductStockAddModel', () => {
   describe('reconstitute', () => {
-    it('restores the stock of a stored product without recording anything', () => {
+    it('restores the stock of a stored product', () => {
       const stock = ProductStockAddModel.reconstitute({ id: '12', sku: 'SKU-0001' });
 
       expect(stock.id).toBe('12');
-      expect(stock.pullDomainEvents()).toEqual([]);
     });
   });
 
   describe('add', () => {
-    it('records the units added to the product', () => {
+    it('holds the units added to the product for the ledger', () => {
       const stock = ProductStockAddModel.reconstitute({ id: '12', sku: 'SKU-0001' });
 
       stock.add(5);
 
-      const events = stock.pullDomainEvents();
-
-      expect(events).toHaveLength(1);
-      expect(events[0]).toBeInstanceOf(ProductStockAddedEvent);
-      expect(events[0]).toMatchObject({ aggregateId: '12', sku: 'SKU-0001', quantity: 5 });
+      expect(stock.toLedgerPayload('700')).toEqual({
+        productStockId: '700',
+        subjectId: '12',
+        payload: { sku: 'SKU-0001', quantity: 5 },
+      });
     });
 
     it.each([

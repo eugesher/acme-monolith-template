@@ -220,6 +220,7 @@ describe('libs', () => {
     ['kernel', 'crypto'],
     ['domain', '@nestjs/common'],
     ['domain', 'typeorm'],
+    ['domain', 'crypto'],
   ])('the framework-free lib %s may NOT import %s', async (lib, source) => {
     await expect({
       file: `libs/${lib}/src/__fixture__.ts`,
@@ -231,13 +232,6 @@ describe('libs', () => {
     await expect({
       file: 'libs/toolkit/src/__fixture__.ts',
       code: 'import { createHash } from "crypto";',
-    }).toPassArchitectureLint();
-  });
-
-  it('the domain lib MAY import crypto (DomainEvent ids)', async () => {
-    await expect({
-      file: 'libs/domain/src/__fixture__.ts',
-      code: 'import { randomUUID } from "crypto";',
     }).toPassArchitectureLint();
   });
 

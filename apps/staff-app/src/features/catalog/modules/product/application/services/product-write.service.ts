@@ -31,11 +31,11 @@ export class ProductWriteService {
     private readonly logger: PinoLogger,
   ) {}
 
-  public async write<TProduct extends ProductAggregate>(
+  public async write<TProduct extends ProductAggregate, TAnswer>(
     command: IProductWriteCommand,
     reconstitute: (record: IProductReconstitute) => TProduct,
-    mutate: (product: TProduct) => void,
-  ): Promise<IProductWriteView<TProduct>> {
+    mutate: (product: TProduct) => TAnswer,
+  ): Promise<IProductWriteView<TProduct, TAnswer>> {
     const { productId, expectedVersion } = command;
     const maxAttempts = expectedVersion === undefined ? this.occRetryAttempts : 1;
 
@@ -57,11 +57,11 @@ export class ProductWriteService {
     });
   }
 
-  private async attempt<TProduct extends ProductAggregate>(
+  private async attempt<TProduct extends ProductAggregate, TAnswer>(
     command: IProductWriteCommand,
     reconstitute: (record: IProductReconstitute) => TProduct,
-    mutate: (product: TProduct) => void,
-  ): Promise<IProductWriteView<TProduct>> {
+    mutate: (product: TProduct) => TAnswer,
+  ): Promise<IProductWriteView<TProduct, TAnswer>> {
     const { productId, expectedVersion } = command;
     const product = await this.accessService.load({ productId }, reconstitute);
 
@@ -69,12 +69,10 @@ export class ProductWriteService {
 
     const versionAsRead = product.version;
 
-    mutate(product);
-
-    const domainEvents = product.pullDomainEvents();
+    const answer = mutate(product);
 
     if (product.version === versionAsRead) {
-      return { product, domainEvents };
+      return { product, answer };
     }
 
     const productUpdatePayload = product.toUpdatePayload(versionAsRead);
@@ -88,7 +86,7 @@ export class ProductWriteService {
 
     const savedProduct = await this.load(productId, reconstitute);
 
-    return { product: savedProduct, domainEvents };
+    return { product: savedProduct, answer };
   }
 
   private async load<TProduct>(

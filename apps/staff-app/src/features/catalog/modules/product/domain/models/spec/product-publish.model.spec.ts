@@ -1,11 +1,10 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
-import { ProductPublishedEvent } from '../../events/product-published.event';
 import { ProductPublishModel } from '../product-publish.model';
 
 describe('ProductPublishModel', () => {
   describe('publish', () => {
-    it('publishes a draft, bumps the version and records the publication', () => {
+    it('publishes a draft and bumps the version', () => {
       const product = ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
@@ -18,18 +17,8 @@ describe('ProductPublishModel', () => {
 
       product.publish();
 
-      const events = product.pullDomainEvents();
-
       expect(product.toSnapshot().status).toBe('active');
       expect(product.version).toBe(2);
-      expect(events).toHaveLength(1);
-      expect(events[0]).toBeInstanceOf(ProductPublishedEvent);
-      expect(events[0]).toMatchObject({
-        aggregateId: '12',
-        sku: 'SKU-0001',
-        version: 2,
-        previousStatus: 'draft',
-      });
     });
 
     it('changes nothing on an active product', () => {
@@ -47,7 +36,6 @@ describe('ProductPublishModel', () => {
 
       expect(product.toSnapshot().status).toBe('active');
       expect(product.version).toBe(3);
-      expect(product.pullDomainEvents()).toEqual([]);
     });
   });
 
@@ -66,7 +54,44 @@ describe('ProductPublishModel', () => {
       product.publish();
 
       expect(product.toSnapshot()).toMatchObject({ status: 'active', version: 6 });
-      expect(product.pullDomainEvents()).toHaveLength(1);
+    });
+  });
+
+  describe('toLedgerPayload', () => {
+    it('answers the publication under the new version with the status it left', () => {
+      const product = ProductPublishModel.reconstitute({
+        id: '12',
+        sku: 'SKU-0001',
+        name: 'Lamp',
+        status: ProductStatusEnum.ARCHIVED,
+        version: 5,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+      });
+
+      product.publish();
+
+      expect(product.toLedgerPayload()).toEqual({
+        subjectId: '12',
+        version: 6,
+        payload: { sku: 'SKU-0001', previousStatus: 'archived' },
+      });
+    });
+
+    it('answers nothing when the product was already active', () => {
+      const product = ProductPublishModel.reconstitute({
+        id: '12',
+        sku: 'SKU-0001',
+        name: 'Lamp',
+        status: ProductStatusEnum.ACTIVE,
+        version: 3,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+      });
+
+      product.publish();
+
+      expect(product.toLedgerPayload()).toBeUndefined();
     });
   });
 

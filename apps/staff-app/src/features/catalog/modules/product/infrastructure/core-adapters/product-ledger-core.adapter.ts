@@ -6,7 +6,7 @@ import {
   PRODUCT_LEDGER_PORT,
   type IProductLedgerPort,
   type IProductLedgerRecordCreatedCommand,
-  type IProductLedgerRecordEventsCommand,
+  type IProductLedgerRecordPublishedCommand,
 } from '../../outbound';
 
 @Injectable()
@@ -34,11 +34,17 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
     });
   }
 
-  public async recordEvents(command: IProductLedgerRecordEventsCommand): Promise<void> {
-    const { ledgerRecords } = command;
+  public async recordPublished(command: IProductLedgerRecordPublishedCommand): Promise<void> {
+    const { subjectId, version, payload } = command;
+    const occurredAt = new Date().toISOString();
 
-    for (const ledgerRecord of ledgerRecords) {
-      await this.ledger.handleEnqueue(ledgerRecord);
-    }
+    await this.ledger.handleEnqueue({
+      operationKey: `product-published:${subjectId}:${version}`,
+      subjectType: 'product',
+      subjectId,
+      action: 'ProductPublished',
+      payload,
+      occurredAt,
+    });
   }
 }

@@ -1,8 +1,8 @@
-import { AggregateRoot } from '@acme-libs/domain';
+import { Entity } from '@acme-libs/domain';
 
 import type { IOrderProductSnapshot, IOrderSnapshot } from '../interfaces';
 
-export abstract class OrderAggregate extends AggregateRoot {
+export abstract class OrderAggregate extends Entity {
   protected constructor(
     id: string,
     protected readonly orderProducts: readonly IOrderProductSnapshot[],

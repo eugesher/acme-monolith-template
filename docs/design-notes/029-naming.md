@@ -54,9 +54,9 @@ implements `IOrderLedgerPort`, `ORDER_LEDGER_PORT`, in
 `application/interfaces/commands/<context>-<service>.command.ts`, next to
 `<context>-<service>.service.ts`. Each command is named after the service and the method that takes
 it, `I<Context><Service><Method>Command`. A port follows the same rule in `outbound/interfaces`:
-`IProductLedgerRecordCreatedCommand` for `recordCreated` and `IProductLedgerRecordEventsCommand` for
-`recordEvents` share `outbound/interfaces/commands/product-ledger.command.ts`. A use case keeps one
-command file of its own, `<context>-<verb>.command.ts`.
+`IProductLedgerRecordCreatedCommand` for `recordCreated` and `IProductLedgerRecordPublishedCommand`
+for `recordPublished` share `outbound/interfaces/commands/product-ledger.command.ts`. A use case
+keeps one command file of its own, `<context>-<verb>.command.ts`.
 
 **A config token is the module, the property and `_TOKEN`.** A token that carries a value read with
 `ConfigValueProvider.provide` takes the prefix of its module, the name of the configuration property

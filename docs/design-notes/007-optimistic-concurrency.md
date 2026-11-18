@@ -22,9 +22,9 @@ The same pattern serves `ReminderWriteService` and `NoteWriteService` in
 3. applies `mutate` in memory;
 4. saves with `UPDATE … WHERE id = ? AND version = <as read>`.
 
-**A change to the current values changes nothing.** The model records no event and keeps the
-version, so the service does not touch the database, and a repeated request does not invalidate the
-`If-Match` version of everyone else.
+**A change to the current values changes nothing.** The model keeps the version, so the service does
+not touch the database, and a repeated request does not invalidate the `If-Match` version of
+everyone else.
 
 **The repository answers a lost race with `false`, not an error.** The service reads the current
 version and throws its own conflict error, which only `OccRetryHelper` sees. Because the class is
@@ -48,18 +48,17 @@ is not a non-negative integer, including a weak tag `W/"3"`, is refused with `IF
 (400), so a typo cannot turn into an unconditional write. The decorator lives in `common/shared`,
 because only staff features read the header.
 
-## Domain events feed the ledger
+## The change answers the ledger
 
-The model records a domain event per change
-(`apps/staff-app/src/features/catalog/modules/product/domain/events`). A use case pulls them after
-the write, picks those that go to the ledger and hands their records to `IProductLedgerPort`, whose
-adapter enqueues them on the `ledger-record` queue (see `022-enqueue-after-commit.md` and
-`004-append-only-journal.md`). An event that goes to the ledger builds its record itself,
-`ProductPublishedEvent.toLedgerRecord()`: the event knows its fields and its aggregate. The use case
-calls it, not the adapter: infrastructure may not reach the domain, so the port takes the records
-rather than the events (see `016-lint-allowlists.md`). The domain may not import the ledger
-contracts, so the event answers `IProductLedgerRecord`, a type of its own with the shape of the
-record of the lib, and the command of the port lists the same fields.
+`mutate` may answer a value, and the service hands it back next to the stored model,
+`{ product, answer }`. The service reads the row again after the save, so a fact that only the
+changed model knows reaches the use case through the answer: `ProductPublishModel.publish()` holds
+the status the product left, and the use case answers `product.toLedgerPayload()` from the change. A
+product that was already active answers nothing, and the use case records nothing. The use case
+hands the payload to `IProductLedgerPort.recordPublished`, whose adapter adds the operation key, the
+action and the time and enqueues the record on the `ledger-record` queue (see
+`022-enqueue-after-commit.md` and `004-append-only-journal.md`). The models record no domain events:
+each fact has one reader, the ledger, and the use case calls it directly.
 
 ## `PATCH` edits fields, `PUT` sets a state
 

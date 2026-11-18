@@ -1,5 +1,4 @@
 import { ProductAggregate } from '../aggregates/product.aggregate';
-import { ProductUpdatedEvent } from '../events/product-updated.event';
 import type {
   IProductReconstitute,
   IProductUpdate,
@@ -24,18 +23,8 @@ export class ProductUpdateModel extends ProductAggregate {
       return;
     }
 
-    const previousName = this.currentName;
-
     this.currentName = validName;
     this.currentVersion += 1;
-
-    const updatedEvent = new ProductUpdatedEvent(
-      this.id,
-      { name: validName },
-      { name: previousName },
-    );
-
-    this.addDomainEvent(updatedEvent);
   }
 
   public toLoggerPayload(): IProductUpdateLoggerPayload {
