@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   ROLE_CREATE_REPOSITORY_PORT,
@@ -19,13 +18,6 @@ export class RoleCreateRepository extends RolePersistenceHost implements IRoleCr
     provide: ROLE_CREATE_REPOSITORY_PORT,
     useClass: RoleCreateRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async insertRole(
     query: IRoleCreateStaffRoleInsertQuery,

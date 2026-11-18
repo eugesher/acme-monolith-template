@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   TAG_CREATE_REPOSITORY_PORT,
@@ -19,13 +18,6 @@ export class TagCreateRepository extends TagPersistenceHost implements ITagCreat
     provide: TAG_CREATE_REPOSITORY_PORT,
     useClass: TagCreateRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async insert(query: ITagCreateQuery): Promise<ITagCreateInsertRecord> {
     const tagId = await MysqlErrorHelper.catchDuplicateKey(() =>

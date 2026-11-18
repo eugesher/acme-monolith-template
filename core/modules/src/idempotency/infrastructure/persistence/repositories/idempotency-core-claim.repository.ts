@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper, type Nullable } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
@@ -22,13 +21,6 @@ export class IdempotencyCoreClaimRepository
     provide: IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
     useClass: IdempotencyCoreClaimRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async insert(
     query: IIdempotencyCoreClaimInsertQuery,

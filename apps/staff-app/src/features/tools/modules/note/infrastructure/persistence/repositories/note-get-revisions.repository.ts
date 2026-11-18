@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   NOTE_GET_REVISIONS_REPOSITORY_PORT,
@@ -19,13 +17,6 @@ export class NoteGetRevisionsRepository
     provide: NOTE_GET_REVISIONS_REPOSITORY_PORT,
     useClass: NoteGetRevisionsRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async listForNote(
     query: INoteGetRevisionsListForNoteQuery,

@@ -1,6 +1,5 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import {
@@ -19,13 +18,6 @@ export class ProductReplaceTagsRepository
     provide: PRODUCT_REPLACE_TAGS_REPOSITORY_PORT,
     useClass: ProductReplaceTagsRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async lockById(productId: string): Promise<Nullable<IProductReplaceTagsRecord>> {
     return await this.createProductBuilder().forLockById(productId).getOne();

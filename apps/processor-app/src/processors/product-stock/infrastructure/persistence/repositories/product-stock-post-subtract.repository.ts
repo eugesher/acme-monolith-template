@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   PRODUCT_STOCK_POST_SUBTRACT_REPOSITORY_PORT,
@@ -18,13 +16,6 @@ export class ProductStockPostSubtractRepository
     provide: PRODUCT_STOCK_POST_SUBTRACT_REPOSITORY_PORT,
     useClass: ProductStockPostSubtractRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async findActive(productIds: string[]): Promise<IProductStockPostSubtractProductRecord[]> {
     if (productIds.length === 0) {

@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { IdempotencyStatusEnum } from '@acme-libs/kernel';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   IDEMPOTENCY_CORE_COMPLETE_REPOSITORY_PORT,
@@ -19,13 +18,6 @@ export class IdempotencyCoreCompleteRepository
     provide: IDEMPOTENCY_CORE_COMPLETE_REPOSITORY_PORT,
     useClass: IdempotencyCoreCompleteRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async complete(query: IIdempotencyCoreCompleteQuery): Promise<void> {
     const { scope, key, responseBody } = query;

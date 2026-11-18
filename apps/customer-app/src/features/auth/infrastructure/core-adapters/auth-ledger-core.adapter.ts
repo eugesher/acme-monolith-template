@@ -1,6 +1,11 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
+import {
+  LEDGER_CORE_PORT,
+  LedgerCoreActionEnum,
+  LedgerCoreSubjectTypeEnum,
+  type ILedgerCorePort,
+} from '@acme-core/contracts/ledger';
 
 import {
   AUTH_LEDGER_PORT,
@@ -25,9 +30,9 @@ export class AuthLedgerCoreAdapter implements IAuthLedgerPort {
 
     await this.ledger.handleEnqueue({
       operationKey: `customer-registered:${subjectId}`,
-      subjectType: 'customer',
+      subjectType: LedgerCoreSubjectTypeEnum.CUSTOMER,
       subjectId,
-      action: 'CustomerRegistered',
+      action: LedgerCoreActionEnum.CUSTOMER_REGISTERED,
       payload: {},
       occurredAt,
     });

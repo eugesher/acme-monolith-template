@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   PRODUCT_STOCK_CORE_LOCK_REPOSITORY_PORT,
@@ -17,11 +15,4 @@ export class ProductStockCoreLockRepository
     provide: PRODUCT_STOCK_CORE_LOCK_REPOSITORY_PORT,
     useClass: ProductStockCoreLockRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 }

@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   TAG_RENAME_REPOSITORY_PORT,
@@ -17,13 +16,6 @@ export class TagRenameRepository extends TagPersistenceHost implements ITagRenam
     provide: TAG_RENAME_REPOSITORY_PORT,
     useClass: TagRenameRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async update(query: ITagRenameQuery): Promise<TagRenameUpdateOutcomeEnum> {
     const { id, name } = query;

@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   ORDER_PLACE_REPOSITORY_PORT,
@@ -21,13 +19,6 @@ export class OrderPlaceRepository
     provide: ORDER_PLACE_REPOSITORY_PORT,
     useClass: OrderPlaceRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async findActiveProducts(
     productIds: readonly string[],

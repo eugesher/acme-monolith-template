@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   USER_REGISTER_REPOSITORY_PORT,
@@ -23,13 +22,6 @@ export class UserRegisterRepository
     provide: USER_REGISTER_REPOSITORY_PORT,
     useClass: UserRegisterRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async insertUser(
     query: IUserRegisterStaffUserInsertQuery,

@@ -1,6 +1,4 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   TAG_GET_MANY_REPOSITORY_PORT,
@@ -16,13 +14,6 @@ export class TagGetManyRepository extends TagPersistenceHost implements ITagGetM
     provide: TAG_GET_MANY_REPOSITORY_PORT,
     useClass: TagGetManyRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async list(query: ITagGetManyQuery): Promise<ITagGetManyRecord> {
     return await this.createTagBuilder().forList(query).getManyAndCount();

@@ -1,8 +1,7 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { QueryDeepPartialEntity } from 'typeorm';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 import type { LedgerEntry } from '@acme-core/entities';
 
 import {
@@ -24,13 +23,6 @@ export class LedgerAppendRepository
     provide: LEDGER_APPEND_REPOSITORY_PORT,
     useClass: LedgerAppendRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async insert(
     record: ILedgerAppendEntryInsertQuery,

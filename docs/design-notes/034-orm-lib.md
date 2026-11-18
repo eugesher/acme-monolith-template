@@ -67,12 +67,24 @@ interface IOrmPort {
 ```
 
 `ORM_PORT` and `IHostedRepository` live in `@acme-libs/contracts/database`, the only contracts that
-may import `typeorm`. A repository injects the port and reads through it:
+may import `typeorm`. The persistence host of a module injects the port in its constructor, and
+every repository of the module reads through it:
 
 ```ts
-@Inject(ORM_PORT)
-protected readonly orm: IOrmPort,
+export abstract class ProductPersistenceHost {
+  constructor(
+    @Inject(ORM_PORT)
+    protected readonly orm: IOrmPort,
+  ) {}
+}
 ```
+
+**A repository declares no constructor.** It extends the host, directly or through a base
+repository, and carries only its `provider` and its methods. Nest reads the parameters of a class
+through its prototype chain: TypeScript and the SWC loader of the build put `design:paramtypes` and
+the token of `@Inject` on the host, and a class without a constructor has none of its own, so the
+repository gets `ORM_PORT` from the host. A repository that needs another dependency declares its
+own constructor and hands `orm` to `super`.
 
 The port exposes `getRepository` alone, and the repository it answers has no manager, so a
 repository can neither open a transaction nor reach the `DataSource` directly.

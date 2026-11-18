@@ -2,6 +2,7 @@ import type { PinoLogger } from 'nestjs-pino';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
+import { LedgerCoreActionEnum, LedgerCoreSubjectTypeEnum } from '@acme-core/contracts/ledger';
 
 import { LedgerCoreEnqueueUseCase } from '../ledger-core-enqueue.use-case';
 
@@ -20,10 +21,10 @@ describe('LedgerCoreEnqueueUseCase', () => {
     it('adds the record with the correlation id of the context once and logs it under its subject and operation key', async () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
-          operationKey: 'item-opened:7',
-          subjectType: 'item',
+          operationKey: 'product-created:7',
+          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: 'ItemOpened',
+          action: LedgerCoreActionEnum.PRODUCT_CREATED,
           payload: { name: 'Lamp' },
           occurredAt: '2026-01-05T08:00:00.000Z',
         }),
@@ -32,10 +33,10 @@ describe('LedgerCoreEnqueueUseCase', () => {
       expect(add).toHaveBeenCalledTimes(1);
       expect(add).toHaveBeenCalledWith({
         record: {
-          operationKey: 'item-opened:7',
-          subjectType: 'item',
+          operationKey: 'product-created:7',
+          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: 'ItemOpened',
+          action: LedgerCoreActionEnum.PRODUCT_CREATED,
           payload: { name: 'Lamp' },
           occurredAt: '2026-01-05T08:00:00.000Z',
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
@@ -43,7 +44,7 @@ describe('LedgerCoreEnqueueUseCase', () => {
         timeoutMs: 500,
       });
       expect(logger.info).toHaveBeenCalledWith(
-        { subjectType: 'item', subjectId: '7', operationKey: 'item-opened:7' },
+        { subjectType: 'product', subjectId: '7', operationKey: 'product-created:7' },
         'Ledger record enqueued',
       );
     });
@@ -53,10 +54,10 @@ describe('LedgerCoreEnqueueUseCase', () => {
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
-          operationKey: 'item-opened:7',
-          subjectType: 'item',
+          operationKey: 'product-created:7',
+          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: 'ItemOpened',
+          action: LedgerCoreActionEnum.PRODUCT_CREATED,
           payload: {},
           occurredAt: '2026-01-05T08:00:00.000Z',
         }),
@@ -68,9 +69,9 @@ describe('LedgerCoreEnqueueUseCase', () => {
           err: new Error('redis is down'),
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
           attempt: 1,
-          subjectType: 'item',
+          subjectType: 'product',
           subjectId: '7',
-          operationKey: 'item-opened:7',
+          operationKey: 'product-created:7',
         },
         'Ledger enqueue failed — retrying',
       );
@@ -82,10 +83,10 @@ describe('LedgerCoreEnqueueUseCase', () => {
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
-          operationKey: 'item-opened:7',
-          subjectType: 'item',
+          operationKey: 'product-created:7',
+          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: 'ItemOpened',
+          action: LedgerCoreActionEnum.PRODUCT_CREATED,
           payload: {},
           occurredAt: '2026-01-05T08:00:00.000Z',
         }),
@@ -97,9 +98,9 @@ describe('LedgerCoreEnqueueUseCase', () => {
         {
           err: new Error('redis is down'),
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
-          subjectType: 'item',
+          subjectType: 'product',
           subjectId: '7',
-          operationKey: 'item-opened:7',
+          operationKey: 'product-created:7',
         },
         'Ledger enqueue failed permanently: the record may be absent from the queue and the ledger, replay this record',
       );

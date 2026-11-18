@@ -1,6 +1,5 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import {
@@ -16,13 +15,6 @@ export class TagAccessRepository extends TagPersistenceHost implements ITagAcces
     provide: TAG_ACCESS_REPOSITORY_PORT,
     useClass: TagAccessRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async findById(tagId: string): Promise<Nullable<ITagAccessRecord>> {
     return await this.createTagBuilder().forById(tagId).getOne();

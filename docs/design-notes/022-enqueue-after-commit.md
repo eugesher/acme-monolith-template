@@ -62,6 +62,13 @@ id, which the ledger takes from the context itself, and calls the facade. Nothin
 the application has no ledger service. Infrastructure may not import the domain, so the use case
 asks the model for the payload and passes it through the command of the port.
 
+**The facts of the ledger are a closed list.** The type of the subject and the action are values of
+`LedgerCoreSubjectTypeEnum` and `LedgerCoreActionEnum` in `@acme-core/contracts/ledger`, and
+`ILedgerCoreEnqueueCommand` takes nothing else, so every fact a module may record is listed in one
+place. The job keeps them as strings: `ILedgerRecordProcessorPayload` describes what the processor
+reads from Redis, where a record of another subject type can sit, as the failing job of the
+processor e2e does (see `014-e2e-suites.md`).
+
 ## Where the queue is declared
 
 **A queue written by several apps keeps its contract outside the apps**: the name and the payload

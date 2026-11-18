@@ -1,6 +1,5 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import {
@@ -17,13 +16,6 @@ export class NoteAccessRepository extends NotePersistenceHost implements INoteAc
     provide: NOTE_ACCESS_REPOSITORY_PORT,
     useClass: NoteAccessRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async findOwned(query: INoteAccessFindOwnedQuery): Promise<Nullable<INoteAccessRecord>> {
     return await this.createNoteBuilder().forOwned(query).getOne();

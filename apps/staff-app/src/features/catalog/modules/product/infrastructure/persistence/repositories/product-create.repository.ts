@@ -1,7 +1,6 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import { MysqlErrorHelper } from '@acme-libs/toolkit';
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   PRODUCT_CREATE_REPOSITORY_PORT,
@@ -22,13 +21,6 @@ export class ProductCreateRepository
     provide: PRODUCT_CREATE_REPOSITORY_PORT,
     useClass: ProductCreateRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async existsBySku(sku: string): Promise<boolean> {
     return await this.createProductBuilder().forExistsBySku(sku).getExists();

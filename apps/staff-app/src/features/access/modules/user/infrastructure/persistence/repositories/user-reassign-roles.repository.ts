@@ -1,7 +1,5 @@
-import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 import { In, Not } from 'typeorm';
-
-import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import {
   USER_REASSIGN_ROLES_REPOSITORY_PORT,
@@ -20,13 +18,6 @@ export class UserReassignRolesRepository
     provide: USER_REASSIGN_ROLES_REPOSITORY_PORT,
     useClass: UserReassignRolesRepository,
   };
-
-  constructor(
-    @Inject(ORM_PORT)
-    protected readonly orm: IOrmPort,
-  ) {
-    super();
-  }
 
   public async existsUser(id: string): Promise<boolean> {
     return await this.staffUserRepository.existsBy({ id });

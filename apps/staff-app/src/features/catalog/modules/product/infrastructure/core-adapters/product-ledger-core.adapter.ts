@@ -1,6 +1,11 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
+import {
+  LEDGER_CORE_PORT,
+  LedgerCoreActionEnum,
+  LedgerCoreSubjectTypeEnum,
+  type ILedgerCorePort,
+} from '@acme-core/contracts/ledger';
 
 import {
   PRODUCT_LEDGER_PORT,
@@ -26,9 +31,9 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
 
     await this.ledger.handleEnqueue({
       operationKey: `product-created:${subjectId}`,
-      subjectType: 'product',
+      subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
       subjectId,
-      action: 'ProductCreated',
+      action: LedgerCoreActionEnum.PRODUCT_CREATED,
       payload,
       occurredAt,
     });
@@ -39,9 +44,9 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
 
     await this.ledger.handleEnqueue({
       operationKey: `product-published:${subjectId}:${version}`,
-      subjectType: 'product',
+      subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
       subjectId,
-      action: 'ProductPublished',
+      action: LedgerCoreActionEnum.PRODUCT_PUBLISHED,
       payload,
       occurredAt,
     });
