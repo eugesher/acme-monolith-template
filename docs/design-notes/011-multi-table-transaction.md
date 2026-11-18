@@ -56,3 +56,10 @@ reveals that another row exists. Every query takes the caller as a required filt
 The edit and resolve repositories share `update` through
 `apps/staff-app/src/features/tools/modules/note/infrastructure/persistence/repositories/base/note-base.repository.ts`;
 the product module shares `findById` the same way.
+
+**The base speaks for every port it serves.** Each port keeps its own types, so a shared method
+takes the union of their queries and answers the intersection of their records:
+`update(query: INoteEditUpdateQuery | INoteResolveUpdateQuery)`,
+`findById(): Promise<Nullable<IProductAccessRecord & IProductWriteRecord>>`, and the lock and the
+sum of core `ProductStockCoreBaseRepository` for the lock and move ports. No port lends its name to
+the other.

@@ -5,6 +5,7 @@ import {
   USER_REASSIGN_ROLES_REPOSITORY_PORT,
   type IUserReassignRolesRepositoryPort,
   type IUserReassignRolesStaffRoleRecord,
+  type IUserReassignRolesStaffUserRoleDeleteQuery,
   type IUserReassignRolesStaffUserRoleInsertQuery,
 } from '../../../outbound';
 import { UserPersistenceHost } from '../host/user-persistence.host';
@@ -31,7 +32,11 @@ export class UserReassignRolesRepository
     return await this.createStaffRoleBuilder().forByIds(ids).getMany();
   }
 
-  public async deleteUserRolesExcept(userId: string, roleIds: string[]): Promise<void> {
+  public async deleteUserRolesExcept(
+    query: IUserReassignRolesStaffUserRoleDeleteQuery,
+  ): Promise<void> {
+    const { userId, roleIds } = query;
+
     if (roleIds.length === 0) {
       await this.staffUserRoleRepository.delete({ userId });
 

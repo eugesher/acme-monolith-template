@@ -1,12 +1,13 @@
 import type {
   IUserReassignRolesStaffRoleRecord,
+  IUserReassignRolesStaffUserRoleDeleteQuery,
   IUserReassignRolesStaffUserRoleInsertQuery,
 } from '../interfaces';
 
 export interface IUserReassignRolesRepositoryPort {
   existsUser(id: string): Promise<boolean>;
   findRoles(ids: readonly string[]): Promise<IUserReassignRolesStaffRoleRecord[]>;
-  deleteUserRolesExcept(userId: string, roleIds: string[]): Promise<void>;
+  deleteUserRolesExcept(query: IUserReassignRolesStaffUserRoleDeleteQuery): Promise<void>;
   insertUserRolesIgnore(queries: IUserReassignRolesStaffUserRoleInsertQuery[]): Promise<void>;
 }
 

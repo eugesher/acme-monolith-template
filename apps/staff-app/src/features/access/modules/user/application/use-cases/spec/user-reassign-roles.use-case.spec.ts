@@ -57,7 +57,10 @@ describe('UserReassignRolesUseCase', () => {
     const view = await useCase.execute({ userId: 'user-1', roleIds: ['2', '3'] });
 
     expect(view).toEqual({ id: 'user-1', roleIds: ['2', '3'] });
-    expect(repository.deleteUserRolesExcept).toHaveBeenCalledWith('user-1', ['2', '3']);
+    expect(repository.deleteUserRolesExcept).toHaveBeenCalledWith({
+      userId: 'user-1',
+      roleIds: ['2', '3'],
+    });
     expect(repository.insertUserRolesIgnore).toHaveBeenCalledWith([
       { userId: 'user-1', roleId: '2' },
       { userId: 'user-1', roleId: '3' },
@@ -94,7 +97,10 @@ describe('UserReassignRolesUseCase', () => {
     const view = await useCase.execute({ userId: 'user-1', roleIds: [] });
 
     expect(view).toEqual({ id: 'user-1', roleIds: [] });
-    expect(repository.deleteUserRolesExcept).toHaveBeenCalledWith('user-1', []);
+    expect(repository.deleteUserRolesExcept).toHaveBeenCalledWith({
+      userId: 'user-1',
+      roleIds: [],
+    });
     expect(repository.insertUserRolesIgnore).toHaveBeenCalledWith([]);
   });
 });

@@ -39,8 +39,6 @@ export class IdempotencyCoreClaimRepository
   public async findByKey(
     query: IIdempotencyCoreClaimFindQuery,
   ): Promise<Nullable<IIdempotencyCoreClaimRecord>> {
-    const { scope, key } = query;
-
-    return await this.createIdempotencyKeyBuilder().forByKey(scope, key).getOne();
+    return await this.createIdempotencyKeyBuilder().forByKey(query).getOne();
   }
 }

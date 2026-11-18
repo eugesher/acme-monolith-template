@@ -1,8 +1,8 @@
 import { NotePersistenceHost } from '../../host/note-persistence.host';
-import type { INoteEditUpdateQuery } from '../../../../outbound';
+import type { INoteEditUpdateQuery, INoteResolveUpdateQuery } from '../../../../outbound';
 
 export abstract class NoteBaseRepository extends NotePersistenceHost {
-  public async update(query: INoteEditUpdateQuery): Promise<boolean> {
+  public async update(query: INoteEditUpdateQuery | INoteResolveUpdateQuery): Promise<boolean> {
     const { id, versionAsRead, body, resolved, version } = query;
     const updateResult = await this.noteRepository.update(
       { id, version: versionAsRead },
