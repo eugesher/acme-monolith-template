@@ -29,7 +29,9 @@ export class OrderPlaceRepository
     super();
   }
 
-  public async findActiveProducts(productIds: string[]): Promise<IOrderPlaceProductRecord[]> {
+  public async findActiveProducts(
+    productIds: readonly string[],
+  ): Promise<IOrderPlaceProductRecord[]> {
     if (productIds.length === 0) {
       return [];
     }

@@ -120,10 +120,11 @@ from the record it reads after the insert. `AuthCustomerCandidateModel.toRegiste
 
 An order is checked against rows the use case reads only after a lock (see
 `021-pessimistic-locking.md`), so `OrderCandidateModel` checks in steps: `validate()` refuses an
-empty request before any read, `distinctProductIds` names the rows to lock and read,
-`assertProducts` and `assertStockQuantities` check what was read, `toInsertPayload()` and
-`createOrderProducts(orderId)` answer the rows to insert. Each check takes its own params,
-`IOrderCandidateActiveProduct` and `IOrderCandidateStockQuantity`.
+empty request before any read, `distinctProductIds` names the rows to lock and read, counted once in
+`create` and handed `readonly` to the lock of core and the read, `assertProducts` and
+`assertStockQuantities` check what was read, `toInsertPayload()` and `createOrderProducts(orderId)`
+answer the rows to insert. Each check takes its own params, `IOrderCandidateActiveProduct` and
+`IOrderCandidateStockQuantity`.
 
 ## Read models
 

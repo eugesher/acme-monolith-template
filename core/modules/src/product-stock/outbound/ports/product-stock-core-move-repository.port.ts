@@ -6,11 +6,11 @@ import type {
 } from '../interfaces';
 
 export interface IProductStockCoreMoveRepositoryPort {
-  lockProducts(productIds: string[]): Promise<IProductStockCoreMoveProductRecord[]>;
+  lockProducts(productIds: readonly string[]): Promise<IProductStockCoreMoveProductRecord[]>;
   insertMany(
     queries: IProductStockCoreMoveInsertQuery[],
   ): Promise<IProductStockCoreMoveInsertRecord[]>;
-  sumStock(productIds: string[]): Promise<IProductStockCoreMoveSumRecord[]>;
+  sumStock(productIds: readonly string[]): Promise<IProductStockCoreMoveSumRecord[]>;
 }
 
 export const PRODUCT_STOCK_CORE_MOVE_REPOSITORY_PORT = Symbol(
