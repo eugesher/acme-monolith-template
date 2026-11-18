@@ -39,7 +39,7 @@ Aggregates below).
 
 **A name does not repeat its class.** The class already names the context and the use case, so the
 method names only what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
-`TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toIds`. A child
+`TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toRows`. A child
 entity keeps its name, `createOrderProducts`. A model in another context takes it in front:
 `StaffAuthCoreLoginModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
 

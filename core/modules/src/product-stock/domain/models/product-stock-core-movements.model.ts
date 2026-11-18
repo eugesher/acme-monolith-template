@@ -3,7 +3,7 @@ import type {
   IProductStockCoreMovementsInsertedRow,
   IProductStockCoreMovementsInsertPayload,
   IProductStockCoreMovementsPostSubtractLoggerPayload,
-  IProductStockCoreMovementsProductStock,
+  IProductStockCoreMovementsRow,
 } from '../interfaces';
 
 export class ProductStockCoreMovementsModel {
@@ -28,9 +28,9 @@ export class ProductStockCoreMovementsModel {
     return new ProductStockCoreMovementsModel(sign, movements);
   }
 
-  public static toProductStocks(
+  public static toRows(
     rows: IProductStockCoreMovementsInsertedRow[],
-  ): IProductStockCoreMovementsProductStock[] {
+  ): IProductStockCoreMovementsRow[] {
     return rows.map((row) => ({ id: String(row.id), createdAt: row.createdAt.toISOString() }));
   }
 
