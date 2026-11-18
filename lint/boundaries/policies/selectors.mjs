@@ -7,7 +7,7 @@ export const to = (category, captured) => ({
 
 export const libs = (...names) => to('acme-libs', { lib: names });
 
-export const baseLibs = (...names) => libs('kernel', 'toolkit', ...names);
+export const baseLibs = (...names) => libs('kernel', 'toolkit', 'domain', ...names);
 
 export const libContracts = (...names) => to('acme-libs:contracts', { lib: names });
 

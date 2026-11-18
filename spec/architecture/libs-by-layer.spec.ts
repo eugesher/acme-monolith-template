@@ -11,6 +11,7 @@ describe('libs by layer', () => {
       'libs/cache/src/index.ts',
       'libs/config/src/index.ts',
       'libs/database/src/index.ts',
+      'libs/domain/src/index.ts',
       'libs/health/src/index.ts',
       'libs/http/src/index.ts',
       'libs/kernel/src/index.ts',
@@ -56,7 +57,7 @@ describe('libs by layer', () => {
 
     await expect({
       file,
-      code: `import { x } from "${libs}/kernel/src";\nimport { y } from "${libs}/toolkit/src";`,
+      code: `import { x } from "${libs}/kernel/src";\nimport { y } from "${libs}/toolkit/src";\nimport { z } from "${libs}/domain/src";`,
     }).toPassArchitectureLint();
 
     for (const lib of others) {
@@ -75,6 +76,7 @@ describe('libs by layer', () => {
       'cache',
       'config',
       'database',
+      'domain',
       'health',
       'http',
       'kernel',

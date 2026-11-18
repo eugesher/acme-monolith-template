@@ -1,4 +1,5 @@
-import { DomainException, type Maybe } from '@acme-libs/toolkit';
+import { DomainException } from '@acme-libs/domain';
+import type { Maybe } from '@acme-libs/toolkit';
 
 import type { OrderExceptionCodeEnum } from '../../enums/order-exception-code.enum';
 

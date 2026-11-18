@@ -62,6 +62,8 @@
       "@acme-libs/credentials/*": ["./libs/credentials/src/*"],
       "@acme-libs/database": ["./libs/database/src"],
       "@acme-libs/database/*": ["./libs/database/src/*"],
+      "@acme-libs/domain": ["./libs/domain/src"],
+      "@acme-libs/domain/*": ["./libs/domain/src/*"],
       "@acme-libs/health": ["./libs/health/src"],
       "@acme-libs/health/*": ["./libs/health/src/*"],
       "@acme-libs/http": ["./libs/http/src"],

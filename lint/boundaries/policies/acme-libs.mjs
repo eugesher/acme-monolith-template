@@ -146,6 +146,7 @@ export const acmeLibs = [
       'pino-http',
     ),
   ]),
+  fromLib('domain', [packages('crypto')]),
   fromLib('toolkit', [packages('crypto')]),
   fromLib('toolkit', [packages('typeorm')], 'database/**'),
 ];

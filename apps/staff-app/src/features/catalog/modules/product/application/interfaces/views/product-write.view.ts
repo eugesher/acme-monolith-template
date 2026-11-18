@@ -1,8 +1,8 @@
-import type { DomainEventBase } from '@acme-libs/toolkit';
+import type { DomainEvent } from '@acme-libs/domain';
 
 import type { ProductAggregate } from '../../../domain';
 
 export interface IProductWriteView<TProduct extends ProductAggregate> {
   product: TProduct;
-  domainEvents: DomainEventBase[];
+  domainEvents: DomainEvent[];
 }

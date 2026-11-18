@@ -1,5 +1,5 @@
+import { AggregateRoot } from '@acme-libs/domain';
 import { ReminderStatusEnum } from '@acme-libs/kernel';
-import { AggregateRootBase } from '@acme-libs/toolkit';
 
 import { ReminderAlreadyDoneException } from '../exceptions/reminder-already-done.exception';
 import { ReminderBodyInvalidException } from '../exceptions/reminder-body-invalid.exception';
@@ -12,7 +12,7 @@ import type {
   IReminderUpdatePayload,
 } from '../interfaces';
 
-export abstract class ReminderAggregate extends AggregateRootBase {
+export abstract class ReminderAggregate extends AggregateRoot {
   public get version(): number {
     return this.currentVersion;
   }

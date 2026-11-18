@@ -1,6 +1,6 @@
-import { DomainEventBase } from '../domain-event.base';
+import { DomainEvent } from '../domain-event';
 
-describe('DomainEventBase', () => {
+describe('DomainEvent', () => {
   beforeEach(() => {
     jest.useFakeTimers({ now: new Date('2026-10-28T10:00:00.000Z') });
   });
@@ -10,7 +10,7 @@ describe('DomainEventBase', () => {
   });
 
   it('records its aggregate id, the time it occurred and a fresh UUID v4 id', () => {
-    class ItemOpenedEvent extends DomainEventBase {
+    class ItemOpenedEvent extends DomainEvent {
       public constructor(aggregateId: string) {
         super(aggregateId);
       }
@@ -26,7 +26,7 @@ describe('DomainEventBase', () => {
   });
 
   it('gives every event its own id', () => {
-    class ItemOpenedEvent extends DomainEventBase {
+    class ItemOpenedEvent extends DomainEvent {
       public constructor(aggregateId: string) {
         super(aggregateId);
       }

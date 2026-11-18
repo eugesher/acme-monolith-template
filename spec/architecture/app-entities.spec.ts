@@ -64,6 +64,7 @@ describe('app entities (@acme-<app>/common/entities)', () => {
     '@nestjs/common',
     'class-validator',
     '@acme-libs/toolkit',
+    '@acme-libs/domain',
     '@acme-core/contracts/staff-auth',
   ])(
     'an app entity may NOT import %s — a table carries no framework or module code',

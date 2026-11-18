@@ -1,4 +1,4 @@
-export abstract class EntityBase<TId = string> {
+export abstract class Entity<TId = string> {
   public get id(): TId {
     return this._id;
   }
@@ -9,7 +9,7 @@ export abstract class EntityBase<TId = string> {
     this._id = id;
   }
 
-  public equals(other?: EntityBase<TId>): boolean {
+  public equals(other?: Entity<TId>): boolean {
     if (other == null) {
       return false;
     }

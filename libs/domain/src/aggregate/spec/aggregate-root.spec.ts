@@ -1,15 +1,15 @@
-import { AggregateRootBase } from '../aggregate-root.base';
-import { DomainEventBase } from '../domain-event.base';
+import { DomainEvent } from '../../event/domain-event';
+import { AggregateRoot } from '../aggregate-root';
 
-describe('AggregateRootBase', () => {
+describe('AggregateRoot', () => {
   describe('pullDomainEvents', () => {
     it('drains the recorded events exactly once', () => {
-      class ItemOpenedEvent extends DomainEventBase {
+      class ItemOpenedEvent extends DomainEvent {
         public constructor(aggregateId: string) {
           super(aggregateId);
         }
       }
-      class ItemAggregate extends AggregateRootBase {
+      class ItemAggregate extends AggregateRoot {
         public constructor(id: string) {
           super(id);
         }

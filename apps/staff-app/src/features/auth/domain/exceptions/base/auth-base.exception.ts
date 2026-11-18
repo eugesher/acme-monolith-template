@@ -1,4 +1,4 @@
-import { DomainException } from '@acme-libs/toolkit';
+import { DomainException } from '@acme-libs/domain';
 import type { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 
 export abstract class AuthBaseException extends DomainException {

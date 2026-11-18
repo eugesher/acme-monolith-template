@@ -1,4 +1,4 @@
-import { AggregateRootBase } from '@acme-libs/toolkit';
+import { AggregateRoot } from '@acme-libs/domain';
 
 import { NoteBodyInvalidException } from '../exceptions/note-body-invalid.exception';
 import { NoteResolvedException } from '../exceptions/note-resolved.exception';
@@ -6,7 +6,7 @@ import { NoteSubjectInvalidException } from '../exceptions/note-subject-invalid.
 import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
 
-export abstract class NoteAggregate extends AggregateRootBase {
+export abstract class NoteAggregate extends AggregateRoot {
   public get version(): number {
     return this.currentVersion;
   }

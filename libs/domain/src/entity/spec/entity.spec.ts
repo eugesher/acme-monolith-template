@@ -1,9 +1,9 @@
-import { EntityBase } from '../entity.base';
+import { Entity } from '../entity';
 
-describe('EntityBase', () => {
+describe('Entity', () => {
   describe('id', () => {
     it('returns the id it was created with', () => {
-      class ItemEntity extends EntityBase<number> {
+      class ItemEntity extends Entity<number> {
         public constructor(id: number) {
           super(id);
         }
@@ -17,7 +17,7 @@ describe('EntityBase', () => {
 
   describe('equals', () => {
     it('is true for the same id within the same concrete subtype', () => {
-      class ItemEntity extends EntityBase<number> {
+      class ItemEntity extends Entity<number> {
         public constructor(id: number) {
           super(id);
         }
@@ -29,7 +29,7 @@ describe('EntityBase', () => {
     });
 
     it('is false for another id', () => {
-      class ItemEntity extends EntityBase<number> {
+      class ItemEntity extends Entity<number> {
         public constructor(id: number) {
           super(id);
         }
@@ -41,12 +41,12 @@ describe('EntityBase', () => {
     });
 
     it('is false for the same id of another subtype', () => {
-      class ItemEntity extends EntityBase<number> {
+      class ItemEntity extends Entity<number> {
         public constructor(id: number) {
           super(id);
         }
       }
-      class NoteEntity extends EntityBase<number> {
+      class NoteEntity extends Entity<number> {
         public constructor(id: number) {
           super(id);
         }
@@ -58,7 +58,7 @@ describe('EntityBase', () => {
     });
 
     it('is false for a missing entity', () => {
-      class ItemEntity extends EntityBase<number> {
+      class ItemEntity extends Entity<number> {
         public constructor(id: number) {
           super(id);
         }

@@ -136,7 +136,7 @@ puts the snapshots on the page. A module that only reads has a domain for that a
 `core/modules/src/product-stock`.
 
 **A read model is a plain class unless it is a model of an aggregate.** A model with the columns of
-its own read records no events and takes no changes, so it does not extend `AggregateRootBase`, like
+its own read records no events and takes no changes, so it does not extend `AggregateRoot`, like
 `StaffAuthCoreSubjectModel`.
 
 **A list model carries the columns of the list.** A page of orders carries no products, so
@@ -160,8 +160,8 @@ of its fields and the answers they share, `toSnapshot()` and `toUpdatePayload(ve
 constructor, so a model of a use case rebuilds itself with `new <Model>(record)`. Each use case
 extends it with a model of its own, which adds only the state and the answers that use case needs:
 `OrderPlaceModel` adds the owner, the stock movements and the payloads of the ledger and the log,
-and `OrderGetOneModel` adds nothing. The aggregate extends `AggregateRootBase`, so a model of a use
-case that only reads extends it too.
+and `OrderGetOneModel` adds nothing. The aggregate extends `AggregateRoot`, so a model of a use case
+that only reads extends it too.
 
 **A shared service takes the model of the caller.** The access and write services of an entity serve
 several use cases, so the caller passes the static `reconstitute` of its model and gets that model

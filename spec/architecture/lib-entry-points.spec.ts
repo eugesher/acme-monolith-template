@@ -15,6 +15,7 @@ describe('lib entry points', () => {
       'contracts',
       'credentials',
       'database',
+      'domain',
       'health',
       'http',
       'kernel',
@@ -51,6 +52,8 @@ describe('lib entry points', () => {
       '@acme-libs/credentials/*',
       '@acme-libs/database',
       '@acme-libs/database/*',
+      '@acme-libs/domain',
+      '@acme-libs/domain/*',
       '@acme-libs/health',
       '@acme-libs/health/*',
       '@acme-libs/http',
@@ -85,6 +88,7 @@ describe('lib entry points', () => {
     '@acme-libs/contracts/local-storage',
     '@acme-libs/credentials',
     '@acme-libs/database',
+    '@acme-libs/domain',
     '@acme-libs/health',
     '@acme-libs/http',
     '@acme-libs/kernel',
@@ -108,7 +112,8 @@ describe('lib entry points', () => {
 
   it.each([
     '@acme-libs/kernel/app/app-name.enum',
-    '@acme-libs/toolkit/ddd/entity.base',
+    '@acme-libs/toolkit/result/result.helper',
+    '@acme-libs/domain/entity/entity',
     '@acme-libs/config/env/env.helper',
     '@acme-libs/local-storage/transactional/shell/local-storage-transactional.module',
     '@acme-libs/database/orm/infrastructure/host/orm-host.adapter',
@@ -139,7 +144,7 @@ describe('lib entry points', () => {
   ])('%s MAY import the framework-free libs by their aliases', async (file) => {
     await expect({
       file,
-      code: 'import { AppNameEnum } from "@acme-libs/kernel";\nimport { Entity } from "@acme-libs/toolkit";',
+      code: 'import { AppNameEnum } from "@acme-libs/kernel";\nimport { ResultHelper } from "@acme-libs/toolkit";\nimport { Entity } from "@acme-libs/domain";',
     }).toPassArchitectureLint();
   });
 
@@ -150,17 +155,20 @@ describe('lib entry points', () => {
     }).toPassArchitectureLint();
   });
 
-  it('entities may NOT import the toolkit lib — a table is not a domain model', async () => {
+  it.each([
+    'import { ResultHelper } from "@acme-libs/toolkit";',
+    'import { Entity } from "@acme-libs/domain";',
+  ])('entities may NOT take %s — a table is not a domain model', async (code) => {
     await expect({
       file: 'core/entities/src/__fixture__.ts',
-      code: 'import { Entity } from "@acme-libs/toolkit";',
+      code,
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('the kernel lib may NOT import the toolkit lib by its alias', async () => {
     await expect({
       file: 'libs/kernel/src/auth/__fixture__.ts',
-      code: 'import { Entity } from "@acme-libs/toolkit";',
+      code: 'import { ResultHelper } from "@acme-libs/toolkit";',
     }).toBreakRule('boundaries/dependencies');
   });
 

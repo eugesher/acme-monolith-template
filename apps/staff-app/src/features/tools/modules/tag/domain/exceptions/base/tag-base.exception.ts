@@ -1,4 +1,4 @@
-import { DomainException } from '@acme-libs/toolkit';
+import { DomainException } from '@acme-libs/domain';
 
 import type { TagExceptionCodeEnum } from '../../enums/tag-exception-code.enum';
 

@@ -12,6 +12,7 @@ describe('libs', () => {
       'libs/config/src/index.ts',
       'libs/credentials/src/index.ts',
       'libs/database/src/index.ts',
+      'libs/domain/src/index.ts',
       'libs/health/src/index.ts',
       'libs/http/src/index.ts',
       'libs/http/src/exceptions/unauthorized-http.exception.ts',
@@ -60,19 +61,20 @@ describe('libs', () => {
   it.each([
     ['kernel', []],
     ['toolkit', []],
-    ['auth', ['kernel', 'toolkit']],
-    ['bootstrap', ['kernel', 'toolkit', 'observability', 'openapi']],
-    ['cache', ['kernel', 'toolkit', 'config', 'observability']],
-    ['config', ['kernel', 'toolkit']],
-    ['credentials', ['kernel', 'toolkit']],
-    ['database', ['kernel', 'toolkit', 'config', 'local-storage']],
-    ['health', ['kernel', 'toolkit', 'observability']],
-    ['http', ['kernel', 'toolkit', 'config', 'observability']],
-    ['local-storage', ['kernel', 'toolkit', 'observability']],
-    ['observability', ['kernel', 'toolkit', 'config']],
-    ['openapi', ['kernel', 'toolkit']],
-    ['queue', ['kernel', 'toolkit', 'config']],
-    ['testing', ['kernel', 'toolkit']],
+    ['domain', []],
+    ['auth', ['kernel', 'toolkit', 'domain']],
+    ['bootstrap', ['kernel', 'toolkit', 'domain', 'observability', 'openapi']],
+    ['cache', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
+    ['config', ['kernel', 'toolkit', 'domain']],
+    ['credentials', ['kernel', 'toolkit', 'domain']],
+    ['database', ['kernel', 'toolkit', 'domain', 'config', 'local-storage']],
+    ['health', ['kernel', 'toolkit', 'domain', 'observability']],
+    ['http', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
+    ['local-storage', ['kernel', 'toolkit', 'domain', 'observability']],
+    ['observability', ['kernel', 'toolkit', 'domain', 'config']],
+    ['openapi', ['kernel', 'toolkit', 'domain']],
+    ['queue', ['kernel', 'toolkit', 'domain', 'config']],
+    ['testing', ['kernel', 'toolkit', 'domain']],
   ])('%s may import only %j of the other libs', async (from, allowed) => {
     const libs = [
       'auth',
@@ -81,6 +83,7 @@ describe('libs', () => {
       'config',
       'credentials',
       'database',
+      'domain',
       'health',
       'http',
       'kernel',
@@ -141,6 +144,7 @@ describe('libs', () => {
     ['config', []],
     ['credentials', ['credentials']],
     ['database', ['database']],
+    ['domain', []],
     ['health', ['cache', 'health']],
     ['http', []],
     ['kernel', []],
@@ -190,7 +194,7 @@ describe('libs', () => {
     async (lib) => {
       await expect({
         file: `libs/contracts/src/${lib}/__fixture__.ts`,
-        code: 'import { x } from "../../../kernel/src";\nimport { y } from "../../../toolkit/src";',
+        code: 'import { x } from "../../../kernel/src";\nimport { y } from "../../../toolkit/src";\nimport { z } from "../../../domain/src";',
       }).toPassArchitectureLint();
     },
   );
@@ -214,6 +218,8 @@ describe('libs', () => {
     ['kernel', '@nestjs/common'],
     ['kernel', 'reflect-metadata'],
     ['kernel', 'crypto'],
+    ['domain', '@nestjs/common'],
+    ['domain', 'typeorm'],
   ])('the framework-free lib %s may NOT import %s', async (lib, source) => {
     await expect({
       file: `libs/${lib}/src/__fixture__.ts`,
@@ -221,10 +227,17 @@ describe('libs', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the toolkit lib MAY import crypto (DomainEventBase ids, BodyFingerprintHelper)', async () => {
+  it('the toolkit lib MAY import crypto (BodyFingerprintHelper)', async () => {
     await expect({
       file: 'libs/toolkit/src/__fixture__.ts',
-      code: 'import { createHash, randomUUID } from "crypto";',
+      code: 'import { createHash } from "crypto";',
+    }).toPassArchitectureLint();
+  });
+
+  it('the domain lib MAY import crypto (DomainEvent ids)', async () => {
+    await expect({
+      file: 'libs/domain/src/__fixture__.ts',
+      code: 'import { randomUUID } from "crypto";',
     }).toPassArchitectureLint();
   });
 

@@ -1,4 +1,4 @@
-import { AggregateRootBase } from '@acme-libs/toolkit';
+import { AggregateRoot } from '@acme-libs/domain';
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
 import { ProductNameInvalidException } from '../exceptions/product-name-invalid.exception';
@@ -6,7 +6,7 @@ import { ProductSkuInvalidException } from '../exceptions/product-sku-invalid.ex
 import { ProductVersionInvalidException } from '../exceptions/product-version-invalid.exception';
 import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
 
-export abstract class ProductAggregate extends AggregateRootBase {
+export abstract class ProductAggregate extends AggregateRoot {
   public get version(): number {
     return this.currentVersion;
   }
