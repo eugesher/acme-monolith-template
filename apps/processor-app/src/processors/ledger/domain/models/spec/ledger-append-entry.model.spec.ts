@@ -31,6 +31,7 @@ describe('LedgerAppendEntryModel', () => {
         '  ',
         'ProductArchived',
         '2026-01-01T00:00:00.000Z',
+        'LEDGER_OPERATION_KEY_REQUIRED',
         'LedgerEntry.operationKey is required',
       ],
       [
@@ -38,6 +39,7 @@ describe('LedgerAppendEntryModel', () => {
         'product-archived:12',
         ' ',
         '2026-01-01T00:00:00.000Z',
+        'LEDGER_ACTION_REQUIRED',
         'LedgerEntry.action is required',
       ],
       [
@@ -45,9 +47,10 @@ describe('LedgerAppendEntryModel', () => {
         'product-archived:12',
         'ProductArchived',
         'nope',
+        'LEDGER_INSTANT_INVALID',
         'LedgerEntry.occurredAt must be a valid instant',
       ],
-    ])('rejects %s', (_case, operationKey, action, occurredAt, message) => {
+    ])('rejects %s with %s', (_case, operationKey, action, occurredAt, code, message) => {
       const initCandidate = (): ILedgerAppendEntryCandidate =>
         LedgerAppendEntryModel.initCandidate({
           operationKey,
@@ -59,7 +62,7 @@ describe('LedgerAppendEntryModel', () => {
           occurredAt: new Date(occurredAt),
         });
 
-      expect(initCandidate).toThrow(message);
+      expect(initCandidate).toThrow(expect.objectContaining({ code, message }) as Error);
     });
   });
 

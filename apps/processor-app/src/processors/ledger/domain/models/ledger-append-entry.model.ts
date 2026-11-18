@@ -1,3 +1,6 @@
+import { LedgerActionRequiredException } from '../exceptions/ledger-action-required.exception';
+import { LedgerInstantInvalidException } from '../exceptions/ledger-instant-invalid.exception';
+import { LedgerOperationKeyRequiredException } from '../exceptions/ledger-operation-key-required.exception';
 import type {
   ILedgerAppendEntryCandidate,
   ILedgerAppendEntryCandidateInit,
@@ -14,15 +17,15 @@ export class LedgerAppendEntryModel {
     const verb = action.trim();
 
     if (key.length === 0) {
-      throw new Error('LedgerEntry.operationKey is required');
+      throw new LedgerOperationKeyRequiredException();
     }
 
     if (verb.length === 0) {
-      throw new Error('LedgerEntry.action is required');
+      throw new LedgerActionRequiredException();
     }
 
     if (Number.isNaN(occurredAt.getTime())) {
-      throw new Error('LedgerEntry.occurredAt must be a valid instant');
+      throw new LedgerInstantInvalidException();
     }
 
     return {

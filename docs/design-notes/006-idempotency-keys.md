@@ -18,6 +18,13 @@ A feature root mounts `IdempotencyCoreModule` from `@acme-core/modules/idempoten
 port only from a core-adapter, like any core module. The `IdempotencyKey` decorator that reads the
 header lives in `@acme-libs/http`, so both apps parse the key the same way.
 
+**A malformed key is a bug of the caller, not a refusal.** `IdempotencyKeyHelper.parse` answers an
+empty key or a key over 128 characters with 400 before any core call, so the core module never
+refuses a key with an outcome. `IdempotencyCoreClaimModel.initCandidate` still checks the length and
+throws a plain `Error` that reaches the client as 500: it guards the contract against a caller that
+skipped the header parser, and an outcome for it would make every core-adapter map a value no
+request can produce (see `027-core-module-outcomes.md`).
+
 ## A key belongs to its owner
 
 Every command of the port carries a `scope` next to the key, and the UNIQUE index covers
