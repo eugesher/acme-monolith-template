@@ -63,10 +63,10 @@ password from, so the healthcheck command carries no password.
 **TLS is on when a CA path is set.** `DATABASE_SSL_CA` and `REDIS_TLS_CA` hold the path of the
 certificate authority file inside the container; empty, the clients connect without TLS, as on the
 `backend` network of the stack. `TlsHelper` of `libs/config` reads the file for the four clients of
-the libs: the ORM, Bull, the cache and the request limits. The migrations data source and
-`admin-create.ts` read `DATABASE_SSL_CA` of `env/migrations/.env` themselves, since they import no
-lib. A path that cannot be read stops the process at boot. The certificate of the server is always
-verified against that authority.
+the libs: for the ORM itself, and for Bull, the cache and the request limits through
+`RedisConfigHelper`. The migrations data source and `admin-create.ts` read `DATABASE_SSL_CA` of
+`env/migrations/.env` themselves, since they import no lib. A path that cannot be read stops the
+process at boot. The certificate of the server is always verified against that authority.
 
 **The apps need no DDL.** The stack runs the apps and the migrations as one MySQL user, `acme`, with
 every privilege on the database. On a managed database the apps take a user with `SELECT`, `INSERT`,

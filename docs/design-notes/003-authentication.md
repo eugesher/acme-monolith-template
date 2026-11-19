@@ -115,9 +115,10 @@ to `ThrottlerModule.forRootAsync` through its own `ThrottleStorageModule`: the s
 provider of Nest, so it reads `ConfigService` and closes its Redis connection on shutdown, where an
 instance built inside `useFactory` would never see `onApplicationShutdown`.
 
-**A Redis outage lifts the limits instead of failing the requests.** The client has no offline queue
-and a command timeout, as the cache has; a failed increment logs a warning and lets the request
-through, so an outage of Redis does not take login down with it.
+**A Redis outage lifts the limits instead of failing the requests.** The client takes the options of
+`RedisConfigHelper.failFast` of `libs/config`, as the cache does: no offline queue and a command
+timeout. A failed increment logs a warning and lets the request through, so an outage of Redis does
+not take login down with it.
 
 **The number of hashes at once is bounded too.** A limit per address does not stop a flood from many
 addresses, and every hash holds `AUTH_ARGON2_MEMORY_COST` KiB while it runs. The password hasher of

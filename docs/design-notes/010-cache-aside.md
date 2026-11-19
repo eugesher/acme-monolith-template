@@ -45,13 +45,21 @@ OpenTelemetry through two ports of the lib's own `outbound`:
 
 **`CacheLibStoreAdapter` is the ioredis adapter.** It holds the JSON encoding, `PX` TTLs, the `SCAN`
 and `UNLINK` loop under the client's `keyPrefix`, and quits the client on shutdown.
-`CacheLibRedisClientProvider` builds the client from `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`,
-`REDIS_COMMAND_TIMEOUT_MS` and `REDIS_TLS_CA` (see `036-production-stack.md`).
+`CacheLibRedisClientProvider` builds the client from `RedisConfigHelper.failFast` of `libs/config`:
+the address and the password of `REDIS_*`, TLS from `REDIS_TLS_CA`, no offline queue and
+`REDIS_COMMAND_TIMEOUT_MS` on every command, so a command fails at once while Redis is down instead
+of waiting for it (see `036-production-stack.md`).
 
 **`CacheLibTracerAdapter` is the OpenTelemetry adapter.** A use case names the span and its
 attributes, adds `cache.hit` or `cache.keys_unlinked` as it learns them, and the adapter records
 them when the work settles. Single-flight, the fallbacks on a failed read or write, and their logs
 stay in the use cases, so neither adapter decides what a failure means.
+
+**A span shows a failure of the cache.** A failure the work passes on marks the span as an error and
+records the exception, as the ioredis instrumentation marks its command. A failure the use case
+answers with a fallback leaves the status alone, because the caller still gets its value; the use
+case names the step that failed in `cache.error`: `read` or `write` of `cache.wrap`, `unlink` of
+`cache.delByPrefix`. The warning of the use case carries the trace id of the same span.
 
 **The Redis commands are child spans.** `cache.wrap` reads and writes through the store, not through
 `cache.get` and `cache.set`, so it opens no nested span of the lib. The auto-instrumentation of

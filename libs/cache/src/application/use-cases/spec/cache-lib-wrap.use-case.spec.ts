@@ -118,7 +118,10 @@ describe('CacheLibWrapUseCase', () => {
       'Cache read failed, computing the value without caching it',
     );
     expect(spans).toEqual([
-      { name: 'cache.wrap', attributes: { 'cache.key': 'k', 'cache.hit': false } },
+      {
+        name: 'cache.wrap',
+        attributes: { 'cache.key': 'k', 'cache.hit': false, 'cache.error': 'read' },
+      },
     ]);
   });
 
@@ -136,6 +139,12 @@ describe('CacheLibWrapUseCase', () => {
       { err: new Error('write failed'), key: 'k' },
       'Cache write failed',
     );
+    expect(spans).toEqual([
+      {
+        name: 'cache.wrap',
+        attributes: { 'cache.key': 'k', 'cache.hit': false, 'cache.error': 'write' },
+      },
+    ]);
   });
 
   it('lets a failed computation reject every waiting caller', async () => {

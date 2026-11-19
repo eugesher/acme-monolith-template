@@ -63,6 +63,7 @@ export class CacheLibWrapUseCase {
         'Cache read failed, computing the value without caching it',
       );
       attributes['cache.hit'] = false;
+      attributes['cache.error'] = 'read';
 
       return await compute();
     }
@@ -82,6 +83,7 @@ export class CacheLibWrapUseCase {
         await this.store.set({ key, value: computedValue, ttlMs });
       } catch (error) {
         this.logger.warn({ err: error, key }, 'Cache write failed');
+        attributes['cache.error'] = 'write';
       }
     }
 

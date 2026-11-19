@@ -1,17 +1,29 @@
-import { trace, type Span, type Tracer } from '@opentelemetry/api';
+import { SpanStatusCode, trace, type Span, type Tracer } from '@opentelemetry/api';
 
 import { CacheLibTracerAdapter } from '../cache-lib-tracer.adapter';
 
 describe('CacheLibTracerAdapter', () => {
   let getTracer: jest.SpyInstance;
-  let spans: { name: string; setAttributes: jest.Mock; end: jest.Mock }[];
+  let spans: {
+    name: string;
+    setAttributes: jest.Mock;
+    recordException: jest.Mock;
+    setStatus: jest.Mock;
+    end: jest.Mock;
+  }[];
   let tracer: CacheLibTracerAdapter;
 
   beforeEach(() => {
     spans = [];
     getTracer = jest.spyOn(trace, 'getTracer').mockReturnValue({
       startActiveSpan: (name: string, callback: (span: Span) => unknown) => {
-        const span = { name, setAttributes: jest.fn(), end: jest.fn() };
+        const span = {
+          name,
+          setAttributes: jest.fn(),
+          recordException: jest.fn(),
+          setStatus: jest.fn(),
+          end: jest.fn(),
+        };
 
         spans.push(span);
 
@@ -55,7 +67,7 @@ describe('CacheLibTracerAdapter', () => {
     expect(attributes).toEqual({ 'cache.key': 'k' });
   });
 
-  it('ends the span when the work fails', async () => {
+  it('marks the span as failed with the exception, ends it and passes the failure on', async () => {
     const span = tracer.span({
       name: 'cache.get',
       attributes: { 'cache.key': 'k' },
@@ -63,7 +75,20 @@ describe('CacheLibTracerAdapter', () => {
     });
 
     await expect(span).rejects.toThrow('read failed');
+    expect(spans[0].recordException).toHaveBeenCalledWith(new Error('read failed'));
+    expect(spans[0].setStatus).toHaveBeenCalledWith({ code: SpanStatusCode.ERROR });
     expect(spans[0].setAttributes).toHaveBeenCalledWith({ 'cache.key': 'k' });
     expect(spans[0].end).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves the status of a span whose work succeeds', async () => {
+    await tracer.span({
+      name: 'cache.get',
+      attributes: { 'cache.key': 'k' },
+      work: () => Promise.resolve('v'),
+    });
+
+    expect(spans[0].recordException).not.toHaveBeenCalled();
+    expect(spans[0].setStatus).not.toHaveBeenCalled();
   });
 });
