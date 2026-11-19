@@ -65,10 +65,9 @@ instead of passing for a taken name. A use case throws its own exception for the
 `AuthHttpExceptionFilter` looks up the status of the code of `AuthBaseException` in its public
 `STATUS`, turns the exception into an `HttpException` with
 `DomainHttpExceptionHelper.toHttpException(exception, statusCode)` of `libs/http` and hands it to
-the shared `HttpExceptionFilter`, which answers the body of every error (see
-`012-app-bootstrap.md`). Logging, and masking of `password` and `email` in the logged request, stay
-in one place. The feature module provides `HttpExceptionFilter` so that Nest can inject it into the
-feature filter.
+the shared `HttpExceptionFilter`, which answers the body of every error (see `039-api-surface.md`).
+Logging, and masking of `password` and `email` in the logged request, stay in one place. The feature
+module provides `HttpExceptionFilter` so that Nest can inject it into the feature filter.
 
 ## One token per audience
 
@@ -102,10 +101,11 @@ over a limit gets `429` with the code `TOO_MANY_REQUESTS` and a `Retry-After` he
 address is `req.ip`, so behind a proxy it needs `HTTP_TRUST_PROXY_HOPS` (see
 `036-production-stack.md`).
 
-**The guard throws an object body.** The `ThrottlerException` of the package carries a string, and
-`HttpExceptionFilter` replies with `getResponse()` as it is, so the client would get plain text.
-`ThrottleGuard` overrides `throwThrottlingException` with an `HttpException` whose response is the
-object above.
+**The guard words its own message.** The `ThrottlerException` of the package says
+`ThrottlerException: Too Many Requests`; `ThrottleGuard` overrides `throwThrottlingException` with
+an `HttpException` whose message is `Too many requests`. It carries no code of its own, so
+`HttpExceptionFilter` answers it with the name of its status, as every error without one (see
+`039-api-surface.md`).
 
 **The counters live in Redis, so the replicas of an app share them.** `ThrottleRedisStorage`
 increments a key `throttle:<hash>` and sets its expiry with the first hit, in one Lua script: a

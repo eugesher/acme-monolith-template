@@ -108,29 +108,8 @@ with no type:
 | `QueryFailedError` of a duplicate key (`MysqlErrorHelper`) | 409 `Resource already exists`                    |
 | any other                                                  | 500 `Internal Server Error`, without its message |
 
-**Every error answers one body**, `ErrorResponseDto` of `libs/http`:
-`{ statusCode, code, message, details }`. The client branches on `code` alone.
-
-| Source                                                     | `code`                                                                    | `details`                           |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------- |
-| a domain exception, through the filter of its module       | the code of the module (see `035-enums-and-response-dtos.md`)             | what the exception carries          |
-| `StrictValidationPipe`                                     | `VALIDATION_FAILED`                                                       | `{ fields: [{ field, messages }] }` |
-| a refused header (`IfMatchHelper`, `IdempotencyKeyHelper`) | `IF_MATCH_INVALID`, `IDEMPOTENCY_KEY_REQUIRED`, `IDEMPOTENCY_KEY_INVALID` | `null`                              |
-| any other                                                  | the name of its status in `HttpStatus`                                    | `null`                              |
-
-Any other is a guard (`UNAUTHORIZED`, `FORBIDDEN`), the request limit (`TOO_MANY_REQUESTS`), an
-unknown route or the body parser (`NOT_FOUND`, `BAD_REQUEST`), the duplicate key (`CONFLICT`) or a
-failure (`INTERNAL_SERVER_ERROR`).
-
-The pipe names a field inside a nested object by its path, `dimensions.width`. A status that
-`HttpStatus` does not name gets `HTTP_ERROR`. `details` is `null` when there is nothing to add,
-never absent, like every field of a response that may be missing.
-
-**The OpenAPI document lists the errors.** `ApiReference.setup` declares `ErrorResponseDto` the
-`default` response of every operation. `@ApiErrorResponses(<Filter>.STATUS, ...codes)` of
-`libs/http` adds a response for each status of the codes the route refuses with, its codes in the
-description, and a 400 names `VALIDATION_FAILED` before them. The statuses come from the public
-`STATUS` of the filter that answers them, so the document cannot drift from the answer.
+**Every error answers one body**, `ErrorResponseDto` of `libs/http`; its codes and its place in the
+OpenAPI document are in `039-api-surface.md`.
 
 A repository maps every expected duplicate to an outcome of its port (see `003-authentication.md`),
 so the 409 of the filter answers an unexpected one, such as the last guard of

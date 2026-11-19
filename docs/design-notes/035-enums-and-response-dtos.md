@@ -31,36 +31,8 @@ health lib and the health features of the apps name them.
 **An enum is never copied between a lib and an app.** The app imports the kernel enum the lib
 answers with, so a new value reaches both at once.
 
-## Exception codes
-
-A domain exception answers a `code` of its module and may add `details`, which `DomainException` of
-`libs/domain` carries for every module. The exception filter of the module maps the code to a status
-(see `003-authentication.md`).
-
-**A shared mechanism answers one code in every module.** A refused `Idempotency-Key` is
-`IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENT_REQUEST_IN_FLIGHT`, a stale `If-Match` is `VERSION_MISMATCH`
-and a write that lost every retry is `VERSION_CONFLICT`, whichever module refuses, so a client
-handles the mechanism once. The member keeps the prefix of its module,
-`OrderExceptionCodeEnum.ORDER_IDEMPOTENCY_KEY_REUSED = 'IDEMPOTENCY_KEY_REUSED'`, because the enum
-is the list the filter of that module maps. The codes of the headers, `IDEMPOTENCY_KEY_REQUIRED`,
-`IDEMPOTENCY_KEY_INVALID` and `IF_MATCH_INVALID`, carry no prefix either.
-
-**The status says where a missing id came from.**
-
-| The id that is not stored | Status | Example                                                                             |
-| ------------------------- | ------ | ----------------------------------------------------------------------------------- |
-| in the path               | 404    | `PRODUCT_NOT_FOUND`, `NOTE_NOT_FOUND`, `AUTH_USER_NOT_FOUND`                        |
-| in the body               | 422    | `PRODUCT_TAG_NOT_FOUND`, `ORDER_PRODUCT_NOT_FOUND`, `AUTH_ROLE_NOT_FOUND` of `user` |
-
-The resource of the path is what the request is about, so its absence is 404; an id in the body is a
-reference inside a request the server understood, so its absence is 422. One code may take both
-statuses: `AUTH_ROLE_NOT_FOUND` is 404 for the `:roleId` of `role` and 422 for the `roleIds` of
-`user`, as each filter maps the codes of its own module. A product an order may not hold, a draft,
-archived or deleted one, is missing for the customer too.
-
-**A stored row that breaks a rule is a fault of the server.** `PRODUCT_VERSION_INVALID` and
-`NOTE_VERSION_INVALID` refuse a stored version below 1 while the aggregate is rebuilt from its row.
-No request carries that version, so the filter answers 500, not 400.
+**The exception codes of a module answer the client**, so their values and the statuses they map to
+follow the rules of `039-api-surface.md`.
 
 ## Response DTOs
 

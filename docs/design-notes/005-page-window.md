@@ -40,11 +40,7 @@ page and limit (see `020-cross-app-cache-invalidation.md`).
 and no exception filter. Its domain holds only the read model `LedgerListEntriesModel`: `toViewData`
 rebuilds each record of the page and answers its snapshot (see `038-domain-models.md`).
 
-**Ids of `bigint unsigned` are strings** from the row to the response, because they may exceed the
-safe integer range of a JavaScript number. Instants are ISO strings in UTC. `@IsEntityId` of
-`libs/http` checks an id of the path, the query or the body as a positive integer of up to 20
-digits, `each` for a list and `optional` for a filter, and documents it with that pattern, so the
-check and the OpenAPI document share one expression.
+**Ids are strings and instants ISO strings** in every response (see `039-api-surface.md`).
 
 **The app lists the entities of the modules it mounts** in `app/entities` and hands them to
 `OrmModule.forRoot`, because a repository reads only an entity registered on the connection.
