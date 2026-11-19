@@ -63,7 +63,9 @@ outcomes are logged by the application.
   space until the next tick.
 
 - **A successful purge logs one line**, `Expired idempotency keys purged`, with each cutoff, the
-  count of keys it deleted and its TTL.
+  count of keys it deleted and its TTL. Each delete of the repository answers that count as a
+  number, `affected` of the `DeleteResult` of TypeORM or 0, so the shape of the ORM stays in
+  infrastructure.
 
 ## Wiring
 
