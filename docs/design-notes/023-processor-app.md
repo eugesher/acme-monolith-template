@@ -40,12 +40,12 @@ module `staff-auth` (see `017-credentials-lib.md`). processor-app has no login: 
 it lists the staff identity entities on its connection for the core module. The health routes carry
 `@Public()`. `APP_PIPE` and `APP_FILTER` are the ones of staff-app.
 
-| Route                                          | Permission     | What it does                            |
-| ---------------------------------------------- | -------------- | --------------------------------------- |
-| `GET /queues`                                  | `queue:read`   | every queue with the counts of its jobs |
-| `GET /queues/:queueName/jobs/failed`           | `queue:read`   | a page of the failed jobs, newest first |
-| `PUT /queues/:queueName/jobs/failed/:jobId`    | `queue:retry`  | returns the job to the queue            |
-| `DELETE /queues/:queueName/jobs/failed/:jobId` | `queue:delete` | removes the job                         |
+| Route                                              | Permission     | What it does                            |
+| -------------------------------------------------- | -------------- | --------------------------------------- |
+| `GET /queues`                                      | `queue:read`   | every queue with the counts of its jobs |
+| `GET /queues/:queueName/jobs/failed`               | `queue:read`   | a page of the failed jobs, newest first |
+| `POST /queues/:queueName/jobs/failed/:jobId/retry` | `queue:retry`  | returns the job to the queue            |
+| `DELETE /queues/:queueName/jobs/failed/:jobId`     | `queue:delete` | removes the job                         |
 
 **The counts are read field by field.** `getJobCounts()` of Bull answers the paused jobs too, but
 its type does not declare them, so the adapter takes the five counts it declares and

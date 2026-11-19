@@ -79,9 +79,20 @@ on the `ledger-record` queue (see `022-enqueue-after-commit.md` and `004-append-
 The models record no domain events: each fact has one reader, the ledger, and the use case calls it
 directly.
 
-## `PATCH` edits fields, `PUT` sets a state
+## `PATCH` edits fields, `POST` runs an action
 
-`PATCH /catalog/products/:productId` takes the fields to change, every one optional
-(`apps/staff-app/src/features/catalog/modules/product/presentation/dto/requests/product-update.request.dto.ts`).
-A state change has no body: `PUT` on the state resource (`.../publish`, `.../archive`) says what the
-row becomes.
+| Method   | What it means                                     | Example                                                    |
+| -------- | ------------------------------------------------- | ---------------------------------------------------------- |
+| `PATCH`  | the fields of the body change, every one optional | `PATCH /catalog/products/:productId` with `{ name }`       |
+| `PUT`    | the body replaces a whole set                     | `PUT /catalog/products/:productId/tags` with `{ tagIds }`  |
+| `POST`   | an action of the resource runs                    | `POST /catalog/products/:productId/publish`, `.../archive` |
+| `DELETE` | the resource goes                                 | `DELETE /tools/notes/:noteId`                              |
+
+**A change of state is an action, not a field.** Publishing a product, archiving it, resolving a
+note and returning a failed job to its queue each check a rule, write the ledger or the log, and
+have no body, so each is a `POST` on a sub-resource named by its verb, the custom method of Google
+AIP-136 and the actions of the Stripe API. `PUT` would promise to replace the resource with its
+body, and RFC 9110 lets a client or a proxy repeat an idempotent request on its own: a repeated
+retry of a job would spend one more attempt. An action that answers the resource answers 200, not
+201, because it creates nothing addressable; the restock of `product-stock` answers the stock it
+leaves, so it is 200 too. An action without an answer, the retry of a job, answers 204.

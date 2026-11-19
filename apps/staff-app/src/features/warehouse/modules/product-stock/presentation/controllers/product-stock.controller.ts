@@ -1,5 +1,5 @@
-import { Body, Controller, Param, Post, UseFilters } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, HttpStatus, Param, Post, UseFilters } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser, RequiresPermission } from '@acme-libs/auth';
 import { ApiErrorResponses, ApiIdempotencyKeyHeader, IdempotencyKey } from '@acme-libs/http';
@@ -22,10 +22,11 @@ export class ProductStockController {
   constructor(private readonly add: ProductStockAddUseCase) {}
 
   @Post(':productId/add')
+  @HttpCode(HttpStatus.OK)
   @RequiresPermission(PermissionCodeEnum.PRODUCT_RESTOCK)
   @ApiIdempotencyKeyHeader()
   @ApiOperation({ summary: 'Add units to the stock of a product (idempotent)' })
-  @ApiCreatedResponse({ type: ProductStockResponseDto })
+  @ApiOkResponse({ type: ProductStockResponseDto })
   @ApiErrorResponses(
     ProductStockHttpExceptionFilter.STATUS,
     ProductStockExceptionCodeEnum.PRODUCT_QUANTITY_INVALID,

@@ -79,12 +79,12 @@ export class ProductE2E {
   }
 
   public handleArchive(): void {
-    describe('PUT /api/catalog/products/:productId/archive', () => {
+    describe('POST /api/catalog/products/:productId/archive', () => {
       it('should archive through core, drop the cached catalog and append its ledger entry', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
 
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/103/archive')
+          .post('/api/catalog/products/103/archive')
           .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000021')
           .auth(this.ctx.editorToken, { type: 'bearer' })
@@ -121,12 +121,12 @@ export class ProductE2E {
   }
 
   public handlePublish(): void {
-    describe('PUT /api/catalog/products/:productId/publish', () => {
+    describe('POST /api/catalog/products/:productId/publish', () => {
       it('should publish a draft, drop the cached catalog and append its ledger entry', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
 
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/101/publish')
+          .post('/api/catalog/products/101/publish')
           .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000022')
           .auth(this.ctx.editorToken, { type: 'bearer' })

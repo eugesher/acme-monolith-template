@@ -19,7 +19,7 @@ export class ProductStockE2E {
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000019')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 5 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         const actual = {
           response: { body: response.body },

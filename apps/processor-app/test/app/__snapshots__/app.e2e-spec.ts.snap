@@ -335,7 +335,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unkno
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED 1`] = `
 {
   "response": {
     "body": {
@@ -348,7 +348,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a user without queue:retry with 403 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a user without queue:retry with 403 1`] = `
 {
   "response": {
     "body": {
@@ -361,7 +361,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
 {
   "response": {
     "body": {
@@ -374,7 +374,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
 {
   "response": {
     "body": {
@@ -387,7 +387,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should return a failed record to the queue and append it once its cause is gone 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should return a failed record to the queue and append it once its cause is gone 1`] = `
 {
   "db": {
     "ledger_entry": [

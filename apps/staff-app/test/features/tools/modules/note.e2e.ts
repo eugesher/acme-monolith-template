@@ -335,10 +335,10 @@ export class NoteE2E {
   }
 
   public handleResolve(): void {
-    describe('PATCH /api/tools/notes/:noteId/resolve', () => {
+    describe('POST /api/tools/notes/:noteId/resolve', () => {
       it('should resolve a note under a matching If-Match', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .patch('/api/tools/notes/201/resolve')
+          .post('/api/tools/notes/201/resolve')
           .set('If-Match', '1')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
@@ -354,7 +354,7 @@ export class NoteE2E {
 
       it('should refuse a stale If-Match with 412 and resolve nothing', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .patch('/api/tools/notes/204/resolve')
+          .post('/api/tools/notes/204/resolve')
           .set('If-Match', '7')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.PRECONDITION_FAILED);
@@ -367,7 +367,7 @@ export class NoteE2E {
 
       it('should hide the note of another staff user with 404 and resolve nothing', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .patch('/api/tools/notes/204/resolve')
+          .post('/api/tools/notes/204/resolve')
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
 
@@ -379,7 +379,7 @@ export class NoteE2E {
 
       it('should refuse to resolve a resolved note with 409', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .patch('/api/tools/notes/202/resolve')
+          .post('/api/tools/notes/202/resolve')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.CONFLICT);
 

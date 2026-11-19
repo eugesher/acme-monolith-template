@@ -5,7 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Put,
+  Post,
   Query,
   UseFilters,
 } from '@nestjs/common';
@@ -66,7 +66,7 @@ export class QueueController {
     return await this.listFailedJobs.execute({ queueName, page, limit });
   }
 
-  @Put(':queueName/jobs/failed/:jobId')
+  @Post(':queueName/jobs/failed/:jobId/retry')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequiresPermission(PermissionCodeEnum.QUEUE_RETRY)
   @ApiOperation({ summary: 'Return a failed job to the queue' })

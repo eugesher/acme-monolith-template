@@ -136,7 +136,8 @@ export class NoteController {
     return await this.edit.execute({ noteId, body, editorId: user.id, expectedVersion });
   }
 
-  @Patch(':noteId/resolve')
+  @Post(':noteId/resolve')
+  @HttpCode(HttpStatus.OK)
   @ApiIfMatchHeader()
   @ApiOperation({ summary: 'Resolve one of your notes for good; it can no longer be edited' })
   @ApiOkResponse({ type: NoteResponseDto })

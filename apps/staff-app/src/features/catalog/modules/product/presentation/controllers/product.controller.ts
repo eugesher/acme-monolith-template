@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Query, UseFilters } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseFilters,
+} from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RequiresPermission } from '@acme-libs/auth';
@@ -106,7 +118,8 @@ export class ProductController {
     return await this.update.execute({ productId, name, expectedVersion });
   }
 
-  @Put(':productId/publish')
+  @Post(':productId/publish')
+  @HttpCode(HttpStatus.OK)
   @RequiresPermission(PermissionCodeEnum.PRODUCT_WRITE)
   @ApiIfMatchHeader()
   @ApiOperation({
@@ -128,7 +141,8 @@ export class ProductController {
     return await this.publish.execute({ productId, expectedVersion });
   }
 
-  @Put(':productId/archive')
+  @Post(':productId/archive')
+  @HttpCode(HttpStatus.OK)
   @RequiresPermission(PermissionCodeEnum.PRODUCT_ARCHIVE)
   @ApiIfMatchHeader()
   @ApiOperation({ summary: 'Archive a product (optimistic concurrency)' })

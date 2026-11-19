@@ -1120,7 +1120,7 @@ exports[`App Catalog Product POST /api/catalog/products should refuse a taken sk
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should archive, queue one ledger record under the correlation id and drop the cached customer catalog 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/archive should archive, queue one ledger record under the correlation id and drop the cached customer catalog 1`] = `
 {
   "cache": {
     "keys": [],
@@ -1167,7 +1167,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should refuse to archive an archived product with 409 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/archive should refuse to archive an archived product with 409 1`] = `
 {
   "db": {
     "product": [
@@ -1195,7 +1195,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should answer 404 for an unknown product 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should answer 404 for an unknown product 1`] = `
 {
   "response": {
     "body": {
@@ -1208,7 +1208,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should keep a published product as is and queue nothing 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should keep a published product as is and queue nothing 1`] = `
 {
   "db": {
     "product": [
@@ -1239,7 +1239,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should publish a draft, queue one ledger record under the correlation id and drop the cached customer catalog 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should publish a draft, queue one ledger record under the correlation id and drop the cached customer catalog 1`] = `
 {
   "cache": {
     "keys": [],
@@ -1286,7 +1286,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should publish an archived product again under a ledger record of its new version 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should publish an archived product again under a ledger record of its new version 1`] = `
 {
   "db": {
     "product": [
@@ -1330,7 +1330,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should refuse a publication by a viewer with 403 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should refuse a publication by a viewer with 403 1`] = `
 {
   "db": {
     "product": [
@@ -2550,7 +2550,41 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for 
 }
 `;
 
-exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should hide the note of another staff user with 404 and resolve nothing 1`] = `
+exports[`App Tools Note POST /api/tools/notes should create an unresolved note on an opaque subject 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Customer called.",
+        "created_at": Any<Date>,
+        "deleted_at": null,
+        "id": Any<String>,
+        "resolved": 0,
+        "subject_id": "T-900",
+        "subject_type": "support-ticket",
+        "updated_at": Any<Date>,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Customer called.",
+      "createdAt": Any<String>,
+      "id": Any<String>,
+      "resolved": false,
+      "subjectId": "T-900",
+      "subjectType": "support-ticket",
+      "updatedAt": Any<String>,
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should hide the note of another staff user with 404 and resolve nothing 1`] = `
 {
   "db": {
     "note": [
@@ -2579,7 +2613,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should hide the n
 }
 `;
 
-exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should refuse a stale If-Match with 412 and resolve nothing 1`] = `
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse a stale If-Match with 412 and resolve nothing 1`] = `
 {
   "db": {
     "note": [
@@ -2610,7 +2644,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should refuse a s
 }
 `;
 
-exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should refuse to resolve a resolved note with 409 1`] = `
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse to resolve a resolved note with 409 1`] = `
 {
   "db": {
     "note": [
@@ -2639,7 +2673,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should refuse to 
 }
 `;
 
-exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should resolve a note under a matching If-Match 1`] = `
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should resolve a note under a matching If-Match 1`] = `
 {
   "db": {
     "note": [
@@ -2668,40 +2702,6 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should resolve a 
       "subjectType": "product",
       "updatedAt": Any<String>,
       "version": 2,
-    },
-  },
-}
-`;
-
-exports[`App Tools Note POST /api/tools/notes should create an unresolved note on an opaque subject 1`] = `
-{
-  "db": {
-    "note": [
-      {
-        "author_id": "1",
-        "body": "Customer called.",
-        "created_at": Any<Date>,
-        "deleted_at": null,
-        "id": Any<String>,
-        "resolved": 0,
-        "subject_id": "T-900",
-        "subject_type": "support-ticket",
-        "updated_at": Any<Date>,
-        "version": 1,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "authorId": "1",
-      "body": "Customer called.",
-      "createdAt": Any<String>,
-      "id": Any<String>,
-      "resolved": false,
-      "subjectId": "T-900",
-      "subjectType": "support-ticket",
-      "updatedAt": Any<String>,
-      "version": 1,
     },
   },
 }
