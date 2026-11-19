@@ -3,7 +3,6 @@ export interface IConfigValueProperties {
   ENQUEUE_RETRY_ATTEMPTS: number;
   IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES: number;
   IDEMPOTENCY_KEY_TTL_HOURS: number;
-  LEDGER_ENQUEUE_RETRY_ATTEMPTS: number;
   OCC_RETRY_ATTEMPTS: number;
   REDIS_COMMAND_TIMEOUT_MS: number;
 }

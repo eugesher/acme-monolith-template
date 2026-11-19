@@ -33,12 +33,13 @@ reads the timeout from `REDIS_COMMAND_TIMEOUT_MS`. The health probes of `libs/he
 checks the same way.
 
 **The write stays committed.** The caller retries the enqueue through `ReplayRetryHelper`
-(`libs/toolkit/src/resilience/replay-retry.helper.ts`), `ENQUEUE_RETRY_ATTEMPTS` or
-`LEDGER_ENQUEUE_RETRY_ATTEMPTS` times, and then logs the job at `error` for a replay. These
-variables count the attempts of `add` only; the attempts of the job in the processor are the
-constant of `BullSetupModule`. The race does not cancel `add`: a timed-out command stays in the
-offline queue of the client and may still reach Redis once it is back, so the log says the record
-may be absent, and a processor must tolerate a duplicate job.
+(`libs/toolkit/src/resilience/replay-retry.helper.ts`) `ENQUEUE_RETRY_ATTEMPTS` times, and then logs
+the job at `error` for a replay. Both producers, the core ledger and the core product-stock, read
+that one variable: they retry the same `add` against the same Redis, so one budget fits both, and
+each binds it to a token of its own. The variable counts the attempts of `add` only; the attempts of
+the job in the processor are the constant of `BullSetupModule`. The race does not cancel `add`: a
+timed-out command stays in the offline queue of the client and may still reach Redis once it is
+back, so the log says the record may be absent, and a processor must tolerate a duplicate job.
 
 **A ledger job is named by its operation key.** `LedgerCoreQueueAdapter` adds the job with
 `jobId: operationKey`, and Bull adds no job under an id it already holds, so the retries of one

@@ -27,14 +27,14 @@ describe('ledger lib config providers', () => {
   });
 
   describe('LedgerCoreConfigEnqueueRetryAttemptsProvider', () => {
-    it('provides LEDGER_ENQUEUE_RETRY_ATTEMPTS under the ledger lib token', () => {
+    it('provides ENQUEUE_RETRY_ATTEMPTS under the token of the core ledger', () => {
       const value = LedgerCoreConfigEnqueueRetryAttemptsProvider.useFactory({ getOrThrow });
 
       expect(LedgerCoreConfigEnqueueRetryAttemptsProvider.provide).toBe(
         LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
       );
       expect(value).toBe(7);
-      expect(getOrThrow).toHaveBeenCalledWith('LEDGER_ENQUEUE_RETRY_ATTEMPTS');
+      expect(getOrThrow).toHaveBeenCalledWith('ENQUEUE_RETRY_ATTEMPTS');
     });
   });
 });
