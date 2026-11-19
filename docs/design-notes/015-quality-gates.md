@@ -148,6 +148,27 @@ by keeping its result. Where a declared type is narrower than the runtime value,
 `as Maybe<…>`: an annotated `const` is narrowed back by its initializer, and
 `no-unnecessary-condition` would then flag the check.
 
+## Test rules
+
+`lint/configs/specs.mjs` lays `eslint-plugin-jest`'s `flat/recommended` over every spec, e2e spec
+and e2e helper. Its warnings are errors here: `expect-expect`, `no-commented-out-tests` and
+`no-disabled-tests` would otherwise pass the pre-commit hook and fail only `lint:all` in CI. Jest
+itself runs a focused or skipped test without a complaint, so `no-focused-tests` and
+`no-disabled-tests` are what keep an `it.only` or an `it.skip` out of the main branch.
+
+- `jest/unbound-method` replaces `@typescript-eslint/unbound-method` in specs: it lets
+  `expect(port.method).toHaveBeenCalledWith(…)` through and still flags a method taken off its
+  object, so a typed mock is asserted where it lives.
+- `valid-expect` knows the asynchronous matchers of `spec/support/lint.ts` (`toBreakRule`,
+  `toPassArchitectureLint`): an architecture case that does not `await` one would pass before the
+  lint ran. `toResolve` is synchronous and stays out of the list.
+
+`lint/configs/e2e.mjs` adapts three rules to the shape of the e2e suites (see `014-e2e-suites.md`):
+`no-export` is off, because a section file exports the `execute()` that mounts its `describe`s; the
+root `afterEach` that fails a case on a root warning counts as a test block for
+`no-standalone-expect`; and the `.expect(status)` of a supertest chain counts as an assertion for
+`expect-expect`.
+
 ## Type imports
 
 `lint/configs/type-imports.mjs` marks every import that has no runtime use. An import of types only

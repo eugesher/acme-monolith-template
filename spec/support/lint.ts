@@ -36,6 +36,7 @@ const ARCHITECTURE_RULES = [
 const eslint = new ESLint({
   cwd: ROOT,
   overrideConfig: typescriptEslint.configs.disableTypeChecked,
+  ruleFilter: ({ ruleId }) => ARCHITECTURE_RULES.includes(ruleId),
 });
 
 const unresolvedImportsOf = ({ file, code }: ILintFixture): string[] =>
