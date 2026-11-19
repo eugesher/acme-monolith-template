@@ -11,6 +11,4 @@ export * from './resilience/job-failure.helper';
 export * from './resilience/job-failure.options';
 export * from './resilience/replay-retry.helper';
 export * from './resilience/replay-retry.options';
-export * from './result/result.helper';
-export * from './result/result.type';
 export * from './types/utility.type';

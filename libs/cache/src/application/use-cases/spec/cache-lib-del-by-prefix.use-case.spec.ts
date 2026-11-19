@@ -16,7 +16,7 @@ describe('CacheLibDelByPrefixUseCase', () => {
     spans = [];
     logger = makePinoLoggerMock();
     useCase = new CacheLibDelByPrefixUseCase(
-      { get: jest.fn(), set: jest.fn(), del: jest.fn(), unlinkByPrefix },
+      { get: jest.fn(), set: jest.fn(), unlinkByPrefix },
       {
         span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
           const attributes = { ...command.attributes };

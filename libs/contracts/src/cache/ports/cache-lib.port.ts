@@ -1,11 +1,9 @@
 import type { Maybe } from '@acme-libs/toolkit';
 
-import type { ICacheLibSetCommand, ICacheLibWrapCommand } from '../interfaces';
+import type { ICacheLibWrapCommand } from '../interfaces';
 
 export interface ICacheLibPort {
   handleGet<T>(key: string): Promise<Maybe<T>>;
-  handleSet<T>(command: ICacheLibSetCommand<T>): Promise<void>;
-  handleDel(key: string): Promise<void>;
   handleDelByPrefix(prefix: string): Promise<number>;
   handleWrap<T>(command: ICacheLibWrapCommand<T>): Promise<T>;
 }

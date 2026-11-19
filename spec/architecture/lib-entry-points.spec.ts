@@ -112,7 +112,7 @@ describe('lib entry points', () => {
 
   it.each([
     '@acme-libs/kernel/app/app-name.enum',
-    '@acme-libs/toolkit/result/result.helper',
+    '@acme-libs/toolkit/pagination/pagination.helper',
     '@acme-libs/domain/entity/entity',
     '@acme-libs/config/env/env.helper',
     '@acme-libs/local-storage/transactional/shell/local-storage-transactional.module',
@@ -144,7 +144,7 @@ describe('lib entry points', () => {
   ])('%s MAY import the framework-free libs by their aliases', async (file) => {
     await expect({
       file,
-      code: 'import { AppNameEnum } from "@acme-libs/kernel";\nimport { ResultHelper } from "@acme-libs/toolkit";\nimport { Entity } from "@acme-libs/domain";',
+      code: 'import { AppNameEnum } from "@acme-libs/kernel";\nimport { PaginationHelper } from "@acme-libs/toolkit";\nimport { Entity } from "@acme-libs/domain";',
     }).toPassArchitectureLint();
   });
 
@@ -156,7 +156,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'import { ResultHelper } from "@acme-libs/toolkit";',
+    'import { PaginationHelper } from "@acme-libs/toolkit";',
     'import { Entity } from "@acme-libs/domain";',
   ])('entities may NOT take %s — a table is not a domain model', async (code) => {
     await expect({
@@ -168,7 +168,7 @@ describe('lib entry points', () => {
   it('the kernel lib may NOT import the toolkit lib by its alias', async () => {
     await expect({
       file: 'libs/kernel/src/auth/__fixture__.ts',
-      code: 'import { ResultHelper } from "@acme-libs/toolkit";',
+      code: 'import { PaginationHelper } from "@acme-libs/toolkit";',
     }).toBreakRule('boundaries/dependencies');
   });
 

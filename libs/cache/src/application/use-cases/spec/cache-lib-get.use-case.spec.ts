@@ -9,18 +9,15 @@ describe('CacheLibGetUseCase', () => {
   beforeEach(() => {
     get = jest.fn().mockResolvedValue(undefined);
     spans = [];
-    useCase = new CacheLibGetUseCase(
-      { get, set: jest.fn(), del: jest.fn(), unlinkByPrefix: jest.fn() },
-      {
-        span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
-          const attributes = { ...command.attributes };
+    useCase = new CacheLibGetUseCase({ get, set: jest.fn(), unlinkByPrefix: jest.fn() }, {
+      span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
+        const attributes = { ...command.attributes };
 
-          spans.push({ name: command.name, attributes });
+        spans.push({ name: command.name, attributes });
 
-          return await command.work(attributes);
-        },
-      } as ICacheLibTracerPort,
-    );
+        return await command.work(attributes);
+      },
+    } as ICacheLibTracerPort);
   });
 
   it('returns undefined on a miss and marks the span as a miss', async () => {

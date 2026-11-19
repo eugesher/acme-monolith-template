@@ -38,17 +38,19 @@ OpenTelemetry through two ports of the lib's own `outbound`:
 | Facade method       | Use case                     | Span                |
 | ------------------- | ---------------------------- | ------------------- |
 | `handleGet`         | `CacheLibGetUseCase`         | `cache.get`         |
-| `handleSet`         | `CacheLibSetUseCase`         | `cache.set`         |
-| `handleDel`         | `CacheLibDelUseCase`         | `cache.del`         |
 | `handleDelByPrefix` | `CacheLibDelByPrefixUseCase` | `cache.delByPrefix` |
 | `handleWrap`        | `CacheLibWrapUseCase`        | `cache.wrap`        |
 
+The port holds exactly what its callers use: `handleWrap` for the catalog, `handleDelByPrefix` for
+its droppers and `handleGet` for the readiness probe of `libs/health`. A plain write or delete of
+one key has no caller, so the lib has none; a feature that needs one adds it with its first call.
+
 **`CacheLibStoreAdapter` is the ioredis adapter.** It holds the JSON encoding, `PX` TTLs, the `SCAN`
-and `UNLINK` loop under the client's `keyPrefix`, and quits the client on shutdown.
-`CacheLibRedisClientProvider` builds the client from `RedisConfigHelper.failFast` of `libs/config`:
-the address and the password of `REDIS_*`, TLS from `REDIS_TLS_CA`, no offline queue and
-`REDIS_COMMAND_TIMEOUT_MS` on every command, so a command fails at once while Redis is down instead
-of waiting for it (see `036-production-stack.md`).
+and `UNLINK` loop over a prefix, and quits the client on shutdown. `CacheLibRedisClientProvider`
+builds the client from `RedisConfigHelper.failFast` of `libs/config`: the address and the password
+of `REDIS_*`, TLS from `REDIS_TLS_CA`, no offline queue and `REDIS_COMMAND_TIMEOUT_MS` on every
+command, so a command fails at once while Redis is down instead of waiting for it (see
+`036-production-stack.md`).
 
 **`CacheLibTracerAdapter` is the OpenTelemetry adapter.** A use case names the span and its
 attributes, adds `cache.hit` or `cache.keys_unlinked` as it learns them, and the adapter records
@@ -62,10 +64,10 @@ case names the step that failed in `cache.error`: `read` or `write` of `cache.wr
 `cache.delByPrefix`. The warning of the use case carries the trace id of the same span.
 
 **The Redis commands are child spans.** `cache.wrap` reads and writes through the store, not through
-`cache.get` and `cache.set`, so it opens no nested span of the lib. The auto-instrumentation of
-ioredis, on in `TracerHelper`, records each command (`get`, `set`) as a child of the span the
-adapter opened, because `startActiveSpan` makes it the active one while the work runs. The tracer
-must start before ioredis is loaded, so `main.ts` imports `@acme-libs/observability/tracer` first.
+`cache.get`, so it opens no nested span of the lib. The auto-instrumentation of ioredis, on in
+`TracerHelper`, records each command (`get`, `set`) as a child of the span the adapter opened,
+because `startActiveSpan` makes it the active one while the work runs. The tracer must start before
+ioredis is loaded, so `main.ts` imports `@acme-libs/observability/tracer` first.
 
 ## Invalidation after the write
 

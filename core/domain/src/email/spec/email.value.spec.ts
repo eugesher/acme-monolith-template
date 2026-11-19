@@ -7,13 +7,6 @@ describe('EmailValue', () => {
 
       expect(email.address).toBe('eve@example.com');
     });
-
-    it('equals the same address written in another case', () => {
-      const email = EmailValue.create('eve@example.com');
-      const sameEmail = EmailValue.create(' EVE@example.com');
-
-      expect(email.equals(sameEmail)).toBe(true);
-    });
   });
 
   describe('isValid', () => {

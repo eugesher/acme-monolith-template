@@ -18,7 +18,7 @@ describe('CacheLibWrapUseCase', () => {
     spans = [];
     logger = makePinoLoggerMock();
     useCase = new CacheLibWrapUseCase(
-      { get, set, del: jest.fn(), unlinkByPrefix: jest.fn() },
+      { get, set, unlinkByPrefix: jest.fn() },
       {
         span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
           const attributes = { ...command.attributes };

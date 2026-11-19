@@ -38,12 +38,7 @@ export class CacheLibStoreAdapter implements ICacheLibStorePort, OnApplicationSh
     await this.redis.set(key, rawValue, 'PX', ttlMs);
   }
 
-  public async del(key: string): Promise<void> {
-    await this.redis.del(key);
-  }
-
   public async unlinkByPrefix(prefix: string): Promise<number> {
-    const keyPrefix = this.redis.options.keyPrefix ?? '';
     let cursor = '0';
     let unlinked = 0;
 
@@ -51,7 +46,7 @@ export class CacheLibStoreAdapter implements ICacheLibStorePort, OnApplicationSh
       const [next, keys] = await this.redis.scan(
         cursor,
         'MATCH',
-        `${keyPrefix}${prefix}*`,
+        `${prefix}*`,
         'COUNT',
         CacheLibStoreAdapter.SCAN_BATCH_SIZE,
       );
@@ -59,9 +54,7 @@ export class CacheLibStoreAdapter implements ICacheLibStorePort, OnApplicationSh
       cursor = next;
 
       if (keys.length > 0) {
-        const unprefixed = keys.map((key) => key.slice(keyPrefix.length));
-
-        unlinked += await this.redis.unlink(...unprefixed);
+        unlinked += await this.redis.unlink(...keys);
       }
     } while (cursor !== '0');
 

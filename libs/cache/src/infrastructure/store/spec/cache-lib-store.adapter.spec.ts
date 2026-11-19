@@ -4,11 +4,9 @@ import { CacheLibStoreAdapter } from '../cache-lib-store.adapter';
 
 describe('CacheLibStoreAdapter', () => {
   let redis: {
-    options: { keyPrefix?: string };
     status: string;
     get: jest.Mock;
     set: jest.Mock;
-    del: jest.Mock;
     scan: jest.Mock;
     unlink: jest.Mock;
     quit: jest.Mock;
@@ -18,11 +16,9 @@ describe('CacheLibStoreAdapter', () => {
 
   beforeEach(() => {
     redis = {
-      options: {},
       status: 'ready',
       get: jest.fn().mockResolvedValue(null),
       set: jest.fn().mockResolvedValue('OK'),
-      del: jest.fn().mockResolvedValue(1),
       scan: jest.fn().mockResolvedValue(['0', []]),
       unlink: jest.fn().mockResolvedValue(0),
       quit: jest.fn().mockResolvedValue('OK'),
@@ -72,24 +68,15 @@ describe('CacheLibStoreAdapter', () => {
     });
   });
 
-  describe('del', () => {
-    it('removes the key', async () => {
-      await store.del('k');
-
-      expect(redis.del).toHaveBeenCalledWith('k');
-    });
-  });
-
   describe('unlinkByPrefix', () => {
-    it('scans by the client keyPrefix and unlinks the keys without it', async () => {
-      redis.options = { keyPrefix: 'app:' };
-      redis.scan.mockResolvedValue(['0', ['app:acme:r:1:a', 'app:acme:r:1:b']]);
+    it('scans the keys under the prefix and unlinks them', async () => {
+      redis.scan.mockResolvedValue(['0', ['acme:r:1:a', 'acme:r:1:b']]);
       redis.unlink.mockResolvedValue(2);
 
       const unlinked = await store.unlinkByPrefix('acme:r:1:');
 
       expect(unlinked).toBe(2);
-      expect(redis.scan).toHaveBeenCalledWith('0', 'MATCH', 'app:acme:r:1:*', 'COUNT', 100);
+      expect(redis.scan).toHaveBeenCalledWith('0', 'MATCH', 'acme:r:1:*', 'COUNT', 100);
       expect(redis.unlink).toHaveBeenCalledWith('acme:r:1:a', 'acme:r:1:b');
     });
 

@@ -17,7 +17,7 @@ A name says who or where; the action lives in the method or in the port.
 | token of a config value            | `<MODULE>_<PROPERTY>_TOKEN`, `<module>-<property>.token.ts`                             | `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`                         |
 | binding of an infrastructure class | `public static readonly provider: ClassProvider<I…Port>`                                | `OrderIdempotencyCoreAdapter.provider`                     |
 | provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                       | `ProductConfigOccRetryAttemptsProvider`                    |
-| type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                  | `replay-retry.options.ts`, `result.type.ts`                |
+| type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                  | `replay-retry.options.ts`, `utility.type.ts`               |
 | params of a helper method          | `I<Subject><Action>`, `interfaces/params/<subject>-<action>.interface.ts`               | `IPageWindowClamp`, `IPageBuild`                           |
 | snapshot of a helper method        | `I<Subject>`, `interfaces/snapshots/<subject>.interface.ts`                             | `IPageWindow`, `IPage`                                     |
 
@@ -84,7 +84,7 @@ libs name an interface file by its role: `.command`, `.view`, `.options`. The ty
 provider or a guard rather than a use case. The options of a helper take `.options.ts`
 (`replay-retry.options.ts`, `config-value-provide.options.ts`); a type with no such role keeps the
 suffix of its syntax, `.interface.ts` or `.type.ts` (`hosted-repository.interface.ts`,
-`result.type.ts`).
+`utility.type.ts`).
 
 **A helper method takes one params object and answers a snapshot.** The types of the method live in
 `interfaces/params` and `interfaces/snapshots` next to the helper, as those of `PaginationHelper` in
