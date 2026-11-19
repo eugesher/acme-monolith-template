@@ -27,14 +27,16 @@ a threshold.
 | `libs/openapi/src/api-reference/api-reference.ts`                                  | mounts the reference page                                                                                             |
 | `libs/testing/**`, `apps/*/test/**`                                                | test code                                                                                                             |
 
-**The thresholds** are 95% for statements, branches, functions and lines, twice over:
+**The threshold is 100% for every counted file**, for statements, branches, functions and lines. The
+exclusions above take out what has no logic or belongs to the e2e suites, so a line below 100% is
+either untested or dead, and either way the change is not done. No line is taken out with an
+`istanbul ignore` comment.
 
-- for the whole tree;
-- for every file of `domain/` and `application/` in a feature, a nested feature module
-  (`features/<area>/modules/<module>`), a processor, a common module and a core module.
-
-The per-file keys are what matter. One unit without a spec barely moves the global numbers, but its
-file drops to zero and fails its own key.
+**The key is per file, not global.** A global threshold measures the whole tree: with about 4,000
+statements, 95% lets 200 of them go untested, and a new adapter or helper without any spec barely
+moves the number. A per-file key fails on the file that lost its spec and names it in the report.
+Jest checks every file matched by `./{apps,core,libs}/**/*.ts` against it, and `collectCoverageFrom`
+decides which files are counted, including those no spec loads, which count at 0%.
 
 **ts-jest compiles the unit suite with type information** (`isolatedModules: false`). With
 `emitDecoratorMetadata`, a file compiled on its own cannot tell whether a constructor parameter type
