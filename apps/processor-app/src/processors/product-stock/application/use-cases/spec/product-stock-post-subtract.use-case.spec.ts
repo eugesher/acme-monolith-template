@@ -5,7 +5,7 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { ProductStockPostSubtractUseCase } from '../product-stock-post-subtract.use-case';
 
 describe('ProductStockPostSubtractUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let findActive: jest.Mock;
   let lock: jest.Mock;
   let archive: jest.Mock;
@@ -14,16 +14,16 @@ describe('ProductStockPostSubtractUseCase', () => {
   let useCase: ProductStockPostSubtractUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     findActive = jest.fn((productIds: string[]) => {
-      outcomes.push('findActive');
+      calls.push('findActive');
 
       const active = productIds.filter((productId) => productId !== '102');
 
       return Promise.resolve(active.map((id) => ({ id })));
     });
     lock = jest.fn(() => {
-      outcomes.push('lock');
+      calls.push('lock');
 
       return Promise.resolve([
         { productId: '100', quantity: 6 },
@@ -33,16 +33,16 @@ describe('ProductStockPostSubtractUseCase', () => {
       ]);
     });
     archive = jest.fn(() => {
-      outcomes.push('archive');
+      calls.push('archive');
 
       return Promise.resolve({ archived: true });
     });
     run = jest.fn(async (work: () => Promise<unknown>) => {
-      outcomes.push('begin');
+      calls.push('begin');
 
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
@@ -62,7 +62,7 @@ describe('ProductStockPostSubtractUseCase', () => {
 
       expect(lock).toHaveBeenCalledWith({ productIds: ['100', '102', '106', '107'] });
       expect(findActive).toHaveBeenCalledWith(['102', '106', '107']);
-      expect(outcomes).toEqual(['begin', 'lock', 'findActive', 'archive', 'archive', 'commit']);
+      expect(calls).toEqual(['begin', 'lock', 'findActive', 'archive', 'archive', 'commit']);
     });
 
     it('archives the published products that have no stock left and logs each one', async () => {

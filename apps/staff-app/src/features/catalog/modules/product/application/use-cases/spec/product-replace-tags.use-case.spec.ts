@@ -2,21 +2,21 @@ import { ProductNotFoundException, ProductTagNotFoundException } from '../../../
 import { ProductReplaceTagsUseCase } from '../product-replace-tags.use-case';
 
 describe('ProductReplaceTagsUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let lockById: jest.Mock;
   let replace: jest.Mock;
   let run: jest.Mock;
   let useCase: ProductReplaceTagsUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     lockById = jest.fn(() => {
-      outcomes.push('lock');
+      calls.push('lockById');
 
       return Promise.resolve({ id: '100' });
     });
     replace = jest.fn(() => {
-      outcomes.push('replace');
+      calls.push('replace');
 
       return Promise.resolve({
         outcome: 'replaced',
@@ -25,9 +25,11 @@ describe('ProductReplaceTagsUseCase', () => {
       });
     });
     run = jest.fn(async (work: () => Promise<unknown>) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
@@ -45,7 +47,7 @@ describe('ProductReplaceTagsUseCase', () => {
       expect(view).toEqual({ tags: [{ id: '300', name: 'fragile' }] });
       expect(lockById).toHaveBeenCalledWith('100');
       expect(replace).toHaveBeenCalledWith({ productId: '100', tagIds: ['300'] });
-      expect(outcomes).toEqual(['lock', 'replace', 'commit']);
+      expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
     });
 
     it('throws ProductNotFoundException and replaces nothing for an unknown product', async () => {
@@ -66,7 +68,7 @@ describe('ProductReplaceTagsUseCase', () => {
 
       expect(error).toBeInstanceOf(ProductTagNotFoundException);
       expect(error).toMatchObject({ details: { missingTagIds: ['999'] } });
-      expect(outcomes).not.toContain('commit');
+      expect(calls).not.toContain('commit');
     });
   });
 });

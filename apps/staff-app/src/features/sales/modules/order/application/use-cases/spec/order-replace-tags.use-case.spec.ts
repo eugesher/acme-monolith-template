@@ -2,21 +2,21 @@ import { OrderNotFoundException, OrderTagNotFoundException } from '../../../doma
 import { OrderReplaceTagsUseCase } from '../order-replace-tags.use-case';
 
 describe('OrderReplaceTagsUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let lockById: jest.Mock;
   let replace: jest.Mock;
   let run: jest.Mock;
   let useCase: OrderReplaceTagsUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     lockById = jest.fn(() => {
-      outcomes.push('lock');
+      calls.push('lockById');
 
       return Promise.resolve({ id: '600' });
     });
     replace = jest.fn(() => {
-      outcomes.push('replace');
+      calls.push('replace');
 
       return Promise.resolve({
         outcome: 'replaced',
@@ -25,9 +25,11 @@ describe('OrderReplaceTagsUseCase', () => {
       });
     });
     run = jest.fn(async (work: () => Promise<unknown>) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
@@ -45,7 +47,7 @@ describe('OrderReplaceTagsUseCase', () => {
       expect(view).toEqual({ tags: [{ id: '302', name: 'vip' }] });
       expect(lockById).toHaveBeenCalledWith('600');
       expect(replace).toHaveBeenCalledWith({ orderId: '600', tagIds: ['302'] });
-      expect(outcomes).toEqual(['lock', 'replace', 'commit']);
+      expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
     });
 
     it('throws OrderNotFoundException and replaces nothing for an unknown order', async () => {
@@ -66,7 +68,7 @@ describe('OrderReplaceTagsUseCase', () => {
 
       expect(error).toBeInstanceOf(OrderTagNotFoundException);
       expect(error).toMatchObject({ details: { missingTagIds: ['999'] } });
-      expect(outcomes).not.toContain('commit');
+      expect(calls).not.toContain('commit');
     });
   });
 });

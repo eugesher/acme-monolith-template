@@ -5,6 +5,7 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { OrderPlaceUseCase } from '../order-place.use-case';
 
 describe('OrderPlaceUseCase', () => {
+  let calls: string[];
   let findActiveProducts: jest.Mock;
   let insertOrder: jest.Mock;
   let insertOrderProducts: jest.Mock;
@@ -20,29 +21,78 @@ describe('OrderPlaceUseCase', () => {
   let useCase: OrderPlaceUseCase;
 
   beforeEach(() => {
-    findActiveProducts = jest.fn().mockResolvedValue([{ id: '100' }, { id: '103' }]);
-    insertOrder = jest.fn().mockResolvedValue('610');
-    insertOrderProducts = jest.fn().mockResolvedValue(undefined);
-    findPlaced = jest.fn().mockResolvedValue({
-      id: '610',
-      customerId: 'customer-1',
-      createdAt: new Date('2026-01-05T08:00:00.000Z'),
-      orderProducts: [
-        { id: '620', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } },
-        { id: '621', product: { id: '103', sku: 'SKU-0004', name: 'Chair' } },
-        { id: '622', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } },
-      ],
+    calls = [];
+    findActiveProducts = jest.fn(() => {
+      calls.push('findActiveProducts');
+
+      return Promise.resolve([{ id: '100' }, { id: '103' }]);
     });
-    lock = jest.fn().mockResolvedValue([
-      { productId: '100', quantity: 8 },
-      { productId: '103', quantity: 3 },
-    ]);
-    withdraw = jest.fn().mockResolvedValue(undefined);
-    claim = jest.fn().mockResolvedValue({ outcome: 'claimed' });
-    complete = jest.fn().mockResolvedValue(undefined);
-    release = jest.fn().mockResolvedValue(undefined);
-    recordPlaced = jest.fn().mockResolvedValue(undefined);
-    run = jest.fn().mockImplementation((work: () => Promise<unknown>) => work());
+    insertOrder = jest.fn(() => {
+      calls.push('insertOrder');
+
+      return Promise.resolve('610');
+    });
+    insertOrderProducts = jest.fn(() => {
+      calls.push('insertOrderProducts');
+
+      return Promise.resolve();
+    });
+    findPlaced = jest.fn(() => {
+      calls.push('findPlaced');
+
+      return Promise.resolve({
+        id: '610',
+        customerId: 'customer-1',
+        createdAt: new Date('2026-01-05T08:00:00.000Z'),
+        orderProducts: [
+          { id: '620', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } },
+          { id: '621', product: { id: '103', sku: 'SKU-0004', name: 'Chair' } },
+          { id: '622', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } },
+        ],
+      });
+    });
+    lock = jest.fn(() => {
+      calls.push('lock');
+
+      return Promise.resolve([
+        { productId: '100', quantity: 8 },
+        { productId: '103', quantity: 3 },
+      ]);
+    });
+    withdraw = jest.fn(() => {
+      calls.push('withdraw');
+
+      return Promise.resolve();
+    });
+    claim = jest.fn(() => {
+      calls.push('claim');
+
+      return Promise.resolve({ outcome: 'claimed' });
+    });
+    complete = jest.fn(() => {
+      calls.push('complete');
+
+      return Promise.resolve();
+    });
+    release = jest.fn(() => {
+      calls.push('release');
+
+      return Promise.resolve();
+    });
+    recordPlaced = jest.fn(() => {
+      calls.push('recordPlaced');
+
+      return Promise.resolve();
+    });
+    run = jest.fn(async (work: () => Promise<unknown>) => {
+      calls.push('begin');
+
+      const result = await work();
+
+      calls.push('commit');
+
+      return result;
+    });
     logger = makePinoLoggerMock();
     useCase = new OrderPlaceUseCase(
       { findActiveProducts, insertOrder, insertOrderProducts, findPlaced },
@@ -69,9 +119,6 @@ describe('OrderPlaceUseCase', () => {
       });
       expect(lock).toHaveBeenCalledWith({ productIds: ['100', '103'] });
       expect(findActiveProducts).toHaveBeenCalledWith(['100', '103']);
-      expect(lock.mock.invocationCallOrder[0]).toBeLessThan(
-        findActiveProducts.mock.invocationCallOrder[0],
-      );
       expect(insertOrder).toHaveBeenCalledWith({ customerId: 'customer-1' });
       expect(insertOrderProducts).toHaveBeenCalledWith([
         { orderId: '610', productId: '100' },
@@ -100,8 +147,19 @@ describe('OrderPlaceUseCase', () => {
         key: 'key-1',
         response: view,
       });
-      expect(run).toHaveBeenCalledTimes(1);
-      expect(release).not.toHaveBeenCalled();
+      expect(calls).toEqual([
+        'claim',
+        'begin',
+        'lock',
+        'findActiveProducts',
+        'insertOrder',
+        'insertOrderProducts',
+        'findPlaced',
+        'withdraw',
+        'complete',
+        'commit',
+        'recordPlaced',
+      ]);
     });
 
     it('records the placed order in the ledger after the commit and logs it', async () => {
@@ -123,9 +181,7 @@ describe('OrderPlaceUseCase', () => {
           ],
         },
       });
-      expect(run.mock.invocationCallOrder[0]).toBeLessThan(
-        recordPlaced.mock.invocationCallOrder[0],
-      );
+      expect(calls.slice(calls.indexOf('commit'))).toEqual(['commit', 'recordPlaced']);
       expect(logger.info).toHaveBeenCalledWith(
         {
           id: '610',
@@ -196,11 +252,7 @@ describe('OrderPlaceUseCase', () => {
         code: 'ORDER_STOCK_INSUFFICIENT',
         message: 'Product 103 has 3 in stock, 4 requested',
       });
-      expect(run).toHaveBeenCalledTimes(1);
-      expect(insertOrder).not.toHaveBeenCalled();
-      expect(withdraw).not.toHaveBeenCalled();
-      expect(complete).not.toHaveBeenCalled();
-      expect(recordPlaced).not.toHaveBeenCalled();
+      expect(calls).toEqual(['claim', 'begin', 'lock', 'findActiveProducts', 'release']);
       expect(release).toHaveBeenCalledWith({ customerId: 'customer-1', key: 'key-1' });
     });
 

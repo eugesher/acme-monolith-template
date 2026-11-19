@@ -6,7 +6,7 @@ import { TagCommonSubjectTypeEnum } from '@acme-staff/contracts/tag';
 import { TagCommonReplaceUseCase } from '../tag-common-replace.use-case';
 
 describe('TagCommonReplaceUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let lockTags: jest.Mock;
   let findLinked: jest.Mock;
   let link: jest.Mock;
@@ -16,18 +16,36 @@ describe('TagCommonReplaceUseCase', () => {
   let useCase: TagCommonReplaceUseCase;
 
   beforeEach(() => {
-    outcomes = [];
-    lockTags = jest.fn().mockResolvedValue([
-      { id: '301', name: 'promo' },
-      { id: '302', name: 'vip' },
-    ]);
-    findLinked = jest.fn().mockResolvedValue([{ tagId: '300' }, { tagId: '301' }]);
-    link = jest.fn(() => Promise.resolve(void outcomes.push('link')));
-    unlink = jest.fn(() => Promise.resolve(void outcomes.push('unlink')));
+    calls = [];
+    lockTags = jest.fn(() => {
+      calls.push('lockTags');
+
+      return Promise.resolve([
+        { id: '301', name: 'promo' },
+        { id: '302', name: 'vip' },
+      ]);
+    });
+    findLinked = jest.fn(() => {
+      calls.push('findLinked');
+
+      return Promise.resolve([{ tagId: '300' }, { tagId: '301' }]);
+    });
+    link = jest.fn(() => {
+      calls.push('link');
+
+      return Promise.resolve();
+    });
+    unlink = jest.fn(() => {
+      calls.push('unlink');
+
+      return Promise.resolve();
+    });
     run = jest.fn(async (work: () => Promise<unknown>) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
@@ -67,7 +85,7 @@ describe('TagCommonReplaceUseCase', () => {
         subjectId: '100',
         tagIds: ['302'],
       });
-      expect(outcomes).toEqual(['unlink', 'link', 'commit']);
+      expect(calls).toEqual(['begin', 'lockTags', 'findLinked', 'unlink', 'link', 'commit']);
       expect(logger.info).toHaveBeenCalledWith(
         {
           subjectType: 'product',
@@ -90,9 +108,7 @@ describe('TagCommonReplaceUseCase', () => {
         tags: [],
         missingTagIds: ['998', '999'],
       });
-      expect(findLinked).not.toHaveBeenCalled();
-      expect(link).not.toHaveBeenCalled();
-      expect(unlink).not.toHaveBeenCalled();
+      expect(calls).toEqual(['begin', 'lockTags', 'commit']);
       expect(logger.info).not.toHaveBeenCalled();
     });
 
@@ -124,7 +140,7 @@ describe('TagCommonReplaceUseCase', () => {
           tagIds: ['301', '302'],
         }),
       ).rejects.toThrow('connection lost');
-      expect(outcomes).toEqual(['unlink']);
+      expect(calls).not.toContain('commit');
       expect(logger.info).not.toHaveBeenCalled();
     });
 
@@ -139,7 +155,7 @@ describe('TagCommonReplaceUseCase', () => {
         }),
       ).rejects.toThrow('connection lost');
       expect(link).not.toHaveBeenCalled();
-      expect(outcomes).toEqual([]);
+      expect(calls).not.toContain('commit');
     });
   });
 });

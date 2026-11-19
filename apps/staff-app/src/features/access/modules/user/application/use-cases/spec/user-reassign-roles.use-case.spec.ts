@@ -6,41 +6,48 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { UserReassignRolesUseCase } from '../user-reassign-roles.use-case';
 
 describe('UserReassignRolesUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let repository: {
     existsUser: jest.Mock;
     findRoles: jest.Mock;
     deleteUserRolesExcept: jest.Mock;
     insertUserRolesIgnore: jest.Mock;
   };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
+  let transaction: { run: jest.Mock };
   let logger: PinoLoggerMock;
   let useCase: UserReassignRolesUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     repository = {
-      existsUser: jest.fn().mockResolvedValue(true),
-      findRoles: jest.fn().mockResolvedValue([{ id: '2' }, { id: '3' }]),
+      existsUser: jest.fn(() => {
+        calls.push('existsUser');
+
+        return Promise.resolve(true);
+      }),
+      findRoles: jest.fn(() => {
+        calls.push('findRoles');
+
+        return Promise.resolve([{ id: '2' }, { id: '3' }]);
+      }),
       deleteUserRolesExcept: jest.fn(() => {
-        outcomes.push('delete');
+        calls.push('deleteUserRolesExcept');
 
         return Promise.resolve();
       }),
       insertUserRolesIgnore: jest.fn(() => {
-        outcomes.push('insert');
+        calls.push('insertUserRolesIgnore');
 
         return Promise.resolve();
       }),
     };
     transaction = {
-      afterCommit: jest.fn(),
       run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+        calls.push('begin');
 
         const result = await work();
 
-        outcomes.push('commit');
+        calls.push('commit');
 
         return result;
       }),
@@ -65,7 +72,14 @@ describe('UserReassignRolesUseCase', () => {
       { userId: 'user-1', roleId: '2' },
       { userId: 'user-1', roleId: '3' },
     ]);
-    expect(outcomes).toEqual(['begin', 'delete', 'insert', 'commit']);
+    expect(calls).toEqual([
+      'existsUser',
+      'findRoles',
+      'begin',
+      'deleteUserRolesExcept',
+      'insertUserRolesIgnore',
+      'commit',
+    ]);
     expect(logger.info).toHaveBeenCalledWith(
       { id: 'user-1', userRoles: [{ roleId: '2' }, { roleId: '3' }] },
       'Roles reassigned',
@@ -90,7 +104,7 @@ describe('UserReassignRolesUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
       message: 'Role 99 was not found',
     });
-    expect(transaction.run).not.toHaveBeenCalled();
+    expect(calls).toEqual(['existsUser', 'findRoles']);
   });
 
   it('clears the roles with an empty list', async () => {

@@ -6,35 +6,46 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { RoleReassignPermissionsUseCase } from '../role-reassign-permissions.use-case';
 
 describe('RoleReassignPermissionsUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let repository: {
     findRole: jest.Mock;
     deleteRolePermissions: jest.Mock;
     insertRolePermissions: jest.Mock;
   };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
+  let transaction: { run: jest.Mock };
   let logger: PinoLoggerMock;
   let useCase: RoleReassignPermissionsUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     repository = {
-      findRole: jest.fn().mockResolvedValue({
-        id: '2',
-        name: 'editor',
-        rolePermissions: [{ code: PermissionCodeEnum.ACCESS_MANAGE }],
+      findRole: jest.fn(() => {
+        calls.push('findRole');
+
+        return Promise.resolve({
+          id: '2',
+          name: 'editor',
+          rolePermissions: [{ code: PermissionCodeEnum.ACCESS_MANAGE }],
+        });
       }),
-      deleteRolePermissions: jest.fn().mockResolvedValue(undefined),
-      insertRolePermissions: jest.fn().mockResolvedValue(undefined),
+      deleteRolePermissions: jest.fn(() => {
+        calls.push('deleteRolePermissions');
+
+        return Promise.resolve();
+      }),
+      insertRolePermissions: jest.fn(() => {
+        calls.push('insertRolePermissions');
+
+        return Promise.resolve();
+      }),
     };
     transaction = {
-      afterCommit: jest.fn(),
       run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+        calls.push('begin');
 
         const result = await work();
 
-        outcomes.push('commit');
+        calls.push('commit');
 
         return result;
       }),
@@ -63,7 +74,13 @@ describe('RoleReassignPermissionsUseCase', () => {
       { roleId: '2', code: 'access:manage' },
       { roleId: '2', code: 'product:read' },
     ]);
-    expect(outcomes).toEqual(['begin', 'commit']);
+    expect(calls).toEqual([
+      'begin',
+      'findRole',
+      'deleteRolePermissions',
+      'insertRolePermissions',
+      'commit',
+    ]);
     expect(logger.info).toHaveBeenCalledWith(
       {
         name: 'editor',
@@ -95,6 +112,6 @@ describe('RoleReassignPermissionsUseCase', () => {
 
     await expect(reassign).rejects.toThrow('deadlock');
     expect(repository.insertRolePermissions).not.toHaveBeenCalled();
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
   });
 });

@@ -7,40 +7,53 @@ import { UserRegisterStaffUserInsertOutcomeEnum } from '../../../outbound';
 import { UserRegisterUseCase } from '../user-register.use-case';
 
 describe('UserRegisterUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let repository: { insertUser: jest.Mock; findRoles: jest.Mock; insertUserRoles: jest.Mock };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
+  let transaction: { run: jest.Mock };
   let credentials: { hashPassword: jest.Mock };
   let logger: PinoLoggerMock;
   let useCase: UserRegisterUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     repository = {
       insertUser: jest.fn(() => {
-        outcomes.push('insert');
+        calls.push('insertUser');
 
         return Promise.resolve({
           outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED,
           id: '5',
         });
       }),
-      findRoles: jest.fn().mockResolvedValue([{ id: '2' }]),
-      insertUserRoles: jest.fn().mockResolvedValue(undefined),
+      findRoles: jest.fn(() => {
+        calls.push('findRoles');
+
+        return Promise.resolve([{ id: '2' }]);
+      }),
+      insertUserRoles: jest.fn(() => {
+        calls.push('insertUserRoles');
+
+        return Promise.resolve();
+      }),
     };
     transaction = {
-      afterCommit: jest.fn(),
       run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+        calls.push('begin');
 
         const result = await work();
 
-        outcomes.push('commit');
+        calls.push('commit');
 
         return result;
       }),
     };
-    credentials = { hashPassword: jest.fn().mockResolvedValue('argon-hash') };
+    credentials = {
+      hashPassword: jest.fn(() => {
+        calls.push('hashPassword');
+
+        return Promise.resolve('argon-hash');
+      }),
+    };
     logger = makePinoLoggerMock();
     useCase = new UserRegisterUseCase(
       repository,
@@ -70,7 +83,14 @@ describe('UserRegisterUseCase', () => {
     });
     expect(repository.findRoles).toHaveBeenCalledWith(['2']);
     expect(repository.insertUserRoles).toHaveBeenCalledWith([{ userId: '5', roleId: '2' }]);
-    expect(outcomes).toEqual(['begin', 'insert', 'commit']);
+    expect(calls).toEqual([
+      'hashPassword',
+      'begin',
+      'insertUser',
+      'findRoles',
+      'insertUserRoles',
+      'commit',
+    ]);
     expect(logger.info).toHaveBeenCalledWith({ id: '5' }, 'User registered');
   });
 
@@ -85,8 +105,7 @@ describe('UserRegisterUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
       message: 'Role 99 was not found',
     });
-    expect(repository.insertUserRoles).not.toHaveBeenCalled();
-    expect(outcomes).not.toContain('commit');
+    expect(calls).toEqual(['hashPassword', 'begin', 'insertUser', 'findRoles']);
   });
 
   it('rejects a weak password before hashing it', async () => {
@@ -130,7 +149,7 @@ describe('UserRegisterUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
       message: 'Email is already registered',
     });
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
     expect(logger.info).not.toHaveBeenCalled();
   });
 
@@ -144,7 +163,7 @@ describe('UserRegisterUseCase', () => {
     });
 
     await expect(register).rejects.toThrow('deadlock');
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
   });
 
   it('rolls the transaction back when the roles fail to store', async () => {
@@ -157,7 +176,7 @@ describe('UserRegisterUseCase', () => {
     });
 
     await expect(register).rejects.toThrow('deadlock');
-    expect(outcomes).toEqual(['begin', 'insert']);
+    expect(calls).not.toContain('commit');
     expect(logger.info).not.toHaveBeenCalled();
   });
 });

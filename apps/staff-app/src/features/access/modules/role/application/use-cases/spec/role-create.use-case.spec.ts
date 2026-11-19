@@ -7,28 +7,33 @@ import { RoleCreateStaffRoleInsertOutcomeEnum } from '../../../outbound';
 import { RoleCreateUseCase } from '../role-create.use-case';
 
 describe('RoleCreateUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let repository: { insertRole: jest.Mock; insertRolePermissions: jest.Mock };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
+  let transaction: { run: jest.Mock };
   let logger: PinoLoggerMock;
   let useCase: RoleCreateUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     repository = {
-      insertRole: jest
-        .fn()
-        .mockResolvedValue({ outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: '7' }),
-      insertRolePermissions: jest.fn().mockResolvedValue(undefined),
+      insertRole: jest.fn(() => {
+        calls.push('insertRole');
+
+        return Promise.resolve({ outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: '7' });
+      }),
+      insertRolePermissions: jest.fn(() => {
+        calls.push('insertRolePermissions');
+
+        return Promise.resolve();
+      }),
     };
     transaction = {
-      afterCommit: jest.fn(),
       run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+        calls.push('begin');
 
         const result = await work();
 
-        outcomes.push('commit');
+        calls.push('commit');
 
         return result;
       }),
@@ -61,7 +66,7 @@ describe('RoleCreateUseCase', () => {
       { roleId: '7', code: 'ledger:read' },
       { roleId: '7', code: 'order:read' },
     ]);
-    expect(outcomes).toEqual(['begin', 'commit']);
+    expect(calls).toEqual(['begin', 'insertRole', 'insertRolePermissions', 'commit']);
     expect(logger.info).toHaveBeenCalledWith({ id: '7' }, 'Role created');
   });
 
@@ -83,7 +88,8 @@ describe('RoleCreateUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN,
       message: 'Role name admin is already taken',
     });
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
+    expect(repository.insertRolePermissions).not.toHaveBeenCalled();
   });
 
   it('rethrows any other error of the repository', async () => {
@@ -104,7 +110,7 @@ describe('RoleCreateUseCase', () => {
     });
 
     await expect(create).rejects.toThrow('deadlock');
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
     expect(logger.info).not.toHaveBeenCalled();
   });
 });

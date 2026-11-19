@@ -6,7 +6,7 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { ProductCoreArchiveUseCase } from '../product-core-archive.use-case';
 
 describe('ProductCoreArchiveUseCase', () => {
-  let outcomes: string[];
+  let calls: string[];
   let hooks: (() => Promise<void>)[];
   let lockById: jest.Mock;
   let update: jest.Mock;
@@ -19,29 +19,51 @@ describe('ProductCoreArchiveUseCase', () => {
   let useCase: ProductCoreArchiveUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     hooks = [];
-    lockById = jest.fn().mockResolvedValue({
-      id: '12',
-      sku: 'SKU-0001',
-      status: ProductStatusEnum.ACTIVE,
-      version: 3,
-      updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+    lockById = jest.fn(() => {
+      calls.push('lockById');
+
+      return Promise.resolve({
+        id: '12',
+        sku: 'SKU-0001',
+        status: ProductStatusEnum.ACTIVE,
+        version: 3,
+        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+      });
     });
-    update = jest.fn(() => Promise.resolve(void outcomes.push('update')));
-    findById = jest.fn().mockResolvedValue({
-      id: '12',
-      sku: 'SKU-0001',
-      status: ProductStatusEnum.ARCHIVED,
-      version: 4,
-      updatedAt: new Date('2026-01-05T08:00:00.000Z'),
+    update = jest.fn(() => {
+      calls.push('update');
+
+      return Promise.resolve();
     });
-    recordArchived = jest.fn(() => Promise.resolve(void outcomes.push('record')));
-    invalidate = jest.fn(() => Promise.resolve(void outcomes.push('invalidate')));
+    findById = jest.fn(() => {
+      calls.push('findById');
+
+      return Promise.resolve({
+        id: '12',
+        sku: 'SKU-0001',
+        status: ProductStatusEnum.ARCHIVED,
+        version: 4,
+        updatedAt: new Date('2026-01-05T08:00:00.000Z'),
+      });
+    });
+    recordArchived = jest.fn(() => {
+      calls.push('recordArchived');
+
+      return Promise.resolve();
+    });
+    invalidate = jest.fn(() => {
+      calls.push('invalidate');
+
+      return Promise.resolve();
+    });
     run = jest.fn(async (work: () => Promise<unknown>) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       for (const hook of hooks) {
         await hook();
@@ -78,8 +100,15 @@ describe('ProductCoreArchiveUseCase', () => {
     it('drops the cached catalog and records the archive at the time of the update only after the commit', async () => {
       await useCase.execute({ productId: '12', expectedVersion: undefined });
 
-      expect(outcomes).toEqual(['update', 'commit', 'invalidate', 'record']);
-      expect(update.mock.invocationCallOrder[0]).toBeLessThan(findById.mock.invocationCallOrder[0]);
+      expect(calls).toEqual([
+        'begin',
+        'lockById',
+        'update',
+        'findById',
+        'commit',
+        'invalidate',
+        'recordArchived',
+      ]);
       expect(findById).toHaveBeenCalledWith('12');
       expect(recordArchived).toHaveBeenCalledWith({
         subjectId: '12',

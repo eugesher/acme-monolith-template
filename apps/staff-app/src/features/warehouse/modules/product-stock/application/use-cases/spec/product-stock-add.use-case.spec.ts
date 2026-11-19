@@ -5,6 +5,7 @@ import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { ProductStockAddUseCase } from '../product-stock-add.use-case';
 
 describe('ProductStockAddUseCase', () => {
+  let calls: string[];
   let findById: jest.Mock;
   let lock: jest.Mock;
   let add: jest.Mock;
@@ -17,14 +18,51 @@ describe('ProductStockAddUseCase', () => {
   let useCase: ProductStockAddUseCase;
 
   beforeEach(() => {
-    findById = jest.fn().mockResolvedValue({ id: '12', sku: 'SKU-0001' });
-    lock = jest.fn().mockResolvedValue(undefined);
-    add = jest.fn().mockResolvedValue({ productStockId: '700', quantity: 15 });
-    claim = jest.fn().mockResolvedValue({ outcome: 'claimed' });
-    complete = jest.fn().mockResolvedValue(undefined);
-    release = jest.fn().mockResolvedValue(undefined);
-    recordAdded = jest.fn().mockResolvedValue(undefined);
-    run = jest.fn().mockImplementation((work: () => Promise<unknown>) => work());
+    calls = [];
+    findById = jest.fn(() => {
+      calls.push('findById');
+
+      return Promise.resolve({ id: '12', sku: 'SKU-0001' });
+    });
+    lock = jest.fn(() => {
+      calls.push('lock');
+
+      return Promise.resolve();
+    });
+    add = jest.fn(() => {
+      calls.push('add');
+
+      return Promise.resolve({ productStockId: '700', quantity: 15 });
+    });
+    claim = jest.fn(() => {
+      calls.push('claim');
+
+      return Promise.resolve({ outcome: 'claimed' });
+    });
+    complete = jest.fn(() => {
+      calls.push('complete');
+
+      return Promise.resolve();
+    });
+    release = jest.fn(() => {
+      calls.push('release');
+
+      return Promise.resolve();
+    });
+    recordAdded = jest.fn(() => {
+      calls.push('recordAdded');
+
+      return Promise.resolve();
+    });
+    run = jest.fn(async (work: () => Promise<unknown>) => {
+      calls.push('begin');
+
+      const result = await work();
+
+      calls.push('commit');
+
+      return result;
+    });
     logger = makePinoLoggerMock();
     useCase = new ProductStockAddUseCase(
       { findById },
@@ -52,7 +90,6 @@ describe('ProductStockAddUseCase', () => {
       });
       expect(lock).toHaveBeenCalledWith({ productId: '12' });
       expect(findById).toHaveBeenCalledWith('12');
-      expect(lock.mock.invocationCallOrder[0]).toBeLessThan(findById.mock.invocationCallOrder[0]);
       expect(add).toHaveBeenCalledWith({ productId: '12', quantity: 5 });
       expect(view).toEqual({ productId: '12', quantity: 15 });
       expect(complete).toHaveBeenCalledWith({
@@ -60,8 +97,16 @@ describe('ProductStockAddUseCase', () => {
         key: 'key-1',
         response: view,
       });
-      expect(run).toHaveBeenCalledTimes(1);
-      expect(release).not.toHaveBeenCalled();
+      expect(calls).toEqual([
+        'claim',
+        'begin',
+        'lock',
+        'findById',
+        'add',
+        'complete',
+        'commit',
+        'recordAdded',
+      ]);
     });
 
     it('records the restock under the stock row in the ledger after the commit and logs it', async () => {
@@ -77,7 +122,7 @@ describe('ProductStockAddUseCase', () => {
         subjectId: '12',
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
-      expect(run.mock.invocationCallOrder[0]).toBeLessThan(recordAdded.mock.invocationCallOrder[0]);
+      expect(calls.slice(calls.indexOf('commit'))).toEqual(['commit', 'recordAdded']);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '700', productId: '12', quantity: 5 },
         'Product restocked',
