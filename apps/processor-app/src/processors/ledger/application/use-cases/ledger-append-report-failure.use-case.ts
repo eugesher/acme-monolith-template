@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
+import { JobFailureHelper } from '@acme-libs/toolkit';
+
 import type { ILedgerAppendReportFailureCommand } from '../interfaces';
 
 @Injectable()
@@ -13,18 +15,13 @@ export class LedgerAppendReportFailureUseCase {
   public execute(command: ILedgerAppendReportFailureCommand): void {
     const { operationKey, attempt, attempts, error } = command;
 
-    if (attempt < attempts) {
-      this.logger.warn(
-        { err: error, operationKey, attempt, attempts },
-        'Ledger record failed, Bull retries the job',
-      );
-
-      return;
-    }
-
-    this.logger.error(
-      { err: error, operationKey, attempt, attempts },
-      'Ledger record failed permanently: the job stays in the failed set of the queue, replay it',
-    );
+    JobFailureHelper.report({
+      logger: this.logger,
+      label: 'Ledger record',
+      context: { operationKey },
+      attempt,
+      attempts,
+      error,
+    });
   }
 }

@@ -7,6 +7,8 @@ export * from './pagination/interfaces/snapshots/page.interface';
 export * from './pagination/pagination.helper';
 export * from './resilience/deadline.helper';
 export * from './resilience/deadline.options';
+export * from './resilience/job-failure.helper';
+export * from './resilience/job-failure.options';
 export * from './resilience/replay-retry.helper';
 export * from './resilience/replay-retry.options';
 export * from './result/result.helper';
