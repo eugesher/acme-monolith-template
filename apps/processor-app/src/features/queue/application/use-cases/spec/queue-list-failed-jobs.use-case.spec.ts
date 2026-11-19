@@ -39,7 +39,7 @@ describe('QueueListFailedJobsUseCase', () => {
     });
 
     it('starts at the first page of 20 jobs by default', async () => {
-      await useCase.execute({ queueName: 'ledger-record' });
+      await useCase.execute({ queueName: 'ledger-record', page: undefined, limit: undefined });
 
       expect(findFailedJobs).toHaveBeenCalledWith({
         queueName: 'ledger-record',
@@ -51,7 +51,9 @@ describe('QueueListFailedJobsUseCase', () => {
     it('refuses an unknown queue with QUEUE_NOT_FOUND', async () => {
       has.mockReturnValue(false);
 
-      await expect(useCase.execute({ queueName: 'unknown' })).rejects.toMatchObject({
+      await expect(
+        useCase.execute({ queueName: 'unknown', page: undefined, limit: undefined }),
+      ).rejects.toMatchObject({
         code: 'QUEUE_NOT_FOUND',
       });
       expect(findFailedJobs).not.toHaveBeenCalled();

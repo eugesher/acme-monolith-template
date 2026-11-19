@@ -73,8 +73,9 @@ export class NoteController {
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NoteResponseDto> {
     const { subjectType, subjectId, body } = request;
+    const { id: authorId } = user;
 
-    return await this.create.execute({ subjectType, subjectId, body, authorId: user.id });
+    return await this.create.execute({ subjectType, subjectId, body, authorId });
   }
 
   @Get()
@@ -86,15 +87,9 @@ export class NoteController {
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NotePageResponseDto> {
     const { page, limit, subjectType, subjectId, resolved } = query;
+    const { id: authorId } = user;
 
-    return await this.getMany.execute({
-      page,
-      limit,
-      subjectType,
-      subjectId,
-      resolved,
-      authorId: user.id,
-    });
+    return await this.getMany.execute({ page, limit, subjectType, subjectId, resolved, authorId });
   }
 
   @Get(':noteId')
@@ -106,8 +101,9 @@ export class NoteController {
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
+    const { id: authorId } = user;
 
-    return await this.getOne.execute({ noteId, authorId: user.id });
+    return await this.getOne.execute({ noteId, authorId });
   }
 
   @Patch(':noteId')
@@ -132,8 +128,9 @@ export class NoteController {
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
     const { body } = request;
+    const { id: editorId } = user;
 
-    return await this.edit.execute({ noteId, body, editorId: user.id, expectedVersion });
+    return await this.edit.execute({ noteId, body, editorId, expectedVersion });
   }
 
   @Post(':noteId/resolve')
@@ -154,8 +151,9 @@ export class NoteController {
     @IfMatch() expectedVersion: Maybe<number>,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
+    const { id: authorId } = user;
 
-    return await this.resolve.execute({ noteId, authorId: user.id, expectedVersion });
+    return await this.resolve.execute({ noteId, authorId, expectedVersion });
   }
 
   @Get(':noteId/revisions')
@@ -169,8 +167,9 @@ export class NoteController {
   ): Promise<NoteRevisionPageResponseDto> {
     const { noteId } = params;
     const { page, limit } = query;
+    const { id: authorId } = user;
 
-    return await this.getRevisions.execute({ noteId, authorId: user.id, page, limit });
+    return await this.getRevisions.execute({ noteId, authorId, page, limit });
   }
 
   @Delete(':noteId')
@@ -183,7 +182,8 @@ export class NoteController {
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<void> {
     const { noteId } = params;
+    const { id: authorId } = user;
 
-    await this.remove.execute({ noteId, authorId: user.id });
+    await this.remove.execute({ noteId, authorId });
   }
 }

@@ -39,7 +39,9 @@ export class AuthController {
   public async handleRegister(
     @Body() body: AuthRegisterRequestDto,
   ): Promise<AuthRegisterResponseDto> {
-    return await this.register.execute(body);
+    const { email, password } = body;
+
+    return await this.register.execute({ email, password });
   }
 
   @Post('login')
@@ -54,7 +56,9 @@ export class AuthController {
     IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
   )
   public async handleLogin(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
-    return await this.login.execute(body);
+    const { email, password } = body;
+
+    return await this.login.execute({ email, password });
   }
 
   @Get('me')

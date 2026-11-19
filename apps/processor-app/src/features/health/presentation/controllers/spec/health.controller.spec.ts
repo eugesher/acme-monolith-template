@@ -20,7 +20,7 @@ describe('HealthController', () => {
   it('answers liveness with the view of the use case', () => {
     liveness.mockReturnValue({ status: 'ok', app: 'processor-app', uptimeSeconds: 7 });
 
-    const body = controller.live();
+    const body = controller.handleLiveness();
 
     expect(body).toEqual({ status: 'ok', app: 'processor-app', uptimeSeconds: 7 });
   });
@@ -35,7 +35,7 @@ describe('HealthController', () => {
       },
     });
 
-    const body = await controller.ready(response);
+    const body = await controller.handleReadiness(response);
 
     expect(body).toEqual({
       status: 'ready',
@@ -58,7 +58,7 @@ describe('HealthController', () => {
       },
     });
 
-    const body = await controller.ready(response);
+    const body = await controller.handleReadiness(response);
 
     expect(body).toEqual({
       status: 'not-ready',

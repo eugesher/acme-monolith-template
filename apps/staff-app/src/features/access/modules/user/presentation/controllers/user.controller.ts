@@ -36,7 +36,9 @@ export class UserController {
     IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
   )
   public async handleRegister(@Body() body: UserRegisterRequestDto): Promise<UserResponseDto> {
-    return await this.register.execute(body);
+    const { email, password, roleIds } = body;
+
+    return await this.register.execute({ email, password, roleIds });
   }
 
   @Put(':userId/roles')

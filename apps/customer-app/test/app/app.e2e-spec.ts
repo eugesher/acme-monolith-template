@@ -37,8 +37,8 @@ describe('App', () => {
   );
 
   describe('Health', () => {
-    healthE2E.live();
-    healthE2E.ready();
+    healthE2E.handleLiveness();
+    healthE2E.handleReadiness();
   });
 
   describe('Auth', () => {

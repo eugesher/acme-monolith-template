@@ -24,7 +24,7 @@ export class HealthController {
   @Get()
   @ApiOperation({ summary: 'Liveness: is the process running?' })
   @ApiOkResponse({ type: HealthLivenessResponseDto })
-  public live(): HealthLivenessResponseDto {
+  public handleLiveness(): HealthLivenessResponseDto {
     return this.liveness.execute();
   }
 
@@ -32,7 +32,7 @@ export class HealthController {
   @ApiOperation({ summary: 'Readiness: can the process serve traffic right now?' })
   @ApiOkResponse({ type: HealthReadinessResponseDto })
   @ApiServiceUnavailableResponse({ type: HealthReadinessResponseDto })
-  public async ready(
+  public async handleReadiness(
     @Res({ passthrough: true }) response: { status(code: HttpStatus): unknown },
   ): Promise<HealthReadinessResponseDto> {
     const readinessView = await this.readiness.execute();
