@@ -291,6 +291,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
           ],
         },
       ],
+      "limit": 10,
       "page": 1,
       "pageCount": 1,
       "total": 1,

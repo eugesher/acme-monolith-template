@@ -10,7 +10,7 @@ describe('AuthGlobalSubjectCoreAdapter', () => {
   });
 
   describe('findSubject', () => {
-    it('answers the subject the core staff auth module finds for the user', async () => {
+    it('answers the id, the email and the permission codes of the subject the core finds', async () => {
       handleFindSubject.mockResolvedValue({
         id: 'user-1',
         email: 'ann@example.com',
@@ -23,10 +23,17 @@ describe('AuthGlobalSubjectCoreAdapter', () => {
       expect(subject).toEqual({
         id: 'user-1',
         email: 'ann@example.com',
-        roles: ['admin'],
         permissionCodes: ['ledger:read'],
       });
       expect(handleFindSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+    });
+
+    it('answers no subject when the core finds no active staff user', async () => {
+      handleFindSubject.mockResolvedValue(null);
+
+      const subject = await adapter.findSubject({ userId: 'user-1' });
+
+      expect(subject).toBeNull();
     });
   });
 });

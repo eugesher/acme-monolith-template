@@ -27,6 +27,7 @@ describe('OrderGetManyUseCase', () => {
       expect(findOrderIds).not.toHaveBeenCalled();
       expect(page).toEqual({
         page: 1,
+        limit: 20,
         count: 1,
         pageCount: 1,
         total: 1,
@@ -53,7 +54,7 @@ describe('OrderGetManyUseCase', () => {
       const page = await useCase.execute({ page: undefined, limit: undefined, tagId: '302' });
 
       expect(list).not.toHaveBeenCalled();
-      expect(page).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
+      expect(page).toEqual({ page: 1, limit: 20, count: 0, pageCount: 0, total: 0, data: [] });
     });
   });
 });

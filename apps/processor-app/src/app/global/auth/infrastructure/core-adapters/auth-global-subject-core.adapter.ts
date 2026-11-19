@@ -26,7 +26,14 @@ export class AuthGlobalSubjectCoreAdapter implements IAuthGlobalSubjectPort {
     command: IAuthGlobalSubjectFindSubjectCommand,
   ): Promise<Nullable<IAuthGlobalSubjectView>> {
     const { userId } = command;
+    const subject = await this.staffAuthCore.handleFindSubject({ userId });
 
-    return await this.staffAuthCore.handleFindSubject({ userId });
+    if (!subject) {
+      return null;
+    }
+
+    const { id, email, permissionCodes } = subject;
+
+    return { id, email, permissionCodes };
   }
 }

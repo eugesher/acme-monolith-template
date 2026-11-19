@@ -139,7 +139,8 @@ for one row the use case calls `Model.reconstitute(record)` and answers `toSnaps
 model of its own, `<Context>GetManyModel`, whose static `toViewData(records)` rebuilds every row and
 answers the snapshots (`TagGetManyModel`): the domain defines the listed item, and the use case only
 puts the snapshots on the page. A module that only reads has a domain for that alone:
-`LedgerListEntriesModel` in `apps/staff-app/src/features/ledger`, `ProductStockCoreOnHandModel` in
+`LedgerListEntriesModel` in `apps/staff-app/src/features/ledger`, `CatalogProductListModel` in
+`apps/customer-app/src/features/catalog`, `ProductStockCoreOnHandModel` in
 `core/modules/src/product-stock`.
 
 **A read model is a plain class unless it is a model of an aggregate.** A model with the columns of

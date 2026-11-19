@@ -20,6 +20,7 @@ describe('CatalogController', () => {
 
       expect(response).toEqual({
         page: 2,
+        limit: 10,
         count: 1,
         pageCount: 1,
         total: 1,

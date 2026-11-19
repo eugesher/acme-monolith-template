@@ -21,8 +21,10 @@ every facade method calls a use case, and the use case reaches the data through 
 
 The staff subject lives in the core module `core/modules/src/staff-auth`: two apps ask for it, and
 staff-app asks twice, from the guard and from `GET /auth/me`. One query reads the user, its roles
-and the codes of their permissions; the global module keeps the id, the email and the codes. The
-customer check has one caller, so it lives in customer-app.
+and the codes of their permissions; `AuthGlobalSubjectCoreAdapter` keeps the id, the email and the
+codes, so the roles never reach `request.user` and the use case answers what its port answers. The
+customer check has one caller, so it lives in customer-app; its repository selects the id and the
+email, and a global module has no domain to rebuild them in.
 
 The global module also imports the lib modules, so mounting `AuthGlobalModule` in `AppModule` is the
 whole wiring.

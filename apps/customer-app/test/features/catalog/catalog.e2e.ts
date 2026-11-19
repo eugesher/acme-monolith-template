@@ -62,6 +62,7 @@ export class CatalogE2E {
           'acme:catalog:v1:page:1:limit:20',
           JSON.stringify({
             page: 1,
+            limit: 20,
             count: 1,
             pageCount: 1,
             total: 1,

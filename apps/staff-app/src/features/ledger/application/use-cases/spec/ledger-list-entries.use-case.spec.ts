@@ -98,6 +98,7 @@ describe('LedgerListEntriesUseCase', () => {
 
       expect(page).toEqual({
         page: 1,
+        limit: 20,
         count: 1,
         pageCount: 1,
         total: 1,

@@ -9,6 +9,9 @@ export const PageResponseType = <TItem>(item: Type<TItem>): Type<IPage<TItem>> =
     public page: number;
 
     @ApiResponseProperty({ example: 20 })
+    public limit: number;
+
+    @ApiResponseProperty({ example: 20 })
     public count: number;
 
     @ApiResponseProperty({ example: 3 })

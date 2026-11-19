@@ -36,6 +36,7 @@ describe('NoteGetRevisionsUseCase', () => {
       expect(listForNote).toHaveBeenCalledWith({ limit: 5, offset: 5, noteId: '7' });
       expect(page).toEqual({
         page: 2,
+        limit: 5,
         count: 1,
         pageCount: 1,
         total: 1,

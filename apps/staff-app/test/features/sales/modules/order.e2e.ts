@@ -48,7 +48,14 @@ export class OrderE2E {
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 
-        expect(response.body).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
+        expect(response.body).toEqual({
+          page: 1,
+          limit: 20,
+          count: 0,
+          pageCount: 0,
+          total: 0,
+          data: [],
+        });
       });
 
       it('should refuse a malformed tag id with 400 from validation', async () => {

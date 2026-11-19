@@ -21,7 +21,7 @@ describe('PageResponseType', () => {
       'data',
     );
 
-    expect(properties).toEqual([':page', ':count', ':pageCount', ':total', ':data']);
+    expect(properties).toEqual([':page', ':limit', ':count', ':pageCount', ':total', ':data']);
     expect(data).toMatchObject({ type: ItemResponseDto, isArray: true, readOnly: true });
   });
 });

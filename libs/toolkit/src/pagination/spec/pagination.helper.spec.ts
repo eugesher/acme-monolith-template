@@ -60,13 +60,20 @@ describe('PaginationHelper', () => {
     it('answers the page with the rows on it, the number of pages and the total', () => {
       const page = PaginationHelper.toPage({ data: ['a', 'b'], page: 3, limit: 20, total: 42 });
 
-      expect(page).toEqual({ page: 3, count: 2, pageCount: 3, total: 42, data: ['a', 'b'] });
+      expect(page).toEqual({
+        page: 3,
+        limit: 20,
+        count: 2,
+        pageCount: 3,
+        total: 42,
+        data: ['a', 'b'],
+      });
     });
 
     it('counts no pages for no rows', () => {
       const page = PaginationHelper.toPage({ data: [], page: 1, limit: 20, total: 0 });
 
-      expect(page).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
+      expect(page).toEqual({ page: 1, limit: 20, count: 0, pageCount: 0, total: 0, data: [] });
     });
   });
 });

@@ -19,8 +19,7 @@ export class AuthGlobalValidateSubjectUseCase {
     command: IAuthGlobalValidateSubjectCommand,
   ): Promise<Nullable<IAuthGlobalValidateSubjectView>> {
     const { userId } = command;
-    const user = await this.subject.findSubject({ userId });
 
-    return user ? { id: user.id, email: user.email, permissionCodes: user.permissionCodes } : null;
+    return await this.subject.findSubject({ userId });
   }
 }
