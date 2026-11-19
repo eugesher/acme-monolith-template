@@ -1,6 +1,6 @@
-name: 02-without-access-management
+name: 02-without-access-manage
 description: |-
-  e2e: Access › Permission › GET /api/access/permissions › should refuse a caller without access-management
+  e2e: Access › Permission › GET /api/access/permissions › should refuse a caller without access:manage
 
   Expect: 403 Forbidden, Insufficient permissions
   User: viewer@example.com (token signed by scripts.py)

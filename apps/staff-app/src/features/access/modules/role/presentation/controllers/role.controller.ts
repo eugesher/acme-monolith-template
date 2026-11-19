@@ -29,7 +29,7 @@ export class RoleController {
   ) {}
 
   @Get()
-  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
+  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'List roles and the permissions they grant' })
   @ApiOkResponse({ type: RoleResponseDto, isArray: true })
   public async handleList(): Promise<RoleResponseDto[]> {
@@ -37,7 +37,7 @@ export class RoleController {
   }
 
   @Post()
-  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
+  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Create a role with its permissions' })
   @ApiCreatedResponse({ type: RoleResponseDto })
   @ApiErrorResponses(RoleHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN)
@@ -48,7 +48,7 @@ export class RoleController {
   }
 
   @Put(':roleId/permissions')
-  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
+  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Reassign the permission set of a role' })
   @ApiOkResponse({ type: RoleResponseDto })
   @ApiErrorResponses(RoleHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND)

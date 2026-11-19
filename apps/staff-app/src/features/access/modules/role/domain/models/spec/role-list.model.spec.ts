@@ -11,13 +11,13 @@ describe('RoleListModel', () => {
           name: 'admin',
           rolePermissions: [
             { code: PermissionCodeEnum.LEDGER_READ },
-            { code: PermissionCodeEnum.ACCESS_MANAGEMENT },
+            { code: PermissionCodeEnum.ACCESS_MANAGE },
           ],
         },
       ]);
 
       expect(data).toEqual([
-        { id: '1', name: 'admin', permissionCodes: ['access-management', 'ledger:read'] },
+        { id: '1', name: 'admin', permissionCodes: ['access:manage', 'ledger:read'] },
       ]);
     });
 

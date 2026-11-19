@@ -113,7 +113,7 @@ export class AuthE2E {
         const forged = this.ctx.jwt.sign({
           sub: '3',
           roles: ['admin'],
-          permissions: ['access-management'],
+          permissions: ['access:manage'],
         });
 
         const response = await request(this.ctx.app.getHttpServer())

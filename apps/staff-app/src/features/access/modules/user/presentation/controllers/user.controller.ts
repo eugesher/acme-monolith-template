@@ -25,7 +25,7 @@ export class UserController {
   ) {}
 
   @Post()
-  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
+  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Create a principal' })
   @ApiCreatedResponse({ type: UserResponseDto })
   @ApiErrorResponses(
@@ -42,7 +42,7 @@ export class UserController {
   }
 
   @Put(':userId/roles')
-  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
+  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Reassign the roles of a principal' })
   @ApiOkResponse({ type: UserRolesResponseDto })
   @ApiErrorResponses(

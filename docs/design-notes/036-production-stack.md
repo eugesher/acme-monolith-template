@@ -93,8 +93,8 @@ until its origin is listed (see `037-http-edge.md`).
 `scripts/node/admin-create.ts` runs once from the `migrations` image, after the migrations:
 
 - it reads `ADMIN_EMAIL` and `ADMIN_PASSWORD`, of 12 characters or more, from `env/migrations/.env`;
-- it creates the user and the `admin` role with the `access-management` permission only, so the
-  first account can grant access and nothing else until it gives itself more;
+- it creates the user and the `admin` role with the `access:manage` permission only, so the first
+  account can grant access and nothing else until it gives itself more;
 - it writes in one transaction, so an email already taken fails without changes.
 
 The two variables are removed from the file afterwards. The script hashes the password with

@@ -197,7 +197,7 @@ and Redis are published only on `127.0.0.1`, like Jaeger, whose traces are at
 <http://127.0.0.1:16686>.
 
 Create the first administrator once, after the migrations have run. The command creates the user and
-the `admin` role with the `access-management` permission, and fails without changes if the email is
+the `admin` role with the `access:manage` permission, and fails without changes if the email is
 taken. Add `ADMIN_EMAIL` and `ADMIN_PASSWORD`, of 12 characters or more, to `env/migrations/.env`,
 and run:
 

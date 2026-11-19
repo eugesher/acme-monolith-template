@@ -35,7 +35,7 @@ def as_viewer(posting) -> None:
 
 
 def as_viewer_forged_claims(posting) -> None:
-    sign(posting, {"sub": VIEWER_ID, "roles": ["admin"], "permissions": ["access-management"]})
+    sign(posting, {"sub": VIEWER_ID, "roles": ["admin"], "permissions": ["access:manage"]})
 
 
 def as_disabled(posting) -> None:

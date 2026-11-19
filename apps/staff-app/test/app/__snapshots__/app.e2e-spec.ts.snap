@@ -6,7 +6,7 @@ exports[`App Access Permission GET /api/access/permissions should list every per
     "body": {
       "codes": [
         "ledger:read",
-        "access-management",
+        "access:manage",
         "product:read",
         "product:write",
         "product:archive",
@@ -24,7 +24,7 @@ exports[`App Access Permission GET /api/access/permissions should list every per
 }
 `;
 
-exports[`App Access Permission GET /api/access/permissions should refuse a caller without access-management 1`] = `
+exports[`App Access Permission GET /api/access/permissions should refuse a caller without access:manage 1`] = `
 {
   "response": {
     "body": {
@@ -45,7 +45,7 @@ exports[`App Access Role GET /api/access/roles should list the roles with their 
         "id": "1",
         "name": "admin",
         "permissionCodes": [
-          "access-management",
+          "access:manage",
           "ledger:read",
           "order:read",
           "order:write",
@@ -91,7 +91,7 @@ exports[`App Access Role GET /api/access/roles should list the roles with their 
 }
 `;
 
-exports[`App Access Role GET /api/access/roles should refuse a caller without access-management 1`] = `
+exports[`App Access Role GET /api/access/roles should refuse a caller without access:manage 1`] = `
 {
   "response": {
     "body": {
@@ -154,7 +154,7 @@ exports[`App Access Role POST /api/access/roles should create a role with its pe
 }
 `;
 
-exports[`App Access Role POST /api/access/roles should refuse a caller without access-management 1`] = `
+exports[`App Access Role POST /api/access/roles should refuse a caller without access:manage 1`] = `
 {
   "response": {
     "body": {
@@ -177,7 +177,7 @@ exports[`App Access Role POST /api/access/roles should refuse a missing permissi
           {
             "field": "permissionCodes",
             "messages": [
-              "each value in permissionCodes must be one of the following values: ledger:read, access-management, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
+              "each value in permissionCodes must be one of the following values: ledger:read, access:manage, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
               "permissionCodes must be an array",
             ],
           },
@@ -281,7 +281,7 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should refuse
           {
             "field": "permissionCodes",
             "messages": [
-              "each value in permissionCodes must be one of the following values: ledger:read, access-management, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
+              "each value in permissionCodes must be one of the following values: ledger:read, access:manage, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
             ],
           },
         ],

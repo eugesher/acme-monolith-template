@@ -25,7 +25,7 @@ interface IInsertResult {
 }
 
 const ROLE_NAME = 'admin';
-const PERMISSION_CODE = 'access-management';
+const PERMISSION_CODE = 'access:manage';
 
 const readEnv = (): IAdminEnv => {
   dotenv.config({

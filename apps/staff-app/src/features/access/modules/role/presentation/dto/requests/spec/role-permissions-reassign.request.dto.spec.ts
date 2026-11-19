@@ -14,7 +14,7 @@ describe('RolePermissionsReassignRequestDto', () => {
 
   it('accepts known permission codes', () => {
     const dto = plainToInstance(RolePermissionsReassignRequestDto, {
-      permissionCodes: ['access-management', 'ledger:read'],
+      permissionCodes: ['access:manage', 'ledger:read'],
     });
 
     const errors = validateSync(dto);
@@ -23,8 +23,8 @@ describe('RolePermissionsReassignRequestDto', () => {
   });
 
   it.each([
-    ['an unknown code', { permissionCodes: ['access-management', 'does-not:exist'] }, 'isEnum'],
-    ['codes that are not a list', { permissionCodes: 'access-management' }, 'isArray'],
+    ['an unknown code', { permissionCodes: ['access:manage', 'does-not:exist'] }, 'isEnum'],
+    ['codes that are not a list', { permissionCodes: 'access:manage' }, 'isArray'],
   ])('rejects %s', (_case, body, constraint) => {
     const dto = plainToInstance(RolePermissionsReassignRequestDto, body);
 
