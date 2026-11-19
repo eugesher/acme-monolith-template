@@ -9,7 +9,6 @@ AUDIENCE = "customer"
 OTHER_AUDIENCE = "staff"
 ENV_DIR = Path(__file__).resolve().parents[2] / "env" / "apps"
 ENV_FILE = ENV_DIR / "customer-app" / ".env"
-STAFF_ENV_FILE = ENV_DIR / "staff-app" / ".env"
 ANN_ID = "101"
 BOB_ID = "102"
 CAROL_ID = "103"
@@ -40,10 +39,6 @@ def as_dora(posting) -> None:
 
 def as_staff_user(posting) -> None:
     sign(posting, {"sub": STAFF_EDITOR_ID})
-
-
-def as_ann_with_staff_secret(posting) -> None:
-    sign(posting, {"sub": ANN_ID}, STAFF_ENV_FILE)
 
 
 def as_ann_for_staff_audience(posting) -> None:

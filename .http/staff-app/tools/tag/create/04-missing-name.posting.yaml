@@ -1,0 +1,20 @@
+name: 04-missing-name
+description: |-
+  e2e: Tools › Tag › POST /api/tools/tags › should refuse a missing name with 400 from validation
+
+  Expect: 400 Bad Request, code VALIDATION_FAILED, field name
+  User: editor@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/tools/tags
+body:
+  content: |-
+    {}
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

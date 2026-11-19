@@ -9,7 +9,7 @@ url: $STAFF_APP_BASE_URL/catalog/products/101
 body:
   content: |-
     {
-      "name": "Malformed rename"
+      "name": "Malformed update"
     }
 auth:
   type: bearer_token

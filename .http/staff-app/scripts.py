@@ -9,7 +9,6 @@ AUDIENCE = "staff"
 OTHER_AUDIENCE = "customer"
 ENV_DIR = Path(__file__).resolve().parents[2] / "env" / "apps"
 ENV_FILE = ENV_DIR / "staff-app" / ".env"
-CUSTOMER_ENV_FILE = ENV_DIR / "customer-app" / ".env"
 ADMIN_ID = "1"
 EDITOR_ID = "2"
 VIEWER_ID = "3"
@@ -44,10 +43,6 @@ def as_disabled(posting) -> None:
 
 def as_customer(posting) -> None:
     sign(posting, {"sub": CUSTOMER_ANN_ID})
-
-
-def as_editor_with_customer_secret(posting) -> None:
-    sign(posting, {"sub": EDITOR_ID}, CUSTOMER_ENV_FILE)
 
 
 def as_editor_for_customer_audience(posting) -> None:

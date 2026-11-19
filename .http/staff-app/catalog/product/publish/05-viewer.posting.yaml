@@ -1,10 +1,10 @@
 name: 05-viewer
 description: |-
-  e2e: Catalog › Product › PUT /api/catalog/products/:productId/publish › should refuse a publication by a viewer with 403
+  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish › should refuse a publication by a viewer with 403
 
   Expect: 403 Forbidden, product 102 unchanged
   User: viewer@example.com (token signed by scripts.py)
-method: PUT
+method: POST
 url: $STAFF_APP_BASE_URL/catalog/products/102/publish
 auth:
   type: bearer_token

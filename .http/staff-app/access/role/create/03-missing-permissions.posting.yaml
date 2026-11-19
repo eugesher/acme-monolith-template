@@ -2,7 +2,7 @@ name: 03-missing-permissions
 description: |-
   e2e: Access › Role › POST /api/access/roles › should refuse a missing permission list with 400
 
-  Expect: 400 Bad Request
+  Expect: 400 Bad Request, code VALIDATION_FAILED, field permissionCodes
   User: admin@example.com (token signed by scripts.py)
 method: POST
 url: $STAFF_APP_BASE_URL/access/roles

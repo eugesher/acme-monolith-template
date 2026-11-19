@@ -1,0 +1,22 @@
+name: 04-unknown-product
+description: |-
+  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags › should answer an unknown product with 404
+
+  Expect: 404 Not Found, code PRODUCT_NOT_FOUND
+  User: editor@example.com (token signed by scripts.py)
+method: PUT
+url: $STAFF_APP_BASE_URL/catalog/products/999/tags
+body:
+  content: |-
+    {
+      "tagIds": ["300"]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

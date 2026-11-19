@@ -1,0 +1,9 @@
+name: 03-live-replace-correlation-id
+description: |-
+  e2e: Health › GET /api/health › should replace an inbound correlation id that is not a UUID and warn on the root logger
+
+  Expect: 200 OK, response header x-correlation-id holds a new UUID instead of e2e-correlation-id; a warning on the root logger of the app
+url: $STAFF_APP_BASE_URL/health
+headers:
+  - name: x-correlation-id
+    value: e2e-correlation-id

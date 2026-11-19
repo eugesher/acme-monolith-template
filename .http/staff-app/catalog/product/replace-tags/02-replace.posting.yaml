@@ -1,0 +1,25 @@
+name: 02-replace
+description: |-
+  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags › should replace the tags the product had and clear them with an empty list
+
+  Expect: 200 OK, tag promo alone
+  User: editor@example.com (token signed by scripts.py)
+  Before: send this request with the body {"tagIds": ["300", "301"]}: 200 OK
+  After: SQL: DELETE FROM subject_tag WHERE subject_type = 'product' AND subject_id = 103
+  Note: the e2e then sends {"tagIds": []} and gets an empty list
+method: PUT
+url: $STAFF_APP_BASE_URL/catalog/products/103/tags
+body:
+  content: |-
+    {
+      "tagIds": ["301"]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

@@ -2,7 +2,7 @@ name: 02-malformed-page
 description: |-
   e2e: Ledger › GET /api/ledger › should refuse a malformed page with 400 from validation
 
-  Expect: 400 Bad Request, messages of page
+  Expect: 400 Bad Request, code VALIDATION_FAILED, field page
   User: viewer@example.com (token signed by scripts.py)
 url: $STAFF_APP_BASE_URL/ledger
 params:

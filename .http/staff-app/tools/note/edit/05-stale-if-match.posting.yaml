@@ -1,0 +1,24 @@
+name: 05-stale-if-match
+description: |-
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId › should refuse a stale If-Match with 412 and the current version and write nothing
+
+  Expect: 412 Precondition Failed, code VERSION_MISMATCH, details.currentVersion 1; note 204 and its revisions unchanged
+  User: admin@example.com (token signed by scripts.py)
+method: PATCH
+url: $STAFF_APP_BASE_URL/tools/notes/204
+body:
+  content: |-
+    {
+      "body": "Edited over a stale version."
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: If-Match
+    value: '7'
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin

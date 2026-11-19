@@ -9,7 +9,7 @@ url: $STAFF_APP_BASE_URL/catalog/products/103
 body:
   content: |-
     {
-      "name": "Viewer rename"
+      "name": "Viewer update"
     }
 auth:
   type: bearer_token

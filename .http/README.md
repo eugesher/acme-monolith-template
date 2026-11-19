@@ -21,21 +21,32 @@ the test can be found in `apps/<app>/test`.
 
 `app` holds the cases that check a route of the other app is not mounted.
 
-Nine e2e cases are not one request:
+Four e2e cases have no request:
 
-- the schema check of staff-app compares the migrated database with the entities and has no request;
-- the concurrent renames of a product send six requests at once,
+- the schema check of staff-app compares the migrated database with the entities;
+- the ledger case of staff-app enqueues one record twice through `LEDGER_CORE_PORT` inside the app;
+- the auth limit of each app sends logins from one address until the limit is spent and one more
+  from another address; `auth/login/02-wrong-password` sent more than `THROTTLE_AUTH_LIMIT` times
+  within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.
+
+A case that sends more than one request has the file of the request it checks, and its `Before:` or
+`Note:` says what else the e2e sends:
+
+- the concurrent updates of a product send five requests at once,
   `catalog/product/update/06-concurrent` sends one;
 - the replays of a restock and an order send the same request twice, as
   `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with
   two keys, as `customer-app/order/place/13-simultaneous` says;
 - two simultaneous registrations with one email send the same request twice at once, in
-  `customer-app/auth/register/03-simultaneous` and `staff-app/access/user/register/02-simultaneous`;
+  `customer-app/auth/register/03-simultaneous` and `staff-app/access/user/register/03-simultaneous`;
 - the sign-up of a customer goes on to log in and read `me` with the new credentials, as
   `auth/register/01-register` says;
 - the soft delete of a note goes on to read the note and its revisions, as
-  `staff-app/tools/note/delete/01-delete` says.
+  `staff-app/tools/note/delete/01-delete` says;
+- the replacement of the tags of an order or a product sets them, replaces them and clears them, as
+  `staff-app/sales/order/replace-tags/02-replace` and
+  `staff-app/catalog/product/replace-tags/02-replace` say.
 
 ## Environment
 
@@ -79,8 +90,6 @@ also covers tokens that no login issues:
 - the token of a disabled user (`as_disabled`, `as_dora`);
 - a token with forged role claims (`as_viewer_forged_claims`);
 - the token of a user of the other app (`as_customer`, `as_staff_user`);
-- a token signed with the `JWT_SECRET` of the other app (`as_editor_with_customer_secret`,
-  `as_ann_with_staff_secret`), which needs `.env` of both apps;
 - a token of a user of this app for the audience of the other app
   (`as_editor_for_customer_audience`, `as_ann_for_staff_audience`).
 
