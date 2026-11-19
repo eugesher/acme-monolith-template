@@ -27,19 +27,7 @@ export class TracerHelper {
     const sdk = new NodeSDK({ resource, traceExporter, instrumentations: [autoInstrumentations] });
 
     sdk.start();
-    process.once('SIGTERM', () => TracerHelper.shutdown(sdk));
-    process.once('SIGINT', () => TracerHelper.shutdown(sdk));
 
     return sdk;
-  }
-
-  private static shutdown(sdk: NodeSDK): void {
-    sdk
-      .shutdown()
-      .catch((error: unknown) => {
-        // eslint-disable-next-line no-console
-        console.error('OpenTelemetry shutdown error', error);
-      })
-      .finally(() => process.exit(0));
   }
 }

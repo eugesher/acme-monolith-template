@@ -133,6 +133,7 @@ export const acmeLibs = [
   fromLib('observability', [
     packages(
       '@nestjs/common',
+      '@nestjs/core',
       '@opentelemetry/api',
       '@opentelemetry/auto-instrumentations-node',
       '@opentelemetry/exporter-trace-otlp-http',

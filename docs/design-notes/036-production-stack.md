@@ -107,7 +107,9 @@ until the administrator changes the password.
 
 An app traces when its `.env` sets `OTEL_SDK_DISABLED=false`. The image starts Node with
 `--env-file-if-exists`, so the tracer, the first import of `main.ts`, sees that value before Nest
-loads the file (see `012-app-bootstrap.md`).
+loads the file (see `012-app-bootstrap.md`). When the app stops, `TracerSetupModule` exports the
+spans left once the queues have finished their jobs, so the spans of the last jobs reach the
+collector.
 
 `OTEL_EXPORTER_OTLP_ENDPOINT` is a base address, `http://otel-collector:4318`: the SDK appends
 `/v1/traces` itself, and a value with that path sends spans to `/v1/traces/v1/traces`.
