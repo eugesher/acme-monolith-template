@@ -10,16 +10,24 @@ A row with a `version` column is changed through a write service that retries a 
 | retry helper      | `OccRetryHelper` in `libs/toolkit/src/concurrency/occ-retry.helper.ts`                                                    |
 | `If-Match`        | `apps/staff-app/src/common/shared/concurrency/decorators/if-match.decorator.ts`                                           |
 
-The same pattern serves `NoteWriteService` in `apps/staff-app/src/features/tools/modules/note`.
+`NoteWriteService` in `apps/staff-app/src/features/tools/modules/note` has the same shape.
 
 ## One attempt
 
-`ProductWriteService.write(command, mutate)` is the only way to change a stored row. Every attempt:
+`ProductWriteService.write(command, reconstitute, mutate)` is the only way to change a stored row.
+Every attempt:
 
 1. loads the aggregate fresh through the access service;
 2. checks the `If-Match` version with `product.assertExpectedVersion(expectedVersion)`;
 3. applies `mutate` in memory;
 4. saves with `UPDATE … WHERE id = ? AND version = <as read>`.
+
+**The note takes the save from the use case.**
+`NoteWriteService.write(command, reconstitute, mutate, save)` runs the same attempt, and
+`save({ note, versionAsRead })` answers whether the row was updated: the resolve updates one row,
+the edit updates the note and appends its revision in one transaction (see
+`011-multi-table-transaction.md`). A product is always saved by one update, so its write service
+makes it itself.
 
 **A change to the current values changes nothing.** The model keeps the version, so the service does
 not touch the database, and a repeated request does not invalidate the `If-Match` version of
@@ -31,8 +39,17 @@ local to the module, the retry loop cannot swallow another module's conflict.
 
 **The budget comes from config** (`OCC_RETRY_ATTEMPTS` into a token of the module). A pinned
 `If-Match` collapses it to one attempt: retrying against a newer version would apply a change the
-client never saw. A spent budget is `VERSION_MISMATCH` (409) with `details.currentVersion`. A domain
-refusal is never retried.
+client never saw. A domain refusal is never retried.
+
+| Refusal                                                   | Code               | Status |
+| --------------------------------------------------------- | ------------------ | ------ |
+| a stale `If-Match`                                        | `VERSION_MISMATCH` | 412    |
+| a race lost at the one attempt of a pinned `If-Match`     | `VERSION_MISMATCH` | 412    |
+| a race lost at every attempt of the budget, no `If-Match` | `VERSION_CONFLICT` | 409    |
+
+Both carry `details.currentVersion`. A failed `If-Match` is a failed precondition: the client sends
+the request again only after it has read the new version. A spent budget is a conflict: the same
+request may succeed later.
 
 After a successful save the service reads the row again, so the answer carries the new `updatedAt`.
 
@@ -45,7 +62,8 @@ only for a read with an optimistic lock, and nothing reads that way: the version
 `3` and `"3"` both mean version 3; a missing or empty header means "no expectation". Anything that
 is not a non-negative integer, including a weak tag `W/"3"`, is refused with `IF_MATCH_INVALID`
 (400), so a typo cannot turn into an unconditional write. The decorator lives in `common/shared`,
-because only staff features read the header.
+because only staff features read the header: the update, publish and archive of a product, and the
+edit and resolve of a note.
 
 ## The change answers the ledger
 

@@ -38,9 +38,9 @@ A domain exception answers a `code` of its module and may add `details`, which `
 (see `003-authentication.md`).
 
 **A shared mechanism answers one code in every module.** A refused `Idempotency-Key` is
-`IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENT_REQUEST_IN_FLIGHT` and a lost optimistic write is
-`VERSION_MISMATCH`, whichever module refuses, so a client handles the mechanism once. The member
-keeps the prefix of its module,
+`IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENT_REQUEST_IN_FLIGHT`, a stale `If-Match` is `VERSION_MISMATCH`
+and a write that lost every retry is `VERSION_CONFLICT`, whichever module refuses, so a client
+handles the mechanism once. The member keeps the prefix of its module,
 `OrderExceptionCodeEnum.ORDER_IDEMPOTENCY_KEY_REUSED = 'IDEMPOTENCY_KEY_REUSED'`, because the enum
 is the list the filter of that module maps. The codes of the headers, `IDEMPOTENCY_KEY_REQUIRED`,
 `IDEMPOTENCY_KEY_INVALID` and `IF_MATCH_INVALID`, carry no prefix either.

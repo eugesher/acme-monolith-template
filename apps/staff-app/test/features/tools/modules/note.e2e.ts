@@ -180,13 +180,14 @@ export class NoteE2E {
 
   public handleEdit(): void {
     describe('PATCH /api/tools/notes/:noteId', () => {
-      it('should rewrite the body and record a revision under the correlation id', async () => {
+      it('should rewrite the body under a matching If-Match and record a revision under the correlation id', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query(
           'SELECT MAX(id) AS lastId FROM note_revision',
         );
 
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/tools/notes/200')
+          .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000018')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .send({ body: 'Customer called twice; refunded manually.' })
@@ -276,6 +277,25 @@ export class NoteE2E {
         }
       });
 
+      it('should refuse a stale If-Match with 412 and the current version and write nothing', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .patch('/api/tools/notes/204')
+          .set('If-Match', '7')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({ body: 'Edited over a stale version.' })
+          .expect(HttpStatus.PRECONDITION_FAILED);
+
+        expect({
+          response: { body: response.body },
+          db: {
+            note: await this.ctx.dataSource.query('SELECT * FROM note WHERE id = 204'),
+            note_revision: await this.ctx.dataSource.query(
+              'SELECT * FROM note_revision WHERE note_id = 204 ORDER BY id',
+            ),
+          },
+        }).toMatchSnapshot();
+      });
+
       it('should hide the note of another staff user with 404 and write nothing', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/tools/notes/204')
@@ -316,9 +336,10 @@ export class NoteE2E {
 
   public handleResolve(): void {
     describe('PATCH /api/tools/notes/:noteId/resolve', () => {
-      it('should resolve a note', async () => {
+      it('should resolve a note under a matching If-Match', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/tools/notes/201/resolve')
+          .set('If-Match', '1')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 
@@ -329,6 +350,19 @@ export class NoteE2E {
           response: { body: { updatedAt: expect.any(String) } },
           db: { note: [{ updated_at: expect.any(Date) }] },
         });
+      });
+
+      it('should refuse a stale If-Match with 412 and resolve nothing', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .patch('/api/tools/notes/204/resolve')
+          .set('If-Match', '7')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .expect(HttpStatus.PRECONDITION_FAILED);
+
+        expect({
+          response: { body: response.body },
+          db: { note: await this.ctx.dataSource.query('SELECT * FROM note WHERE id = 204') },
+        }).toMatchSnapshot();
       });
 
       it('should hide the note of another staff user with 404 and resolve nothing', async () => {

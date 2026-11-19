@@ -18,17 +18,19 @@ describe('NoteEditModel', () => {
       });
     });
 
-    it('replaces the body with the trimmed one and bumps the version', () => {
-      note.edit('  Supplier confirmed  ');
+    it('replaces the body with the trimmed one, bumps the version and answers true', () => {
+      const isEdited = note.edit('  Supplier confirmed  ');
 
-      expect(note.body).toBe('Supplier confirmed');
+      expect(isEdited).toBe(true);
+      expect(note.toSnapshot().body).toBe('Supplier confirmed');
       expect(note.version).toBe(3);
     });
 
-    it('changes nothing when the trimmed body is the current one', () => {
-      note.edit('  Check the supplier ');
+    it('changes nothing and answers false when the trimmed body is the current one', () => {
+      const isEdited = note.edit('  Check the supplier ');
 
-      expect(note.body).toBe('Check the supplier');
+      expect(isEdited).toBe(false);
+      expect(note.toSnapshot().body).toBe('Check the supplier');
       expect(note.version).toBe(2);
     });
 
@@ -36,7 +38,7 @@ describe('NoteEditModel', () => {
       expect(() => note.edit('   ')).toThrow(
         expect.objectContaining({ code: 'NOTE_BODY_INVALID' }) as Error,
       );
-      expect(note.body).toBe('Check the supplier');
+      expect(note.toSnapshot().body).toBe('Check the supplier');
       expect(note.version).toBe(2);
     });
 
@@ -88,7 +90,7 @@ describe('NoteEditModel', () => {
   });
 
   describe('toRevisionInsertPayload', () => {
-    it('answers the revision of the edit at the version of the note', () => {
+    it('answers the revision of the edit: the body as read, the new body and the new version', () => {
       const note = NoteEditModel.reconstitute({
         id: '7',
         subjectType: 'product',
@@ -101,17 +103,15 @@ describe('NoteEditModel', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       });
 
+      note.edit('Supplier confirmed');
+
       expect(
-        note.toRevisionInsertPayload({
-          bodyBefore: 'Old body',
-          editorId: 'admin-1',
-          correlationId: 'correlation-1',
-        }),
+        note.toRevisionInsertPayload({ editorId: 'admin-1', correlationId: 'correlation-1' }),
       ).toEqual({
         noteId: '7',
-        noteVersion: 3,
-        bodyBefore: 'Old body',
-        bodyAfter: 'Check the supplier',
+        noteVersion: 4,
+        bodyBefore: 'Check the supplier',
+        bodyAfter: 'Supplier confirmed',
         editorId: 'admin-1',
         correlationId: 'correlation-1',
       });

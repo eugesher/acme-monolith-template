@@ -3,14 +3,12 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { NoteResolveModel } from '../../domain';
 import { NOTE_RESOLVE_REPOSITORY_PORT, type INoteResolveRepositoryPort } from '../../outbound';
-import { NoteAccessService } from '../services/note-access.service';
 import { NoteWriteService } from '../services/note-write.service';
-import type { INoteResolveCommand, INoteView } from '../interfaces';
+import type { INoteResolveCommand, INoteView, INoteWriteSaveCommand } from '../interfaces';
 
 @Injectable()
 export class NoteResolveUseCase {
   constructor(
-    private readonly accessService: NoteAccessService,
     private readonly writeService: NoteWriteService,
     @Inject(NOTE_RESOLVE_REPOSITORY_PORT)
     private readonly repository: INoteResolveRepositoryPort,
@@ -19,31 +17,25 @@ export class NoteResolveUseCase {
   ) {}
 
   public async execute(command: INoteResolveCommand): Promise<INoteView> {
-    const { noteId } = command;
-    const resolvedNote = await this.writeService.run({ noteId }, () => this.attempt(command));
-    const noteLoggerPayload = resolvedNote.toLoggerPayload();
+    const { noteId, authorId, expectedVersion } = command;
+    const writeResult = await this.writeService.write(
+      { noteId, authorId, expectedVersion },
+      NoteResolveModel.reconstitute,
+      (note) => note.resolve(),
+      (saveCommand) => this.save(saveCommand),
+    );
+    const { note } = writeResult;
+    const noteLoggerPayload = note.toLoggerPayload();
 
     this.logger.info(noteLoggerPayload, 'Note resolved');
 
-    return resolvedNote.toSnapshot();
+    return note.toSnapshot();
   }
 
-  private async attempt(command: INoteResolveCommand): Promise<NoteResolveModel> {
-    const { noteId, authorId } = command;
-    const note = await this.accessService.loadOwned(
-      { noteId, authorId },
-      NoteResolveModel.reconstitute,
-    );
-    const versionAsRead = note.version;
-
-    note.resolve();
-
+  private async save(command: INoteWriteSaveCommand<NoteResolveModel>): Promise<boolean> {
+    const { note, versionAsRead } = command;
     const noteUpdatePayload = note.toUpdatePayload(versionAsRead);
-    const isSaved = await this.repository.update(noteUpdatePayload);
 
-    return await this.writeService.reload(
-      { noteId, authorId, isSaved },
-      NoteResolveModel.reconstitute,
-    );
+    return await this.repository.update(noteUpdatePayload);
   }
 }

@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiHeader,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -21,6 +22,8 @@ import {
 
 import { CurrentUser } from '@acme-libs/auth';
 import { ApiErrorResponses } from '@acme-libs/http';
+import { IfMatch } from '@acme-staff/common/shared';
+import type { Maybe } from '@acme-libs/toolkit';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import {
@@ -110,6 +113,7 @@ export class NoteController {
   }
 
   @Patch(':noteId')
+  @ApiHeader({ name: 'If-Match', required: false, description: 'The note version, for OCC' })
   @ApiOperation({
     summary: 'Rewrite the body of one of your notes and record the revision with it',
   })
@@ -119,35 +123,40 @@ export class NoteController {
     NoteExceptionCodeEnum.NOTE_BODY_INVALID,
     NoteExceptionCodeEnum.NOTE_NOT_FOUND,
     NoteExceptionCodeEnum.NOTE_RESOLVED,
+    NoteExceptionCodeEnum.NOTE_VERSION_CONFLICT,
     NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
   )
   public async handleEdit(
     @Param() params: NoteIdParamDto,
     @Body() request: NoteEditRequestDto,
     @CurrentUser() user: IAuthCurrentUserView,
+    @IfMatch() expectedVersion: Maybe<number>,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
     const { body } = request;
 
-    return await this.edit.execute({ noteId, body, editorId: user.id });
+    return await this.edit.execute({ noteId, body, editorId: user.id, expectedVersion });
   }
 
   @Patch(':noteId/resolve')
+  @ApiHeader({ name: 'If-Match', required: false, description: 'The note version, for OCC' })
   @ApiOperation({ summary: 'Resolve one of your notes for good; it can no longer be edited' })
   @ApiOkResponse({ type: NoteResponseDto })
   @ApiErrorResponses(
     NoteHttpExceptionFilter.STATUS,
     NoteExceptionCodeEnum.NOTE_NOT_FOUND,
     NoteExceptionCodeEnum.NOTE_RESOLVED,
+    NoteExceptionCodeEnum.NOTE_VERSION_CONFLICT,
     NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
   )
   public async handleResolve(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
+    @IfMatch() expectedVersion: Maybe<number>,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
 
-    return await this.resolve.execute({ noteId, authorId: user.id });
+    return await this.resolve.execute({ noteId, authorId: user.id, expectedVersion });
   }
 
   @Get(':noteId/revisions')

@@ -1,3 +1,5 @@
+import type { Maybe } from '@acme-libs/toolkit';
+
 import { NoteExceptionCodeEnum } from '../enums/note-exception-code.enum';
 import { NoteBaseException } from './base/note-base.exception';
 
@@ -6,9 +8,9 @@ export class NoteVersionMismatchException extends NoteBaseException {
 
   constructor(
     noteId: string,
-    attempts: number,
+    expectedVersion: Maybe<number>,
     currentVersion: number,
-    message = `Note ${noteId} write lost the optimistic race after ${attempts} attempts`,
+    message = `Note ${noteId}: If-Match version ${String(expectedVersion)} does not match the current version ${currentVersion}`,
   ) {
     super(message, { currentVersion });
   }

@@ -99,6 +99,7 @@ export class ProductController {
     ProductHttpExceptionFilter.STATUS,
     ProductExceptionCodeEnum.PRODUCT_NAME_INVALID,
     ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductExceptionCodeEnum.PRODUCT_VERSION_CONFLICT,
     ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH,
   )
   public async handleUpdate(
@@ -122,6 +123,7 @@ export class ProductController {
   @ApiErrorResponses(
     ProductHttpExceptionFilter.STATUS,
     ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductExceptionCodeEnum.PRODUCT_VERSION_CONFLICT,
     ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH,
   )
   public async handlePublish(

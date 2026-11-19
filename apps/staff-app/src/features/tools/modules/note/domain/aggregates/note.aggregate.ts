@@ -1,9 +1,11 @@
 import { VersionedEntity } from '@acme-libs/domain';
+import type { Maybe } from '@acme-libs/toolkit';
 
 import { NoteBodyInvalidException } from '../exceptions/note-body-invalid.exception';
 import { NoteResolvedException } from '../exceptions/note-resolved.exception';
 import { NoteSubjectInvalidException } from '../exceptions/note-subject-invalid.exception';
 import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
+import { NoteVersionMismatchException } from '../exceptions/note-version-mismatch.exception';
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
 
 export abstract class NoteAggregate extends VersionedEntity {
@@ -57,6 +59,14 @@ export abstract class NoteAggregate extends VersionedEntity {
       resolved: this.currentResolved,
       version: this.version,
     };
+  }
+
+  public assertExpectedVersion(expectedVersion: Maybe<number>): void {
+    if (this.isExpectedVersion(expectedVersion)) {
+      return;
+    }
+
+    throw new NoteVersionMismatchException(this.id, expectedVersion, this.version);
   }
 
   protected static validSubjectType(subjectType: string): string {

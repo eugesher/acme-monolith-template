@@ -193,13 +193,13 @@ export class ProductE2E {
         }).toMatchSnapshot();
       });
 
-      it('should refuse a stale If-Match with 409 and the current version', async () => {
+      it('should refuse a stale If-Match with 412 and the current version', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/catalog/products/101')
           .set('If-Match', '0')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ name: 'Stale update' })
-          .expect(HttpStatus.CONFLICT);
+          .expect(HttpStatus.PRECONDITION_FAILED);
 
         expect({
           response: { body: response.body },

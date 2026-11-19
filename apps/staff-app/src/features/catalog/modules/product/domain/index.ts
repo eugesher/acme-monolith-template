@@ -7,6 +7,7 @@ export * from './exceptions/product-not-found.exception';
 export * from './exceptions/product-sku-invalid.exception';
 export * from './exceptions/product-sku-taken.exception';
 export * from './exceptions/product-tag-not-found.exception';
+export * from './exceptions/product-version-conflict.exception';
 export * from './exceptions/product-version-invalid.exception';
 export * from './exceptions/product-version-mismatch.exception';
 

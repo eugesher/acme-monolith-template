@@ -53,7 +53,6 @@ describe('NoteEditUseCase', () => {
     const accessService = new NoteAccessService({ findOwned });
 
     useCase = new NoteEditUseCase(
-      accessService,
       new NoteWriteService(accessService, 3, logger as unknown as PinoLogger),
       { update, appendRevision },
       { run },
@@ -64,7 +63,12 @@ describe('NoteEditUseCase', () => {
   describe('execute', () => {
     it('saves the note and appends its revision in one transaction, then answers the stored note', async () => {
       const view = await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
-        useCase.execute({ noteId: '7', body: ' Supplier confirmed ', editorId: 'admin-1' }),
+        useCase.execute({
+          noteId: '7',
+          body: ' Supplier confirmed ',
+          editorId: 'admin-1',
+          expectedVersion: undefined,
+        }),
       );
       const [command] = update.mock.calls[0] as [INoteEditUpdateQuery];
       const [revision] = appendRevision.mock.calls[0] as [INoteEditRevisionInsertQuery];
@@ -100,7 +104,12 @@ describe('NoteEditUseCase', () => {
 
     it('reads before the transaction and reads the stored note after it', async () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
-        useCase.execute({ noteId: '7', body: 'Supplier confirmed', editorId: 'admin-1' }),
+        useCase.execute({
+          noteId: '7',
+          body: 'Supplier confirmed',
+          editorId: 'admin-1',
+          expectedVersion: undefined,
+        }),
       );
 
       expect(findOwned.mock.invocationCallOrder[0]).toBeLessThan(run.mock.invocationCallOrder[0]);
@@ -118,6 +127,7 @@ describe('NoteEditUseCase', () => {
         noteId: '7',
         body: ' Check the supplier ',
         editorId: 'admin-1',
+        expectedVersion: undefined,
       });
 
       expect(run).not.toHaveBeenCalled();
@@ -136,7 +146,12 @@ describe('NoteEditUseCase', () => {
 
       await expect(
         CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
-          useCase.execute({ noteId: '7', body: 'Supplier confirmed', editorId: 'admin-1' }),
+          useCase.execute({
+            noteId: '7',
+            body: 'Supplier confirmed',
+            editorId: 'admin-1',
+            expectedVersion: undefined,
+          }),
         ),
       ).rejects.toThrow('deadlock');
       await expect(run.mock.results[0].value).rejects.toThrow('deadlock');
@@ -163,7 +178,12 @@ describe('NoteEditUseCase', () => {
       );
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
-        useCase.execute({ noteId: '7', body: 'Supplier confirmed', editorId: 'admin-1' }),
+        useCase.execute({
+          noteId: '7',
+          body: 'Supplier confirmed',
+          editorId: 'admin-1',
+          expectedVersion: undefined,
+        }),
       );
 
       expect(run).toHaveBeenCalledTimes(2);
@@ -175,7 +195,7 @@ describe('NoteEditUseCase', () => {
       );
     });
 
-    it('refuses with VERSION_MISMATCH once every attempt lost the race', async () => {
+    it('refuses with VERSION_CONFLICT once every attempt lost the race', async () => {
       update.mockResolvedValue(false);
       findOwned.mockReset().mockImplementation(() =>
         Promise.resolve({
@@ -192,13 +212,30 @@ describe('NoteEditUseCase', () => {
       );
 
       await expect(
-        useCase.execute({ noteId: '7', body: 'Supplier confirmed', editorId: 'admin-1' }),
+        useCase.execute({
+          noteId: '7',
+          body: 'Supplier confirmed',
+          editorId: 'admin-1',
+          expectedVersion: undefined,
+        }),
       ).rejects.toMatchObject({
-        code: 'VERSION_MISMATCH',
+        code: 'VERSION_CONFLICT',
         details: { currentVersion: 2 },
       });
       expect(update).toHaveBeenCalledTimes(3);
       expect(appendRevision).not.toHaveBeenCalled();
+    });
+
+    it('refuses a stale If-Match with VERSION_MISMATCH before opening a transaction', async () => {
+      await expect(
+        useCase.execute({
+          noteId: '7',
+          body: 'Supplier confirmed',
+          editorId: 'admin-1',
+          expectedVersion: 1,
+        }),
+      ).rejects.toMatchObject({ code: 'VERSION_MISMATCH', details: { currentVersion: 2 } });
+      expect(run).not.toHaveBeenCalled();
     });
 
     it('refuses a resolved note before opening a transaction', async () => {
@@ -215,7 +252,12 @@ describe('NoteEditUseCase', () => {
       });
 
       await expect(
-        useCase.execute({ noteId: '7', body: 'Supplier confirmed', editorId: 'admin-1' }),
+        useCase.execute({
+          noteId: '7',
+          body: 'Supplier confirmed',
+          editorId: 'admin-1',
+          expectedVersion: undefined,
+        }),
       ).rejects.toMatchObject({ code: 'NOTE_RESOLVED' });
       expect(run).not.toHaveBeenCalled();
     });
@@ -224,7 +266,12 @@ describe('NoteEditUseCase', () => {
       findOwned.mockReset().mockResolvedValue(null);
 
       await expect(
-        useCase.execute({ noteId: '7', body: 'Supplier confirmed', editorId: 'admin-1' }),
+        useCase.execute({
+          noteId: '7',
+          body: 'Supplier confirmed',
+          editorId: 'admin-1',
+          expectedVersion: undefined,
+        }),
       ).rejects.toMatchObject({ code: 'NOTE_NOT_FOUND' });
       expect(run).not.toHaveBeenCalled();
     });

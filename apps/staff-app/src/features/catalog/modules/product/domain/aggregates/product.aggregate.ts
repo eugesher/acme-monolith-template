@@ -58,11 +58,7 @@ export abstract class ProductAggregate extends VersionedEntity {
       return;
     }
 
-    throw new ProductVersionMismatchException(
-      this.id,
-      this.version,
-      `Product ${this.id}: If-Match version ${String(expectedVersion)} does not match the current version ${this.version}`,
-    );
+    throw new ProductVersionMismatchException(this.id, expectedVersion, this.version);
   }
 
   protected static validSku(sku: string): string {

@@ -12,7 +12,8 @@ export class ProductHttpExceptionFilter implements ExceptionFilter<ProductBaseEx
     [ProductExceptionCodeEnum.PRODUCT_NOT_FOUND]: HttpStatus.NOT_FOUND,
     [ProductExceptionCodeEnum.PRODUCT_ALREADY_ARCHIVED]: HttpStatus.CONFLICT,
     [ProductExceptionCodeEnum.PRODUCT_SKU_TAKEN]: HttpStatus.CONFLICT,
-    [ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH]: HttpStatus.CONFLICT,
+    [ProductExceptionCodeEnum.PRODUCT_VERSION_CONFLICT]: HttpStatus.CONFLICT,
+    [ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH]: HttpStatus.PRECONDITION_FAILED,
     [ProductExceptionCodeEnum.PRODUCT_TAG_NOT_FOUND]: HttpStatus.UNPROCESSABLE_ENTITY,
     [ProductExceptionCodeEnum.PRODUCT_VERSION_INVALID]: HttpStatus.INTERNAL_SERVER_ERROR,
   };
