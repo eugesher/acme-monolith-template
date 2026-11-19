@@ -66,10 +66,32 @@ describe('QueueRegistryQueueAdapter', () => {
   });
 
   describe('findFailedJobs', () => {
-    it('answers the JSON of the failed jobs in the window and their total', async () => {
+    it('answers the failed jobs in the window with ISO instants, and their total', async () => {
       ledgerQueue.getFailed.mockResolvedValue([
-        { toJSON: () => ({ id: '7', name: '__default__' }) },
-        { toJSON: () => ({ id: '8', name: '__default__', debounceId: 'd-8' }) },
+        {
+          id: 7,
+          name: '__default__',
+          data: { operationKey: 'product-created:12' },
+          opts: { attempts: 3 },
+          attemptsMade: 3,
+          failedReason: 'Data too long for column',
+          stacktrace: ['Error: Data too long for column'],
+          timestamp: Date.UTC(2026, 0, 1, 0, 0, 0),
+          processedOn: Date.UTC(2026, 0, 1, 0, 0, 1),
+          finishedOn: Date.UTC(2026, 0, 1, 0, 0, 2),
+        },
+        {
+          id: '8',
+          name: '__default__',
+          data: {},
+          opts: {},
+          attemptsMade: 0,
+          failedReason: undefined,
+          stacktrace: [],
+          timestamp: Date.UTC(2026, 0, 1, 0, 0, 0),
+          processedOn: undefined,
+          finishedOn: null,
+        },
       ] as never);
       ledgerQueue.getFailedCount.mockResolvedValue(21);
 
@@ -81,8 +103,30 @@ describe('QueueRegistryQueueAdapter', () => {
 
       expect(failed).toEqual([
         [
-          { id: '7', name: '__default__', debounceId: null },
-          { id: '8', name: '__default__', debounceId: 'd-8' },
+          {
+            id: '7',
+            name: '__default__',
+            data: { operationKey: 'product-created:12' },
+            attempts: 3,
+            attemptsMade: 3,
+            failedReason: 'Data too long for column',
+            stacktrace: ['Error: Data too long for column'],
+            createdAt: '2026-01-01T00:00:00.000Z',
+            processedAt: '2026-01-01T00:00:01.000Z',
+            failedAt: '2026-01-01T00:00:02.000Z',
+          },
+          {
+            id: '8',
+            name: '__default__',
+            data: {},
+            attempts: 1,
+            attemptsMade: 0,
+            failedReason: null,
+            stacktrace: [],
+            createdAt: '2026-01-01T00:00:00.000Z',
+            processedAt: null,
+            failedAt: null,
+          },
         ],
         21,
       ]);

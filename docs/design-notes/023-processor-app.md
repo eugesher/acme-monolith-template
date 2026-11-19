@@ -40,12 +40,18 @@ module `staff-auth` (see `017-credentials-lib.md`). processor-app has no login: 
 it lists the staff identity entities on its connection for the core module. The health routes carry
 `@Public()`. `APP_PIPE` and `APP_FILTER` are the ones of staff-app.
 
-| Route                                          | Permission     | What it does                                              |
-| ---------------------------------------------- | -------------- | --------------------------------------------------------- |
-| `GET /queues`                                  | `queue:read`   | every queue with its `getJobCounts()`                     |
-| `GET /queues/:queueName/jobs/failed`           | `queue:read`   | a page of the failed jobs as `job.toJSON()`, newest first |
-| `PUT /queues/:queueName/jobs/failed/:jobId`    | `queue:retry`  | returns the job to the queue                              |
-| `DELETE /queues/:queueName/jobs/failed/:jobId` | `queue:delete` | removes the job                                           |
+| Route                                          | Permission     | What it does                            |
+| ---------------------------------------------- | -------------- | --------------------------------------- |
+| `GET /queues`                                  | `queue:read`   | every queue with its `getJobCounts()`   |
+| `GET /queues/:queueName/jobs/failed`           | `queue:read`   | a page of the failed jobs, newest first |
+| `PUT /queues/:queueName/jobs/failed/:jobId`    | `queue:retry`  | returns the job to the queue            |
+| `DELETE /queues/:queueName/jobs/failed/:jobId` | `queue:delete` | removes the job                         |
+
+**A failed job answers what the staff acts on, not the job of Bull.** `QueueRegistryQueueAdapter`
+maps each job to the view of its port: the id as a string, the name, the `data`, `attempts` and
+`attemptsMade`, the `failedReason` and the `stacktrace`, and the instants `createdAt`, `processedAt`
+and `failedAt` as ISO strings in UTC, `null` when Bull has none. The options, the progress and the
+return value of Bull stay in the adapter, so an upgrade of Bull does not change the response.
 
 An unknown queue or job answers 404, a job that is not failed 409. A retried job keeps its
 `attemptsMade`, so its next failure sends it straight back to the failed set: a retry is one more

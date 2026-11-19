@@ -12,22 +12,17 @@ export interface IQueueRegistryJobCountsView {
   };
 }
 
-export type IQueueRegistryFailedJobsView = [
-  {
-    id: string | number;
-    name: string;
-    data: unknown;
-    opts: unknown;
-    progress: number;
-    delay: number;
-    timestamp: number;
-    attemptsMade: number;
-    failedReason: unknown;
-    stacktrace: Nullable<string[]>;
-    returnvalue: unknown;
-    debounceId: Nullable<string>;
-    finishedOn: Nullable<number>;
-    processedOn: Nullable<number>;
-  }[],
-  number,
-];
+export interface IQueueRegistryFailedJobView {
+  id: string;
+  name: string;
+  data: unknown;
+  attempts: number;
+  attemptsMade: number;
+  failedReason: Nullable<string>;
+  stacktrace: string[];
+  createdAt: string;
+  processedAt: Nullable<string>;
+  failedAt: Nullable<string>;
+}
+
+export type IQueueRegistryFailedJobsView = [IQueueRegistryFailedJobView[], number];

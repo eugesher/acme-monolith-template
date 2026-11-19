@@ -33,7 +33,7 @@ export class QueueE2E {
 
   public listFailedJobs(): void {
     describe('GET /api/queues/:queueName/jobs/failed', () => {
-      it('should answer a page of the failed jobs as their JSON', async () => {
+      it('should answer a page of the failed jobs with the reason and the instants of the failure', async () => {
         const job = await this.ctx.ledgerRecordQueue.add(
           {
             operationKey: 'e2e-queue:1',
@@ -60,11 +60,12 @@ export class QueueE2E {
             body: {
               data: [
                 {
-                  id: expect.anything(),
-                  opts: { timestamp: expect.any(Number) },
-                  timestamp: expect.any(Number),
-                  processedOn: expect.any(Number),
-                  finishedOn: expect.any(Number),
+                  id: expect.stringMatching(/^\d+$/),
+                  createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                  processedAt: expect.stringMatching(
+                    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                  ),
+                  failedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
                   stacktrace: [expect.any(String)],
                 },
               ],

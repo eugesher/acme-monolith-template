@@ -262,14 +262,16 @@ exports[`App Queue GET /api/queues should refuse a request without a token with 
 }
 `;
 
-exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page of the failed jobs as their JSON 1`] = `
+exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page of the failed jobs with the reason and the instants of the failure 1`] = `
 {
   "response": {
     "body": {
       "count": 1,
       "data": [
         {
+          "attempts": 1,
           "attemptsMade": 1,
+          "createdAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "data": {
             "action": "ProductCreated",
             "correlationId": "e2e00000-0000-4000-8000-000000000009",
@@ -279,29 +281,14 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
             "subjectId": "200",
             "subjectType": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
           },
-          "debounceId": null,
-          "delay": 0,
+          "failedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "failedReason": "Data too long for column 'subject_type' at row 1",
-          "finishedOn": Any<Number>,
-          "id": Anything,
+          "id": StringMatching /\\^\\\\d\\+\\$/,
           "name": "__default__",
-          "opts": {
-            "attempts": 1,
-            "backoff": {
-              "delay": 1000,
-              "type": "exponential",
-            },
-            "delay": 0,
-            "removeOnComplete": true,
-            "timestamp": Any<Number>,
-          },
-          "processedOn": Any<Number>,
-          "progress": 0,
-          "returnvalue": null,
+          "processedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "stacktrace": [
             Any<String>,
           ],
-          "timestamp": Any<Number>,
         },
       ],
       "page": 1,
