@@ -1,11 +1,8 @@
-export interface IOccRetryLogger {
-  info(context: Record<string, unknown>, message: string): void;
-  warn(context: Record<string, unknown>, message: string): void;
-}
+import type { IHelperLogger } from '../types/helper-logger.interface';
 
-export interface IOccRetryPolicy<TConflict> {
+export interface IOccRetryOptions<TConflict> {
   subject: string;
-  logger: IOccRetryLogger;
+  logger: IHelperLogger;
   maxAttempts: number;
   isConflict: (error: unknown) => error is TConflict;
   retryContext: (conflict: TConflict) => object;

@@ -1,9 +1,9 @@
-import type { IOccRetryPolicy } from './occ-retry-policy.interface';
+import type { IOccRetryOptions } from './occ-retry.options';
 
 export class OccRetryHelper {
   public static async run<T, TConflict>(
     attempt: () => Promise<T>,
-    policy: IOccRetryPolicy<TConflict>,
+    options: IOccRetryOptions<TConflict>,
   ): Promise<T> {
     const {
       subject,
@@ -13,7 +13,7 @@ export class OccRetryHelper {
       retryContext,
       exhaustedContext,
       onExhausted,
-    } = policy;
+    } = options;
 
     for (let attemptNo = 1; attemptNo <= maxAttempts; attemptNo++) {
       try {

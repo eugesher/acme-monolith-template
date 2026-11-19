@@ -200,6 +200,9 @@ layer of features, processors, common modules and core modules alike. Presentati
 infrastructure and the shell log nothing; a lib takes the package as a whole, so its infrastructure
 logs its own failures. Retries log through `OccRetryHelper` and `ReplayRetryHelper`, which take the
 logger of the use case: `warn` for an attempt, `error` with a call to replay after the last one.
+`JobFailureHelper` logs a failed job the same way. The three take one type, `IHelperLogger` of
+`libs/toolkit`, which the `PinoLogger` of a use case satisfies, so the toolkit needs no logging
+package.
 
 `LoggerSetupConfig` sends the logs through `pino-pretty` only when `NODE_ENV` is `development`.
 Production, the e2e runs with `NODE_ENV=test` and a process without `NODE_ENV` log JSON lines, so

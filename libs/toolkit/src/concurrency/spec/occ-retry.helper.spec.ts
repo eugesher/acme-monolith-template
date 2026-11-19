@@ -2,10 +2,10 @@ import { OccRetryHelper } from '../occ-retry.helper';
 
 describe('OccRetryHelper', () => {
   describe('run', () => {
-    let logger: { info: jest.Mock; warn: jest.Mock };
+    let logger: { info: jest.Mock; warn: jest.Mock; error: jest.Mock };
 
     beforeEach(() => {
-      logger = { info: jest.fn(), warn: jest.fn() };
+      logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
     });
 
     it('returns the first successful attempt without logging', async () => {
