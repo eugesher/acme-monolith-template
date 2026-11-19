@@ -78,7 +78,7 @@ export class CacheLibWrapUseCase {
 
     const computedValue = await compute();
 
-    if (computedValue !== undefined) {
+    if (computedValue !== undefined && computedValue !== null) {
       try {
         await this.store.set({ key, value: computedValue, ttlMs });
       } catch (error) {

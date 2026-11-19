@@ -25,6 +25,11 @@ case, so the rule of one repository per consumer holds.
 without caching when Redis fails, so an adapter has no single-flight and no fallback of its own. It
 logs nothing either: the cache lib logs its failures.
 
+**An empty answer is not cached.** `handleWrap` writes neither `null` nor `undefined`, so the next
+miss computes it again and Redis gets no write for it; the store reads a stored `null` as a miss
+too. A `compute` that answers nothing for a missing row costs one read of the database per request,
+as without a cache, and a row created later shows at once instead of after the TTL.
+
 **The TTL is a token of the module**, bound to `CACHE_TTL_MS_DEFAULT` in `infrastructure/config`.
 The use case injects it and passes it as `ttlMs` of the read command, and the adapter hands it to
 `handleWrap` (see `030-config-values.md`).
