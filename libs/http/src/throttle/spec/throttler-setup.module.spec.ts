@@ -130,7 +130,12 @@ describe('ThrottlerSetupModule', () => {
 
     expect({ status: response.status, body }).toEqual({
       status: 429,
-      body: { statusCode: 429, message: 'Too many requests' },
+      body: {
+        statusCode: 429,
+        code: 'TOO_MANY_REQUESTS',
+        message: 'Too many requests',
+        details: null,
+      },
     });
   });
 });

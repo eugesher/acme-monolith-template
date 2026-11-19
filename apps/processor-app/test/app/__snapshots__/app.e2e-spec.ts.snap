@@ -196,7 +196,8 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refus
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -209,6 +210,7 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refus
   "response": {
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
+      "details": null,
       "message": "Job 999999 was not found in queue ledger-record",
       "statusCode": 404,
     },
@@ -251,6 +253,8 @@ exports[`App Queue GET /api/queues should refuse a request without a token with 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -312,11 +316,19 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse a malfor
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "page must be a positive number",
-        "page must be an integer number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "page",
+            "messages": [
+              "page must be a positive number",
+              "page must be an integer number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -328,6 +340,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unkno
   "response": {
     "body": {
       "code": "QUEUE_NOT_FOUND",
+      "details": null,
       "message": "Queue unknown was not found",
       "statusCode": 404,
     },
@@ -340,6 +353,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
   "response": {
     "body": {
       "code": "QUEUE_JOB_NOT_FAILED",
+      "details": null,
       "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-record is delayed, not failed\\$/,
       "statusCode": 409,
     },
@@ -351,7 +365,8 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -364,6 +379,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
   "response": {
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
+      "details": null,
       "message": "Job 999999 was not found in queue ledger-record",
       "statusCode": 404,
     },
@@ -376,6 +392,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
   "response": {
     "body": {
       "code": "QUEUE_NOT_FOUND",
+      "details": null,
       "message": "Queue unknown was not found",
       "statusCode": 404,
     },

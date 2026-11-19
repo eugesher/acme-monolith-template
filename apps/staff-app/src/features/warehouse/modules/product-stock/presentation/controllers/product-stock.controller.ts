@@ -2,11 +2,12 @@ import { Body, Controller, Param, Post, UseFilters } from '@nestjs/common';
 import { ApiCreatedResponse, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser, RequiresPermission } from '@acme-libs/auth';
-import { IdempotencyKey } from '@acme-libs/http';
+import { ApiErrorResponses, IdempotencyKey } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import { ProductStockAddUseCase } from '../../application';
+import { ProductStockExceptionCodeEnum } from '../../domain';
 import {
   ProductStockAddRequestDto,
   ProductStockProductIdParamDto,
@@ -25,6 +26,13 @@ export class ProductStockController {
   @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'At most 128 characters' })
   @ApiOperation({ summary: 'Add units to the stock of a product (idempotent)' })
   @ApiCreatedResponse({ type: ProductStockResponseDto })
+  @ApiErrorResponses(
+    ProductStockHttpExceptionFilter.STATUS,
+    ProductStockExceptionCodeEnum.PRODUCT_QUANTITY_INVALID,
+    ProductStockExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT,
+    ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENCY_KEY_REUSED,
+  )
   public async handleAdd(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: ProductStockProductIdParamDto,

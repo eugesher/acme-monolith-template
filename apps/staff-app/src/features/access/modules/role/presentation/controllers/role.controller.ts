@@ -2,7 +2,8 @@ import { Body, Controller, Get, Param, Post, Put, UseFilters } from '@nestjs/com
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RequiresPermission } from '@acme-libs/auth';
-import { PermissionCodeEnum } from '@acme-libs/kernel';
+import { ApiErrorResponses } from '@acme-libs/http';
+import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 
 import {
   RoleCreateUseCase,
@@ -39,6 +40,7 @@ export class RoleController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
   @ApiOperation({ summary: 'Create a role with its permissions' })
   @ApiCreatedResponse({ type: RoleResponseDto })
+  @ApiErrorResponses(RoleHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN)
   public async handleCreate(@Body() body: RoleCreateRequestDto): Promise<RoleResponseDto> {
     const { name, permissionCodes } = body;
 
@@ -49,6 +51,7 @@ export class RoleController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
   @ApiOperation({ summary: 'Reassign the permission set of a role' })
   @ApiOkResponse({ type: RoleResponseDto })
+  @ApiErrorResponses(RoleHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND)
   public async handleReassignPermissions(
     @Param() params: RoleIdParamDto,
     @Body() body: RolePermissionsReassignRequestDto,

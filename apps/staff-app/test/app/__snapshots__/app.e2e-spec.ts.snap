@@ -28,7 +28,8 @@ exports[`App Access Permission GET /api/access/permissions should refuse a calle
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -94,7 +95,8 @@ exports[`App Access Role GET /api/access/roles should refuse a caller without ac
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -156,7 +158,8 @@ exports[`App Access Role POST /api/access/roles should refuse a caller without a
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -168,11 +171,19 @@ exports[`App Access Role POST /api/access/roles should refuse a missing permissi
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "each value in permissionCodes must be one of the following values: ledger:read, access-management, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
-        "permissionCodes must be an array",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "permissionCodes",
+            "messages": [
+              "each value in permissionCodes must be one of the following values: ledger:read, access-management, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
+              "permissionCodes must be an array",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -184,6 +195,7 @@ exports[`App Access Role POST /api/access/roles should refuse a taken name with 
   "response": {
     "body": {
       "code": "AUTH_ROLE_NAME_TAKEN",
+      "details": null,
       "message": "Role name admin is already taken",
       "statusCode": 409,
     },
@@ -196,6 +208,7 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should answer
   "response": {
     "body": {
       "code": "AUTH_ROLE_NOT_FOUND",
+      "details": null,
       "message": "Role 99 was not found",
       "statusCode": 404,
     },
@@ -217,7 +230,8 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should reassi
     ],
   },
   "ledger": {
-    "error": "Forbidden",
+    "code": "FORBIDDEN",
+    "details": null,
     "message": "Insufficient permissions",
     "statusCode": 403,
   },
@@ -261,10 +275,18 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should refuse
   },
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "each value in permissionCodes must be one of the following values: ledger:read, access-management, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "permissionCodes",
+            "messages": [
+              "each value in permissionCodes must be one of the following values: ledger:read, access-management, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -311,6 +333,7 @@ exports[`App Access User POST /api/access/users should let one of two simultaneo
   "refused": {
     "body": {
       "code": "AUTH_EMAIL_TAKEN",
+      "details": null,
       "message": "Email is already registered",
       "statusCode": 409,
     },
@@ -330,6 +353,7 @@ exports[`App Access User POST /api/access/users should refuse a role that is not
   "response": {
     "body": {
       "code": "AUTH_ROLE_NOT_FOUND",
+      "details": null,
       "message": "Role 99 was not found",
       "statusCode": 422,
     },
@@ -350,6 +374,7 @@ exports[`App Access User POST /api/access/users should refuse a taken email in a
   "response": {
     "body": {
       "code": "AUTH_EMAIL_TAKEN",
+      "details": null,
       "message": "Email is already registered",
       "statusCode": 409,
     },
@@ -362,6 +387,7 @@ exports[`App Access User PUT /api/access/users/:userId/roles should answer 404 f
   "response": {
     "body": {
       "code": "AUTH_USER_NOT_FOUND",
+      "details": null,
       "message": "User 99 was not found",
       "statusCode": 404,
     },
@@ -386,6 +412,7 @@ exports[`App Access User PUT /api/access/users/:userId/roles should answer 422 f
   "response": {
     "body": {
       "code": "AUTH_ROLE_NOT_FOUND",
+      "details": null,
       "message": "Role 99 was not found",
       "statusCode": 422,
     },
@@ -437,6 +464,8 @@ exports[`App Auth GET /api/auth/me should refuse a caller without a token 1`] = 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -448,6 +477,8 @@ exports[`App Auth GET /api/auth/me should refuse the token of a customer signed 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -459,6 +490,8 @@ exports[`App Auth GET /api/auth/me should refuse the token of a disabled user 1`
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -470,6 +503,8 @@ exports[`App Auth GET /api/auth/me should refuse the token of a staff user issue
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -489,7 +524,8 @@ exports[`App Auth GET /api/auth/me should take the roles from the database, not 
     },
   },
   "roles": {
-    "error": "Forbidden",
+    "code": "FORBIDDEN",
+    "details": null,
     "message": "Insufficient permissions",
     "statusCode": 403,
   },
@@ -500,6 +536,8 @@ exports[`App Auth POST /api/auth/login should answer 429 to an address that spen
 {
   "blocked": {
     "body": {
+      "code": "TOO_MANY_REQUESTS",
+      "details": null,
       "message": "Too many requests",
       "statusCode": 429,
     },
@@ -508,6 +546,7 @@ exports[`App Auth POST /api/auth/login should answer 429 to an address that spen
   "other": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -545,6 +584,7 @@ exports[`App Auth POST /api/auth/login should refuse a disabled user with 403 1`
   "response": {
     "body": {
       "code": "AUTH_USER_INACTIVE",
+      "details": null,
       "message": "User 4 is disabled",
       "statusCode": 403,
     },
@@ -557,6 +597,7 @@ exports[`App Auth POST /api/auth/login should refuse a wrong password with the s
   "response": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -568,14 +609,27 @@ exports[`App Auth POST /api/auth/login should refuse an empty body with 400 from
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "email must be shorter than or equal to 255 characters",
-        "email must be an email",
-        "password must be shorter than or equal to 256 characters",
-        "password must be longer than or equal to 1 characters",
-        "password must be a string",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "email",
+            "messages": [
+              "email must be shorter than or equal to 255 characters",
+              "email must be an email",
+            ],
+          },
+          {
+            "field": "password",
+            "messages": [
+              "password must be shorter than or equal to 256 characters",
+              "password must be longer than or equal to 1 characters",
+              "password must be a string",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -587,6 +641,7 @@ exports[`App Auth POST /api/auth/login should refuse an unknown email with the s
   "response": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -709,10 +764,18 @@ exports[`App Catalog Product GET /api/catalog/products should refuse a malformed
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "tagId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "tagId",
+            "messages": [
+              "tagId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -724,6 +787,7 @@ exports[`App Catalog Product GET /api/catalog/products/:productId should answer 
   "response": {
     "body": {
       "code": "PRODUCT_NOT_FOUND",
+      "details": null,
       "message": "Product 999 was not found",
       "statusCode": 404,
     },
@@ -752,6 +816,7 @@ exports[`App Catalog Product GET /api/catalog/products/:productId/tags should an
   "response": {
     "body": {
       "code": "PRODUCT_NOT_FOUND",
+      "details": null,
       "message": "Product 999 was not found",
       "statusCode": 404,
     },
@@ -833,6 +898,7 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should refus
   "response": {
     "body": {
       "code": "IF_MATCH_INVALID",
+      "details": null,
       "message": "The If-Match header must be a non-negative integer version",
       "statusCode": 400,
     },
@@ -887,7 +953,8 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should refus
   },
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -985,6 +1052,7 @@ exports[`App Catalog Product POST /api/catalog/products should refuse a taken sk
   "response": {
     "body": {
       "code": "PRODUCT_SKU_TAKEN",
+      "details": null,
       "message": "Product sku SKU-0001 is already registered",
       "statusCode": 409,
     },
@@ -1059,6 +1127,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should
   "response": {
     "body": {
       "code": "PRODUCT_ALREADY_ARCHIVED",
+      "details": null,
       "message": "Product 105 is already archived",
       "statusCode": 409,
     },
@@ -1071,6 +1140,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should
   "response": {
     "body": {
       "code": "PRODUCT_NOT_FOUND",
+      "details": null,
       "message": "Product 999 was not found",
       "statusCode": 404,
     },
@@ -1218,7 +1288,8 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should
   },
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -1231,6 +1302,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should an
   "response": {
     "body": {
       "code": "PRODUCT_NOT_FOUND",
+      "details": null,
       "message": "Product 999 was not found",
       "statusCode": 404,
     },
@@ -1275,7 +1347,8 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should re
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -1287,10 +1360,18 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should re
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "each tagId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "tagIds",
+            "messages": [
+              "each tagId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1434,11 +1515,19 @@ exports[`App Ledger GET /api/ledger should refuse a malformed page with 400 from
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "page must be a positive number",
-        "page must be an integer number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "page",
+            "messages": [
+              "page must be a positive number",
+              "page must be an integer number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1519,6 +1608,8 @@ exports[`App Sales Order GET /api/sales/orders should refuse a caller without a 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -1530,11 +1621,19 @@ exports[`App Sales Order GET /api/sales/orders should refuse a malformed page wi
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "page must be a positive number",
-        "page must be an integer number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "page",
+            "messages": [
+              "page must be a positive number",
+              "page must be an integer number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1545,10 +1644,18 @@ exports[`App Sales Order GET /api/sales/orders should refuse a malformed tag id 
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "tagId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "tagId",
+            "messages": [
+              "tagId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1559,7 +1666,8 @@ exports[`App Sales Order GET /api/sales/orders should refuse a role without orde
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -1572,6 +1680,7 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should answer an unknown
   "response": {
     "body": {
       "code": "ORDER_NOT_FOUND",
+      "details": null,
       "message": "Order 999 was not found",
       "statusCode": 404,
     },
@@ -1635,6 +1744,8 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a caller w
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -1646,10 +1757,18 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a malforme
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "orderId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "orderId",
+            "messages": [
+              "orderId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1660,7 +1779,8 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a role wit
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -1673,6 +1793,7 @@ exports[`App Sales Order GET /api/sales/orders/:orderId/tags should answer an un
   "response": {
     "body": {
       "code": "ORDER_NOT_FOUND",
+      "details": null,
       "message": "Order 999 was not found",
       "statusCode": 404,
     },
@@ -1700,6 +1821,7 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should answer an un
   "response": {
     "body": {
       "code": "ORDER_NOT_FOUND",
+      "details": null,
       "message": "Order 999 was not found",
       "statusCode": 404,
     },
@@ -1744,7 +1866,8 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a rol
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -1756,10 +1879,18 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a wor
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "each tagId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "tagIds",
+            "messages": [
+              "each tagId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1832,6 +1963,7 @@ exports[`App Tools Note DELETE /api/tools/notes/:noteId should hide the note of 
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 204 was not found",
       "statusCode": 404,
     },
@@ -1860,6 +1992,7 @@ exports[`App Tools Note DELETE /api/tools/notes/:noteId should soft-delete a not
   "getOne": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 200 was not found",
       "statusCode": 404,
     },
@@ -1867,6 +2000,7 @@ exports[`App Tools Note DELETE /api/tools/notes/:noteId should soft-delete a not
   "getRevisions": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 200 was not found",
       "statusCode": 404,
     },
@@ -1958,10 +2092,18 @@ exports[`App Tools Note GET /api/tools/notes should refuse a resolution that is 
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "resolved must be a boolean value",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "resolved",
+            "messages": [
+              "resolved must be a boolean value",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -1973,6 +2115,7 @@ exports[`App Tools Note GET /api/tools/notes should refuse half of a subject fil
   "response": {
     "body": {
       "code": "NOTE_SUBJECT_INVALID",
+      "details": null,
       "message": "A subject filter needs both subjectType and subjectId, or neither",
       "statusCode": 400,
     },
@@ -1985,6 +2128,7 @@ exports[`App Tools Note GET /api/tools/notes/:noteId should answer 404 for a mis
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 299 was not found",
       "statusCode": 404,
     },
@@ -1997,6 +2141,7 @@ exports[`App Tools Note GET /api/tools/notes/:noteId should hide the note of ano
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 200 was not found",
       "statusCode": 404,
     },
@@ -2026,10 +2171,18 @@ exports[`App Tools Note GET /api/tools/notes/:noteId should refuse an id that is
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "noteId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "noteId",
+            "messages": [
+              "noteId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -2041,6 +2194,7 @@ exports[`App Tools Note GET /api/tools/notes/:noteId/revisions should answer 404
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 299 was not found",
       "statusCode": 404,
     },
@@ -2053,6 +2207,7 @@ exports[`App Tools Note GET /api/tools/notes/:noteId/revisions should hide the r
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 202 was not found",
       "statusCode": 404,
     },
@@ -2105,6 +2260,8 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should answer 500 and rol
   },
   "response": {
     "body": {
+      "code": "INTERNAL_SERVER_ERROR",
+      "details": null,
       "message": "Internal Server Error",
       "statusCode": 500,
     },
@@ -2134,6 +2291,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should hide the note of a
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 204 was not found",
       "statusCode": 404,
     },
@@ -2174,6 +2332,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to edit a r
   "response": {
     "body": {
       "code": "NOTE_RESOLVED",
+      "details": null,
       "message": "Note 202 is resolved and can no longer be modified",
       "statusCode": 409,
     },
@@ -2255,7 +2414,8 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should roll the note back
   },
   "response": {
     "body": {
-      "error": "Conflict",
+      "code": "CONFLICT",
+      "details": null,
       "message": "Resource already exists",
       "statusCode": 409,
     },
@@ -2319,6 +2479,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should hide the n
   "response": {
     "body": {
       "code": "NOTE_NOT_FOUND",
+      "details": null,
       "message": "Note 204 was not found",
       "statusCode": 404,
     },
@@ -2347,6 +2508,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId/resolve should refuse to 
   "response": {
     "body": {
       "code": "NOTE_RESOLVED",
+      "details": null,
       "message": "Note 202 is resolved and can no longer be modified",
       "statusCode": 409,
     },
@@ -2427,6 +2589,7 @@ exports[`App Tools Tag DELETE /api/tools/tags/:tagId should answer an unknown ta
   "response": {
     "body": {
       "code": "TAG_NOT_FOUND",
+      "details": null,
       "message": "Tag 999 was not found",
       "statusCode": 404,
     },
@@ -2438,7 +2601,8 @@ exports[`App Tools Tag DELETE /api/tools/tags/:tagId should refuse a role withou
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -2504,7 +2668,8 @@ exports[`App Tools Tag GET /api/tools/tags should refuse a role without tag:read
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -2517,6 +2682,7 @@ exports[`App Tools Tag PATCH /api/tools/tags/:tagId should answer an unknown tag
   "response": {
     "body": {
       "code": "TAG_NOT_FOUND",
+      "details": null,
       "message": "Tag 999 was not found",
       "statusCode": 404,
     },
@@ -2541,10 +2707,18 @@ exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse a malformed ta
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "tagId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "tagId",
+            "messages": [
+              "tagId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -2556,6 +2730,7 @@ exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse the name of an
   "response": {
     "body": {
       "code": "TAG_NAME_TAKEN",
+      "details": null,
       "message": "A tag named vip already exists",
       "statusCode": 409,
     },
@@ -2613,12 +2788,20 @@ exports[`App Tools Tag POST /api/tools/tags should refuse a missing name with 40
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "name must be shorter than or equal to 64 characters",
-        "name must be longer than or equal to 1 characters",
-        "name must be a string",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "name",
+            "messages": [
+              "name must be shorter than or equal to 64 characters",
+              "name must be longer than or equal to 1 characters",
+              "name must be a string",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -2630,6 +2813,7 @@ exports[`App Tools Tag POST /api/tools/tags should refuse a name of spaces with 
   "response": {
     "body": {
       "code": "TAG_NAME_INVALID",
+      "details": null,
       "message": "Tag.name must be a non-empty string of at most 64 characters",
       "statusCode": 400,
     },
@@ -2642,6 +2826,7 @@ exports[`App Tools Tag POST /api/tools/tags should refuse a name that differs fr
   "response": {
     "body": {
       "code": "TAG_NAME_TAKEN",
+      "details": null,
       "message": "A tag named Fragile already exists",
       "statusCode": 409,
     },
@@ -2653,7 +2838,8 @@ exports[`App Tools Tag POST /api/tools/tags should refuse a role without tag:wri
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -2732,6 +2918,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
   "response": {
     "body": {
       "code": "PRODUCT_NOT_FOUND",
+      "details": null,
       "message": "Product 107 was not found",
       "statusCode": 404,
     },
@@ -2744,6 +2931,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
   "response": {
     "body": {
       "code": "PRODUCT_NOT_FOUND",
+      "details": null,
       "message": "Product 999 was not found",
       "statusCode": 404,
     },
@@ -2756,6 +2944,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
   "response": {
     "body": {
       "code": "IDEMPOTENCY_KEY_INVALID",
+      "details": null,
       "message": "The Idempotency-Key header must be at most 128 characters",
       "statusCode": 400,
     },
@@ -2767,10 +2956,18 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "quantity must be an integer number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "quantity",
+            "messages": [
+              "quantity must be an integer number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -2781,10 +2978,18 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "quantity must be a positive number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "quantity",
+            "messages": [
+              "quantity must be a positive number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -2795,7 +3000,8 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -2808,6 +3014,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
   "response": {
     "body": {
       "code": "IDEMPOTENCY_KEY_REQUIRED",
+      "details": null,
       "message": "The Idempotency-Key header is required for this operation",
       "statusCode": 400,
     },
@@ -2828,6 +3035,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
   "response": {
     "body": {
       "code": "IDEMPOTENCY_KEY_REUSED",
+      "details": null,
       "message": "Idempotency-Key e2e-restock-reuse-key was already used with a different request body",
       "statusCode": 422,
     },

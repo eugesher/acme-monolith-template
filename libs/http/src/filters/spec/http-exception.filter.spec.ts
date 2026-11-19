@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   NotFoundException,
   ServiceUnavailableException,
   type ArgumentsHost,
@@ -39,18 +40,95 @@ describe('HttpExceptionFilter', () => {
     );
   });
 
-  it('answers with the status and body of the exception', () => {
-    filter.catch(new NotFoundException('Item not found'), host);
+  it('answers with the status, the code, the message and the details of the exception', () => {
+    const exception = new HttpException(
+      {
+        statusCode: 409,
+        code: 'VERSION_MISMATCH',
+        message: 'Item 7 changed',
+        details: { currentVersion: 4 },
+      },
+      409,
+    );
+
+    filter.catch(exception, host);
 
     expect(reply).toHaveBeenCalledWith(
       'response',
-      { statusCode: 404, message: 'Item not found', error: 'Not Found' },
+      {
+        statusCode: 409,
+        code: 'VERSION_MISMATCH',
+        message: 'Item 7 changed',
+        details: { currentVersion: 4 },
+      },
+      409,
+    );
+  });
+
+  it('answers the details of an exception without them with null', () => {
+    const exception = new HttpException(
+      { statusCode: 404, code: 'ITEM_NOT_FOUND', message: 'Item 7 was not found', details: null },
+      404,
+    );
+
+    filter.catch(exception, host);
+
+    expect(reply).toHaveBeenCalledWith(
+      'response',
+      { statusCode: 404, code: 'ITEM_NOT_FOUND', message: 'Item 7 was not found', details: null },
       404,
     );
   });
 
+  it('names an exception without a code after its status', () => {
+    filter.catch(new NotFoundException('Cannot GET /api/lamps'), host);
+
+    expect(reply).toHaveBeenCalledWith(
+      'response',
+      { statusCode: 404, code: 'NOT_FOUND', message: 'Cannot GET /api/lamps', details: null },
+      404,
+    );
+  });
+
+  it('answers an exception of a plain message with that message', () => {
+    filter.catch(new HttpException('Request body is too large', 413), host);
+
+    expect(reply).toHaveBeenCalledWith(
+      'response',
+      {
+        statusCode: 413,
+        code: 'PAYLOAD_TOO_LARGE',
+        message: 'Request body is too large',
+        details: null,
+      },
+      413,
+    );
+  });
+
+  it('answers a status without a name with HTTP_ERROR', () => {
+    filter.catch(new HttpException('Client closed the request', 499), host);
+
+    expect(reply).toHaveBeenCalledWith(
+      'response',
+      {
+        statusCode: 499,
+        code: 'HTTP_ERROR',
+        message: 'Client closed the request',
+        details: null,
+      },
+      499,
+    );
+  });
+
   it('logs a client error as a warning with the masked request body and the response', () => {
-    filter.catch(new BadRequestException(['title must be a string']), host);
+    const exception = new BadRequestException({
+      statusCode: 400,
+      code: 'VALIDATION_FAILED',
+      message: 'The request is not valid',
+      details: { fields: [{ field: 'title', messages: ['title must be a string'] }] },
+    });
+
+    filter.catch(exception, host);
 
     expect(logger.warn).toHaveBeenCalledWith(
       {
@@ -60,8 +138,9 @@ describe('HttpExceptionFilter', () => {
         request: { title: 'Lamp', password: '[REDACTED]' },
         response: {
           statusCode: 400,
-          message: ['title must be a string'],
-          error: 'Bad Request',
+          code: 'VALIDATION_FAILED',
+          message: 'The request is not valid',
+          details: { fields: [{ field: 'title', messages: ['title must be a string'] }] },
         },
       },
       'Response with error',
@@ -78,7 +157,12 @@ describe('HttpExceptionFilter', () => {
         url: '/api/items',
         status: 503,
         request: { title: 'Lamp', password: '[REDACTED]' },
-        response: { statusCode: 503, message: 'Service Unavailable' },
+        response: {
+          statusCode: 503,
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Service Unavailable',
+          details: null,
+        },
       },
       'Response with error',
     );
@@ -93,7 +177,7 @@ describe('HttpExceptionFilter', () => {
 
     expect(reply).toHaveBeenCalledWith(
       'response',
-      { statusCode: 409, message: 'Resource already exists', error: 'Conflict' },
+      { statusCode: 409, code: 'CONFLICT', message: 'Resource already exists', details: null },
       409,
     );
     expect(logger.warn).toHaveBeenCalledWith(
@@ -102,7 +186,12 @@ describe('HttpExceptionFilter', () => {
         url: '/api/items',
         status: 409,
         request: { title: 'Lamp', password: '[REDACTED]' },
-        response: { statusCode: 409, message: 'Resource already exists', error: 'Conflict' },
+        response: {
+          statusCode: 409,
+          code: 'CONFLICT',
+          message: 'Resource already exists',
+          details: null,
+        },
         err: exception,
       },
       'Response with error',
@@ -117,7 +206,12 @@ describe('HttpExceptionFilter', () => {
 
     expect(reply).toHaveBeenCalledWith(
       'response',
-      { statusCode: 500, message: 'Internal Server Error' },
+      {
+        statusCode: 500,
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Internal Server Error',
+        details: null,
+      },
       500,
     );
     expect(logger.error).toHaveBeenCalledWith(
@@ -126,7 +220,12 @@ describe('HttpExceptionFilter', () => {
         url: '/api/items',
         status: 500,
         request: { title: 'Lamp', password: '[REDACTED]' },
-        response: { statusCode: 500, message: 'Internal Server Error' },
+        response: {
+          statusCode: 500,
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Internal Server Error',
+          details: null,
+        },
         err: exception,
       },
       'Response with error',
@@ -140,7 +239,12 @@ describe('HttpExceptionFilter', () => {
 
     expect(reply).toHaveBeenCalledWith(
       'response',
-      { statusCode: 500, message: 'Internal Server Error' },
+      {
+        statusCode: 500,
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Internal Server Error',
+        details: null,
+      },
       500,
     );
     expect(logger.error).toHaveBeenCalledWith(

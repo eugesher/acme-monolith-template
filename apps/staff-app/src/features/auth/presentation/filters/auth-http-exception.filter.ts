@@ -1,19 +1,13 @@
-import {
-  Catch,
-  HttpException,
-  HttpStatus,
-  type ArgumentsHost,
-  type ExceptionFilter,
-} from '@nestjs/common';
+import { Catch, HttpStatus, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
+import { DomainHttpExceptionHelper, HttpExceptionFilter } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 
 import { AuthBaseException } from '../../domain';
 
 @Catch(AuthBaseException)
 export class AuthHttpExceptionFilter implements ExceptionFilter<AuthBaseException> {
-  private static readonly STATUS: Record<AuthBaseException['code'], HttpStatus> = {
+  public static readonly STATUS: Record<AuthBaseException['code'], HttpStatus> = {
     [IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS]: HttpStatus.UNAUTHORIZED,
     [IdentityExceptionCodeEnum.AUTH_USER_INACTIVE]: HttpStatus.FORBIDDEN,
     [IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND]: HttpStatus.NOT_FOUND,
@@ -22,9 +16,8 @@ export class AuthHttpExceptionFilter implements ExceptionFilter<AuthBaseExceptio
   constructor(private readonly httpExceptionFilter: HttpExceptionFilter) {}
 
   public catch(exception: AuthBaseException, host: ArgumentsHost): void {
-    const { code, message } = exception;
-    const statusCode = AuthHttpExceptionFilter.STATUS[code];
-    const error = new HttpException({ statusCode, message, code }, statusCode);
+    const statusCode = AuthHttpExceptionFilter.STATUS[exception.code];
+    const error = DomainHttpExceptionHelper.toHttpException(exception, statusCode);
 
     this.httpExceptionFilter.catch(error, host);
   }

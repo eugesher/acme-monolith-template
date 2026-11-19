@@ -8,10 +8,11 @@ import {
 } from '@nestjs/swagger';
 
 import { CurrentUser } from '@acme-libs/auth';
-import { IdempotencyKey } from '@acme-libs/http';
+import { ApiErrorResponses, IdempotencyKey } from '@acme-libs/http';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import { OrderGetManyUseCase, OrderGetOneUseCase, OrderPlaceUseCase } from '../../application';
+import { OrderExceptionCodeEnum } from '../../domain';
 import {
   OrderGetManyQueryDto,
   OrderIdParamDto,
@@ -35,6 +36,14 @@ export class OrderController {
   @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'At most 128 characters' })
   @ApiOperation({ summary: 'Place an order for active products in stock (idempotent)' })
   @ApiCreatedResponse({ type: OrderResponseDto })
+  @ApiErrorResponses(
+    OrderHttpExceptionFilter.STATUS,
+    OrderExceptionCodeEnum.ORDER_EMPTY,
+    OrderExceptionCodeEnum.ORDER_PRODUCT_NOT_FOUND,
+    OrderExceptionCodeEnum.ORDER_STOCK_INSUFFICIENT,
+    OrderExceptionCodeEnum.ORDER_IDEMPOTENT_REQUEST_IN_FLIGHT,
+    OrderExceptionCodeEnum.ORDER_IDEMPOTENCY_KEY_REUSED,
+  )
   public async handlePlace(
     @CurrentUser() user: IAuthCurrentUserView,
     @Body() body: OrderPlaceRequestDto,
@@ -62,6 +71,7 @@ export class OrderController {
   @Get(':orderId')
   @ApiOperation({ summary: 'Read one order of the caller with its products' })
   @ApiOkResponse({ type: OrderResponseDto })
+  @ApiErrorResponses(OrderHttpExceptionFilter.STATUS, OrderExceptionCodeEnum.ORDER_NOT_FOUND)
   public async handleGetOne(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: OrderIdParamDto,

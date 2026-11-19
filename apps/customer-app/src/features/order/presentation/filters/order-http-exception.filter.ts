@@ -1,18 +1,12 @@
-import {
-  Catch,
-  HttpException,
-  HttpStatus,
-  type ArgumentsHost,
-  type ExceptionFilter,
-} from '@nestjs/common';
+import { Catch, HttpStatus, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
+import { DomainHttpExceptionHelper, HttpExceptionFilter } from '@acme-libs/http';
 
 import { OrderBaseException, OrderExceptionCodeEnum } from '../../domain';
 
 @Catch(OrderBaseException)
 export class OrderHttpExceptionFilter implements ExceptionFilter<OrderBaseException> {
-  private static readonly STATUS: Record<OrderExceptionCodeEnum, HttpStatus> = {
+  public static readonly STATUS: Record<OrderBaseException['code'], HttpStatus> = {
     [OrderExceptionCodeEnum.ORDER_EMPTY]: HttpStatus.BAD_REQUEST,
     [OrderExceptionCodeEnum.ORDER_NOT_FOUND]: HttpStatus.NOT_FOUND,
     [OrderExceptionCodeEnum.ORDER_STOCK_INSUFFICIENT]: HttpStatus.CONFLICT,
@@ -24,10 +18,8 @@ export class OrderHttpExceptionFilter implements ExceptionFilter<OrderBaseExcept
   constructor(private readonly httpExceptionFilter: HttpExceptionFilter) {}
 
   public catch(exception: OrderBaseException, host: ArgumentsHost): void {
-    const { code, message, details } = exception;
-    const statusCode = OrderHttpExceptionFilter.STATUS[code];
-    const body = details ? { statusCode, message, code, details } : { statusCode, message, code };
-    const error = new HttpException(body, statusCode);
+    const statusCode = OrderHttpExceptionFilter.STATUS[exception.code];
+    const error = DomainHttpExceptionHelper.toHttpException(exception, statusCode);
 
     this.httpExceptionFilter.catch(error, host);
   }

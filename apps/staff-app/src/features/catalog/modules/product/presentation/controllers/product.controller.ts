@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 
 import { RequiresPermission } from '@acme-libs/auth';
+import { ApiErrorResponses } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 import { IfMatch } from '@acme-staff/common/shared';
 import type { Maybe } from '@acme-libs/toolkit';
@@ -22,6 +23,7 @@ import {
   ProductReplaceTagsUseCase,
   ProductUpdateUseCase,
 } from '../../application';
+import { ProductExceptionCodeEnum } from '../../domain';
 import {
   ProductCreateRequestDto,
   ProductGetManyQueryDto,
@@ -53,6 +55,12 @@ export class ProductController {
   @RequiresPermission(PermissionCodeEnum.PRODUCT_WRITE)
   @ApiOperation({ summary: 'Create a product' })
   @ApiCreatedResponse({ type: ProductResponseDto })
+  @ApiErrorResponses(
+    ProductHttpExceptionFilter.STATUS,
+    ProductExceptionCodeEnum.PRODUCT_SKU_INVALID,
+    ProductExceptionCodeEnum.PRODUCT_NAME_INVALID,
+    ProductExceptionCodeEnum.PRODUCT_SKU_TAKEN,
+  )
   public async handleCreate(@Body() body: ProductCreateRequestDto): Promise<ProductResponseDto> {
     const { sku, name } = body;
 
@@ -75,6 +83,7 @@ export class ProductController {
   @RequiresPermission(PermissionCodeEnum.PRODUCT_READ)
   @ApiOperation({ summary: 'Read one catalog product' })
   @ApiOkResponse({ type: ProductResponseDto })
+  @ApiErrorResponses(ProductHttpExceptionFilter.STATUS, ProductExceptionCodeEnum.PRODUCT_NOT_FOUND)
   public async handleGetOne(@Param() params: ProductIdParamDto): Promise<ProductResponseDto> {
     const { productId } = params;
 
@@ -86,6 +95,12 @@ export class ProductController {
   @ApiHeader({ name: 'If-Match', required: false, description: 'The product version, for OCC' })
   @ApiOperation({ summary: 'Update the fields of a product (optimistic concurrency)' })
   @ApiOkResponse({ type: ProductResponseDto })
+  @ApiErrorResponses(
+    ProductHttpExceptionFilter.STATUS,
+    ProductExceptionCodeEnum.PRODUCT_NAME_INVALID,
+    ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH,
+  )
   public async handleUpdate(
     @Param() params: ProductIdParamDto,
     @Body() body: ProductUpdateRequestDto,
@@ -104,6 +119,11 @@ export class ProductController {
     summary: 'Publish a draft product to the customer catalog (optimistic concurrency)',
   })
   @ApiOkResponse({ type: ProductResponseDto })
+  @ApiErrorResponses(
+    ProductHttpExceptionFilter.STATUS,
+    ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH,
+  )
   public async handlePublish(
     @Param() params: ProductIdParamDto,
     @IfMatch() expectedVersion: Maybe<number>,
@@ -118,6 +138,12 @@ export class ProductController {
   @ApiHeader({ name: 'If-Match', required: false, description: 'The product version, for OCC' })
   @ApiOperation({ summary: 'Archive a product (optimistic concurrency)' })
   @ApiOkResponse({ type: ProductResponseDto })
+  @ApiErrorResponses(
+    ProductHttpExceptionFilter.STATUS,
+    ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductExceptionCodeEnum.PRODUCT_ALREADY_ARCHIVED,
+    ProductExceptionCodeEnum.PRODUCT_VERSION_MISMATCH,
+  )
   public async handleArchive(
     @Param() params: ProductIdParamDto,
     @IfMatch() expectedVersion: Maybe<number>,
@@ -131,6 +157,7 @@ export class ProductController {
   @RequiresPermission(PermissionCodeEnum.PRODUCT_READ)
   @ApiOperation({ summary: 'Read the tags of a product, by name' })
   @ApiOkResponse({ type: ProductTagsResponseDto })
+  @ApiErrorResponses(ProductHttpExceptionFilter.STATUS, ProductExceptionCodeEnum.PRODUCT_NOT_FOUND)
   public async handleGetTags(@Param() params: ProductIdParamDto): Promise<ProductTagsResponseDto> {
     const { productId } = params;
 
@@ -141,6 +168,11 @@ export class ProductController {
   @RequiresPermission(PermissionCodeEnum.PRODUCT_WRITE)
   @ApiOperation({ summary: 'Replace the tags of a product' })
   @ApiOkResponse({ type: ProductTagsResponseDto })
+  @ApiErrorResponses(
+    ProductHttpExceptionFilter.STATUS,
+    ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
+    ProductExceptionCodeEnum.PRODUCT_TAG_NOT_FOUND,
+  )
   public async handleReplaceTags(
     @Param() params: ProductIdParamDto,
     @Body() body: ProductTagsReplaceRequestDto,

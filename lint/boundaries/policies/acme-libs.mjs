@@ -93,6 +93,7 @@ export const acmeLibs = [
   ]),
   fromLib('queue', [libs('config'), packages('@nestjs/bull', '@nestjs/common', '@nestjs/config')]),
   fromLib('openapi', [
+    libs('http'),
     packages(
       '@nestjs/common',
       '@nestjs/config',

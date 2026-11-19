@@ -62,11 +62,13 @@ instead of passing for a taken name. A use case throws its own exception for the
 
 ## The feature filter delegates
 
-`AuthHttpExceptionFilter` turns the code of `AuthBaseException` into an `HttpException` with the
-body `{ statusCode, message, code }` and hands it to the shared `HttpExceptionFilter` of
-`libs/http`. Logging, and masking of `password` and `email` in the logged request, stay in one
-place. The feature module provides `HttpExceptionFilter` so that Nest can inject it into the feature
-filter.
+`AuthHttpExceptionFilter` looks up the status of the code of `AuthBaseException` in its public
+`STATUS`, turns the exception into an `HttpException` with
+`DomainHttpExceptionHelper.toHttpException(exception, statusCode)` of `libs/http` and hands it to
+the shared `HttpExceptionFilter`, which answers the body of every error (see
+`012-app-bootstrap.md`). Logging, and masking of `password` and `email` in the logged request, stay
+in one place. The feature module provides `HttpExceptionFilter` so that Nest can inject it into the
+feature filter.
 
 ## One token per audience
 
@@ -95,9 +97,9 @@ of `libs/http` mounts `ThrottleGuard`, a subclass of the `ThrottlerGuard` of `@n
 a global guard with two throttlers: `default` from `THROTTLE_TTL_MS` and `THROTTLE_LIMIT` on every
 route, and `auth` from `THROTTLE_AUTH_TTL_MS` and `THROTTLE_AUTH_LIMIT` on the routes marked
 `@AuthThrottle()`: login in staff-app and customer-app and registration in customer-app. A request
-over a limit gets `429` with `{ statusCode, message: 'Too many requests' }` and a `Retry-After`
-header, `Retry-After-auth` for the second throttler. The guard counts per route and per client
-address; the address is `req.ip`, so behind a proxy it needs `HTTP_TRUST_PROXY_HOPS` (see
+over a limit gets `429` with the code `TOO_MANY_REQUESTS` and a `Retry-After` header,
+`Retry-After-auth` for the second throttler. The guard counts per route and per client address; the
+address is `req.ip`, so behind a proxy it needs `HTTP_TRUST_PROXY_HOPS` (see
 `036-production-stack.md`).
 
 **The guard throws an object body.** The `ThrottlerException` of the package carries a string, and

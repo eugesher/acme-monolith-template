@@ -2,7 +2,8 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseFilters } from '@
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser, Public } from '@acme-libs/auth';
-import { AuthThrottle } from '@acme-libs/http';
+import { ApiErrorResponses, AuthThrottle } from '@acme-libs/http';
+import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import { AuthLoginUseCase, AuthMeUseCase } from '../../application';
@@ -24,6 +25,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Exchange staff credentials for an access token' })
   @ApiOkResponse({ type: AuthAccessTokenResponseDto })
+  @ApiErrorResponses(
+    AuthHttpExceptionFilter.STATUS,
+    IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
+    IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
+  )
   public async handleLogin(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
     return await this.login.execute(body);
   }
@@ -31,6 +37,7 @@ export class AuthController {
   @Get('me')
   @ApiOperation({ summary: 'The authenticated staff user and the roles they hold' })
   @ApiOkResponse({ type: AuthMeResponseDto })
+  @ApiErrorResponses(AuthHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND)
   public async handleMe(@CurrentUser() user: IAuthCurrentUserView): Promise<AuthMeResponseDto> {
     const { id } = user;
 

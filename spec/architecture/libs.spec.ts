@@ -72,7 +72,7 @@ describe('libs', () => {
     ['http', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
     ['local-storage', ['kernel', 'toolkit', 'domain', 'observability']],
     ['observability', ['kernel', 'toolkit', 'domain', 'config']],
-    ['openapi', ['kernel', 'toolkit', 'domain']],
+    ['openapi', ['kernel', 'toolkit', 'domain', 'http']],
     ['queue', ['kernel', 'toolkit', 'domain', 'config']],
     ['testing', ['kernel', 'toolkit', 'domain']],
   ])('%s may import only %j of the other libs', async (from, allowed) => {
