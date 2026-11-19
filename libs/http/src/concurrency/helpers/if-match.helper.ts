@@ -6,6 +6,7 @@ export class IfMatchHelper {
   public static readonly INVALID_CODE = 'IF_MATCH_INVALID';
 
   private static readonly QUOTED = /^"(.*)"$/;
+  private static readonly DIGITS = /^\d+$/;
 
   public static parse(header: Maybe<string | string[]>): Maybe<number> {
     if (typeof header !== 'string') {
@@ -20,7 +21,7 @@ export class IfMatchHelper {
 
     const version = Number(unquotedHeader);
 
-    if (!Number.isInteger(version) || version < 0) {
+    if (!IfMatchHelper.DIGITS.test(unquotedHeader) || !Number.isSafeInteger(version)) {
       throw new BadRequestException({
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'The If-Match header must be a non-negative integer version',
