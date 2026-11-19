@@ -68,7 +68,7 @@ describe('libs', () => {
     ['config', ['kernel', 'toolkit', 'domain']],
     ['credentials', ['kernel', 'toolkit', 'domain']],
     ['database', ['kernel', 'toolkit', 'domain', 'config', 'local-storage']],
-    ['health', ['kernel', 'toolkit', 'domain', 'observability']],
+    ['health', ['kernel', 'toolkit', 'domain']],
     ['http', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
     ['local-storage', ['kernel', 'toolkit', 'domain', 'observability']],
     ['observability', ['kernel', 'toolkit', 'domain', 'config']],

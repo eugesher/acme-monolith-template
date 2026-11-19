@@ -70,7 +70,6 @@ export const acmeLibs = [
     ),
   ]),
   fromLib('health', [
-    libs('observability'),
     libContracts('cache'),
     packages('@nestjs/common', '@nestjs/core', 'nestjs-pino', 'typeorm'),
   ]),
