@@ -6,18 +6,16 @@ import { ApiReference } from '@acme-libs/openapi';
 import type { AppNameEnum } from '@acme-libs/kernel';
 
 export class AppBootstrap {
-  private readonly config: ConfigService;
   private readonly port: number;
-  private readonly prefix: string;
   private readonly logger: Logger;
 
   private constructor(
     private readonly app: INestApplication,
     private readonly appName: AppNameEnum,
   ) {
-    this.config = app.get(ConfigService);
-    this.port = this.config.getOrThrow<number>('PORT');
-    this.prefix = this.config.getOrThrow<string>('API_PREFIX');
+    const config = app.get(ConfigService);
+
+    this.port = config.getOrThrow<number>('PORT');
     this.logger = app.get(Logger);
   }
 
@@ -25,9 +23,18 @@ export class AppBootstrap {
     return new AppBootstrap(app, appName);
   }
 
+  public static configure(app: INestApplication): void {
+    const config = app.get(ConfigService);
+    const prefix = config.getOrThrow<string>('API_PREFIX');
+    const logger = app.get(Logger);
+
+    app.useLogger(logger);
+    app.setGlobalPrefix(prefix);
+  }
+
   public async execute(): Promise<void> {
-    this.app.useLogger(this.logger);
-    this.app.setGlobalPrefix(this.prefix);
+    AppBootstrap.configure(this.app);
+
     this.app.enableShutdownHooks();
 
     ApiReference.setup(this.app, this.appName);

@@ -1,11 +1,12 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { Logger, PinoLogger } from 'nestjs-pino';
+import { PinoLogger } from 'nestjs-pino';
 import { DataSource } from 'typeorm';
 import type { INestApplication, Type } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 
+import { AppBootstrap } from '@acme-libs/bootstrap';
 import type { AuthAudienceEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
@@ -80,12 +81,8 @@ export class E2EContext {
 
   protected static async start(moduleFixture: TestingModule): Promise<INestApplication> {
     const app = moduleFixture.createNestApplication({ bufferLogs: true });
-    const config = app.get(ConfigService);
-    const prefix = config.getOrThrow<string>('API_PREFIX');
-    const logger = app.get(Logger);
 
-    app.useLogger(logger);
-    app.setGlobalPrefix(prefix);
+    AppBootstrap.configure(app);
 
     await app.init();
 

@@ -38,6 +38,18 @@ describe('AppBootstrap', () => {
     jest.restoreAllMocks();
   });
 
+  describe('configure', () => {
+    it('routes the logs of Nest through pino and sets the prefix, without starting the app', () => {
+      AppBootstrap.configure(app as unknown as INestApplication);
+
+      expect(app.useLogger).toHaveBeenCalledWith({ log });
+      expect(app.setGlobalPrefix).toHaveBeenCalledWith('api');
+      expect(app.enableShutdownHooks).not.toHaveBeenCalled();
+      expect(setupReference).not.toHaveBeenCalled();
+      expect(app.listen).not.toHaveBeenCalled();
+    });
+  });
+
   describe('execute', () => {
     it('starts the app on the port of its config, behind its prefix', async () => {
       const bootstrap = AppBootstrap.create(

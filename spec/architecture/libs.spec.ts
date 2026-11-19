@@ -74,7 +74,7 @@ describe('libs', () => {
     ['observability', ['kernel', 'toolkit', 'domain', 'config']],
     ['openapi', ['kernel', 'toolkit', 'domain', 'http']],
     ['queue', ['kernel', 'toolkit', 'domain', 'config']],
-    ['testing', ['kernel', 'toolkit', 'domain']],
+    ['testing', ['kernel', 'toolkit', 'domain', 'bootstrap']],
   ])('%s may import only %j of the other libs', async (from, allowed) => {
     const libs = [
       'auth',

@@ -214,5 +214,5 @@ may reach `naming` and `orm/application` may reach `repository`.
 `e2e/e2e.context.ts`, the Redis token of `cache/` and the logger mock of
 `observability/pino-logger.mock.ts`. Any `*.spec.ts` may import it, through a policy that matches
 the path, and so may the e2e code and `test/system`; no layer of production code lists it, so lint
-refuses it there. The lib reaches the `outbound` of the cache lib for the Redis token and nothing
-else of another lib.
+refuses it there. The lib reaches the `outbound` of the cache lib for the Redis token and the
+bootstrap lib for `AppBootstrap.configure`, and nothing else of another lib.

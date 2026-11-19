@@ -43,6 +43,7 @@ export const acmeLibs = [
   ]),
   fromLib('auth', [packages('@nestjs/common', '@nestjs/config', '@nestjs/core', '@nestjs/jwt')]),
   fromLib('testing', [
+    libs('bootstrap'),
     to('acme-libs', { lib: 'cache', file: 'outbound/**' }),
     packages(
       '@nestjs/common',
