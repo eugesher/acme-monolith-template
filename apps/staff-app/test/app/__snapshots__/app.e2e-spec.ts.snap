@@ -322,7 +322,7 @@ exports[`App Access User POST /api/access/users should let one of two simultaneo
 }
 `;
 
-exports[`App Access User POST /api/access/users should refuse a role that is not stored with 404 and create no user 1`] = `
+exports[`App Access User POST /api/access/users should refuse a role that is not stored with 422 and create no user 1`] = `
 {
   "db": {
     "staff_user": [],
@@ -331,7 +331,7 @@ exports[`App Access User POST /api/access/users should refuse a role that is not
     "body": {
       "code": "AUTH_ROLE_NOT_FOUND",
       "message": "Role 99 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -357,7 +357,19 @@ exports[`App Access User POST /api/access/users should refuse a taken email in a
 }
 `;
 
-exports[`App Access User PUT /api/access/users/:userId/roles should answer 404 for a role that is not stored and change nothing 1`] = `
+exports[`App Access User PUT /api/access/users/:userId/roles should answer 404 for an unknown user 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_USER_NOT_FOUND",
+      "message": "User 99 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Access User PUT /api/access/users/:userId/roles should answer 422 for a role that is not stored and change nothing 1`] = `
 {
   "db": {
     "staff_user_roles": [
@@ -375,19 +387,7 @@ exports[`App Access User PUT /api/access/users/:userId/roles should answer 404 f
     "body": {
       "code": "AUTH_ROLE_NOT_FOUND",
       "message": "Role 99 was not found",
-      "statusCode": 404,
-    },
-  },
-}
-`;
-
-exports[`App Access User PUT /api/access/users/:userId/roles should answer 404 for an unknown user 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "AUTH_USER_NOT_FOUND",
-      "message": "User 99 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -2827,7 +2827,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
   },
   "response": {
     "body": {
-      "code": "PRODUCT_IDEMPOTENCY_KEY_REUSED",
+      "code": "IDEMPOTENCY_KEY_REUSED",
       "message": "Idempotency-Key e2e-restock-reuse-key was already used with a different request body",
       "statusCode": 422,
     },

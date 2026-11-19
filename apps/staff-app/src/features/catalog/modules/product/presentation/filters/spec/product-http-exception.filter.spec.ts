@@ -39,12 +39,12 @@ describe('ProductHttpExceptionFilter', () => {
       new ProductSkuInvalidException(/^[A-Z]+$/, 'SKU-0001', 'domain message'),
     ],
     ['PRODUCT_NAME_INVALID', 400, new ProductNameInvalidException(255, 'domain message')],
-    ['PRODUCT_VERSION_INVALID', 400, new ProductVersionInvalidException(0, 'domain message')],
     ['PRODUCT_NOT_FOUND', 404, new ProductNotFoundException('100', 'domain message')],
     ['PRODUCT_ALREADY_ARCHIVED', 409, new ProductAlreadyArchivedException('100', 'domain message')],
     ['PRODUCT_SKU_TAKEN', 409, new ProductSkuTakenException('SKU-0001', 'domain message')],
     ['VERSION_MISMATCH', 409, new ProductVersionMismatchException('100', 4, 'domain message')],
     ['PRODUCT_TAG_NOT_FOUND', 422, new ProductTagNotFoundException(['999'], 'domain message')],
+    ['PRODUCT_VERSION_INVALID', 500, new ProductVersionInvalidException(0, 'domain message')],
   ])(
     'maps %s to %i with the code and the domain message in the body',
     (code, status, exception) => {

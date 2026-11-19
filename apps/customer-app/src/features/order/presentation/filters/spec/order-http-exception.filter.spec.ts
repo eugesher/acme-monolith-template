@@ -32,7 +32,6 @@ describe('OrderHttpExceptionFilter', () => {
 
   it.each([
     ['ORDER_EMPTY', 400, new OrderEmptyException('domain message')],
-    ['ORDER_PRODUCT_NOT_FOUND', 404, new OrderProductNotFoundException('100', 'domain message')],
     ['ORDER_NOT_FOUND', 404, new OrderNotFoundException('600', 'domain message')],
     [
       'ORDER_STOCK_INSUFFICIENT',
@@ -40,15 +39,16 @@ describe('OrderHttpExceptionFilter', () => {
       new OrderStockInsufficientException('100', 9, 8, 'domain message'),
     ],
     [
-      'ORDER_IDEMPOTENT_REQUEST_IN_FLIGHT',
+      'IDEMPOTENT_REQUEST_IN_FLIGHT',
       409,
       new OrderIdempotentRequestInFlightException('key-1', 'domain message'),
     ],
     [
-      'ORDER_IDEMPOTENCY_KEY_REUSED',
+      'IDEMPOTENCY_KEY_REUSED',
       422,
       new OrderIdempotencyKeyReusedException('key-1', 'domain message'),
     ],
+    ['ORDER_PRODUCT_NOT_FOUND', 422, new OrderProductNotFoundException('100', 'domain message')],
   ])(
     'maps %s to %i with the code and the domain message in the body',
     (code, status, exception) => {

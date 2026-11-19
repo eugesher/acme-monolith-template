@@ -38,12 +38,12 @@ describe('ProductStockHttpExceptionFilter', () => {
     ],
     ['PRODUCT_NOT_FOUND', 404, new ProductNotFoundException('100', 'domain message')],
     [
-      'PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT',
+      'IDEMPOTENT_REQUEST_IN_FLIGHT',
       409,
       new ProductIdempotentRequestInFlightException('key-1', 'domain message'),
     ],
     [
-      'PRODUCT_IDEMPOTENCY_KEY_REUSED',
+      'IDEMPOTENCY_KEY_REUSED',
       422,
       new ProductIdempotencyKeyReusedException('key-1', 'domain message'),
     ],

@@ -33,10 +33,10 @@ describe('NoteHttpExceptionFilter', () => {
   it.each([
     ['NOTE_SUBJECT_INVALID', 400, new NoteSubjectInvalidException('domain message')],
     ['NOTE_BODY_INVALID', 400, new NoteBodyInvalidException(255, 'domain message')],
-    ['NOTE_VERSION_INVALID', 400, new NoteVersionInvalidException(0, 'domain message')],
     ['NOTE_NOT_FOUND', 404, new NoteNotFoundException('1', 'domain message')],
     ['NOTE_RESOLVED', 409, new NoteResolvedException('1', 'domain message')],
     ['VERSION_MISMATCH', 409, new NoteVersionMismatchException('1', 5, 4, 'domain message')],
+    ['NOTE_VERSION_INVALID', 500, new NoteVersionInvalidException(0, 'domain message')],
   ])(
     'maps %s to %i with the code and the domain message in the body',
     (code, status, exception) => {

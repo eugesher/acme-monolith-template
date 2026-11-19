@@ -68,7 +68,7 @@ export class UserE2E {
         expect(login.body).toEqual({ accessToken: expect.any(String) });
       });
 
-      it('should refuse a role that is not stored with 404 and create no user', async () => {
+      it('should refuse a role that is not stored with 422 and create no user', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/access/users')
           .auth(this.ctx.adminToken, { type: 'bearer' })
@@ -77,7 +77,7 @@ export class UserE2E {
             password: 'unknown-role-password-please-change',
             roleIds: ['3', '99'],
           })
-          .expect(HttpStatus.NOT_FOUND);
+          .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
         const actual = {
           response: { body: response.body },
@@ -188,12 +188,12 @@ export class UserE2E {
         }).toMatchSnapshot();
       });
 
-      it('should answer 404 for a role that is not stored and change nothing', async () => {
+      it('should answer 422 for a role that is not stored and change nothing', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .put('/api/access/users/4/roles')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .send({ roleIds: ['2', '99'] })
-          .expect(HttpStatus.NOT_FOUND);
+          .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
         expect({
           response: { body: response.body },

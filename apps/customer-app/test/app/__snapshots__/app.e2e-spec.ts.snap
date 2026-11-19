@@ -721,7 +721,7 @@ exports[`App Order POST /api/orders should refuse a caller without a token 1`] =
 }
 `;
 
-exports[`App Order POST /api/orders should refuse a deleted product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse a deleted product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -733,13 +733,13 @@ exports[`App Order POST /api/orders should refuse a deleted product with 404 and
         "productId": "107",
       },
       "message": "Product 107 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
 `;
 
-exports[`App Order POST /api/orders should refuse a draft product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse a draft product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -751,7 +751,7 @@ exports[`App Order POST /api/orders should refuse a draft product with 404 and w
         "productId": "101",
       },
       "message": "Product 101 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -772,7 +772,7 @@ exports[`App Order POST /api/orders should refuse a placement without a key with
 }
 `;
 
-exports[`App Order POST /api/orders should refuse an archived product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse an archived product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -784,7 +784,7 @@ exports[`App Order POST /api/orders should refuse an archived product with 404 a
         "productId": "105",
       },
       "message": "Product 105 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -818,7 +818,7 @@ exports[`App Order POST /api/orders should refuse an id that is not a number wit
 }
 `;
 
-exports[`App Order POST /api/orders should refuse an unknown product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse an unknown product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -830,7 +830,7 @@ exports[`App Order POST /api/orders should refuse an unknown product with 404 an
         "productId": "999",
       },
       "message": "Product 999 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -864,7 +864,7 @@ exports[`App Order POST /api/orders should refuse the same key with another body
   },
   "response": {
     "body": {
-      "code": "ORDER_IDEMPOTENCY_KEY_REUSED",
+      "code": "IDEMPOTENCY_KEY_REUSED",
       "message": "Idempotency-Key e2e-order-reuse-key was already used with a different request body",
       "statusCode": 422,
     },

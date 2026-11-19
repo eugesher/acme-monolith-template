@@ -163,12 +163,12 @@ describe('OrderPlaceUseCase', () => {
     it.each([
       [
         'in-flight',
-        'ORDER_IDEMPOTENT_REQUEST_IN_FLIGHT',
+        'IDEMPOTENT_REQUEST_IN_FLIGHT',
         'Idempotency-Key key-1 is still being processed, retry shortly',
       ],
       [
         'mismatch',
-        'ORDER_IDEMPOTENCY_KEY_REUSED',
+        'IDEMPOTENCY_KEY_REUSED',
         'Idempotency-Key key-1 was already used with a different request body',
       ],
     ])('refuses an %s key with %s and keeps the key', async (outcome, code, message) => {

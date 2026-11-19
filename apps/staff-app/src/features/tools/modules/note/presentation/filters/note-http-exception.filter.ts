@@ -15,10 +15,10 @@ export class NoteHttpExceptionFilter implements ExceptionFilter<NoteBaseExceptio
   private static readonly STATUS: Record<NoteExceptionCodeEnum, HttpStatus> = {
     [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID]: HttpStatus.BAD_REQUEST,
     [NoteExceptionCodeEnum.NOTE_BODY_INVALID]: HttpStatus.BAD_REQUEST,
-    [NoteExceptionCodeEnum.NOTE_VERSION_INVALID]: HttpStatus.BAD_REQUEST,
     [NoteExceptionCodeEnum.NOTE_NOT_FOUND]: HttpStatus.NOT_FOUND,
     [NoteExceptionCodeEnum.NOTE_RESOLVED]: HttpStatus.CONFLICT,
     [NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH]: HttpStatus.CONFLICT,
+    [NoteExceptionCodeEnum.NOTE_VERSION_INVALID]: HttpStatus.INTERNAL_SERVER_ERROR,
   };
 
   constructor(private readonly httpExceptionFilter: HttpExceptionFilter) {}

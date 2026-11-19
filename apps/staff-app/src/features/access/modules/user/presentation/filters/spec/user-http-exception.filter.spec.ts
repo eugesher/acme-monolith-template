@@ -33,8 +33,8 @@ describe('UserHttpExceptionFilter', () => {
     ['AUTH_EMAIL_INVALID', 400, new UserEmailInvalidException('domain message')],
     ['AUTH_PASSWORD_TOO_WEAK', 400, new UserPasswordTooWeakException(12, 'domain message')],
     ['AUTH_USER_NOT_FOUND', 404, new UserNotFoundException('1', 'domain message')],
-    ['AUTH_ROLE_NOT_FOUND', 404, new UserRoleNotFoundException('admin', 'domain message')],
     ['AUTH_EMAIL_TAKEN', 409, new UserEmailTakenException('domain message')],
+    ['AUTH_ROLE_NOT_FOUND', 422, new UserRoleNotFoundException('admin', 'domain message')],
   ])(
     'maps %s to %i with the code and the domain message in the body',
     (code, status, exception) => {
