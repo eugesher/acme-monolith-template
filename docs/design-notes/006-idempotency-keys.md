@@ -63,6 +63,12 @@ is kept. The caller must leave out anything that changes on a retry, such as the
 The outcome enum lives in the contract, not in `libs/kernel`, because only the core-adapters read
 it.
 
+**Every caller branches the same way.** `ProductStockAddUseCase` and customer `OrderPlaceUseCase`
+answer a `replay` first, refuse `in-flight` and `mismatch` next, each with an early exit, and do the
+work last, through a private `write` that runs it in a transaction and releases the key when it
+throws. The work completes the key inside the same transaction, so a stored answer never outlives a
+rolled-back write.
+
 **A key that vanished is in flight.** If the insert hits a duplicate but the row is gone when the
 module reads it, the holder has just released it. The answer is `in-flight`: the client retries and
 claims it properly. Answering `claimed` would let the caller work without holding a row, so a
