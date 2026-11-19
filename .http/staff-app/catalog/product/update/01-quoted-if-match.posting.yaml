@@ -4,7 +4,7 @@ description: |-
 
   Expect: 200 OK, product 102 renamed at version 2; no acme:catalog:* key left
   User: editor@example.com (token signed by scripts.py)
-  Before: Redis: SET acme:catalog:v1:page:1:size:20 '{}'
+  Before: Redis: SET acme:catalog:v1:page:1:limit:20 '{}'
 method: PATCH
 url: $STAFF_APP_BASE_URL/catalog/products/102
 body:

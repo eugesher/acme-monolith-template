@@ -7,6 +7,6 @@ describe('PermissionListUseCase', () => {
     const view = new PermissionListUseCase().execute();
 
     expect(view.codes).toEqual(Object.values(PermissionCodeEnum));
-    expect(view.codes).toContain('access-management');
+    expect(view.codes).toContain('access:manage');
   });
 });

@@ -59,9 +59,11 @@ only for a read with an optimistic lock, and nothing reads that way: the version
 
 ## `If-Match` is a version
 
-`3` and `"3"` both mean version 3; a missing or empty header means "no expectation". Anything that
-is not a non-negative integer, including a weak tag `W/"3"`, is refused with `IF_MATCH_INVALID`
-(400), so a typo cannot turn into an unconditional write. The decorator and its helper live in
+`3` and `"3"` both mean version 3; a missing or empty header means "no expectation". Anything but
+decimal digits, bare or quoted, is refused with `IF_MATCH_INVALID` (400), so a typo cannot turn into
+an unconditional write: a weak tag `W/"3"`, a sign, and the forms `Number` would read, `0x10`, `1e3`
+or `12.0`. So is a number beyond the safe integers of JavaScript, which no stored version reaches.
+The ids of the path and the body are checked as strictly, and the decorator and its helper live in
 `libs/http` next to `IdempotencyKey` (see `039-api-surface.md`). The update, publish and archive of
 a product and the edit and resolve of a note read it.
 

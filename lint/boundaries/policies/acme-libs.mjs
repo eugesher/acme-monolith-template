@@ -43,6 +43,7 @@ export const acmeLibs = [
   ]),
   fromLib('auth', [packages('@nestjs/common', '@nestjs/config', '@nestjs/core', '@nestjs/jwt')]),
   fromLib('testing', [
+    libs('bootstrap'),
     to('acme-libs', { lib: 'cache', file: 'outbound/**' }),
     packages(
       '@nestjs/common',
@@ -69,7 +70,6 @@ export const acmeLibs = [
     ),
   ]),
   fromLib('health', [
-    libs('observability'),
     libContracts('cache'),
     packages('@nestjs/common', '@nestjs/core', 'nestjs-pino', 'typeorm'),
   ]),
@@ -133,6 +133,7 @@ export const acmeLibs = [
   fromLib('observability', [
     packages(
       '@nestjs/common',
+      '@nestjs/core',
       '@opentelemetry/api',
       '@opentelemetry/auto-instrumentations-node',
       '@opentelemetry/exporter-trace-otlp-http',

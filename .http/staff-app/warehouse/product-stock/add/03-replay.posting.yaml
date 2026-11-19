@@ -2,7 +2,7 @@ name: 03-replay
 description: |-
   e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should replay the same response for the same key and body without a second movement
 
-  Expect: 201 Created both times with the same body, product 100 at 10 units, one +2 row
+  Expect: 200 OK both times with the same body, product 100 at 10 units, one +2 row
   User: editor@example.com (token signed by scripts.py)
   Note: send it twice
 method: POST

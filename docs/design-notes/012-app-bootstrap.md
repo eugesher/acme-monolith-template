@@ -12,7 +12,9 @@ jobs of its queues, and runs the queue processors and the schedules (see `023-pr
 1. `@acme-libs/observability/tracer` is the first import, so OpenTelemetry patches the modules
    before Nest loads them. Tracing starts only when `OTEL_SDK_DISABLED=false` is set in the
    environment of the process: the env file of the app is not loaded yet at that point.
-   `yarn start:dev` and the built image pass `.env` to Node with `--env-file`, so both trace.
+   `yarn start:dev` and the built image pass `.env` to Node with `--env-file`, so both trace. The
+   import hands the SDK to `TracerSetupModule`, which closes it when the app stops (see Shutdown
+   below).
 2. `BootstrapLogger.setup(<app>)` gives a pino logger for the line outside DI:
    `<app> bootstrap error` with exit code 1 for a failed start.
 3. `NestFactory.create(AppModule, { bufferLogs: true })` creates the app, and
@@ -22,11 +24,14 @@ jobs of its queues, and runs the queue processors and the schedules (see `023-pr
 `main.ts` creates the app the way any Nest app does, and `AppBootstrap.execute` holds the steps
 every app takes after that, so the three apps cannot start differently:
 
-1. `app.useLogger(app.get(Logger))`: Nest's own lines go through pino too, and the lines buffered
-   before the logger existed are flushed through it.
-2. The global prefix from `API_PREFIX`, `enableShutdownHooks`, the API reference and `listen` on
-   `PORT`.
+1. `AppBootstrap.configure(app)`: `app.useLogger(app.get(Logger))`, so Nest's own lines go through
+   pino too and the lines buffered before the logger existed are flushed through it, and the global
+   prefix from `API_PREFIX`.
+2. `enableShutdownHooks`, the API reference and `listen` on `PORT`.
 3. `<app> is listening on port <port>` through the logger of the app.
+
+The e2e context calls `configure` too, so an app under test logs and routes as the running one; the
+steps that start a process stay in `execute` (see `014-e2e-suites.md`).
 
 ## Environment
 
@@ -85,6 +90,7 @@ change.
 | ----------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `ConfigSetupModule.forRoot()`       | `app/setup/config`                                   | validates the environment of the app with Joi                                                           |
 | `LoggerSetupModule.forRoot(<app>)`  | `libs/observability`                                 | pino, HTTP request logs                                                                                 |
+| `TracerSetupModule.forRoot()`       | `libs/observability`                                 | closes the tracer once the queues have closed                                                           |
 | `LocalStorageSetupModule.forRoot()` | `libs/local-storage`                                 | the CLS context of every request under its correlation id                                               |
 | `OrmModule.forRoot(entities)`       | `libs/database`, the entities of `app/entities`      | the connection, the entities of the app, `ORM_PORT`, `TRANSACTION_PORT` (see `026-transaction-port.md`) |
 | `ScheduleSetupModule`               | `app/setup/schedule`, processor-app only             | `ScheduleModule.forRoot()` for `@Cron`                                                                  |
@@ -153,6 +159,32 @@ The entity list of each app holds exactly the entities of the modules it mounts.
 has `IdempotencyKey`, because the `order` feature mounts the core idempotency module. The entity
 list of processor-app is in `023-processor-app.md`.
 
+## Shutdown
+
+**Nest owns the signals.** `AppBootstrap` calls `enableShutdownHooks`, so on SIGTERM or SIGINT Nest
+closes the app and only then ends the process with the same signal. No other code listens to a
+signal or calls `process.exit`, apart from `main.ts` after a failed start: a second listener that
+exits would end the process while Nest is still closing it, cutting the job a processor runs.
+
+Nest closes in phases: `onModuleDestroy`, `beforeApplicationShutdown`, the HTTP server, then
+`onApplicationShutdown`. Each phase walks the modules from the root down, and the global modules
+come last. In the last phase:
+
+| Hook                | Where                                          | What it waits for              |
+| ------------------- | ---------------------------------------------- | ------------------------------ |
+| `queue.close()`     | the queue modules of `@nestjs/bull`            | the job a processor is running |
+| the `DataSource`    | `TypeOrmCoreModule` of `OrmModule`             | the pool                       |
+| the Redis clients   | `CacheLibStoreAdapter`, `ThrottleRedisStorage` | `quit`                         |
+| `TracerSetupModule` | `libs/observability`                           | the export of the spans left   |
+
+**The tracer closes after the queues.** `@acme-libs/observability/tracer` starts the SDK before Nest
+loads and hands it to `TracerSetupModule.track`. The module is global, so its hook runs after the
+hooks of the queue modules, which sit deeper in the graph, and the SDK exports the spans of the jobs
+that finished during the shutdown. A failed export is logged by Nest, like any failed hook, and the
+shutdown goes on. The module imports the SDK as a type only, so the specs and e2e suites that load
+`@acme-libs/observability` never load OpenTelemetry. Its spec boots a context with a module two
+levels deep and checks the order.
+
 ## Logs
 
 **A write logs once, where it happens.** The use case that changes state logs one `info` line with
@@ -168,6 +200,9 @@ layer of features, processors, common modules and core modules alike. Presentati
 infrastructure and the shell log nothing; a lib takes the package as a whole, so its infrastructure
 logs its own failures. Retries log through `OccRetryHelper` and `ReplayRetryHelper`, which take the
 logger of the use case: `warn` for an attempt, `error` with a call to replay after the last one.
+`JobFailureHelper` logs a failed job the same way. The three take one type, `IHelperLogger` of
+`libs/toolkit`, which the `PinoLogger` of a use case satisfies, so the toolkit needs no logging
+package.
 
 `LoggerSetupConfig` sends the logs through `pino-pretty` only when `NODE_ENV` is `development`.
 Production, the e2e runs with `NODE_ENV=test` and a process without `NODE_ENV` log JSON lines, so

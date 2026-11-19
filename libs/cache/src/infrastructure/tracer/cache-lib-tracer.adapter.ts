@@ -1,5 +1,5 @@
 import { Injectable, type ClassProvider } from '@nestjs/common';
-import { trace } from '@opentelemetry/api';
+import { SpanStatusCode, trace, type Exception } from '@opentelemetry/api';
 
 import {
   CACHE_LIB_TRACER_PORT,
@@ -25,6 +25,11 @@ export class CacheLibTracerAdapter implements ICacheLibTracerPort {
 
       try {
         return await work(collected);
+      } catch (error) {
+        span.recordException(error as Exception);
+        span.setStatus({ code: SpanStatusCode.ERROR });
+
+        throw error;
       } finally {
         span.setAttributes(collected);
         span.end();

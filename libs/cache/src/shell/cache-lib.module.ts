@@ -4,9 +4,7 @@ import { CACHE_LIB_PORT } from '@acme-libs/contracts/cache';
 
 import {
   CacheLibDelByPrefixUseCase,
-  CacheLibDelUseCase,
   CacheLibGetUseCase,
-  CacheLibSetUseCase,
   CacheLibWrapUseCase,
 } from '../application';
 import {
@@ -22,8 +20,6 @@ import { CacheLibFacade } from './cache-lib.facade';
   providers: [
     { provide: CACHE_LIB_PORT, useClass: CacheLibFacade },
     CacheLibGetUseCase,
-    CacheLibSetUseCase,
-    CacheLibDelUseCase,
     CacheLibDelByPrefixUseCase,
     CacheLibWrapUseCase,
     CacheLibStoreAdapter.provider,

@@ -1,5 +1,5 @@
-export * from './concurrency/occ-retry-policy.interface';
 export * from './concurrency/occ-retry.helper';
+export * from './concurrency/occ-retry.options';
 export * from './database/mysql-error.helper';
 export * from './idempotency/body-fingerprint.helper';
 export * from './pagination/interfaces/snapshots/page-window.interface';
@@ -11,6 +11,5 @@ export * from './resilience/job-failure.helper';
 export * from './resilience/job-failure.options';
 export * from './resilience/replay-retry.helper';
 export * from './resilience/replay-retry.options';
-export * from './result/result.helper';
-export * from './result/result.type';
+export * from './types/helper-logger.interface';
 export * from './types/utility.type';

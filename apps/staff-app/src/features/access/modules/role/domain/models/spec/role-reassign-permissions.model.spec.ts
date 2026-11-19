@@ -11,7 +11,7 @@ describe('RoleReassignPermissionsModel', () => {
       name: 'editor',
       rolePermissions: [
         { code: PermissionCodeEnum.LEDGER_READ },
-        { code: PermissionCodeEnum.ACCESS_MANAGEMENT },
+        { code: PermissionCodeEnum.ACCESS_MANAGE },
       ],
     });
   });
@@ -21,7 +21,7 @@ describe('RoleReassignPermissionsModel', () => {
       expect(role.toSnapshot()).toEqual({
         id: '2',
         name: 'editor',
-        permissionCodes: ['access-management', 'ledger:read'],
+        permissionCodes: ['access:manage', 'ledger:read'],
       });
     });
   });
@@ -29,13 +29,13 @@ describe('RoleReassignPermissionsModel', () => {
   describe('reassignPermissions', () => {
     it('reassigns the codes, without duplicates', () => {
       role.reassignPermissions([
-        PermissionCodeEnum.ACCESS_MANAGEMENT,
+        PermissionCodeEnum.ACCESS_MANAGE,
         PermissionCodeEnum.PRODUCT_READ,
-        PermissionCodeEnum.ACCESS_MANAGEMENT,
+        PermissionCodeEnum.ACCESS_MANAGE,
       ]);
 
       expect(role.toSnapshot()).toMatchObject({
-        permissionCodes: ['access-management', 'product:read'],
+        permissionCodes: ['access:manage', 'product:read'],
       });
     });
 
@@ -49,7 +49,7 @@ describe('RoleReassignPermissionsModel', () => {
   describe('getRolePermissions', () => {
     it('answers a row of the role for every permission code', () => {
       expect(role.getRolePermissions()).toEqual([
-        { roleId: '2', code: 'access-management' },
+        { roleId: '2', code: 'access:manage' },
         { roleId: '2', code: 'ledger:read' },
       ]);
     });
@@ -59,7 +59,7 @@ describe('RoleReassignPermissionsModel', () => {
     it('answers the name of the role and its permissions', () => {
       expect(role.toLoggerPayload()).toEqual({
         name: 'editor',
-        rolePermissions: [{ code: 'access-management' }, { code: 'ledger:read' }],
+        rolePermissions: [{ code: 'access:manage' }, { code: 'ledger:read' }],
       });
     });
   });

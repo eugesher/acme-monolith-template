@@ -39,8 +39,9 @@ feature declares a port of its own (`AUTH_CREDENTIALS_PORT`) and implements it i
 `infrastructure/lib-adapters` on top of `CREDENTIALS_LIB_PORT`, so no feature imports `argon2` or
 `@nestjs/jwt` and the application never sees the lib. Example:
 `apps/customer-app/src/features/auth/infrastructure/lib-adapters/auth-credentials-lib.adapter.ts`.
-Verifying a token stays in `libs/auth`: signing and verifying meet only in `JWT_SECRET` and in
-`AuthAudienceEnum`. A module imports the lib as `CredentialsLibModule.register(audience)`; the lib
+Verifying a token stays in `libs/auth`: signing and verifying meet only in `JWT_SECRET` and in the
+enums of `libs/kernel`, `AuthAudienceEnum` and `AuthTokenAlgorithmEnum`, since neither lib may
+import the other. A module imports the lib as `CredentialsLibModule.register(audience)`; the lib
 signs `HS256` tokens with that `aud`.
 
 ## One model per module over one table

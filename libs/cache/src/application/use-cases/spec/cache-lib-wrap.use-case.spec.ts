@@ -18,7 +18,7 @@ describe('CacheLibWrapUseCase', () => {
     spans = [];
     logger = makePinoLoggerMock();
     useCase = new CacheLibWrapUseCase(
-      { get, set, del: jest.fn(), unlinkByPrefix: jest.fn() },
+      { get, set, unlinkByPrefix: jest.fn() },
       {
         span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
           const attributes = { ...command.attributes };
@@ -59,21 +59,12 @@ describe('CacheLibWrapUseCase', () => {
     ]);
   });
 
-  it('caches a computed null', async () => {
-    const compute = jest.fn().mockResolvedValue(null);
+  it.each([null, undefined])('returns a computed %p without writing it', async (empty) => {
+    const compute = jest.fn().mockResolvedValue(empty);
 
     const value = await useCase.execute({ key: 'k', ttlMs: 600_000, compute });
 
-    expect(value).toBeNull();
-    expect(set).toHaveBeenCalledWith({ key: 'k', value: null, ttlMs: 600_000 });
-  });
-
-  it('does not cache undefined', async () => {
-    const compute = jest.fn().mockResolvedValue(undefined);
-
-    const value = await useCase.execute({ key: 'k', ttlMs: 600_000, compute });
-
-    expect(value).toBeUndefined();
+    expect(value).toBe(empty);
     expect(set).not.toHaveBeenCalled();
   });
 
@@ -118,7 +109,10 @@ describe('CacheLibWrapUseCase', () => {
       'Cache read failed, computing the value without caching it',
     );
     expect(spans).toEqual([
-      { name: 'cache.wrap', attributes: { 'cache.key': 'k', 'cache.hit': false } },
+      {
+        name: 'cache.wrap',
+        attributes: { 'cache.key': 'k', 'cache.hit': false, 'cache.error': 'read' },
+      },
     ]);
   });
 
@@ -136,6 +130,12 @@ describe('CacheLibWrapUseCase', () => {
       { err: new Error('write failed'), key: 'k' },
       'Cache write failed',
     );
+    expect(spans).toEqual([
+      {
+        name: 'cache.wrap',
+        attributes: { 'cache.key': 'k', 'cache.hit': false, 'cache.error': 'write' },
+      },
+    ]);
   });
 
   it('lets a failed computation reject every waiting caller', async () => {

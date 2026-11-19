@@ -1,10 +1,7 @@
-export interface IJobFailureLogger {
-  warn(context: Record<string, unknown>, message: string): void;
-  error(context: Record<string, unknown>, message: string): void;
-}
+import type { IHelperLogger } from '../types/helper-logger.interface';
 
 export interface IJobFailureOptions {
-  logger: IJobFailureLogger;
+  logger: IHelperLogger;
   label: string;
   context: object;
   attempt: number;

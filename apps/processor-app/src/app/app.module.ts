@@ -11,7 +11,7 @@ import {
 } from '@acme-libs/http';
 import { AppNameEnum } from '@acme-libs/kernel';
 import { LocalStorageSetupModule } from '@acme-libs/local-storage';
-import { LoggerSetupModule } from '@acme-libs/observability';
+import { LoggerSetupModule, TracerSetupModule } from '@acme-libs/observability';
 import { BullSetupModule } from '@acme-libs/queue';
 import { HealthModule, QueueModule } from '@acme-processor/features';
 import { IdempotencyModule, LedgerModule, ProductStockModule } from '@acme-processor/processors';
@@ -24,6 +24,7 @@ import { ConfigSetupModule, ScheduleSetupModule } from './setup';
   imports: [
     ConfigSetupModule.forRoot(),
     LoggerSetupModule.forRoot(AppNameEnum.PROCESSOR_APP),
+    TracerSetupModule.forRoot(),
     LocalStorageSetupModule.forRoot(),
     OrmModule.forRoot(entities),
     ScheduleSetupModule,

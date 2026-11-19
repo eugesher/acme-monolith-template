@@ -20,7 +20,7 @@ describe('ApiIfMatchHeader', () => {
         in: 'header',
         required: false,
         description:
-          'The version as read, for optimistic concurrency; a value that is not a non-negative integer answers IF_MATCH_INVALID (400)',
+          'The version as read, for optimistic concurrency; a value other than decimal digits, bare or quoted, answers IF_MATCH_INVALID (400)',
         schema: { type: 'string' },
       },
     ]);

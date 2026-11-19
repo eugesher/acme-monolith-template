@@ -2,7 +2,7 @@ import { BullModule, type BullRootModuleOptions } from '@nestjs/bull';
 import { ConfigService } from '@nestjs/config';
 import type { DynamicModule } from '@nestjs/common';
 
-import { TlsHelper } from '@acme-libs/config';
+import { RedisConfigHelper } from '@acme-libs/config';
 
 export class BullSetupModule {
   private static readonly DEFAULT_JOB_OPTIONS: BullRootModuleOptions['defaultJobOptions'] = {
@@ -23,12 +23,7 @@ export class BullSetupModule {
   }
 
   private static options(config: ConfigService): BullRootModuleOptions {
-    const host = config.getOrThrow<string>('REDIS_HOST');
-    const port = config.getOrThrow<number>('REDIS_PORT');
-    const password = config.getOrThrow<string>('REDIS_PASSWORD');
-    const caPath = config.getOrThrow<string>('REDIS_TLS_CA');
-    const tls = TlsHelper.options(caPath);
-    const redis = { host, port, password, tls };
+    const redis = RedisConfigHelper.connection(config);
 
     return { redis, defaultJobOptions: BullSetupModule.DEFAULT_JOB_OPTIONS };
   }

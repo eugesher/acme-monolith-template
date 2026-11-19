@@ -1,0 +1,22 @@
+name: 03-unknown-role
+description: |-
+  e2e: Access › User › PUT /api/access/users/:userId/roles › should answer 422 for a role that is not stored and change nothing
+
+  Expect: 422 Unprocessable Entity, code AUTH_ROLE_NOT_FOUND; user 4 keeps roles 2 and 3
+  User: admin@example.com (token signed by scripts.py)
+method: PUT
+url: $STAFF_APP_BASE_URL/access/users/4/roles
+body:
+  content: |-
+    {
+      "roleIds": ["2", "99"]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin

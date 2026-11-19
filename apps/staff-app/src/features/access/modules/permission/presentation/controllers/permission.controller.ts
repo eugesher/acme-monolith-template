@@ -13,7 +13,7 @@ export class PermissionController {
   constructor(private readonly list: PermissionListUseCase) {}
 
   @Get()
-  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGEMENT)
+  @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'List every permission code' })
   @ApiOkResponse({ type: PermissionListResponseDto })
   public handleList(): PermissionListResponseDto {

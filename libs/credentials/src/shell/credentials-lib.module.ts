@@ -2,8 +2,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule, type JwtSignOptions } from '@nestjs/jwt';
 import type { DynamicModule } from '@nestjs/common';
 
+import { AuthTokenAlgorithmEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
 import { CREDENTIALS_LIB_PORT } from '@acme-libs/contracts/credentials';
-import type { AuthAudienceEnum } from '@acme-libs/kernel';
 
 import {
   CredentialsLibHashPasswordUseCase,
@@ -26,7 +26,7 @@ export class CredentialsLibModule {
           useFactory: (config: ConfigService) => ({
             secret: config.getOrThrow<string>('JWT_SECRET'),
             signOptions: {
-              algorithm: 'HS256',
+              algorithm: AuthTokenAlgorithmEnum.HS256,
               audience,
               expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN') as JwtSignOptions['expiresIn'],
             },

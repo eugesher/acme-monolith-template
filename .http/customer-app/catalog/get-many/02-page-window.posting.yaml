@@ -9,7 +9,7 @@ url: $CUSTOMER_APP_BASE_URL/products
 params:
   - name: page
     value: '2'
-  - name: size
+  - name: limit
     value: '1'
 auth:
   type: bearer_token

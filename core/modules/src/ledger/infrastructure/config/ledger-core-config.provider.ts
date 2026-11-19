@@ -12,5 +12,5 @@ export const LedgerCoreConfigRedisCommandTimeoutMsProvider = ConfigValueProvider
 
 export const LedgerCoreConfigEnqueueRetryAttemptsProvider = ConfigValueProvider.provide({
   injectionToken: LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
-  configProperty: 'LEDGER_ENQUEUE_RETRY_ATTEMPTS',
+  configProperty: 'ENQUEUE_RETRY_ATTEMPTS',
 });

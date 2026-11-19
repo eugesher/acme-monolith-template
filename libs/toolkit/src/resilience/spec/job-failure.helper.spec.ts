@@ -12,7 +12,7 @@ describe('JobFailureHelper', () => {
 
     it('logs a failed attempt with attempts left as a retry', () => {
       JobFailureHelper.report({
-        logger: { warn, error },
+        logger: { info: jest.fn(), warn, error },
         label: 'Item sync',
         context: { itemId: '7' },
         attempt: 1,
@@ -29,7 +29,7 @@ describe('JobFailureHelper', () => {
 
     it('logs the last failed attempt for a replay', () => {
       JobFailureHelper.report({
-        logger: { warn, error },
+        logger: { info: jest.fn(), warn, error },
         label: 'Item sync',
         context: { itemId: '7' },
         attempt: 3,

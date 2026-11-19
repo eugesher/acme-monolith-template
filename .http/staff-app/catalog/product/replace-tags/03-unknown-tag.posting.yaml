@@ -1,0 +1,22 @@
+name: 03-unknown-tag
+description: |-
+  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags › should refuse an unknown tag with 422 and keep the tags the product had
+
+  Expect: 422 Unprocessable Entity, code PRODUCT_TAG_NOT_FOUND, details.missingTagIds 998 and 999; product 100 keeps fragile and promo
+  User: editor@example.com (token signed by scripts.py)
+method: PUT
+url: $STAFF_APP_BASE_URL/catalog/products/100/tags
+body:
+  content: |-
+    {
+      "tagIds": ["300", "998", "999"]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

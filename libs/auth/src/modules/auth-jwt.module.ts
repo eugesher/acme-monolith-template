@@ -3,7 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import type { DynamicModule } from '@nestjs/common';
 
-import type { AuthAudienceEnum } from '@acme-libs/kernel';
+import { AuthTokenAlgorithmEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
 
 import { AuthJwtGuard } from '../guards/auth-jwt.guard';
 
@@ -16,7 +16,7 @@ export class AuthJwtModule {
           inject: [ConfigService],
           useFactory: (config: ConfigService) => ({
             secret: config.getOrThrow<string>('JWT_SECRET'),
-            verifyOptions: { algorithms: ['HS256'], audience },
+            verifyOptions: { algorithms: [AuthTokenAlgorithmEnum.HS256], audience },
           }),
         }),
       ],

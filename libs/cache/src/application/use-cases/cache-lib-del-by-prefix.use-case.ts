@@ -35,6 +35,7 @@ export class CacheLibDelByPrefixUseCase {
             { err: error, prefix },
             'Cache invalidation failed, entries expire on TTL',
           );
+          attributes['cache.error'] = 'unlink';
 
           return 0;
         }

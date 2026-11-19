@@ -1,0 +1,16 @@
+name: 05-malformed-tag
+description: |-
+  e2e: Sales › Order › GET /api/sales/orders › should refuse a malformed tag id with 400 from validation
+
+  Expect: 400 Bad Request, code VALIDATION_FAILED, tagId must be a positive integer
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/sales/orders
+params:
+  - name: tagId
+    value: fragile
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

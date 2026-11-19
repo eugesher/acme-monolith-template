@@ -2,7 +2,7 @@ name: 09-fraction
 description: |-
   e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should refuse a quantity of a fraction with 400 from validation
 
-  Expect: 400 Bad Request, quantity must be an integer number
+  Expect: 400 Bad Request, code VALIDATION_FAILED, quantity must be an integer number
   User: editor@example.com (token signed by scripts.py)
 method: POST
 url: $STAFF_APP_BASE_URL/warehouse/product-stock/100/add

@@ -68,13 +68,13 @@ describe('libs', () => {
     ['config', ['kernel', 'toolkit', 'domain']],
     ['credentials', ['kernel', 'toolkit', 'domain']],
     ['database', ['kernel', 'toolkit', 'domain', 'config', 'local-storage']],
-    ['health', ['kernel', 'toolkit', 'domain', 'observability']],
+    ['health', ['kernel', 'toolkit', 'domain']],
     ['http', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
     ['local-storage', ['kernel', 'toolkit', 'domain', 'observability']],
     ['observability', ['kernel', 'toolkit', 'domain', 'config']],
     ['openapi', ['kernel', 'toolkit', 'domain', 'http']],
     ['queue', ['kernel', 'toolkit', 'domain', 'config']],
-    ['testing', ['kernel', 'toolkit', 'domain']],
+    ['testing', ['kernel', 'toolkit', 'domain', 'bootstrap']],
   ])('%s may import only %j of the other libs', async (from, allowed) => {
     const libs = [
       'auth',

@@ -2,7 +2,7 @@ name: 05-id-not-a-number
 description: |-
   e2e: Order › GET /api/orders/:orderId › should refuse an order id that is not a number with 400 from validation
 
-  Expect: 400 Bad Request
+  Expect: 400 Bad Request, code VALIDATION_FAILED, orderId must be a positive integer
   User: bob@example.com (token signed by scripts.py)
 url: $CUSTOMER_APP_BASE_URL/orders/latest
 auth:

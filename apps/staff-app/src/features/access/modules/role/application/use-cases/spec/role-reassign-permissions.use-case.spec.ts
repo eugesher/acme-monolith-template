@@ -22,7 +22,7 @@ describe('RoleReassignPermissionsUseCase', () => {
       findRole: jest.fn().mockResolvedValue({
         id: '2',
         name: 'editor',
-        rolePermissions: [{ code: PermissionCodeEnum.ACCESS_MANAGEMENT }],
+        rolePermissions: [{ code: PermissionCodeEnum.ACCESS_MANAGE }],
       }),
       deleteRolePermissions: jest.fn().mockResolvedValue(undefined),
       insertRolePermissions: jest.fn().mockResolvedValue(undefined),
@@ -50,24 +50,24 @@ describe('RoleReassignPermissionsUseCase', () => {
   it('reassigns the permissions of the role in one transaction', async () => {
     const view = await useCase.execute({
       roleId: '2',
-      permissionCodes: [PermissionCodeEnum.ACCESS_MANAGEMENT, PermissionCodeEnum.PRODUCT_READ],
+      permissionCodes: [PermissionCodeEnum.ACCESS_MANAGE, PermissionCodeEnum.PRODUCT_READ],
     });
 
     expect(view).toEqual({
       id: '2',
       name: 'editor',
-      permissionCodes: ['access-management', 'product:read'],
+      permissionCodes: ['access:manage', 'product:read'],
     });
     expect(repository.deleteRolePermissions).toHaveBeenCalledWith('2');
     expect(repository.insertRolePermissions).toHaveBeenCalledWith([
-      { roleId: '2', code: 'access-management' },
+      { roleId: '2', code: 'access:manage' },
       { roleId: '2', code: 'product:read' },
     ]);
     expect(outcomes).toEqual(['begin', 'commit']);
     expect(logger.info).toHaveBeenCalledWith(
       {
         name: 'editor',
-        rolePermissions: [{ code: 'access-management' }, { code: 'product:read' }],
+        rolePermissions: [{ code: 'access:manage' }, { code: 'product:read' }],
       },
       'Role permissions reassigned',
     );

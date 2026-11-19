@@ -21,7 +21,7 @@ export class PermissionE2E {
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
 
-      it('should refuse a caller without access-management', async () => {
+      it('should refuse a caller without access:manage', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/access/permissions')
           .auth(this.ctx.viewerToken, { type: 'bearer' })

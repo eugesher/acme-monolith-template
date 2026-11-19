@@ -68,9 +68,8 @@ fields and the `data` of the job: a deleted ledger record never reaches the ledg
 the only place it can be restored from.
 
 **The config holds what the processors read**: the database, Redis, `IDEMPOTENCY_KEY_TTL_HOURS`,
-`IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES`, `LEDGER_ENQUEUE_RETRY_ATTEMPTS` of the core ledger and
-`ENQUEUE_RETRY_ATTEMPTS` of the core modules it mounts, the logger and tracing, and `JWT_SECRET` to
-check the staff token. No cache TTL.
+`IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES`, `ENQUEUE_RETRY_ATTEMPTS` of the core modules it mounts, the
+logger and tracing, and `JWT_SECRET` to check the staff token. No cache TTL.
 
 **The entity list holds `IdempotencyKey`, `LedgerEntry`, `Product` and `ProductStock`**, the tables
 of the purge, the ledger append and the stock check, with `Order`, `OrderProduct` and `Customer`,

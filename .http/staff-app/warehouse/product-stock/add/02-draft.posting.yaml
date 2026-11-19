@@ -2,7 +2,7 @@ name: 02-draft
 description: |-
   e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should restock a draft
 
-  Expect: 201 Created, draft 101 at 8 units
+  Expect: 200 OK, draft 101 at 8 units
   User: admin@example.com (token signed by scripts.py)
 method: POST
 url: $STAFF_APP_BASE_URL/warehouse/product-stock/101/add

@@ -24,8 +24,11 @@ connection, the job options and the registration of a queue.
 
 ## The connection is per app, the job options are not
 
-`forRoot()` takes the `REDIS_*` variables from `ConfigService`, as `libs/cache` and
-`libs/credentials` do. The job options are the private constant `DEFAULT_JOB_OPTIONS` of
+`forRoot()` takes the address, the password and the TLS of Redis from `RedisConfigHelper.connection`
+of `libs/config`; the cache and the request limits take `failFast`, which adds no offline queue and
+a command timeout. Bull keeps the defaults of ioredis: its blocking commands wait for jobs longer
+than a command timeout, and an enqueue has a deadline of its own (see
+`022-enqueue-after-commit.md`). The job options are the private constant `DEFAULT_JOB_OPTIONS` of
 `BullSetupModule`, listed in `008-queue-processor.md`. Several apps write to `ledger-record` and to
 `product-stock-post-subtract`; options read from the environment of each app would let their jobs
 retry differently, while the code of the lib is the same in every app.

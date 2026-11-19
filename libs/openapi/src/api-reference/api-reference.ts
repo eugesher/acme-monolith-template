@@ -24,7 +24,7 @@ export class ApiReference {
     [AppNameEnum.PROCESSOR_APP]: {
       title: 'ACME processor app',
       description:
-        'The background worker: the staff login and the failed jobs of its queues; the rest of its work comes from queues and schedules.',
+        'The background worker: its queues and their failed jobs, listed, retried and removed with the token of a staff login to the staff API; the rest of its work comes from queues and schedules.',
     },
   };
   private static readonly ERROR_DESCRIPTION =

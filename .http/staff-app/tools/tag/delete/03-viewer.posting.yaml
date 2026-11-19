@@ -1,0 +1,14 @@
+name: 03-viewer
+description: |-
+  e2e: Tools › Tag › DELETE /api/tools/tags/:tagId › should refuse a role without tag:write with 403
+
+  Expect: 403 Forbidden, code FORBIDDEN
+  User: viewer@example.com (token signed by scripts.py)
+method: DELETE
+url: $STAFF_APP_BASE_URL/tools/tags/300
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

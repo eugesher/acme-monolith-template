@@ -1,0 +1,13 @@
+name: 02-no-tags
+description: |-
+  e2e: Sales › Order › GET /api/sales/orders/:orderId/tags › should answer an empty list for a order without tags
+
+  Expect: 200 OK, an empty list
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/sales/orders/601/tags
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

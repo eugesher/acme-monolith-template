@@ -63,10 +63,10 @@ password from, so the healthcheck command carries no password.
 **TLS is on when a CA path is set.** `DATABASE_SSL_CA` and `REDIS_TLS_CA` hold the path of the
 certificate authority file inside the container; empty, the clients connect without TLS, as on the
 `backend` network of the stack. `TlsHelper` of `libs/config` reads the file for the four clients of
-the libs: the ORM, Bull, the cache and the request limits. The migrations data source and
-`admin-create.ts` read `DATABASE_SSL_CA` of `env/migrations/.env` themselves, since they import no
-lib. A path that cannot be read stops the process at boot. The certificate of the server is always
-verified against that authority.
+the libs: for the ORM itself, and for Bull, the cache and the request limits through
+`RedisConfigHelper`. The migrations data source and `admin-create.ts` read `DATABASE_SSL_CA` of
+`env/migrations/.env` themselves, since they import no lib. A path that cannot be read stops the
+process at boot. The certificate of the server is always verified against that authority.
 
 **The apps need no DDL.** The stack runs the apps and the migrations as one MySQL user, `acme`, with
 every privilege on the database. On a managed database the apps take a user with `SELECT`, `INSERT`,
@@ -93,8 +93,8 @@ until its origin is listed (see `037-http-edge.md`).
 `scripts/node/admin-create.ts` runs once from the `migrations` image, after the migrations:
 
 - it reads `ADMIN_EMAIL` and `ADMIN_PASSWORD`, of 12 characters or more, from `env/migrations/.env`;
-- it creates the user and the `admin` role with the `access-management` permission only, so the
-  first account can grant access and nothing else until it gives itself more;
+- it creates the user and the `admin` role with the `access:manage` permission only, so the first
+  account can grant access and nothing else until it gives itself more;
 - it writes in one transaction, so an email already taken fails without changes.
 
 The two variables are removed from the file afterwards. The script hashes the password with
@@ -107,7 +107,9 @@ until the administrator changes the password.
 
 An app traces when its `.env` sets `OTEL_SDK_DISABLED=false`. The image starts Node with
 `--env-file-if-exists`, so the tracer, the first import of `main.ts`, sees that value before Nest
-loads the file (see `012-app-bootstrap.md`).
+loads the file (see `012-app-bootstrap.md`). When the app stops, `TracerSetupModule` exports the
+spans left once the queues have finished their jobs, so the spans of the last jobs reach the
+collector.
 
 `OTEL_EXPORTER_OTLP_ENDPOINT` is a base address, `http://otel-collector:4318`: the SDK appends
 `/v1/traces` itself, and a value with that path sends spans to `/v1/traces/v1/traces`.

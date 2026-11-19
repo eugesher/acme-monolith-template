@@ -2,10 +2,10 @@ import { ReplayRetryHelper } from '../replay-retry.helper';
 
 describe('ReplayRetryHelper', () => {
   describe('retryThenLogForReplay', () => {
-    let logger: { warn: jest.Mock; error: jest.Mock };
+    let logger: { info: jest.Mock; warn: jest.Mock; error: jest.Mock };
 
     beforeEach(() => {
-      logger = { warn: jest.fn(), error: jest.fn() };
+      logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
     });
 
     it('returns on the first success without logging', async () => {

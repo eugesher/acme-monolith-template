@@ -2,7 +2,7 @@ name: 11-empty-list
 description: |-
   e2e: Order › POST /api/orders › should refuse an empty list with 400 from validation
 
-  Expect: 400 Bad Request
+  Expect: 400 Bad Request, code VALIDATION_FAILED, productIds must contain at least 1 elements
   User: ann@example.com (token signed by scripts.py)
 method: POST
 url: $CUSTOMER_APP_BASE_URL/orders

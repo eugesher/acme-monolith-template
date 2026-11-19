@@ -10,7 +10,7 @@ url: $STAFF_APP_BASE_URL/catalog/products/104
 body:
   content: |-
     {
-      "name": "Concurrent rename 1"
+      "name": "Concurrent update 1"
     }
 auth:
   type: bearer_token

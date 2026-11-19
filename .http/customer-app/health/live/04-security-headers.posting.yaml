@@ -1,0 +1,6 @@
+name: 04-security-headers
+description: |-
+  e2e: Health › GET /api/health › should set the security headers of helmet
+
+  Expect: 200 OK, headers content-security-policy default-src 'none';frame-ancestors 'none', strict-transport-security max-age=31536000; includeSubDomains, x-content-type-options nosniff, x-frame-options DENY, no x-powered-by
+url: $CUSTOMER_APP_BASE_URL/health

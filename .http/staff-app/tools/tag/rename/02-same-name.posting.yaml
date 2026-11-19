@@ -1,0 +1,24 @@
+name: 02-same-name
+description: |-
+  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId › should answer the tag as it is when the name does not change
+
+  Expect: 200 OK, tag 390 still named seasonal
+  User: editor@example.com (token signed by scripts.py)
+  Before: SQL: INSERT INTO tag (id, name, created_at, updated_at) VALUES (390, 'seasonal', '2026-01-01 00:00:00', '2026-01-01 00:00:00')
+  After: SQL: DELETE FROM tag WHERE id = 390
+method: PATCH
+url: $STAFF_APP_BASE_URL/tools/tags/390
+body:
+  content: |-
+    {
+      "name": "seasonal"
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

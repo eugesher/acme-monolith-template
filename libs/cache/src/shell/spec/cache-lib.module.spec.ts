@@ -85,12 +85,10 @@ describe('CacheLibModule', () => {
     );
   });
 
-  it('fails reads, writes and deletes at once while Redis is down', async () => {
+  it('fails a read at once while Redis is down', async () => {
     await connectionError;
 
     await expect(port.handleGet('k')).rejects.toThrow();
-    await expect(port.handleSet({ key: 'k', value: 'v', ttlMs: 1000 })).rejects.toThrow();
-    await expect(port.handleDel('k')).rejects.toThrow();
   });
 
   it('keeps invalidation and read-through working while Redis is down', async () => {

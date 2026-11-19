@@ -16,7 +16,7 @@ describe('CacheLibDelByPrefixUseCase', () => {
     spans = [];
     logger = makePinoLoggerMock();
     useCase = new CacheLibDelByPrefixUseCase(
-      { get: jest.fn(), set: jest.fn(), del: jest.fn(), unlinkByPrefix },
+      { get: jest.fn(), set: jest.fn(), unlinkByPrefix },
       {
         span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
           const attributes = { ...command.attributes };
@@ -53,5 +53,11 @@ describe('CacheLibDelByPrefixUseCase', () => {
       { err: new Error('scan failed'), prefix: 'acme:r:1:' },
       'Cache invalidation failed, entries expire on TTL',
     );
+    expect(spans).toEqual([
+      {
+        name: 'cache.delByPrefix',
+        attributes: { 'cache.prefix': 'acme:r:1:', 'cache.error': 'unlink' },
+      },
+    ]);
   });
 });

@@ -8,7 +8,11 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
-import { AUTH_USER_VALIDATOR_PORT, type IAuthUserValidatorPort } from '@acme-libs/contracts/auth';
+import {
+  AUTH_USER_VALIDATOR_PORT,
+  type IAuthJwtPayloadCommand,
+  type IAuthUserValidatorPort,
+} from '@acme-libs/contracts/auth';
 import type { Maybe } from '@acme-libs/toolkit';
 
 import { AuthMetadataKeyEnum } from '../enums/auth-metadata-key.enum';
@@ -41,7 +45,7 @@ export class AuthJwtGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const payload = await this.jwt.verifyAsync<{ sub: string }>(token).catch(() => {
+    const payload = await this.jwt.verifyAsync<IAuthJwtPayloadCommand>(token).catch(() => {
       throw new UnauthorizedException();
     });
     const user = await this.validator.handleValidate({ sub: payload.sub });

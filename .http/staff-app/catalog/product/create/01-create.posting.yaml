@@ -2,7 +2,7 @@ name: 01-create
 description: |-
   e2e: Catalog › Product › POST /api/catalog/products › should create a draft and queue the ledger record under the correlation id
 
-  Expect: 201 Created; product and a ledger entry product-created with correlation_id e2e-product-create
+  Expect: 201 Created; product and a ledger entry product-created with correlation_id e2e00000-0000-4000-8000-000000000014
   User: editor@example.com (token signed by scripts.py)
 method: POST
 url: $STAFF_APP_BASE_URL/catalog/products
@@ -18,7 +18,7 @@ auth:
     token: $token
 headers:
   - name: x-correlation-id
-    value: e2e-product-create
+    value: e2e00000-0000-4000-8000-000000000014
   - name: Content-Type
     value: application/json
 scripts:

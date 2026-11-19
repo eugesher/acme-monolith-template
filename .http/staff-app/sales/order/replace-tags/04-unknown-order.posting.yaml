@@ -1,0 +1,22 @@
+name: 04-unknown-order
+description: |-
+  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags › should answer an unknown order with 404
+
+  Expect: 404 Not Found, code ORDER_NOT_FOUND
+  User: editor@example.com (token signed by scripts.py)
+method: PUT
+url: $STAFF_APP_BASE_URL/sales/orders/999/tags
+body:
+  content: |-
+    {
+      "tagIds": ["302"]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

@@ -170,7 +170,8 @@ adds only the state and the answers that use case needs: `OrderPlaceModel` adds 
 movements and the payloads of the ledger and the log, and `OrderGetOneModel` adds nothing. The
 aggregate extends `Entity` of `libs/domain`, so a model of a use case that only reads extends it
 too. No model records domain events: a change reaches the ledger through `toLedgerPayload()`, as
-every other shape that leaves the use case.
+every other shape that leaves the use case. Neither `Entity` nor `ValueObject` compares two
+instances: no model compares two of them, and a use case compares the ids or the fields it means.
 
 **A versioned aggregate extends `VersionedEntity`.** `ProductAggregate`, `NoteAggregate` and the
 core `ProductCoreArchiveModel` take their `version` from `VersionedEntity` of `libs/domain`: the

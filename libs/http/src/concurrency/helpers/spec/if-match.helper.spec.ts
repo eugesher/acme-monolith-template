@@ -21,6 +21,7 @@ describe('IfMatchHelper', () => {
       ['a quoted version', '"3"', 3],
       ['a padded version', '  7 ', 7],
       ['version zero', '0', 0],
+      ['a version with leading zeros', '007', 7],
     ])('reads %s', (_case, header, expected) => {
       const version = IfMatchHelper.parse(header);
 
@@ -31,6 +32,13 @@ describe('IfMatchHelper', () => {
       ['a word', 'not-a-number'],
       ['a negative version', '-1'],
       ['a fraction', '1.5'],
+      ['a fraction that is a whole number', '12.0'],
+      ['a hexadecimal number', '0x10'],
+      ['a binary number', '0b11'],
+      ['an exponent', '1e3'],
+      ['a signed version', '+3'],
+      ['a padded version inside the quotes', '" 3 "'],
+      ['a version beyond the safe integers', '9007199254740993'],
       ['a weak tag', 'W/"3"'],
     ])('refuses %s with a 400 IF_MATCH_INVALID', (_case, header) => {
       const parse = (): unknown => IfMatchHelper.parse(header);

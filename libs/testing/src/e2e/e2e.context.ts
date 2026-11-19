@@ -1,12 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { Logger, PinoLogger } from 'nestjs-pino';
+import { PinoLogger } from 'nestjs-pino';
 import { DataSource } from 'typeorm';
 import type { INestApplication, Type } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 
-import type { AuthAudienceEnum } from '@acme-libs/kernel';
+import { AppBootstrap } from '@acme-libs/bootstrap';
+import { AuthTokenAlgorithmEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IE2EContextState {
@@ -54,7 +55,8 @@ export class E2EContext {
     const dataSource = moduleFixture.get(DataSource);
     const config = moduleFixture.get(ConfigService);
     const secret = config.getOrThrow<string>('JWT_SECRET');
-    const jwt = new JwtService({ secret, signOptions: { audience: this.audience } });
+    const algorithm = AuthTokenAlgorithmEnum.HS256;
+    const jwt = new JwtService({ secret, signOptions: { algorithm, audience: this.audience } });
     const app = await E2EContext.start(moduleFixture);
     const rootLoggerWarn = jest.spyOn(PinoLogger.root, 'warn');
 
@@ -80,12 +82,8 @@ export class E2EContext {
 
   protected static async start(moduleFixture: TestingModule): Promise<INestApplication> {
     const app = moduleFixture.createNestApplication({ bufferLogs: true });
-    const config = app.get(ConfigService);
-    const prefix = config.getOrThrow<string>('API_PREFIX');
-    const logger = app.get(Logger);
 
-    app.useLogger(logger);
-    app.setGlobalPrefix(prefix);
+    AppBootstrap.configure(app);
 
     await app.init();
 
