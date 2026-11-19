@@ -32,12 +32,12 @@ describe('UserController', () => {
 
   describe('handleReassignRoles', () => {
     it('reassigns the roles of the user of the path with the ids of the body', async () => {
-      reassignRoles.mockResolvedValue({ id: 'user-1', roleIds: ['3'] });
+      reassignRoles.mockResolvedValue({ id: '4', roleIds: ['3'] });
 
-      const response = await controller.handleReassignRoles('user-1', { roleIds: ['3'] });
+      const response = await controller.handleReassignRoles({ userId: '4' }, { roleIds: ['3'] });
 
-      expect(response).toEqual({ id: 'user-1', roleIds: ['3'] });
-      expect(reassignRoles).toHaveBeenCalledWith({ userId: 'user-1', roleIds: ['3'] });
+      expect(response).toEqual({ id: '4', roleIds: ['3'] });
+      expect(reassignRoles).toHaveBeenCalledWith({ userId: '4', roleIds: ['3'] });
     });
   });
 });

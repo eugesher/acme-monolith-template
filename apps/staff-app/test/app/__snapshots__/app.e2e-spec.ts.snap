@@ -460,6 +460,66 @@ exports[`App Access User PUT /api/access/users/:userId/roles should reassign the
 }
 `;
 
+exports[`App Access User PUT /api/access/users/:userId/roles should refuse a number with a suffix as the user id with 400 from validation and change nothing 1`] = `
+{
+  "db": {
+    "staff_user_roles": [
+      {
+        "role_id": "1",
+        "user_id": "1",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "userId",
+            "messages": [
+              "userId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Access User PUT /api/access/users/:userId/roles should refuse a word as the user id with 400 from validation and change nothing 1`] = `
+{
+  "db": {
+    "staff_user_roles": [
+      {
+        "role_id": "1",
+        "user_id": "1",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "userId",
+            "messages": [
+              "userId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
 exports[`App Auth GET /api/auth/me should refuse a caller without a token 1`] = `
 {
   "response": {

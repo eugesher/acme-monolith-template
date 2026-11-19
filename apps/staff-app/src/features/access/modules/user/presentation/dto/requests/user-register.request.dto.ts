@@ -1,14 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEmail, IsString, Matches, MinLength } from 'class-validator';
+import { IsArray, IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class UserRegisterRequestDto {
   @ApiProperty({ example: 'editor@example.com' })
   @IsEmail()
+  @MaxLength(255)
   public email: string;
 
   @ApiProperty({ example: 'change-me-please-32' })
   @IsString()
   @MinLength(12)
+  @MaxLength(256)
   public password: string;
 
   @ApiProperty({ isArray: true, example: ['2'] })

@@ -7,6 +7,7 @@ import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel
 
 import { UserReassignRolesUseCase, UserRegisterUseCase } from '../../application';
 import {
+  UserIdParamDto,
   UserRegisterRequestDto,
   UserResponseDto,
   UserRolesReassignRequestDto,
@@ -48,9 +49,10 @@ export class UserController {
     IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
   )
   public async handleReassignRoles(
-    @Param('userId') userId: string,
+    @Param() params: UserIdParamDto,
     @Body() body: UserRolesReassignRequestDto,
   ): Promise<UserRolesResponseDto> {
+    const { userId } = params;
     const { roleIds } = body;
 
     return await this.reassignRoles.execute({ userId, roleIds });

@@ -210,6 +210,25 @@ export class UserE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
+
+      it.each([
+        ['a word', 'abc'],
+        ['a number with a suffix', '1abc'],
+      ])(
+        'should refuse %s as the user id with 400 from validation and change nothing',
+        async (_, userId) => {
+          const response = await request(this.ctx.app.getHttpServer())
+            .put(`/api/access/users/${userId}/roles`)
+            .auth(this.ctx.adminToken, { type: 'bearer' })
+            .send({ roleIds: [] })
+            .expect(HttpStatus.BAD_REQUEST);
+
+          expect({
+            response: { body: response.body },
+            db: { staff_user_roles: await staffUserRolesOf('1') },
+          }).toMatchSnapshot();
+        },
+      );
     });
   }
 }
