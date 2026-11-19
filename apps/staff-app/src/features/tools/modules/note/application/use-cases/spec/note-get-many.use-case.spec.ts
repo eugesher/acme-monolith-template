@@ -1,11 +1,13 @@
 import { NoteGetManyUseCase } from '../note-get-many.use-case';
+import type { INoteGetManyRepositoryPort } from '../../../outbound';
 
 describe('NoteGetManyUseCase', () => {
-  let list: jest.Mock;
+  let repository: jest.Mocked<INoteGetManyRepositoryPort>;
   let useCase: NoteGetManyUseCase;
 
   beforeEach(() => {
-    list = jest.fn().mockResolvedValue([
+    repository = { list: jest.fn() };
+    repository.list.mockResolvedValue([
       [
         {
           id: '7',
@@ -21,7 +23,7 @@ describe('NoteGetManyUseCase', () => {
       ],
       1,
     ]);
-    useCase = new NoteGetManyUseCase({ list });
+    useCase = new NoteGetManyUseCase(repository);
   });
 
   describe('execute', () => {
@@ -35,7 +37,7 @@ describe('NoteGetManyUseCase', () => {
         authorId: 'admin-1',
       });
 
-      expect(list).toHaveBeenCalledWith({
+      expect(repository.list).toHaveBeenCalledWith({
         limit: 20,
         offset: 0,
         subjectType: undefined,
@@ -75,7 +77,7 @@ describe('NoteGetManyUseCase', () => {
         authorId: 'admin-1',
       });
 
-      expect(list).toHaveBeenCalledWith({
+      expect(repository.list).toHaveBeenCalledWith({
         limit: 100,
         offset: 0,
         subjectType: 'product',
@@ -102,7 +104,7 @@ describe('NoteGetManyUseCase', () => {
         code: 'NOTE_SUBJECT_INVALID',
         message: 'A subject filter needs both subjectType and subjectId, or neither',
       });
-      expect(list).not.toHaveBeenCalled();
+      expect(repository.list).not.toHaveBeenCalled();
     });
   });
 });

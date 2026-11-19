@@ -1,11 +1,13 @@
 import { TagGetManyUseCase } from '../tag-get-many.use-case';
+import type { ITagGetManyRepositoryPort } from '../../../outbound';
 
 describe('TagGetManyUseCase', () => {
-  let list: jest.Mock;
+  let repository: jest.Mocked<ITagGetManyRepositoryPort>;
   let useCase: TagGetManyUseCase;
 
   beforeEach(() => {
-    list = jest.fn().mockResolvedValue([
+    repository = { list: jest.fn() };
+    repository.list.mockResolvedValue([
       [
         {
           id: '300',
@@ -16,14 +18,14 @@ describe('TagGetManyUseCase', () => {
       ],
       21,
     ]);
-    useCase = new TagGetManyUseCase({ list });
+    useCase = new TagGetManyUseCase(repository);
   });
 
   describe('execute', () => {
     it('answers a page of views', async () => {
       const page = await useCase.execute({ page: 2, limit: 20 });
 
-      expect(list).toHaveBeenCalledWith({ limit: 20, offset: 20 });
+      expect(repository.list).toHaveBeenCalledWith({ limit: 20, offset: 20 });
       expect(page).toEqual({
         page: 2,
         limit: 20,
@@ -47,7 +49,7 @@ describe('TagGetManyUseCase', () => {
     ])('%s', async (_, page, limit, pageWindow) => {
       await useCase.execute({ page, limit });
 
-      expect(list).toHaveBeenCalledWith(pageWindow);
+      expect(repository.list).toHaveBeenCalledWith(pageWindow);
     });
   });
 });

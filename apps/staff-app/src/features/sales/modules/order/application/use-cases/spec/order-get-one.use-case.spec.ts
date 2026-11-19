@@ -1,24 +1,26 @@
 import { OrderGetOneUseCase } from '../order-get-one.use-case';
+import type { IOrderGetOneRepositoryPort } from '../../../outbound';
 
 describe('OrderGetOneUseCase', () => {
-  let findById: jest.Mock;
+  let repository: jest.Mocked<IOrderGetOneRepositoryPort>;
   let useCase: OrderGetOneUseCase;
 
   beforeEach(() => {
-    findById = jest.fn().mockResolvedValue({
+    repository = { findById: jest.fn() };
+    repository.findById.mockResolvedValue({
       id: '600',
       customerId: 'customer-1',
       createdAt: new Date('2026-01-03T00:00:00.000Z'),
       orderProducts: [{ id: '600', product: { id: '100', sku: 'SKU-0001', name: 'Lamp' } }],
     });
-    useCase = new OrderGetOneUseCase({ findById });
+    useCase = new OrderGetOneUseCase(repository);
   });
 
   describe('execute', () => {
     it('returns the order of any customer with its products', async () => {
       const view = await useCase.execute({ orderId: '600' });
 
-      expect(findById).toHaveBeenCalledWith('600');
+      expect(repository.findById).toHaveBeenCalledWith('600');
       expect(view).toEqual({
         id: '600',
         customerId: 'customer-1',
@@ -28,7 +30,7 @@ describe('OrderGetOneUseCase', () => {
     });
 
     it('refuses a missing order with ORDER_NOT_FOUND', async () => {
-      findById.mockResolvedValue(null);
+      repository.findById.mockResolvedValue(null);
 
       await expect(useCase.execute({ orderId: '999' })).rejects.toMatchObject({
         code: 'ORDER_NOT_FOUND',

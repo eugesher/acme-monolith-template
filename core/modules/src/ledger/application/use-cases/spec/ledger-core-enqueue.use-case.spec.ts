@@ -1,20 +1,20 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { LedgerCoreActionEnum, LedgerCoreSubjectTypeEnum } from '@acme-core/contracts/ledger';
 
 import { LedgerCoreEnqueueUseCase } from '../ledger-core-enqueue.use-case';
+import type { ILedgerCoreQueuePort } from '../../../outbound';
 
 describe('LedgerCoreEnqueueUseCase', () => {
-  let add: jest.Mock;
+  let queue: jest.Mocked<ILedgerCoreQueuePort>;
   let logger: PinoLoggerMock;
   let useCase: LedgerCoreEnqueueUseCase;
 
   beforeEach(() => {
-    add = jest.fn().mockResolvedValue(undefined);
+    queue = { add: jest.fn() };
+    queue.add.mockResolvedValue();
     logger = makePinoLoggerMock();
-    useCase = new LedgerCoreEnqueueUseCase({ add }, 2, 500, logger as unknown as PinoLogger);
+    useCase = new LedgerCoreEnqueueUseCase(queue, 2, 500, logger);
   });
 
   describe('execute', () => {
@@ -30,8 +30,8 @@ describe('LedgerCoreEnqueueUseCase', () => {
         }),
       );
 
-      expect(add).toHaveBeenCalledTimes(1);
-      expect(add).toHaveBeenCalledWith({
+      expect(queue.add).toHaveBeenCalledTimes(1);
+      expect(queue.add).toHaveBeenCalledWith({
         record: {
           operationKey: 'product-created:7',
           subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
@@ -50,7 +50,7 @@ describe('LedgerCoreEnqueueUseCase', () => {
     });
 
     it('retries a failed add and logs each retry', async () => {
-      add.mockRejectedValueOnce(new Error('redis is down')).mockResolvedValue(undefined);
+      queue.add.mockRejectedValueOnce(new Error('redis is down')).mockResolvedValue(undefined);
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
@@ -63,7 +63,7 @@ describe('LedgerCoreEnqueueUseCase', () => {
         }),
       );
 
-      expect(add).toHaveBeenCalledTimes(2);
+      expect(queue.add).toHaveBeenCalledTimes(2);
       expect(logger.warn).toHaveBeenCalledWith(
         {
           err: new Error('redis is down'),
@@ -79,7 +79,7 @@ describe('LedgerCoreEnqueueUseCase', () => {
     });
 
     it('logs the record for replay after the configured attempts instead of throwing', async () => {
-      add.mockRejectedValue(new Error('redis is down'));
+      queue.add.mockRejectedValue(new Error('redis is down'));
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
@@ -92,7 +92,7 @@ describe('LedgerCoreEnqueueUseCase', () => {
         }),
       );
 
-      expect(add).toHaveBeenCalledTimes(2);
+      expect(queue.add).toHaveBeenCalledTimes(2);
       expect(logger.info).not.toHaveBeenCalled();
       expect(logger.error).toHaveBeenCalledWith(
         {

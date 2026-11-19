@@ -1,24 +1,26 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { CacheLibWrapUseCase } from '../cache-lib-wrap.use-case';
-import type { ICacheLibTracerPort, ICacheLibTracerSpanCommand } from '../../../outbound';
+import type {
+  ICacheLibStorePort,
+  ICacheLibTracerPort,
+  ICacheLibTracerSpanCommand,
+} from '../../../outbound';
 
 describe('CacheLibWrapUseCase', () => {
-  let get: jest.Mock;
-  let set: jest.Mock;
+  let store: jest.Mocked<ICacheLibStorePort>;
   let spans: { name: string; attributes: ICacheLibTracerSpanCommand<unknown>['attributes'] }[];
   let logger: PinoLoggerMock;
   let useCase: CacheLibWrapUseCase;
 
   beforeEach(() => {
-    get = jest.fn().mockResolvedValue(undefined);
-    set = jest.fn().mockResolvedValue(undefined);
+    store = { get: jest.fn(), set: jest.fn(), unlinkByPrefix: jest.fn() };
+    store.get.mockResolvedValue(undefined);
+    store.set.mockResolvedValue();
     spans = [];
     logger = makePinoLoggerMock();
     useCase = new CacheLibWrapUseCase(
-      { get, set, unlinkByPrefix: jest.fn() },
+      store,
       {
         span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
           const attributes = { ...command.attributes };
@@ -28,7 +30,7 @@ describe('CacheLibWrapUseCase', () => {
           return await command.work(attributes);
         },
       } as ICacheLibTracerPort,
-      logger as unknown as PinoLogger,
+      logger,
     );
   });
 
@@ -39,21 +41,21 @@ describe('CacheLibWrapUseCase', () => {
 
     expect(value).toBe('30d');
     expect(compute).toHaveBeenCalledTimes(1);
-    expect(set).toHaveBeenCalledWith({ key: 'k', value: '30d', ttlMs: 600_000 });
+    expect(store.set).toHaveBeenCalledWith({ key: 'k', value: '30d', ttlMs: 600_000 });
     expect(spans).toEqual([
       { name: 'cache.wrap', attributes: { 'cache.key': 'k', 'cache.hit': false } },
     ]);
   });
 
   it('serves a hit from the cache without computing', async () => {
-    get.mockResolvedValue('30d');
+    store.get.mockResolvedValue('30d');
     const compute = jest.fn().mockResolvedValue('other');
 
     const value = await useCase.execute({ key: 'k', ttlMs: 600_000, compute });
 
     expect(value).toBe('30d');
     expect(compute).not.toHaveBeenCalled();
-    expect(set).not.toHaveBeenCalled();
+    expect(store.set).not.toHaveBeenCalled();
     expect(spans).toEqual([
       { name: 'cache.wrap', attributes: { 'cache.key': 'k', 'cache.hit': true } },
     ]);
@@ -65,7 +67,7 @@ describe('CacheLibWrapUseCase', () => {
     const value = await useCase.execute({ key: 'k', ttlMs: 600_000, compute });
 
     expect(value).toBe(empty);
-    expect(set).not.toHaveBeenCalled();
+    expect(store.set).not.toHaveBeenCalled();
   });
 
   it('collapses concurrent calls for one key into one computation', async () => {
@@ -94,7 +96,7 @@ describe('CacheLibWrapUseCase', () => {
   });
 
   it('computes without writing when the cache cannot be read, so a stalled Redis costs one timeout', async () => {
-    get.mockRejectedValue(new Error('read failed'));
+    store.get.mockRejectedValue(new Error('read failed'));
 
     const value = await useCase.execute({
       key: 'k',
@@ -103,7 +105,7 @@ describe('CacheLibWrapUseCase', () => {
     });
 
     expect(value).toBe('v');
-    expect(set).not.toHaveBeenCalled();
+    expect(store.set).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
       { err: new Error('read failed'), key: 'k' },
       'Cache read failed, computing the value without caching it',
@@ -117,7 +119,7 @@ describe('CacheLibWrapUseCase', () => {
   });
 
   it('returns the computed value when the cache cannot be written', async () => {
-    set.mockRejectedValue(new Error('write failed'));
+    store.set.mockRejectedValue(new Error('write failed'));
 
     const value = await useCase.execute({
       key: 'k',

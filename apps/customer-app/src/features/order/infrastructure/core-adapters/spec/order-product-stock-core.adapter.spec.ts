@@ -1,24 +1,29 @@
+import type { IProductStockCorePort } from '@acme-core/contracts/product-stock';
+
 import { OrderProductStockCoreAdapter } from '../order-product-stock-core.adapter';
 
 describe('OrderProductStockCoreAdapter', () => {
-  let handleLock: jest.Mock;
-  let handleMove: jest.Mock;
+  let productStock: jest.Mocked<IProductStockCorePort>;
   let adapter: OrderProductStockCoreAdapter;
 
   beforeEach(() => {
-    handleLock = jest.fn().mockResolvedValue([{ productId: '100', quantity: 8 }]);
-    handleMove = jest.fn().mockResolvedValue({
-      productStockIds: ['700', '701'],
+    productStock = { handleLock: jest.fn(), handleMove: jest.fn() };
+    productStock.handleLock.mockResolvedValue([{ productId: '100', quantity: 8 }]);
+    productStock.handleMove.mockResolvedValue({
+      productStocks: [
+        { id: '700', createdAt: '2026-01-05T08:00:00.000Z' },
+        { id: '701', createdAt: '2026-01-05T08:00:00.000Z' },
+      ],
       stock: [{ productId: '100', quantity: 6 }],
     });
-    adapter = new OrderProductStockCoreAdapter({ handleLock, handleMove });
+    adapter = new OrderProductStockCoreAdapter(productStock);
   });
 
   describe('lock', () => {
     it('locks the products through the core module and answers their stock', async () => {
       const stock = await adapter.lock({ productIds: ['100'] });
 
-      expect(handleLock).toHaveBeenCalledWith({ productIds: ['100'] });
+      expect(productStock.handleLock).toHaveBeenCalledWith({ productIds: ['100'] });
       expect(stock).toEqual([{ productId: '100', quantity: 8 }]);
     });
   });
@@ -34,7 +39,7 @@ describe('OrderProductStockCoreAdapter', () => {
         }),
       ).resolves.toBeUndefined();
 
-      expect(handleMove).toHaveBeenCalledWith({
+      expect(productStock.handleMove).toHaveBeenCalledWith({
         kind: 'subtract',
         movements: [
           { productId: '100', quantity: 1, orderProductId: '620' },

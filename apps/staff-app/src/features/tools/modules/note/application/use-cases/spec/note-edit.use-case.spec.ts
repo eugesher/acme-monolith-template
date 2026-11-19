@@ -1,26 +1,27 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { NoteAccessService } from '../../services/note-access.service';
 import { NoteWriteService } from '../../services/note-write.service';
 import { NoteEditUseCase } from '../note-edit.use-case';
-import type { INoteEditRevisionInsertQuery, INoteEditUpdateQuery } from '../../../outbound';
+import type {
+  INoteAccessRepositoryPort,
+  INoteEditRepositoryPort,
+  INoteTransactionPort,
+} from '../../../outbound';
 
 describe('NoteEditUseCase', () => {
   let calls: string[];
-  let findOwned: jest.Mock;
-  let update: jest.Mock;
-  let appendRevision: jest.Mock;
-  let run: jest.Mock;
+  let accessRepository: jest.Mocked<INoteAccessRepositoryPort>;
+  let repository: jest.Mocked<INoteEditRepositoryPort>;
+  let transaction: jest.Mocked<INoteTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: NoteEditUseCase;
 
   beforeEach(() => {
     calls = [];
-    findOwned = jest
-      .fn()
+    accessRepository = { findOwned: jest.fn() };
+    accessRepository.findOwned
       .mockImplementationOnce(() => {
         calls.push('findOwned');
 
@@ -51,17 +52,19 @@ describe('NoteEditUseCase', () => {
           updatedAt: new Date('2026-01-03T00:00:00.000Z'),
         });
       });
-    update = jest.fn(() => {
+    repository = { update: jest.fn(), appendRevision: jest.fn() };
+    repository.update.mockImplementation(() => {
       calls.push('update');
 
       return Promise.resolve(true);
     });
-    appendRevision = jest.fn(() => {
+    repository.appendRevision.mockImplementation(() => {
       calls.push('appendRevision');
 
       return Promise.resolve();
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
       calls.push('begin');
 
       const result = await work();
@@ -72,13 +75,13 @@ describe('NoteEditUseCase', () => {
     });
     logger = makePinoLoggerMock();
 
-    const accessService = new NoteAccessService({ findOwned });
+    const accessService = new NoteAccessService(accessRepository);
 
     useCase = new NoteEditUseCase(
-      new NoteWriteService(accessService, 3, logger as unknown as PinoLogger),
-      { update, appendRevision },
-      { run },
-      logger as unknown as PinoLogger,
+      new NoteWriteService(accessService, 3, logger),
+      repository,
+      transaction,
+      logger,
     );
   });
 
@@ -92,8 +95,8 @@ describe('NoteEditUseCase', () => {
           expectedVersion: undefined,
         }),
       );
-      const [command] = update.mock.calls[0] as [INoteEditUpdateQuery];
-      const [revision] = appendRevision.mock.calls[0] as [INoteEditRevisionInsertQuery];
+      const [command] = repository.update.mock.calls[0];
+      const [revision] = repository.appendRevision.mock.calls[0];
 
       expect(calls).toEqual([
         'findOwned',
@@ -139,10 +142,10 @@ describe('NoteEditUseCase', () => {
         expectedVersion: undefined,
       });
 
-      expect(run).not.toHaveBeenCalled();
-      expect(update).not.toHaveBeenCalled();
-      expect(appendRevision).not.toHaveBeenCalled();
-      expect(findOwned).toHaveBeenCalledTimes(1);
+      expect(transaction.run).not.toHaveBeenCalled();
+      expect(repository.update).not.toHaveBeenCalled();
+      expect(repository.appendRevision).not.toHaveBeenCalled();
+      expect(accessRepository.findOwned).toHaveBeenCalledTimes(1);
       expect(view.version).toBe(2);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '7', authorId: 'admin-1', version: 2 },
@@ -151,7 +154,7 @@ describe('NoteEditUseCase', () => {
     });
 
     it('fails the transaction when the revision cannot be appended, so the note update rolls back', async () => {
-      appendRevision.mockRejectedValue(new Error('deadlock'));
+      repository.appendRevision.mockRejectedValue(new Error('deadlock'));
 
       await expect(
         CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
@@ -164,15 +167,15 @@ describe('NoteEditUseCase', () => {
         ),
       ).rejects.toThrow('deadlock');
       expect(calls).not.toContain('commit');
-      expect(update).toHaveBeenCalledTimes(1);
-      expect(run).toHaveBeenCalledTimes(1);
-      expect(findOwned).toHaveBeenCalledTimes(1);
+      expect(repository.update).toHaveBeenCalledTimes(1);
+      expect(transaction.run).toHaveBeenCalledTimes(1);
+      expect(accessRepository.findOwned).toHaveBeenCalledTimes(1);
       expect(logger.info).not.toHaveBeenCalled();
     });
 
     it('appends no revision for a lost race and retries the whole edit with a fresh read', async () => {
-      update.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
-      findOwned.mockReset().mockImplementation(() =>
+      repository.update.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      accessRepository.findOwned.mockReset().mockImplementation(() =>
         Promise.resolve({
           id: '7',
           subjectType: 'product',
@@ -195,9 +198,9 @@ describe('NoteEditUseCase', () => {
         }),
       );
 
-      expect(run).toHaveBeenCalledTimes(2);
-      expect(update).toHaveBeenCalledTimes(2);
-      expect(appendRevision).toHaveBeenCalledTimes(1);
+      expect(transaction.run).toHaveBeenCalledTimes(2);
+      expect(repository.update).toHaveBeenCalledTimes(2);
+      expect(repository.appendRevision).toHaveBeenCalledTimes(1);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '7', version: 2, attempt: 1, maxAttempts: 3 },
         'Note write conflict — retrying with a fresh read',
@@ -205,8 +208,8 @@ describe('NoteEditUseCase', () => {
     });
 
     it('refuses with VERSION_CONFLICT once every attempt lost the race', async () => {
-      update.mockResolvedValue(false);
-      findOwned.mockReset().mockImplementation(() =>
+      repository.update.mockResolvedValue(false);
+      accessRepository.findOwned.mockReset().mockImplementation(() =>
         Promise.resolve({
           id: '7',
           subjectType: 'product',
@@ -231,8 +234,8 @@ describe('NoteEditUseCase', () => {
         code: 'VERSION_CONFLICT',
         details: { currentVersion: 2 },
       });
-      expect(update).toHaveBeenCalledTimes(3);
-      expect(appendRevision).not.toHaveBeenCalled();
+      expect(repository.update).toHaveBeenCalledTimes(3);
+      expect(repository.appendRevision).not.toHaveBeenCalled();
     });
 
     it('refuses a stale If-Match with VERSION_MISMATCH before opening a transaction', async () => {
@@ -244,11 +247,11 @@ describe('NoteEditUseCase', () => {
           expectedVersion: 1,
         }),
       ).rejects.toMatchObject({ code: 'VERSION_MISMATCH', details: { currentVersion: 2 } });
-      expect(run).not.toHaveBeenCalled();
+      expect(transaction.run).not.toHaveBeenCalled();
     });
 
     it('refuses a resolved note before opening a transaction', async () => {
-      findOwned.mockReset().mockResolvedValue({
+      accessRepository.findOwned.mockReset().mockResolvedValue({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
@@ -268,11 +271,11 @@ describe('NoteEditUseCase', () => {
           expectedVersion: undefined,
         }),
       ).rejects.toMatchObject({ code: 'NOTE_RESOLVED' });
-      expect(run).not.toHaveBeenCalled();
+      expect(transaction.run).not.toHaveBeenCalled();
     });
 
     it('refuses a note not found for the editor with NOTE_NOT_FOUND', async () => {
-      findOwned.mockReset().mockResolvedValue(null);
+      accessRepository.findOwned.mockReset().mockResolvedValue(null);
 
       await expect(
         useCase.execute({
@@ -282,7 +285,7 @@ describe('NoteEditUseCase', () => {
           expectedVersion: undefined,
         }),
       ).rejects.toMatchObject({ code: 'NOTE_NOT_FOUND' });
-      expect(run).not.toHaveBeenCalled();
+      expect(transaction.run).not.toHaveBeenCalled();
     });
   });
 });

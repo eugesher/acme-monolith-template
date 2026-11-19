@@ -1,5 +1,3 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { LedgerAppendReportFailureUseCase } from '../ledger-append-report-failure.use-case';
@@ -10,7 +8,7 @@ describe('LedgerAppendReportFailureUseCase', () => {
 
   beforeEach(() => {
     logger = makePinoLoggerMock();
-    useCase = new LedgerAppendReportFailureUseCase(logger as unknown as PinoLogger);
+    useCase = new LedgerAppendReportFailureUseCase(logger);
   });
 
   describe('execute', () => {

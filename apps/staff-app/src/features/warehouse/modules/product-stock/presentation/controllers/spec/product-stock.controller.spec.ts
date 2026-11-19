@@ -2,18 +2,18 @@ import { ProductStockController } from '../product-stock.controller';
 import type { ProductStockAddUseCase } from '../../../application';
 
 describe('ProductStockController', () => {
-  let add: jest.Mock;
+  let add: jest.Mocked<Pick<ProductStockAddUseCase, 'execute'>>;
   let controller: ProductStockController;
 
   beforeEach(() => {
-    add = jest.fn();
+    add = { execute: jest.fn() };
 
-    controller = new ProductStockController({ execute: add } as unknown as ProductStockAddUseCase);
+    controller = new ProductStockController(add as unknown as ProductStockAddUseCase);
   });
 
   describe('handleAdd', () => {
     it('adds the quantity of the body to the stock of the product of the path for the caller under the idempotency key', async () => {
-      add.mockResolvedValue({ productId: '12', quantity: 15 });
+      add.execute.mockResolvedValue({ productId: '12', quantity: 15 });
 
       const response = await controller.handleAdd(
         { id: 'staff-1', email: 'editor@example.com' },
@@ -23,7 +23,7 @@ describe('ProductStockController', () => {
       );
 
       expect(response).toEqual({ productId: '12', quantity: 15 });
-      expect(add).toHaveBeenCalledWith({
+      expect(add.execute).toHaveBeenCalledWith({
         productId: '12',
         quantity: 5,
         staffUserId: 'staff-1',

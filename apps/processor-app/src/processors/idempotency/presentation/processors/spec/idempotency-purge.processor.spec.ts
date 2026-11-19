@@ -5,24 +5,25 @@ import type { IdempotencyPurgeUseCase } from '../../../application';
 
 describe('IdempotencyPurgeProcessor', () => {
   let correlationIds: string[];
-  let execute: jest.Mock;
+  let purge: jest.Mocked<Pick<IdempotencyPurgeUseCase, 'execute'>>;
   let processor: IdempotencyPurgeProcessor;
 
   beforeEach(() => {
     correlationIds = [];
-    execute = jest.fn().mockImplementation(() => {
+    purge = { execute: jest.fn() };
+    purge.execute.mockImplementation(() => {
       correlationIds.push(CorrelationContextHelper.current('IdempotencyPurgeUseCase'));
 
       return Promise.resolve();
     });
-    processor = new IdempotencyPurgeProcessor({ execute } as unknown as IdempotencyPurgeUseCase);
+    processor = new IdempotencyPurgeProcessor(purge as unknown as IdempotencyPurgeUseCase);
   });
 
   describe('handleTick', () => {
     it('runs the purge inside a correlation context of its own', async () => {
       await processor.handleTick();
 
-      expect(execute).toHaveBeenCalledWith();
+      expect(purge.execute).toHaveBeenCalledWith();
       expect(correlationIds).toEqual([
         expect.stringMatching(
           /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,

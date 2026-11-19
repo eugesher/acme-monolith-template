@@ -1,6 +1,5 @@
 import { Redis } from 'ioredis';
 import type { ConfigService } from '@nestjs/config';
-import type { PinoLogger } from 'nestjs-pino';
 
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
@@ -41,7 +40,7 @@ describe('ThrottleRedisStorage', () => {
       getOrThrow: jest.fn((key: string) => values[key]),
     } as unknown as ConfigService;
 
-    storage = new ThrottleRedisStorage(config, logger as unknown as PinoLogger);
+    storage = new ThrottleRedisStorage(config, logger);
   });
 
   afterEach(() => {

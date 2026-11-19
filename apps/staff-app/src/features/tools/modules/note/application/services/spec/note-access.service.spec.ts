@@ -1,12 +1,14 @@
 import { NoteGetOneModel } from '../../../domain';
 import { NoteAccessService } from '../note-access.service';
+import type { INoteAccessRepositoryPort } from '../../../outbound';
 
 describe('NoteAccessService', () => {
-  let findOwned: jest.Mock;
+  let repository: jest.Mocked<INoteAccessRepositoryPort>;
   let service: NoteAccessService;
 
   beforeEach(() => {
-    findOwned = jest.fn().mockResolvedValue({
+    repository = { findOwned: jest.fn() };
+    repository.findOwned.mockResolvedValue({
       id: '7',
       subjectType: 'product',
       subjectId: '42',
@@ -17,7 +19,7 @@ describe('NoteAccessService', () => {
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
-    service = new NoteAccessService({ findOwned });
+    service = new NoteAccessService(repository);
   });
 
   describe('loadOwned', () => {
@@ -27,13 +29,13 @@ describe('NoteAccessService', () => {
         NoteGetOneModel.reconstitute,
       );
 
-      expect(findOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
+      expect(repository.findOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
       expect(note.id).toBe('7');
       expect(note.toSnapshot().authorId).toBe('admin-1');
     });
 
     it('refuses a note not found for the author with NOTE_NOT_FOUND', async () => {
-      findOwned.mockResolvedValue(null);
+      repository.findOwned.mockResolvedValue(null);
 
       await expect(
         service.loadOwned({ noteId: '7', authorId: 'admin-1' }, NoteGetOneModel.reconstitute),
@@ -49,11 +51,11 @@ describe('NoteAccessService', () => {
       await expect(
         service.assertOwned({ noteId: '7', authorId: 'admin-1' }),
       ).resolves.toBeUndefined();
-      expect(findOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
+      expect(repository.findOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
     });
 
     it('refuses a note not found for the author with NOTE_NOT_FOUND', async () => {
-      findOwned.mockResolvedValue(null);
+      repository.findOwned.mockResolvedValue(null);
 
       await expect(service.assertOwned({ noteId: '7', authorId: 'admin-1' })).rejects.toMatchObject(
         {

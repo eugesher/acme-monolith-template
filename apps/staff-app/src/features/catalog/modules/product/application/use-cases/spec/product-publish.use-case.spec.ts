@@ -1,22 +1,21 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { ProductPublishModel } from '../../../domain';
 import { ProductPublishUseCase } from '../product-publish.use-case';
-import type { IProductLedgerPort } from '../../../outbound';
+import type { IProductCatalogCachePort, IProductLedgerPort } from '../../../outbound';
 import type { ProductWriteService } from '../../services/product-write.service';
 
 describe('ProductPublishUseCase', () => {
-  let write: jest.Mock;
-  let recordPublished: jest.Mock;
-  let invalidate: jest.Mock;
+  let writeService: jest.Mocked<Pick<ProductWriteService, 'write'>>;
+  let catalogCache: jest.Mocked<IProductCatalogCachePort>;
+  let ledger: jest.Mocked<IProductLedgerPort>;
   let logger: PinoLoggerMock;
   let useCase: ProductPublishUseCase;
 
   beforeEach(() => {
-    write = jest.fn().mockResolvedValue({
+    writeService = { write: jest.fn() };
+    writeService.write.mockResolvedValue({
       product: ProductPublishModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
@@ -28,14 +27,16 @@ describe('ProductPublishUseCase', () => {
       }),
       answer: ProductStatusEnum.DRAFT,
     });
-    recordPublished = jest.fn().mockResolvedValue(undefined);
-    invalidate = jest.fn().mockResolvedValue(undefined);
+    ledger = { recordCreated: jest.fn(), recordPublished: jest.fn() };
+    ledger.recordPublished.mockResolvedValue(undefined);
+    catalogCache = { invalidate: jest.fn() };
+    catalogCache.invalidate.mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
     useCase = new ProductPublishUseCase(
-      { write } as unknown as ProductWriteService,
-      { invalidate },
-      { recordPublished } as unknown as IProductLedgerPort,
-      logger as unknown as PinoLogger,
+      writeService as unknown as ProductWriteService,
+      catalogCache,
+      ledger,
+      logger,
     );
   });
 
@@ -43,12 +44,12 @@ describe('ProductPublishUseCase', () => {
     it('publishes, records the publication of the stored product in the ledger and answers it', async () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: 1 });
 
-      expect(write).toHaveBeenCalledWith(
+      expect(writeService.write).toHaveBeenCalledWith(
         { productId: '12', expectedVersion: 1 },
         ProductPublishModel.reconstitute,
         expect.any(Function),
       );
-      expect(recordPublished).toHaveBeenCalledWith({
+      expect(ledger.recordPublished).toHaveBeenCalledWith({
         subjectId: '12',
         version: 2,
         occurredAt: '2026-01-03T00:00:00.000Z',
@@ -67,44 +68,53 @@ describe('ProductPublishUseCase', () => {
     });
 
     it('records nothing in the ledger when the product was already active', async () => {
-      const { product } = (await write()) as { product: ProductPublishModel };
-
-      write.mockResolvedValue({ product, answer: undefined });
+      writeService.write.mockResolvedValue({
+        product: ProductPublishModel.reconstitute({
+          id: '12',
+          sku: 'SKU-0001',
+          name: 'Lamp',
+          status: ProductStatusEnum.ACTIVE,
+          version: 2,
+          createdAt: new Date('2026-01-01T00:00:00.000Z'),
+          updatedAt: new Date('2026-01-03T00:00:00.000Z'),
+        }),
+        answer: undefined,
+      });
 
       await useCase.execute({ productId: '12', expectedVersion: 2 });
 
-      expect(recordPublished).not.toHaveBeenCalled();
+      expect(ledger.recordPublished).not.toHaveBeenCalled();
     });
 
     it('invalidates the customer catalog after the write and before the ledger', async () => {
       await useCase.execute({ productId: '12', expectedVersion: undefined });
 
-      expect(invalidate).toHaveBeenCalledTimes(1);
-      expect(write.mock.invocationCallOrder[0]).toBeLessThan(
-        invalidate.mock.invocationCallOrder[0],
+      expect(catalogCache.invalidate).toHaveBeenCalledTimes(1);
+      expect(writeService.write.mock.invocationCallOrder[0]).toBeLessThan(
+        catalogCache.invalidate.mock.invocationCallOrder[0],
       );
-      expect(invalidate.mock.invocationCallOrder[0]).toBeLessThan(
-        recordPublished.mock.invocationCallOrder[0],
+      expect(catalogCache.invalidate.mock.invocationCallOrder[0]).toBeLessThan(
+        ledger.recordPublished.mock.invocationCallOrder[0],
       );
     });
 
     it('invalidates nothing when the write fails', async () => {
-      write.mockRejectedValue(new Error('PRODUCT_ALREADY_ARCHIVED'));
+      writeService.write.mockRejectedValue(new Error('PRODUCT_ALREADY_ARCHIVED'));
 
       await expect(
         useCase.execute({ productId: '12', expectedVersion: undefined }),
       ).rejects.toThrow('PRODUCT_ALREADY_ARCHIVED');
-      expect(invalidate).not.toHaveBeenCalled();
-      expect(recordPublished).not.toHaveBeenCalled();
+      expect(catalogCache.invalidate).not.toHaveBeenCalled();
+      expect(ledger.recordPublished).not.toHaveBeenCalled();
     });
 
     it('stops at a failed invalidation before the ledger', async () => {
-      invalidate.mockRejectedValue(new Error('redis is down'));
+      catalogCache.invalidate.mockRejectedValue(new Error('redis is down'));
 
       await expect(
         useCase.execute({ productId: '12', expectedVersion: undefined }),
       ).rejects.toThrow('redis is down');
-      expect(recordPublished).not.toHaveBeenCalled();
+      expect(ledger.recordPublished).not.toHaveBeenCalled();
     });
 
     it('hands the write service a change that publishes the product and answers the status it left', async () => {
@@ -120,7 +130,7 @@ describe('ProductPublishUseCase', () => {
 
       await useCase.execute({ productId: '12', expectedVersion: 1 });
 
-      const [, , mutate] = write.mock.calls[0] as [
+      const [, , mutate] = writeService.write.mock.calls[0] as [
         unknown,
         unknown,
         (product: ProductPublishModel) => unknown,

@@ -1,19 +1,28 @@
+import {
+  HealthDependencyStatusEnum,
+  HealthLivenessStatusEnum,
+  HealthReadinessStatusEnum,
+} from '@acme-libs/kernel';
+import type { IHealthLibPort } from '@acme-libs/contracts/health';
+
 import { HealthStatusLibAdapter } from '../health-status-lib.adapter';
 
 describe('HealthStatusLibAdapter', () => {
-  let handleLiveness: jest.Mock;
-  let handleReadiness: jest.Mock;
+  let health: jest.Mocked<IHealthLibPort>;
   let adapter: HealthStatusLibAdapter;
 
   beforeEach(() => {
-    handleLiveness = jest.fn();
-    handleReadiness = jest.fn();
-    adapter = new HealthStatusLibAdapter({ handleLiveness, handleReadiness });
+    health = { handleLiveness: jest.fn(), handleReadiness: jest.fn() };
+    adapter = new HealthStatusLibAdapter(health);
   });
 
   describe('liveness', () => {
     it('answers the liveness of the health lib', () => {
-      handleLiveness.mockReturnValue({ status: 'ok', app: 'customer-app', uptimeSeconds: 7 });
+      health.handleLiveness.mockReturnValue({
+        status: HealthLivenessStatusEnum.OK,
+        app: 'customer-app',
+        uptimeSeconds: 7,
+      });
 
       const view = adapter.liveness();
 
@@ -23,12 +32,12 @@ describe('HealthStatusLibAdapter', () => {
 
   describe('readiness', () => {
     it('answers the readiness of the health lib', async () => {
-      handleReadiness.mockResolvedValue({
-        status: 'ready',
+      health.handleReadiness.mockResolvedValue({
+        status: HealthReadinessStatusEnum.READY,
         app: 'customer-app',
         dependencies: {
-          database: { status: 'ok', latencyMs: 2 },
-          cache: { status: 'ok', latencyMs: 1 },
+          database: { status: HealthDependencyStatusEnum.OK, latencyMs: 2 },
+          cache: { status: HealthDependencyStatusEnum.OK, latencyMs: 1 },
         },
       });
 

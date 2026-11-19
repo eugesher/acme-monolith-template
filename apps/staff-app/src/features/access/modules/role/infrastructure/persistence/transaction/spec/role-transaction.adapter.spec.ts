@@ -1,12 +1,15 @@
+import type { ITransactionPort } from '@acme-libs/contracts/local-storage';
+
 import { RoleTransactionAdapter } from '../role-transaction.adapter';
 
 describe('RoleTransactionAdapter', () => {
-  let run: jest.Mock;
+  let transaction: jest.Mocked<ITransactionPort>;
   let adapter: RoleTransactionAdapter;
 
   beforeEach(() => {
-    run = jest.fn((work: () => Promise<unknown>) => work());
-    adapter = new RoleTransactionAdapter({ run, afterCommit: jest.fn() });
+    transaction = { run: jest.fn(), afterCommit: jest.fn() };
+    transaction.run.mockImplementation((work) => work());
+    adapter = new RoleTransactionAdapter(transaction);
   });
 
   describe('run', () => {
@@ -16,7 +19,7 @@ describe('RoleTransactionAdapter', () => {
       const result = await adapter.run(work);
 
       expect(result).toBe('result');
-      expect(run).toHaveBeenCalledWith(work);
+      expect(transaction.run).toHaveBeenCalledWith(work);
     });
   });
 });

@@ -1,30 +1,39 @@
 import { ProductNotFoundException, ProductTagNotFoundException } from '../../../domain';
+import {
+  ProductTagReplaceOutcomeEnum,
+  type IProductReplaceTagsRepositoryPort,
+  type IProductTagPort,
+  type IProductTransactionPort,
+} from '../../../outbound';
 import { ProductReplaceTagsUseCase } from '../product-replace-tags.use-case';
 
 describe('ProductReplaceTagsUseCase', () => {
   let calls: string[];
-  let lockById: jest.Mock;
-  let replace: jest.Mock;
-  let run: jest.Mock;
+  let repository: jest.Mocked<IProductReplaceTagsRepositoryPort>;
+  let tag: jest.Mocked<IProductTagPort>;
+  let transaction: jest.Mocked<IProductTransactionPort>;
   let useCase: ProductReplaceTagsUseCase;
 
   beforeEach(() => {
     calls = [];
-    lockById = jest.fn(() => {
+    repository = { lockById: jest.fn() };
+    repository.lockById.mockImplementation(() => {
       calls.push('lockById');
 
       return Promise.resolve({ id: '100' });
     });
-    replace = jest.fn(() => {
+    tag = { find: jest.fn(), replace: jest.fn(), findProductIds: jest.fn() };
+    tag.replace.mockImplementation(() => {
       calls.push('replace');
 
       return Promise.resolve({
-        outcome: 'replaced',
+        outcome: ProductTagReplaceOutcomeEnum.REPLACED,
         tags: [{ id: '300', name: 'fragile' }],
         missingTagIds: [],
       });
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
       calls.push('begin');
 
       const result = await work();
@@ -33,11 +42,7 @@ describe('ProductReplaceTagsUseCase', () => {
 
       return result;
     });
-    useCase = new ProductReplaceTagsUseCase(
-      { lockById },
-      { find: jest.fn(), replace, findProductIds: jest.fn() },
-      { run },
-    );
+    useCase = new ProductReplaceTagsUseCase(repository, tag, transaction);
   });
 
   describe('execute', () => {
@@ -45,22 +50,26 @@ describe('ProductReplaceTagsUseCase', () => {
       const view = await useCase.execute({ productId: '100', tagIds: ['300'] });
 
       expect(view).toEqual({ tags: [{ id: '300', name: 'fragile' }] });
-      expect(lockById).toHaveBeenCalledWith('100');
-      expect(replace).toHaveBeenCalledWith({ productId: '100', tagIds: ['300'] });
+      expect(repository.lockById).toHaveBeenCalledWith('100');
+      expect(tag.replace).toHaveBeenCalledWith({ productId: '100', tagIds: ['300'] });
       expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
     });
 
     it('throws ProductNotFoundException and replaces nothing for an unknown product', async () => {
-      lockById.mockResolvedValue(null);
+      repository.lockById.mockResolvedValue(null);
 
       await expect(useCase.execute({ productId: '999', tagIds: ['300'] })).rejects.toThrow(
         ProductNotFoundException,
       );
-      expect(replace).not.toHaveBeenCalled();
+      expect(tag.replace).not.toHaveBeenCalled();
     });
 
     it('throws ProductTagNotFoundException with the missing tags, so the transaction rolls back', async () => {
-      replace.mockResolvedValue({ outcome: 'tag-not-found', tags: [], missingTagIds: ['999'] });
+      tag.replace.mockResolvedValue({
+        outcome: ProductTagReplaceOutcomeEnum.TAG_NOT_FOUND,
+        tags: [],
+        missingTagIds: ['999'],
+      });
 
       const error: unknown = await useCase
         .execute({ productId: '100', tagIds: ['300', '999'] })

@@ -1,44 +1,41 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { LocalStorageTransactionalRunUseCase } from '../local-storage-transactional-run.use-case';
+import type {
+  ILocalStorageTransactionalContextPort,
+  ILocalStorageTransactionalHostPort,
+} from '../../../outbound';
 
 describe('LocalStorageTransactionalRunUseCase', () => {
-  let isActive: jest.Mock;
-  let withTransaction: jest.Mock;
-  let run: jest.Mock;
-  let setHooks: jest.Mock;
+  let host: jest.Mocked<ILocalStorageTransactionalHostPort>;
+  let context: jest.Mocked<ILocalStorageTransactionalContextPort>;
   let logger: PinoLoggerMock;
   let useCase: LocalStorageTransactionalRunUseCase;
 
   beforeEach(() => {
-    isActive = jest.fn().mockReturnValue(false);
-    withTransaction = jest.fn((work: () => Promise<unknown>) => work());
-    run = jest.fn((work: () => Promise<unknown>) => work());
-    setHooks = jest.fn();
+    host = { isActive: jest.fn(), withTransaction: jest.fn() };
+    host.isActive.mockReturnValue(false);
+    host.withTransaction.mockImplementation((work) => work());
+    context = { run: jest.fn(), setHooks: jest.fn(), getHooks: jest.fn() };
+    context.run.mockImplementation((work) => work());
     logger = makePinoLoggerMock();
-    useCase = new LocalStorageTransactionalRunUseCase(
-      { isActive, withTransaction },
-      { run, setHooks, getHooks: jest.fn() },
-      logger as unknown as PinoLogger,
-    );
+    useCase = new LocalStorageTransactionalRunUseCase(host, context, logger);
   });
 
   it('joins the open transaction without a context or hooks of its own', async () => {
-    isActive.mockReturnValue(true);
+    host.isActive.mockReturnValue(true);
 
     const result = await useCase.execute(() => Promise.resolve('done'));
 
     expect(result).toBe('done');
-    expect(withTransaction).toHaveBeenCalledTimes(1);
-    expect(run).not.toHaveBeenCalled();
-    expect(setHooks).not.toHaveBeenCalled();
+    expect(host.withTransaction).toHaveBeenCalledTimes(1);
+    expect(context.run).not.toHaveBeenCalled();
+    expect(context.setHooks).not.toHaveBeenCalled();
   });
 
   it('opens a context with fresh hooks for the outermost run and runs them after the work', async () => {
     const outcomes: string[] = [];
-    setHooks.mockImplementation((hooks: (() => Promise<void>)[]) => {
+    context.setHooks.mockImplementation((hooks) => {
       hooks.push(() => Promise.resolve(void outcomes.push('hook')));
     });
 
@@ -46,13 +43,13 @@ describe('LocalStorageTransactionalRunUseCase', () => {
       useCase.execute(() => Promise.resolve(void outcomes.push('work'))),
     ).resolves.toBeUndefined();
 
-    expect(run).toHaveBeenCalledTimes(1);
+    expect(context.run).toHaveBeenCalledTimes(1);
     expect(outcomes).toEqual(['work', 'hook']);
   });
 
   it('runs the hooks one after another and answers after the last one', async () => {
     const outcomes: string[] = [];
-    setHooks.mockImplementation((hooks: (() => Promise<void>)[]) => {
+    context.setHooks.mockImplementation((hooks) => {
       hooks.push(async () => {
         await Promise.resolve();
         outcomes.push('hook 1');
@@ -67,7 +64,7 @@ describe('LocalStorageTransactionalRunUseCase', () => {
 
   it('logs a failed hook and runs the rest', async () => {
     const outcomes: string[] = [];
-    setHooks.mockImplementation((hooks: (() => Promise<void>)[]) => {
+    context.setHooks.mockImplementation((hooks) => {
       hooks.push(() => Promise.reject(new Error('cache is down')));
       hooks.push(() => Promise.resolve(void outcomes.push('hook 2')));
     });

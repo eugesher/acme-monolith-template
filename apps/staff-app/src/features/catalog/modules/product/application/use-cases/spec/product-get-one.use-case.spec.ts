@@ -5,11 +5,12 @@ import { ProductGetOneUseCase } from '../product-get-one.use-case';
 import type { ProductAccessService } from '../../services/product-access.service';
 
 describe('ProductGetOneUseCase', () => {
-  let load: jest.Mock;
+  let accessService: jest.Mocked<Pick<ProductAccessService, 'load'>>;
   let useCase: ProductGetOneUseCase;
 
   beforeEach(() => {
-    load = jest.fn().mockResolvedValue(
+    accessService = { load: jest.fn() };
+    accessService.load.mockResolvedValue(
       ProductGetOneModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
@@ -20,14 +21,17 @@ describe('ProductGetOneUseCase', () => {
         updatedAt: new Date('2026-01-02T00:00:00.000Z'),
       }),
     );
-    useCase = new ProductGetOneUseCase({ load } as unknown as ProductAccessService);
+    useCase = new ProductGetOneUseCase(accessService as unknown as ProductAccessService);
   });
 
   describe('execute', () => {
     it('answers the view of the product the caller owns', async () => {
       const view = await useCase.execute({ productId: '12' });
 
-      expect(load).toHaveBeenCalledWith({ productId: '12' }, ProductGetOneModel.reconstitute);
+      expect(accessService.load).toHaveBeenCalledWith(
+        { productId: '12' },
+        ProductGetOneModel.reconstitute,
+      );
       expect(view).toEqual({
         id: '12',
         sku: 'SKU-0001',

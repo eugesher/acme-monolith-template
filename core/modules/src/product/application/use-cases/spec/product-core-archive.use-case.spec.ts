@@ -1,27 +1,29 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { ProductCoreArchiveUseCase } from '../product-core-archive.use-case';
+import type {
+  IProductCoreArchiveRepositoryPort,
+  IProductCoreCatalogCachePort,
+  IProductCoreLedgerPort,
+  IProductCoreTransactionPort,
+} from '../../../outbound';
 
 describe('ProductCoreArchiveUseCase', () => {
   let calls: string[];
   let hooks: (() => Promise<void>)[];
-  let lockById: jest.Mock;
-  let update: jest.Mock;
-  let findById: jest.Mock;
-  let recordArchived: jest.Mock;
-  let invalidate: jest.Mock;
-  let run: jest.Mock;
-  let afterCommit: jest.Mock;
+  let repository: jest.Mocked<IProductCoreArchiveRepositoryPort>;
+  let catalogCache: jest.Mocked<IProductCoreCatalogCachePort>;
+  let ledger: jest.Mocked<IProductCoreLedgerPort>;
+  let transaction: jest.Mocked<IProductCoreTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: ProductCoreArchiveUseCase;
 
   beforeEach(() => {
     calls = [];
     hooks = [];
-    lockById = jest.fn(() => {
+    repository = { lockById: jest.fn(), update: jest.fn(), findById: jest.fn() };
+    repository.lockById.mockImplementation(() => {
       calls.push('lockById');
 
       return Promise.resolve({
@@ -32,12 +34,12 @@ describe('ProductCoreArchiveUseCase', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       });
     });
-    update = jest.fn(() => {
+    repository.update.mockImplementation(() => {
       calls.push('update');
 
       return Promise.resolve();
     });
-    findById = jest.fn(() => {
+    repository.findById.mockImplementation(() => {
       calls.push('findById');
 
       return Promise.resolve({
@@ -48,17 +50,20 @@ describe('ProductCoreArchiveUseCase', () => {
         updatedAt: new Date('2026-01-05T08:00:00.000Z'),
       });
     });
-    recordArchived = jest.fn(() => {
-      calls.push('recordArchived');
-
-      return Promise.resolve();
-    });
-    invalidate = jest.fn(() => {
+    catalogCache = { invalidate: jest.fn() };
+    catalogCache.invalidate.mockImplementation(() => {
       calls.push('invalidate');
 
       return Promise.resolve();
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    ledger = { recordArchived: jest.fn() };
+    ledger.recordArchived.mockImplementation(() => {
+      calls.push('recordArchived');
+
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn(), afterCommit: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
       calls.push('begin');
 
       const result = await work();
@@ -71,15 +76,9 @@ describe('ProductCoreArchiveUseCase', () => {
 
       return result;
     });
-    afterCommit = jest.fn((hook: () => Promise<void>) => hooks.push(hook));
+    transaction.afterCommit.mockImplementation((hook) => hooks.push(hook));
     logger = makePinoLoggerMock();
-    useCase = new ProductCoreArchiveUseCase(
-      { lockById, update, findById },
-      { invalidate },
-      { recordArchived },
-      { run, afterCommit },
-      logger as unknown as PinoLogger,
-    );
+    useCase = new ProductCoreArchiveUseCase(repository, catalogCache, ledger, transaction, logger);
   });
 
   describe('execute', () => {
@@ -87,8 +86,8 @@ describe('ProductCoreArchiveUseCase', () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: 3 });
 
       expect(view).toEqual({ outcome: 'archived', currentVersion: 4 });
-      expect(lockById).toHaveBeenCalledWith('12');
-      expect(update).toHaveBeenCalledWith({
+      expect(repository.lockById).toHaveBeenCalledWith('12');
+      expect(repository.update).toHaveBeenCalledWith({
         id: '12',
         versionAsRead: 3,
         status: 'archived',
@@ -109,8 +108,8 @@ describe('ProductCoreArchiveUseCase', () => {
         'invalidate',
         'recordArchived',
       ]);
-      expect(findById).toHaveBeenCalledWith('12');
-      expect(recordArchived).toHaveBeenCalledWith({
+      expect(repository.findById).toHaveBeenCalledWith('12');
+      expect(ledger.recordArchived).toHaveBeenCalledWith({
         subjectId: '12',
         version: 4,
         occurredAt: '2026-01-05T08:00:00.000Z',
@@ -119,25 +118,25 @@ describe('ProductCoreArchiveUseCase', () => {
     });
 
     it('answers not-found for an unknown product and writes nothing', async () => {
-      lockById.mockResolvedValue(null);
+      repository.lockById.mockResolvedValue(null);
 
       const view = await useCase.execute({ productId: '99', expectedVersion: undefined });
 
       expect(view).toEqual({ outcome: 'not-found', currentVersion: undefined });
-      expect(update).not.toHaveBeenCalled();
-      expect(afterCommit).not.toHaveBeenCalled();
+      expect(repository.update).not.toHaveBeenCalled();
+      expect(transaction.afterCommit).not.toHaveBeenCalled();
     });
 
     it('answers version-mismatch with the current version for a stale expected version', async () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: 2 });
 
       expect(view).toEqual({ outcome: 'version-mismatch', currentVersion: 3 });
-      expect(update).not.toHaveBeenCalled();
-      expect(afterCommit).not.toHaveBeenCalled();
+      expect(repository.update).not.toHaveBeenCalled();
+      expect(transaction.afterCommit).not.toHaveBeenCalled();
     });
 
     it('answers already-archived for an archived product and announces nothing', async () => {
-      lockById.mockResolvedValue({
+      repository.lockById.mockResolvedValue({
         id: '12',
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,
@@ -148,8 +147,8 @@ describe('ProductCoreArchiveUseCase', () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: undefined });
 
       expect(view).toEqual({ outcome: 'already-archived', currentVersion: 5 });
-      expect(update).not.toHaveBeenCalled();
-      expect(afterCommit).not.toHaveBeenCalled();
+      expect(repository.update).not.toHaveBeenCalled();
+      expect(transaction.afterCommit).not.toHaveBeenCalled();
       expect(logger.info).not.toHaveBeenCalled();
     });
   });

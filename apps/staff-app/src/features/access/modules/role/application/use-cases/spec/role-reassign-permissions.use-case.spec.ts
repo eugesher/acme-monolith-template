@@ -1,61 +1,57 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { RoleReassignPermissionsUseCase } from '../role-reassign-permissions.use-case';
+import type {
+  IRoleReassignPermissionsRepositoryPort,
+  IRoleTransactionPort,
+} from '../../../outbound';
 
 describe('RoleReassignPermissionsUseCase', () => {
   let calls: string[];
-  let repository: {
-    findRole: jest.Mock;
-    deleteRolePermissions: jest.Mock;
-    insertRolePermissions: jest.Mock;
-  };
-  let transaction: { run: jest.Mock };
+  let repository: jest.Mocked<IRoleReassignPermissionsRepositoryPort>;
+  let transaction: jest.Mocked<IRoleTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: RoleReassignPermissionsUseCase;
 
   beforeEach(() => {
     calls = [];
     repository = {
-      findRole: jest.fn(() => {
-        calls.push('findRole');
-
-        return Promise.resolve({
-          id: '2',
-          name: 'editor',
-          rolePermissions: [{ code: PermissionCodeEnum.ACCESS_MANAGE }],
-        });
-      }),
-      deleteRolePermissions: jest.fn(() => {
-        calls.push('deleteRolePermissions');
-
-        return Promise.resolve();
-      }),
-      insertRolePermissions: jest.fn(() => {
-        calls.push('insertRolePermissions');
-
-        return Promise.resolve();
-      }),
+      findRole: jest.fn(),
+      deleteRolePermissions: jest.fn(),
+      insertRolePermissions: jest.fn(),
     };
-    transaction = {
-      run: jest.fn(async (work: () => Promise<unknown>) => {
-        calls.push('begin');
+    repository.findRole.mockImplementation(() => {
+      calls.push('findRole');
 
-        const result = await work();
+      return Promise.resolve({
+        id: '2',
+        name: 'editor',
+        rolePermissions: [{ code: PermissionCodeEnum.ACCESS_MANAGE }],
+      });
+    });
+    repository.deleteRolePermissions.mockImplementation(() => {
+      calls.push('deleteRolePermissions');
 
-        calls.push('commit');
+      return Promise.resolve();
+    });
+    repository.insertRolePermissions.mockImplementation(() => {
+      calls.push('insertRolePermissions');
 
-        return result;
-      }),
-    };
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
+
+      const result = await work();
+
+      calls.push('commit');
+
+      return result;
+    });
     logger = makePinoLoggerMock();
-    useCase = new RoleReassignPermissionsUseCase(
-      repository,
-      transaction,
-      logger as unknown as PinoLogger,
-    );
+    useCase = new RoleReassignPermissionsUseCase(repository, transaction, logger);
   });
 
   it('reassigns the permissions of the role in one transaction', async () => {

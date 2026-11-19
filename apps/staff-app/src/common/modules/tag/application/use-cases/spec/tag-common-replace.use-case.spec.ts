@@ -1,23 +1,20 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { TagCommonSubjectTypeEnum } from '@acme-staff/contracts/tag';
 
 import { TagCommonReplaceUseCase } from '../tag-common-replace.use-case';
+import type { ITagCommonReplaceRepositoryPort, ITagCommonTransactionPort } from '../../../outbound';
 
 describe('TagCommonReplaceUseCase', () => {
   let calls: string[];
-  let lockTags: jest.Mock;
-  let findLinked: jest.Mock;
-  let link: jest.Mock;
-  let unlink: jest.Mock;
-  let run: jest.Mock;
+  let repository: jest.Mocked<ITagCommonReplaceRepositoryPort>;
+  let transaction: jest.Mocked<ITagCommonTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: TagCommonReplaceUseCase;
 
   beforeEach(() => {
     calls = [];
-    lockTags = jest.fn(() => {
+    repository = { lockTags: jest.fn(), findLinked: jest.fn(), link: jest.fn(), unlink: jest.fn() };
+    repository.lockTags.mockImplementation(() => {
       calls.push('lockTags');
 
       return Promise.resolve([
@@ -25,22 +22,23 @@ describe('TagCommonReplaceUseCase', () => {
         { id: '302', name: 'vip' },
       ]);
     });
-    findLinked = jest.fn(() => {
+    repository.findLinked.mockImplementation(() => {
       calls.push('findLinked');
 
       return Promise.resolve([{ tagId: '300' }, { tagId: '301' }]);
     });
-    link = jest.fn(() => {
+    repository.link.mockImplementation(() => {
       calls.push('link');
 
       return Promise.resolve();
     });
-    unlink = jest.fn(() => {
+    repository.unlink.mockImplementation(() => {
       calls.push('unlink');
 
       return Promise.resolve();
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
       calls.push('begin');
 
       const result = await work();
@@ -50,11 +48,7 @@ describe('TagCommonReplaceUseCase', () => {
       return result;
     });
     logger = makePinoLoggerMock();
-    useCase = new TagCommonReplaceUseCase(
-      { lockTags, findLinked, link, unlink },
-      { run },
-      logger as unknown as PinoLogger,
-    );
+    useCase = new TagCommonReplaceUseCase(repository, transaction, logger);
   });
 
   describe('execute', () => {
@@ -73,14 +67,17 @@ describe('TagCommonReplaceUseCase', () => {
         ],
         missingTagIds: [],
       });
-      expect(lockTags).toHaveBeenCalledWith(['302', '301']);
-      expect(findLinked).toHaveBeenCalledWith({ subjectType: 'product', subjectId: '100' });
-      expect(unlink).toHaveBeenCalledWith({
+      expect(repository.lockTags).toHaveBeenCalledWith(['302', '301']);
+      expect(repository.findLinked).toHaveBeenCalledWith({
+        subjectType: 'product',
+        subjectId: '100',
+      });
+      expect(repository.unlink).toHaveBeenCalledWith({
         subjectType: 'product',
         subjectId: '100',
         tagIds: ['300'],
       });
-      expect(link).toHaveBeenCalledWith({
+      expect(repository.link).toHaveBeenCalledWith({
         subjectType: 'product',
         subjectId: '100',
         tagIds: ['302'],
@@ -113,7 +110,7 @@ describe('TagCommonReplaceUseCase', () => {
     });
 
     it('clears the tags of the subject for an empty list', async () => {
-      lockTags.mockResolvedValue([]);
+      repository.lockTags.mockResolvedValue([]);
 
       const view = await useCase.execute({
         subjectType: TagCommonSubjectTypeEnum.ORDER,
@@ -122,16 +119,20 @@ describe('TagCommonReplaceUseCase', () => {
       });
 
       expect(view).toEqual({ outcome: 'replaced', tags: [], missingTagIds: [] });
-      expect(unlink).toHaveBeenCalledWith({
+      expect(repository.unlink).toHaveBeenCalledWith({
         subjectType: 'order',
         subjectId: '600',
         tagIds: ['300', '301'],
       });
-      expect(link).toHaveBeenCalledWith({ subjectType: 'order', subjectId: '600', tagIds: [] });
+      expect(repository.link).toHaveBeenCalledWith({
+        subjectType: 'order',
+        subjectId: '600',
+        tagIds: [],
+      });
     });
 
     it('does not commit when a write fails', async () => {
-      link.mockRejectedValue(new Error('connection lost'));
+      repository.link.mockRejectedValue(new Error('connection lost'));
 
       await expect(
         useCase.execute({
@@ -145,7 +146,7 @@ describe('TagCommonReplaceUseCase', () => {
     });
 
     it('neither links nor commits when the unlink fails', async () => {
-      unlink.mockRejectedValue(new Error('connection lost'));
+      repository.unlink.mockRejectedValue(new Error('connection lost'));
 
       await expect(
         useCase.execute({
@@ -154,7 +155,7 @@ describe('TagCommonReplaceUseCase', () => {
           tagIds: ['301', '302'],
         }),
       ).rejects.toThrow('connection lost');
-      expect(link).not.toHaveBeenCalled();
+      expect(repository.link).not.toHaveBeenCalled();
       expect(calls).not.toContain('commit');
     });
   });

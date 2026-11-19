@@ -6,26 +6,30 @@ import type {
 } from '../../../application';
 
 describe('OrderController', () => {
-  let place: jest.Mock;
-  let getMany: jest.Mock;
-  let getOne: jest.Mock;
+  let place: jest.Mocked<Pick<OrderPlaceUseCase, 'execute'>>;
+  let getMany: jest.Mocked<Pick<OrderGetManyUseCase, 'execute'>>;
+  let getOne: jest.Mocked<Pick<OrderGetOneUseCase, 'execute'>>;
   let controller: OrderController;
 
   beforeEach(() => {
-    place = jest.fn();
-    getMany = jest.fn();
-    getOne = jest.fn();
+    place = { execute: jest.fn() };
+    getMany = { execute: jest.fn() };
+    getOne = { execute: jest.fn() };
 
     controller = new OrderController(
-      { execute: place } as unknown as OrderPlaceUseCase,
-      { execute: getMany } as unknown as OrderGetManyUseCase,
-      { execute: getOne } as unknown as OrderGetOneUseCase,
+      place as unknown as OrderPlaceUseCase,
+      getMany as unknown as OrderGetManyUseCase,
+      getOne as unknown as OrderGetOneUseCase,
     );
   });
 
   describe('handlePlace', () => {
     it('places the order of the body for the caller under the idempotency key', async () => {
-      place.mockResolvedValue({ id: '610', orderProducts: [] });
+      place.execute.mockResolvedValue({
+        id: '610',
+        createdAt: '2026-01-05T08:00:00.000Z',
+        orderProducts: [],
+      });
 
       const response = await controller.handlePlace(
         { id: 'customer-1', email: 'ann@example.com' },
@@ -33,8 +37,12 @@ describe('OrderController', () => {
         'key-1',
       );
 
-      expect(response).toEqual({ id: '610', orderProducts: [] });
-      expect(place).toHaveBeenCalledWith({
+      expect(response).toEqual({
+        id: '610',
+        createdAt: '2026-01-05T08:00:00.000Z',
+        orderProducts: [],
+      });
+      expect(place.execute).toHaveBeenCalledWith({
         customerId: 'customer-1',
         productIds: ['100', '100'],
         idempotencyKey: 'key-1',
@@ -44,29 +52,51 @@ describe('OrderController', () => {
 
   describe('handleGetMany', () => {
     it('lists the orders of the caller for the page window', async () => {
-      getMany.mockResolvedValue({ page: 2, count: 0, pageCount: 0, total: 0, data: [] });
+      getMany.execute.mockResolvedValue({
+        page: 2,
+        limit: 5,
+        count: 0,
+        pageCount: 0,
+        total: 0,
+        data: [],
+      });
 
       const response = await controller.handleGetMany(
         { id: 'customer-1', email: 'ann@example.com' },
         { page: 2, limit: 5 },
       );
 
-      expect(response).toEqual({ page: 2, count: 0, pageCount: 0, total: 0, data: [] });
-      expect(getMany).toHaveBeenCalledWith({ customerId: 'customer-1', page: 2, limit: 5 });
+      expect(response).toEqual({
+        page: 2,
+        limit: 5,
+        count: 0,
+        pageCount: 0,
+        total: 0,
+        data: [],
+      });
+      expect(getMany.execute).toHaveBeenCalledWith({ customerId: 'customer-1', page: 2, limit: 5 });
     });
   });
 
   describe('handleGetOne', () => {
     it('reads the order of the path for the caller', async () => {
-      getOne.mockResolvedValue({ id: '600', orderProducts: [] });
+      getOne.execute.mockResolvedValue({
+        id: '600',
+        createdAt: '2026-01-03T00:00:00.000Z',
+        orderProducts: [],
+      });
 
       const response = await controller.handleGetOne(
         { id: 'customer-1', email: 'ann@example.com' },
         { orderId: '600' },
       );
 
-      expect(response).toEqual({ id: '600', orderProducts: [] });
-      expect(getOne).toHaveBeenCalledWith({ customerId: 'customer-1', orderId: '600' });
+      expect(response).toEqual({
+        id: '600',
+        createdAt: '2026-01-03T00:00:00.000Z',
+        orderProducts: [],
+      });
+      expect(getOne.execute).toHaveBeenCalledWith({ customerId: 'customer-1', orderId: '600' });
     });
   });
 });

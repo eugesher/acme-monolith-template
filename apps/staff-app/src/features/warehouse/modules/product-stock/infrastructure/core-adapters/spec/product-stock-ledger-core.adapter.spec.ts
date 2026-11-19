@@ -1,12 +1,15 @@
+import type { ILedgerCorePort } from '@acme-core/contracts/ledger';
+
 import { ProductStockLedgerCoreAdapter } from '../product-stock-ledger-core.adapter';
 
 describe('ProductStockLedgerCoreAdapter', () => {
-  let handleEnqueue: jest.Mock;
+  let ledger: jest.Mocked<ILedgerCorePort>;
   let adapter: ProductStockLedgerCoreAdapter;
 
   beforeEach(() => {
-    handleEnqueue = jest.fn().mockResolvedValue(undefined);
-    adapter = new ProductStockLedgerCoreAdapter({ handleEnqueue });
+    ledger = { handleEnqueue: jest.fn() };
+    ledger.handleEnqueue.mockResolvedValue(undefined);
+    adapter = new ProductStockLedgerCoreAdapter(ledger);
   });
 
   describe('recordAdded', () => {
@@ -18,7 +21,7 @@ describe('ProductStockLedgerCoreAdapter', () => {
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
 
-      expect(handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-restocked:700',
         subjectType: 'product',
         subjectId: '12',

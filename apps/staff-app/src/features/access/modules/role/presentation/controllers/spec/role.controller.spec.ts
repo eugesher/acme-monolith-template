@@ -8,26 +8,26 @@ import type {
 } from '../../../application';
 
 describe('RoleController', () => {
-  let list: jest.Mock;
-  let create: jest.Mock;
-  let reassignPermissions: jest.Mock;
+  let list: jest.Mocked<Pick<RoleListUseCase, 'execute'>>;
+  let create: jest.Mocked<Pick<RoleCreateUseCase, 'execute'>>;
+  let reassignPermissions: jest.Mocked<Pick<RoleReassignPermissionsUseCase, 'execute'>>;
   let controller: RoleController;
 
   beforeEach(() => {
-    list = jest.fn();
-    create = jest.fn();
-    reassignPermissions = jest.fn();
+    list = { execute: jest.fn() };
+    create = { execute: jest.fn() };
+    reassignPermissions = { execute: jest.fn() };
 
     controller = new RoleController(
-      { execute: list } as unknown as RoleListUseCase,
-      { execute: create } as unknown as RoleCreateUseCase,
-      { execute: reassignPermissions } as unknown as RoleReassignPermissionsUseCase,
+      list as unknown as RoleListUseCase,
+      create as unknown as RoleCreateUseCase,
+      reassignPermissions as unknown as RoleReassignPermissionsUseCase,
     );
   });
 
   describe('handleList', () => {
     it('answers the roles', async () => {
-      list.mockResolvedValue([{ id: '3', name: 'viewer', permissionCodes: [] }]);
+      list.execute.mockResolvedValue([{ id: '3', name: 'viewer', permissionCodes: [] }]);
 
       const response = await controller.handleList();
 
@@ -37,18 +37,18 @@ describe('RoleController', () => {
 
   describe('handleCreate', () => {
     it('creates the role from the body and answers it', async () => {
-      create.mockResolvedValue({ id: '7', name: 'auditor', permissionCodes: [] });
+      create.execute.mockResolvedValue({ id: '7', name: 'auditor', permissionCodes: [] });
 
       const response = await controller.handleCreate({ name: 'auditor', permissionCodes: [] });
 
       expect(response).toEqual({ id: '7', name: 'auditor', permissionCodes: [] });
-      expect(create).toHaveBeenCalledWith({ name: 'auditor', permissionCodes: [] });
+      expect(create.execute).toHaveBeenCalledWith({ name: 'auditor', permissionCodes: [] });
     });
   });
 
   describe('handleReassignPermissions', () => {
     it('reassigns the permissions of the role of the path with the codes of the body', async () => {
-      reassignPermissions.mockResolvedValue({
+      reassignPermissions.execute.mockResolvedValue({
         id: '3',
         name: 'viewer',
         permissionCodes: [PermissionCodeEnum.ACCESS_MANAGE],
@@ -66,7 +66,7 @@ describe('RoleController', () => {
         name: 'viewer',
         permissionCodes: ['access:manage'],
       });
-      expect(reassignPermissions).toHaveBeenCalledWith({
+      expect(reassignPermissions.execute).toHaveBeenCalledWith({
         roleId: '3',
         permissionCodes: ['access:manage'],
       });

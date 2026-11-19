@@ -1,30 +1,27 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum, UserStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { AuthLoginUseCase } from '../auth-login.use-case';
+import type { IAuthCredentialsPort, IAuthLoginRepositoryPort } from '../../../outbound';
 
 describe('AuthLoginUseCase', () => {
-  let repository: { findByEmail: jest.Mock };
-  let credentials: { issueAccessToken: jest.Mock; verifyPassword: jest.Mock };
+  let repository: jest.Mocked<IAuthLoginRepositoryPort>;
+  let credentials: jest.Mocked<IAuthCredentialsPort>;
   let logger: PinoLoggerMock;
   let useCase: AuthLoginUseCase;
 
   beforeEach(() => {
-    repository = {
-      findByEmail: jest.fn().mockResolvedValue({
-        id: 'user-1',
-        passwordHash: 'hash',
-        status: UserStatusEnum.ACTIVE,
-      }),
-    };
-    credentials = {
-      issueAccessToken: jest.fn().mockResolvedValue('access-token'),
-      verifyPassword: jest.fn().mockResolvedValue(true),
-    };
+    repository = { findByEmail: jest.fn() };
+    repository.findByEmail.mockResolvedValue({
+      id: 'user-1',
+      passwordHash: 'hash',
+      status: UserStatusEnum.ACTIVE,
+    });
+    credentials = { issueAccessToken: jest.fn(), verifyPassword: jest.fn() };
+    credentials.issueAccessToken.mockResolvedValue('access-token');
+    credentials.verifyPassword.mockResolvedValue(true);
     logger = makePinoLoggerMock();
-    useCase = new AuthLoginUseCase(repository, credentials, logger as unknown as PinoLogger);
+    useCase = new AuthLoginUseCase(repository, credentials, logger);
   });
 
   describe('execute', () => {

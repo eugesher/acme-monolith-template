@@ -8,23 +8,25 @@ import type { LedgerAppendReportFailureUseCase, LedgerAppendUseCase } from '../.
 
 describe('LedgerAppendProcessor', () => {
   let correlationIds: string[];
-  let execute: jest.Mock;
-  let report: jest.Mock;
+  let append: jest.Mocked<Pick<LedgerAppendUseCase, 'execute'>>;
+  let reportFailure: jest.Mocked<Pick<LedgerAppendReportFailureUseCase, 'execute'>>;
   let processor: LedgerAppendProcessor;
 
   beforeEach(() => {
     correlationIds = [];
-    execute = jest.fn().mockImplementation(() => {
+    append = { execute: jest.fn() };
+    append.execute.mockImplementation(() => {
       correlationIds.push(CorrelationContextHelper.current('LedgerAppendUseCase'));
 
       return Promise.resolve();
     });
-    report = jest.fn().mockImplementation(() => {
+    reportFailure = { execute: jest.fn() };
+    reportFailure.execute.mockImplementation(() => {
       correlationIds.push(CorrelationContextHelper.current('LedgerAppendReportFailureUseCase'));
     });
     processor = new LedgerAppendProcessor(
-      { execute } as unknown as LedgerAppendUseCase,
-      { execute: report } as unknown as LedgerAppendReportFailureUseCase,
+      append as unknown as LedgerAppendUseCase,
+      reportFailure as unknown as LedgerAppendReportFailureUseCase,
     );
   });
 
@@ -42,7 +44,7 @@ describe('LedgerAppendProcessor', () => {
         },
       } as unknown as Job<ILedgerRecordProcessorPayload>);
 
-      expect(execute).toHaveBeenCalledWith({
+      expect(append.execute).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
         subjectType: 'product',
         subjectId: '12',
@@ -54,7 +56,7 @@ describe('LedgerAppendProcessor', () => {
     });
 
     it('passes a failing append through, so Bull retries the job', async () => {
-      execute.mockRejectedValue(new Error('deadlock'));
+      append.execute.mockRejectedValue(new Error('deadlock'));
 
       const handling = processor.handleRecord({
         data: {
@@ -91,7 +93,7 @@ describe('LedgerAppendProcessor', () => {
         new Error('deadlock'),
       );
 
-      expect(report).toHaveBeenCalledWith({
+      expect(reportFailure.execute).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
         attempt: 2,
         attempts: 3,
@@ -118,7 +120,7 @@ describe('LedgerAppendProcessor', () => {
         new Error('deadlock'),
       );
 
-      expect(report).toHaveBeenCalledWith({
+      expect(reportFailure.execute).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
         attempt: 1,
         attempts: 1,

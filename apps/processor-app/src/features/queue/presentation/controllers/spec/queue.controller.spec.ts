@@ -7,28 +7,33 @@ import type {
 } from '../../../application';
 
 describe('QueueController', () => {
-  let list: jest.Mock;
-  let listFailedJobs: jest.Mock;
-  let retryFailedJob: jest.Mock;
-  let deleteFailedJob: jest.Mock;
+  let list: jest.Mocked<Pick<QueueListUseCase, 'execute'>>;
+  let listFailedJobs: jest.Mocked<Pick<QueueListFailedJobsUseCase, 'execute'>>;
+  let retryFailedJob: jest.Mocked<Pick<QueueRetryFailedJobUseCase, 'execute'>>;
+  let deleteFailedJob: jest.Mocked<Pick<QueueDeleteFailedJobUseCase, 'execute'>>;
   let controller: QueueController;
 
   beforeEach(() => {
-    list = jest.fn().mockResolvedValue([]);
-    listFailedJobs = jest.fn().mockResolvedValue({
+    list = { execute: jest.fn() };
+    list.execute.mockResolvedValue([]);
+    listFailedJobs = { execute: jest.fn() };
+    listFailedJobs.execute.mockResolvedValue({
       page: 1,
+      limit: 20,
       count: 0,
       pageCount: 0,
       total: 0,
       data: [],
     });
-    retryFailedJob = jest.fn().mockResolvedValue(undefined);
-    deleteFailedJob = jest.fn().mockResolvedValue(undefined);
+    retryFailedJob = { execute: jest.fn() };
+    retryFailedJob.execute.mockResolvedValue(undefined);
+    deleteFailedJob = { execute: jest.fn() };
+    deleteFailedJob.execute.mockResolvedValue(undefined);
     controller = new QueueController(
-      { execute: list } as unknown as QueueListUseCase,
-      { execute: listFailedJobs } as unknown as QueueListFailedJobsUseCase,
-      { execute: retryFailedJob } as unknown as QueueRetryFailedJobUseCase,
-      { execute: deleteFailedJob } as unknown as QueueDeleteFailedJobUseCase,
+      list as unknown as QueueListUseCase,
+      listFailedJobs as unknown as QueueListFailedJobsUseCase,
+      retryFailedJob as unknown as QueueRetryFailedJobUseCase,
+      deleteFailedJob as unknown as QueueDeleteFailedJobUseCase,
     );
   });
 
@@ -37,7 +42,7 @@ describe('QueueController', () => {
       const response = await controller.handleList();
 
       expect(response).toEqual([]);
-      expect(list).toHaveBeenCalledWith();
+      expect(list.execute).toHaveBeenCalledWith();
     });
   });
 
@@ -48,8 +53,15 @@ describe('QueueController', () => {
         { page: 2, limit: 10 },
       );
 
-      expect(response).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
-      expect(listFailedJobs).toHaveBeenCalledWith({
+      expect(response).toEqual({
+        page: 1,
+        limit: 20,
+        count: 0,
+        pageCount: 0,
+        total: 0,
+        data: [],
+      });
+      expect(listFailedJobs.execute).toHaveBeenCalledWith({
         queueName: 'ledger-record',
         page: 2,
         limit: 10,
@@ -64,7 +76,7 @@ describe('QueueController', () => {
         { id: '1', email: 'admin@example.com' },
       );
 
-      expect(retryFailedJob).toHaveBeenCalledWith({
+      expect(retryFailedJob.execute).toHaveBeenCalledWith({
         queueName: 'ledger-record',
         jobId: '7',
         staffUserId: '1',
@@ -72,7 +84,7 @@ describe('QueueController', () => {
     });
 
     it('lets a failed retry reject', async () => {
-      retryFailedJob.mockRejectedValue(new Error('job is not failed'));
+      retryFailedJob.execute.mockRejectedValue(new Error('job is not failed'));
 
       const retry = controller.handleRetryFailedJob(
         { queueName: 'ledger-record', jobId: '7' },
@@ -90,7 +102,7 @@ describe('QueueController', () => {
         { id: '1', email: 'admin@example.com' },
       );
 
-      expect(deleteFailedJob).toHaveBeenCalledWith({
+      expect(deleteFailedJob.execute).toHaveBeenCalledWith({
         queueName: 'ledger-record',
         jobId: '7',
         staffUserId: '1',

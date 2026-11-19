@@ -2,17 +2,17 @@ import { AuthGlobalValidateSubjectUseCase } from '../../application';
 import { AuthGlobalFacade } from '../auth-global.facade';
 
 describe('AuthGlobalFacade', () => {
-  let findActiveById: jest.Mock;
+  let repository: jest.Mocked<ConstructorParameters<typeof AuthGlobalValidateSubjectUseCase>[0]>;
   let facade: AuthGlobalFacade;
 
   beforeEach(() => {
-    findActiveById = jest.fn();
-    facade = new AuthGlobalFacade(new AuthGlobalValidateSubjectUseCase({ findActiveById }));
+    repository = { findActiveById: jest.fn() };
+    facade = new AuthGlobalFacade(new AuthGlobalValidateSubjectUseCase(repository));
   });
 
   describe('handleValidate', () => {
     it('answers the active customer of the token subject', async () => {
-      findActiveById.mockResolvedValue({
+      repository.findActiveById.mockResolvedValue({
         id: 'customer-1',
         email: 'ann@example.com',
       });
@@ -20,11 +20,11 @@ describe('AuthGlobalFacade', () => {
       const user = await facade.handleValidate({ sub: 'customer-1' });
 
       expect(user).toEqual({ id: 'customer-1', email: 'ann@example.com' });
-      expect(findActiveById).toHaveBeenCalledWith('customer-1');
+      expect(repository.findActiveById).toHaveBeenCalledWith('customer-1');
     });
 
     it('answers no user when the subject is not an active customer', async () => {
-      findActiveById.mockResolvedValue(null);
+      repository.findActiveById.mockResolvedValue(null);
 
       const user = await facade.handleValidate({ sub: 'customer-1' });
 

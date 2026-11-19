@@ -1,20 +1,20 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { ProductUpdateModel } from '../../../domain';
 import { ProductUpdateUseCase } from '../product-update.use-case';
+import type { IProductCatalogCachePort } from '../../../outbound';
 import type { ProductWriteService } from '../../services/product-write.service';
 
 describe('ProductUpdateUseCase', () => {
-  let write: jest.Mock;
-  let invalidate: jest.Mock;
+  let writeService: jest.Mocked<Pick<ProductWriteService, 'write'>>;
+  let catalogCache: jest.Mocked<IProductCatalogCachePort>;
   let logger: PinoLoggerMock;
   let useCase: ProductUpdateUseCase;
 
   beforeEach(() => {
-    write = jest.fn().mockResolvedValue({
+    writeService = { write: jest.fn() };
+    writeService.write.mockResolvedValue({
       product: ProductUpdateModel.reconstitute({
         id: '12',
         sku: 'SKU-0001',
@@ -26,12 +26,13 @@ describe('ProductUpdateUseCase', () => {
       }),
       answer: undefined,
     });
-    invalidate = jest.fn().mockResolvedValue(undefined);
+    catalogCache = { invalidate: jest.fn() };
+    catalogCache.invalidate.mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
     useCase = new ProductUpdateUseCase(
-      { write } as unknown as ProductWriteService,
-      { invalidate },
-      logger as unknown as PinoLogger,
+      writeService as unknown as ProductWriteService,
+      catalogCache,
+      logger,
     );
   });
 
@@ -43,7 +44,7 @@ describe('ProductUpdateUseCase', () => {
         expectedVersion: 3,
       });
 
-      expect(write).toHaveBeenCalledWith(
+      expect(writeService.write).toHaveBeenCalledWith(
         { productId: '12', expectedVersion: 3 },
         ProductUpdateModel.reconstitute,
         expect.any(Function),
@@ -63,23 +64,23 @@ describe('ProductUpdateUseCase', () => {
     it('invalidates the customer catalog after the write', async () => {
       await useCase.execute({ productId: '12', name: 'Desk lamp', expectedVersion: 3 });
 
-      expect(invalidate).toHaveBeenCalledTimes(1);
-      expect(write.mock.invocationCallOrder[0]).toBeLessThan(
-        invalidate.mock.invocationCallOrder[0],
+      expect(catalogCache.invalidate).toHaveBeenCalledTimes(1);
+      expect(writeService.write.mock.invocationCallOrder[0]).toBeLessThan(
+        catalogCache.invalidate.mock.invocationCallOrder[0],
       );
     });
 
     it('invalidates nothing when the write fails', async () => {
-      write.mockRejectedValue(new Error('PRODUCT_NOT_FOUND'));
+      writeService.write.mockRejectedValue(new Error('PRODUCT_NOT_FOUND'));
 
       await expect(
         useCase.execute({ productId: '12', name: 'Desk lamp', expectedVersion: 3 }),
       ).rejects.toThrow('PRODUCT_NOT_FOUND');
-      expect(invalidate).not.toHaveBeenCalled();
+      expect(catalogCache.invalidate).not.toHaveBeenCalled();
     });
 
     it('lets a failed invalidation reject without logging the update', async () => {
-      invalidate.mockRejectedValue(new Error('redis is down'));
+      catalogCache.invalidate.mockRejectedValue(new Error('redis is down'));
 
       await expect(
         useCase.execute({ productId: '12', name: 'Desk lamp', expectedVersion: 3 }),
@@ -104,7 +105,7 @@ describe('ProductUpdateUseCase', () => {
         expectedVersion: undefined,
       });
 
-      const [, , mutate] = write.mock.calls[0] as [
+      const [, , mutate] = writeService.write.mock.calls[0] as [
         unknown,
         unknown,
         (product: ProductUpdateModel) => void,

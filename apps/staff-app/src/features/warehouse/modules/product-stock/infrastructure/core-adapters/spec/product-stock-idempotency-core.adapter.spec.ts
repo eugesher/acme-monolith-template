@@ -1,27 +1,22 @@
-import { IdempotencyCoreClaimOutcomeEnum } from '@acme-core/contracts/idempotency';
+import {
+  IdempotencyCoreClaimOutcomeEnum,
+  type IIdempotencyCorePort,
+} from '@acme-core/contracts/idempotency';
 
 import { ProductStockIdempotencyCoreAdapter } from '../product-stock-idempotency-core.adapter';
 
 describe('ProductStockIdempotencyCoreAdapter', () => {
-  let handleClaim: jest.Mock;
-  let handleComplete: jest.Mock;
-  let handleRelease: jest.Mock;
+  let idempotency: jest.Mocked<IIdempotencyCorePort>;
   let adapter: ProductStockIdempotencyCoreAdapter;
 
   beforeEach(() => {
-    handleClaim = jest.fn();
-    handleComplete = jest.fn();
-    handleRelease = jest.fn();
-    adapter = new ProductStockIdempotencyCoreAdapter({
-      handleClaim,
-      handleComplete,
-      handleRelease,
-    });
+    idempotency = { handleClaim: jest.fn(), handleComplete: jest.fn(), handleRelease: jest.fn() };
+    adapter = new ProductStockIdempotencyCoreAdapter(idempotency);
   });
 
   describe('claim', () => {
     it('claims the key in the scope of the owner on the logical body', async () => {
-      handleClaim.mockResolvedValue({
+      idempotency.handleClaim.mockResolvedValue({
         outcome: IdempotencyCoreClaimOutcomeEnum.CLAIMED,
         storedResponse: undefined,
       });
@@ -33,7 +28,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
       });
 
       expect(outcome).toEqual({ outcome: 'claimed' });
-      expect(handleClaim).toHaveBeenCalledWith({
+      expect(idempotency.handleClaim).toHaveBeenCalledWith({
         scope: 'staff:staff-1',
         key: 'key-1',
         body: { productId: '12', quantity: 5 },
@@ -44,7 +39,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
       [IdempotencyCoreClaimOutcomeEnum.IN_FLIGHT, 'in-flight'],
       [IdempotencyCoreClaimOutcomeEnum.MISMATCH, 'mismatch'],
     ])('answers %s as %s without a stored response', async (core, outcome) => {
-      handleClaim.mockResolvedValue({ outcome: core, storedResponse: undefined });
+      idempotency.handleClaim.mockResolvedValue({ outcome: core, storedResponse: undefined });
 
       const result = await adapter.claim({ staffUserId: 'staff-1', key: 'key-1', body: {} });
 
@@ -52,7 +47,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
     });
 
     it('answers a replay with the stored response', async () => {
-      handleClaim.mockResolvedValue({
+      idempotency.handleClaim.mockResolvedValue({
         outcome: IdempotencyCoreClaimOutcomeEnum.REPLAY,
         storedResponse: { productId: '12', quantity: 15 },
       });
@@ -68,7 +63,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
 
   describe('complete', () => {
     it('stores the response under the key in the scope of the owner', async () => {
-      handleComplete.mockResolvedValue(undefined);
+      idempotency.handleComplete.mockResolvedValue(undefined);
 
       await adapter.complete({
         staffUserId: 'staff-1',
@@ -76,7 +71,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
         response: { productId: '12' },
       });
 
-      expect(handleComplete).toHaveBeenCalledWith({
+      expect(idempotency.handleComplete).toHaveBeenCalledWith({
         scope: 'staff:staff-1',
         key: 'key-1',
         response: { productId: '12' },
@@ -84,7 +79,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
     });
 
     it('lets a failed write reject', async () => {
-      handleComplete.mockRejectedValue(new Error('connection lost'));
+      idempotency.handleComplete.mockRejectedValue(new Error('connection lost'));
 
       const complete = adapter.complete({ staffUserId: 'staff-1', key: 'key-1', response: {} });
 
@@ -94,11 +89,14 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
 
   describe('release', () => {
     it('releases the key in the scope of the owner', async () => {
-      handleRelease.mockResolvedValue(undefined);
+      idempotency.handleRelease.mockResolvedValue(undefined);
 
       await adapter.release({ staffUserId: 'staff-1', key: 'key-1' });
 
-      expect(handleRelease).toHaveBeenCalledWith({ scope: 'staff:staff-1', key: 'key-1' });
+      expect(idempotency.handleRelease).toHaveBeenCalledWith({
+        scope: 'staff:staff-1',
+        key: 'key-1',
+      });
     });
   });
 });

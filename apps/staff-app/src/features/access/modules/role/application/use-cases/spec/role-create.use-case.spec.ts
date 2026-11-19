@@ -1,45 +1,45 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { RoleCreateStaffRoleInsertOutcomeEnum } from '../../../outbound';
+import {
+  RoleCreateStaffRoleInsertOutcomeEnum,
+  type IRoleCreateRepositoryPort,
+  type IRoleTransactionPort,
+} from '../../../outbound';
 import { RoleCreateUseCase } from '../role-create.use-case';
 
 describe('RoleCreateUseCase', () => {
   let calls: string[];
-  let repository: { insertRole: jest.Mock; insertRolePermissions: jest.Mock };
-  let transaction: { run: jest.Mock };
+  let repository: jest.Mocked<IRoleCreateRepositoryPort>;
+  let transaction: jest.Mocked<IRoleTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: RoleCreateUseCase;
 
   beforeEach(() => {
     calls = [];
-    repository = {
-      insertRole: jest.fn(() => {
-        calls.push('insertRole');
+    repository = { insertRole: jest.fn(), insertRolePermissions: jest.fn() };
+    repository.insertRole.mockImplementation(() => {
+      calls.push('insertRole');
 
-        return Promise.resolve({ outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: '7' });
-      }),
-      insertRolePermissions: jest.fn(() => {
-        calls.push('insertRolePermissions');
+      return Promise.resolve({ outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: '7' });
+    });
+    repository.insertRolePermissions.mockImplementation(() => {
+      calls.push('insertRolePermissions');
 
-        return Promise.resolve();
-      }),
-    };
-    transaction = {
-      run: jest.fn(async (work: () => Promise<unknown>) => {
-        calls.push('begin');
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
 
-        const result = await work();
+      const result = await work();
 
-        calls.push('commit');
+      calls.push('commit');
 
-        return result;
-      }),
-    };
+      return result;
+    });
     logger = makePinoLoggerMock();
-    useCase = new RoleCreateUseCase(repository, transaction, logger as unknown as PinoLogger);
+    useCase = new RoleCreateUseCase(repository, transaction, logger);
   });
 
   afterEach(() => {

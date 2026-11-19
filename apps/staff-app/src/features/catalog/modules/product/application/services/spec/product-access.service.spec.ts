@@ -2,13 +2,15 @@ import { ProductStatusEnum } from '@acme-libs/kernel';
 
 import { ProductGetOneModel } from '../../../domain';
 import { ProductAccessService } from '../product-access.service';
+import type { IProductAccessRepositoryPort } from '../../../outbound';
 
 describe('ProductAccessService', () => {
-  let findById: jest.Mock;
+  let repository: jest.Mocked<IProductAccessRepositoryPort>;
   let service: ProductAccessService;
 
   beforeEach(() => {
-    findById = jest.fn().mockResolvedValue({
+    repository = { findById: jest.fn() };
+    repository.findById.mockResolvedValue({
       id: '12',
       sku: 'SKU-0001',
       name: 'Lamp',
@@ -17,7 +19,7 @@ describe('ProductAccessService', () => {
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
-    service = new ProductAccessService({ findById });
+    service = new ProductAccessService(repository);
   });
 
   describe('load', () => {
@@ -25,11 +27,11 @@ describe('ProductAccessService', () => {
       const product = await service.load({ productId: '12' }, ProductGetOneModel.reconstitute);
 
       expect(product.id).toBe('12');
-      expect(findById).toHaveBeenCalledWith('12');
+      expect(repository.findById).toHaveBeenCalledWith('12');
     });
 
     it('refuses a missing product with PRODUCT_NOT_FOUND', async () => {
-      findById.mockResolvedValue(null);
+      repository.findById.mockResolvedValue(null);
 
       await expect(
         service.load({ productId: '12' }, ProductGetOneModel.reconstitute),
@@ -43,11 +45,11 @@ describe('ProductAccessService', () => {
   describe('assertExists', () => {
     it('passes for a stored product', async () => {
       await expect(service.assertExists({ productId: '12' })).resolves.toBeUndefined();
-      expect(findById).toHaveBeenCalledWith('12');
+      expect(repository.findById).toHaveBeenCalledWith('12');
     });
 
     it('refuses a missing product with PRODUCT_NOT_FOUND', async () => {
-      findById.mockResolvedValue(null);
+      repository.findById.mockResolvedValue(null);
 
       await expect(service.assertExists({ productId: '12' })).rejects.toMatchObject({
         code: 'PRODUCT_NOT_FOUND',

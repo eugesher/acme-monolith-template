@@ -1,23 +1,26 @@
 import { LocalStorageTransactionalAfterCommitUseCase } from '../local-storage-transactional-after-commit.use-case';
+import type {
+  ILocalStorageTransactionalContextPort,
+  ILocalStorageTransactionalHostPort,
+} from '../../../outbound';
 
 describe('LocalStorageTransactionalAfterCommitUseCase', () => {
-  let isActive: jest.Mock;
-  let getHooks: jest.Mock;
+  let host: jest.Mocked<ILocalStorageTransactionalHostPort>;
+  let context: jest.Mocked<ILocalStorageTransactionalContextPort>;
   let useCase: LocalStorageTransactionalAfterCommitUseCase;
 
   beforeEach(() => {
-    isActive = jest.fn().mockReturnValue(true);
-    getHooks = jest.fn().mockReturnValue([]);
-    useCase = new LocalStorageTransactionalAfterCommitUseCase(
-      { isActive, withTransaction: jest.fn() },
-      { run: jest.fn(), setHooks: jest.fn(), getHooks },
-    );
+    host = { isActive: jest.fn(), withTransaction: jest.fn() };
+    host.isActive.mockReturnValue(true);
+    context = { run: jest.fn(), setHooks: jest.fn(), getHooks: jest.fn() };
+    context.getHooks.mockReturnValue([]);
+    useCase = new LocalStorageTransactionalAfterCommitUseCase(host, context);
   });
 
   it('adds the hook to the hooks of the open run', () => {
     const hooks: (() => Promise<void>)[] = [];
     const hook = (): Promise<void> => Promise.resolve();
-    getHooks.mockReturnValue(hooks);
+    context.getHooks.mockReturnValue(hooks);
 
     useCase.execute(hook);
 
@@ -25,7 +28,7 @@ describe('LocalStorageTransactionalAfterCommitUseCase', () => {
   });
 
   it('refuses a hook while no transaction is open', () => {
-    isActive.mockReturnValue(false);
+    host.isActive.mockReturnValue(false);
 
     expect(() => useCase.execute(() => Promise.resolve())).toThrow(
       'afterCommit must be called inside TRANSACTION_PORT.run',
@@ -33,7 +36,7 @@ describe('LocalStorageTransactionalAfterCommitUseCase', () => {
   });
 
   it('refuses a hook when the run holds no hooks', () => {
-    getHooks.mockReturnValue(undefined);
+    context.getHooks.mockReturnValue(undefined);
 
     expect(() => useCase.execute(() => Promise.resolve())).toThrow(
       'afterCommit must be called inside TRANSACTION_PORT.run',

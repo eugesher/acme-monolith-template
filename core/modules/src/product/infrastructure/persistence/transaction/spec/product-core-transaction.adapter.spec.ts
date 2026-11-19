@@ -1,14 +1,15 @@
+import type { ITransactionPort } from '@acme-libs/contracts/local-storage';
+
 import { ProductCoreTransactionAdapter } from '../product-core-transaction.adapter';
 
 describe('ProductCoreTransactionAdapter', () => {
-  let run: jest.Mock;
-  let afterCommit: jest.Mock;
+  let transaction: jest.Mocked<ITransactionPort>;
   let adapter: ProductCoreTransactionAdapter;
 
   beforeEach(() => {
-    run = jest.fn((work: () => Promise<unknown>) => work());
-    afterCommit = jest.fn();
-    adapter = new ProductCoreTransactionAdapter({ run, afterCommit });
+    transaction = { run: jest.fn(), afterCommit: jest.fn() };
+    transaction.run.mockImplementation((work) => work());
+    adapter = new ProductCoreTransactionAdapter(transaction);
   });
 
   describe('run', () => {
@@ -18,7 +19,7 @@ describe('ProductCoreTransactionAdapter', () => {
       const result = await adapter.run(work);
 
       expect(result).toBe('result');
-      expect(run).toHaveBeenCalledWith(work);
+      expect(transaction.run).toHaveBeenCalledWith(work);
     });
   });
 
@@ -28,7 +29,7 @@ describe('ProductCoreTransactionAdapter', () => {
 
       adapter.afterCommit(hook);
 
-      expect(afterCommit).toHaveBeenCalledWith(hook);
+      expect(transaction.afterCommit).toHaveBeenCalledWith(hook);
     });
   });
 });

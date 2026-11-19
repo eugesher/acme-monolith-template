@@ -1,26 +1,20 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { IdempotencyPurgeUseCase } from '../idempotency-purge.use-case';
+import type { IIdempotencyPurgeRepositoryPort } from '../../../outbound';
 
 describe('IdempotencyPurgeUseCase', () => {
-  let deleteCreatedBefore: jest.Mock;
-  let deleteInFlightCreatedBefore: jest.Mock;
+  let repository: jest.Mocked<IIdempotencyPurgeRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: IdempotencyPurgeUseCase;
 
   beforeEach(() => {
     jest.useFakeTimers({ now: new Date('2026-01-02T12:00:00.000Z') });
-    deleteCreatedBefore = jest.fn().mockResolvedValue(3);
-    deleteInFlightCreatedBefore = jest.fn().mockResolvedValue(2);
+    repository = { deleteCreatedBefore: jest.fn(), deleteInFlightCreatedBefore: jest.fn() };
+    repository.deleteCreatedBefore.mockResolvedValue(3);
+    repository.deleteInFlightCreatedBefore.mockResolvedValue(2);
     logger = makePinoLoggerMock();
-    useCase = new IdempotencyPurgeUseCase(
-      { deleteCreatedBefore, deleteInFlightCreatedBefore },
-      24,
-      5,
-      logger as unknown as PinoLogger,
-    );
+    useCase = new IdempotencyPurgeUseCase(repository, 24, 5, logger);
   });
 
   afterEach(() => {
@@ -31,14 +25,16 @@ describe('IdempotencyPurgeUseCase', () => {
     it('deletes the keys created more than the TTL ago', async () => {
       await useCase.execute();
 
-      expect(deleteCreatedBefore.mock.calls).toEqual([[new Date('2026-01-01T12:00:00.000Z')]]);
+      expect(repository.deleteCreatedBefore.mock.calls).toEqual([
+        [new Date('2026-01-01T12:00:00.000Z')],
+      ]);
       expect(logger.warn).not.toHaveBeenCalled();
     });
 
     it('deletes the in-flight keys created more than the in-flight TTL ago', async () => {
       await useCase.execute();
 
-      expect(deleteInFlightCreatedBefore.mock.calls).toEqual([
+      expect(repository.deleteInFlightCreatedBefore.mock.calls).toEqual([
         [new Date('2026-01-02T11:55:00.000Z')],
       ]);
     });
@@ -64,7 +60,7 @@ describe('IdempotencyPurgeUseCase', () => {
     it('skips a tick that arrives while the previous purge is still running', async () => {
       let finish: (removed: number) => void = () => undefined;
 
-      deleteCreatedBefore.mockReturnValueOnce(
+      repository.deleteCreatedBefore.mockReturnValueOnce(
         new Promise<number>((resolve) => {
           finish = resolve;
         }),
@@ -76,7 +72,7 @@ describe('IdempotencyPurgeUseCase', () => {
       finish(0);
       await first;
 
-      expect(deleteCreatedBefore).toHaveBeenCalledTimes(1);
+      expect(repository.deleteCreatedBefore).toHaveBeenCalledTimes(1);
       expect(logger.info.mock.calls[0]).toEqual([
         {},
         'Idempotency purge still running, this tick is skipped',
@@ -87,13 +83,13 @@ describe('IdempotencyPurgeUseCase', () => {
       await useCase.execute();
       await useCase.execute();
 
-      expect(deleteCreatedBefore).toHaveBeenCalledTimes(2);
+      expect(repository.deleteCreatedBefore).toHaveBeenCalledTimes(2);
     });
 
     it('logs a failed purge as a warning instead of throwing', async () => {
       const error = new Error('database is down');
 
-      deleteCreatedBefore.mockRejectedValue(error);
+      repository.deleteCreatedBefore.mockRejectedValue(error);
 
       await useCase.execute();
 
@@ -104,12 +100,12 @@ describe('IdempotencyPurgeUseCase', () => {
     });
 
     it('purges again on the tick after a failed purge', async () => {
-      deleteCreatedBefore.mockRejectedValueOnce(new Error('database is down'));
+      repository.deleteCreatedBefore.mockRejectedValueOnce(new Error('database is down'));
 
       await useCase.execute();
       await useCase.execute();
 
-      expect(deleteCreatedBefore).toHaveBeenCalledTimes(2);
+      expect(repository.deleteCreatedBefore).toHaveBeenCalledTimes(2);
     });
   });
 });

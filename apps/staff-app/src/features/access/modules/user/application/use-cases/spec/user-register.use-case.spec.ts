@@ -1,66 +1,61 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { UserRegisterStaffUserInsertOutcomeEnum } from '../../../outbound';
+import {
+  UserRegisterStaffUserInsertOutcomeEnum,
+  type IUserCredentialsPort,
+  type IUserRegisterRepositoryPort,
+  type IUserTransactionPort,
+} from '../../../outbound';
 import { UserRegisterUseCase } from '../user-register.use-case';
 
 describe('UserRegisterUseCase', () => {
   let calls: string[];
-  let repository: { insertUser: jest.Mock; findRoles: jest.Mock; insertUserRoles: jest.Mock };
-  let transaction: { run: jest.Mock };
-  let credentials: { hashPassword: jest.Mock };
+  let repository: jest.Mocked<IUserRegisterRepositoryPort>;
+  let transaction: jest.Mocked<IUserTransactionPort>;
+  let credentials: jest.Mocked<IUserCredentialsPort>;
   let logger: PinoLoggerMock;
   let useCase: UserRegisterUseCase;
 
   beforeEach(() => {
     calls = [];
-    repository = {
-      insertUser: jest.fn(() => {
-        calls.push('insertUser');
+    repository = { insertUser: jest.fn(), findRoles: jest.fn(), insertUserRoles: jest.fn() };
+    repository.insertUser.mockImplementation(() => {
+      calls.push('insertUser');
 
-        return Promise.resolve({
-          outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED,
-          id: '5',
-        });
-      }),
-      findRoles: jest.fn(() => {
-        calls.push('findRoles');
+      return Promise.resolve({
+        outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED,
+        id: '5',
+      });
+    });
+    repository.findRoles.mockImplementation(() => {
+      calls.push('findRoles');
 
-        return Promise.resolve([{ id: '2' }]);
-      }),
-      insertUserRoles: jest.fn(() => {
-        calls.push('insertUserRoles');
+      return Promise.resolve([{ id: '2' }]);
+    });
+    repository.insertUserRoles.mockImplementation(() => {
+      calls.push('insertUserRoles');
 
-        return Promise.resolve();
-      }),
-    };
-    transaction = {
-      run: jest.fn(async (work: () => Promise<unknown>) => {
-        calls.push('begin');
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
 
-        const result = await work();
+      const result = await work();
 
-        calls.push('commit');
+      calls.push('commit');
 
-        return result;
-      }),
-    };
-    credentials = {
-      hashPassword: jest.fn(() => {
-        calls.push('hashPassword');
+      return result;
+    });
+    credentials = { hashPassword: jest.fn() };
+    credentials.hashPassword.mockImplementation(() => {
+      calls.push('hashPassword');
 
-        return Promise.resolve('argon-hash');
-      }),
-    };
+      return Promise.resolve('argon-hash');
+    });
     logger = makePinoLoggerMock();
-    useCase = new UserRegisterUseCase(
-      repository,
-      transaction,
-      credentials,
-      logger as unknown as PinoLogger,
-    );
+    useCase = new UserRegisterUseCase(repository, transaction, credentials, logger);
   });
 
   afterEach(() => {

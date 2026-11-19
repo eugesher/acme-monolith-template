@@ -1,28 +1,34 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { ProductStockPostSubtractUseCase } from '../product-stock-post-subtract.use-case';
+import type {
+  IProductStockArchivePort,
+  IProductStockOnHandPort,
+  IProductStockPostSubtractRepositoryPort,
+  IProductStockTransactionPort,
+} from '../../../outbound';
 
 describe('ProductStockPostSubtractUseCase', () => {
   let calls: string[];
-  let findActive: jest.Mock;
-  let lock: jest.Mock;
-  let archive: jest.Mock;
-  let run: jest.Mock;
+  let repository: jest.Mocked<IProductStockPostSubtractRepositoryPort>;
+  let onHand: jest.Mocked<IProductStockOnHandPort>;
+  let archive: jest.Mocked<IProductStockArchivePort>;
+  let transaction: jest.Mocked<IProductStockTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: ProductStockPostSubtractUseCase;
 
   beforeEach(() => {
     calls = [];
-    findActive = jest.fn((productIds: string[]) => {
+    repository = { findActive: jest.fn() };
+    repository.findActive.mockImplementation((productIds: string[]) => {
       calls.push('findActive');
 
       const active = productIds.filter((productId) => productId !== '102');
 
       return Promise.resolve(active.map((id) => ({ id })));
     });
-    lock = jest.fn(() => {
+    onHand = { lock: jest.fn() };
+    onHand.lock.mockImplementation(() => {
       calls.push('lock');
 
       return Promise.resolve([
@@ -32,12 +38,14 @@ describe('ProductStockPostSubtractUseCase', () => {
         { productId: '107', quantity: -1 },
       ]);
     });
-    archive = jest.fn(() => {
+    archive = { archive: jest.fn() };
+    archive.archive.mockImplementation(() => {
       calls.push('archive');
 
       return Promise.resolve({ archived: true });
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
       calls.push('begin');
 
       const result = await work();
@@ -47,28 +55,22 @@ describe('ProductStockPostSubtractUseCase', () => {
       return result;
     });
     logger = makePinoLoggerMock();
-    useCase = new ProductStockPostSubtractUseCase(
-      { findActive },
-      { lock },
-      { archive },
-      { run },
-      logger as unknown as PinoLogger,
-    );
+    useCase = new ProductStockPostSubtractUseCase(repository, onHand, archive, transaction, logger);
   });
 
   describe('execute', () => {
     it('locks the products and sums their stock before it reads their status', async () => {
       await useCase.execute({ productIds: ['100', '102', '106', '107'] });
 
-      expect(lock).toHaveBeenCalledWith({ productIds: ['100', '102', '106', '107'] });
-      expect(findActive).toHaveBeenCalledWith(['102', '106', '107']);
+      expect(onHand.lock).toHaveBeenCalledWith({ productIds: ['100', '102', '106', '107'] });
+      expect(repository.findActive).toHaveBeenCalledWith(['102', '106', '107']);
       expect(calls).toEqual(['begin', 'lock', 'findActive', 'archive', 'archive', 'commit']);
     });
 
     it('archives the published products that have no stock left and logs each one', async () => {
       await useCase.execute({ productIds: ['100', '102', '106', '107'] });
 
-      expect(archive.mock.calls).toEqual([[{ productId: '106' }], [{ productId: '107' }]]);
+      expect(archive.archive.mock.calls).toEqual([[{ productId: '106' }], [{ productId: '107' }]]);
       expect(logger.info).toHaveBeenCalledWith(
         { productId: '106' },
         'Out-of-stock product archived',
@@ -80,15 +82,15 @@ describe('ProductStockPostSubtractUseCase', () => {
     });
 
     it('leaves a draft without stock as it is', async () => {
-      lock.mockResolvedValue([{ productId: '102', quantity: 0 }]);
+      onHand.lock.mockResolvedValue([{ productId: '102', quantity: 0 }]);
 
       await useCase.execute({ productIds: ['102'] });
 
-      expect(archive).not.toHaveBeenCalled();
+      expect(archive.archive).not.toHaveBeenCalled();
     });
 
     it('logs nothing for a product the core module did not archive', async () => {
-      archive.mockResolvedValue({ archived: false });
+      archive.archive.mockResolvedValue({ archived: false });
 
       await useCase.execute({ productIds: ['106'] });
 

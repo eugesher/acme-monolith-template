@@ -1,8 +1,9 @@
 import { OccRetryHelper } from '../occ-retry.helper';
+import type { IHelperLogger } from '../../types/helper-logger.interface';
 
 describe('OccRetryHelper', () => {
   describe('run', () => {
-    let logger: { info: jest.Mock; warn: jest.Mock; error: jest.Mock };
+    let logger: jest.Mocked<IHelperLogger>;
 
     beforeEach(() => {
       logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };

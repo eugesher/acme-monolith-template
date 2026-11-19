@@ -1,31 +1,32 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { QueueDeleteFailedJobUseCase } from '../queue-delete-failed-job.use-case';
+import type { IQueueRegistryPort } from '../../../outbound';
 import type { QueueFailedJobService } from '../../services/queue-failed-job.service';
 
 describe('QueueDeleteFailedJobUseCase', () => {
-  let ensure: jest.Mock;
-  let removeJob: jest.Mock;
+  let failedJobService: jest.Mocked<Pick<QueueFailedJobService, 'ensure'>>;
+  let registry: jest.Mocked<IQueueRegistryPort>;
   let logger: PinoLoggerMock;
   let useCase: QueueDeleteFailedJobUseCase;
 
   beforeEach(() => {
-    ensure = jest.fn().mockResolvedValue(undefined);
-    removeJob = jest.fn().mockResolvedValue({ record: { subjectId: '5' } });
+    failedJobService = { ensure: jest.fn() };
+    failedJobService.ensure.mockResolvedValue(undefined);
+    registry = {
+      has: jest.fn(),
+      listJobCounts: jest.fn(),
+      findFailedJobs: jest.fn(),
+      findJobState: jest.fn(),
+      retryJob: jest.fn(),
+      removeJob: jest.fn(),
+    };
+    registry.removeJob.mockResolvedValue({ record: { subjectId: '5' } });
     logger = makePinoLoggerMock();
     useCase = new QueueDeleteFailedJobUseCase(
-      { ensure } as unknown as QueueFailedJobService,
-      {
-        has: jest.fn(),
-        listJobCounts: jest.fn(),
-        findFailedJobs: jest.fn(),
-        findJobState: jest.fn(),
-        retryJob: jest.fn(),
-        removeJob,
-      },
-      logger as unknown as PinoLogger,
+      failedJobService as unknown as QueueFailedJobService,
+      registry,
+      logger,
     );
   });
 
@@ -33,8 +34,11 @@ describe('QueueDeleteFailedJobUseCase', () => {
     it('removes the job once it is known to be failed and logs its data and who removed it', async () => {
       await useCase.execute({ queueName: 'ledger-record', jobId: '7', staffUserId: '1' });
 
-      expect(ensure).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
-      expect(removeJob).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
+      expect(failedJobService.ensure).toHaveBeenCalledWith({
+        queueName: 'ledger-record',
+        jobId: '7',
+      });
+      expect(registry.removeJob).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
       expect(logger.warn).toHaveBeenCalledWith(
         {
           queueName: 'ledger-record',
@@ -47,12 +51,12 @@ describe('QueueDeleteFailedJobUseCase', () => {
     });
 
     it('removes nothing when the check refuses the job', async () => {
-      ensure.mockRejectedValue(new Error('not failed'));
+      failedJobService.ensure.mockRejectedValue(new Error('not failed'));
 
       await expect(
         useCase.execute({ queueName: 'ledger-record', jobId: '7', staffUserId: '1' }),
       ).rejects.toThrow('not failed');
-      expect(removeJob).not.toHaveBeenCalled();
+      expect(registry.removeJob).not.toHaveBeenCalled();
       expect(logger.warn).not.toHaveBeenCalled();
     });
   });

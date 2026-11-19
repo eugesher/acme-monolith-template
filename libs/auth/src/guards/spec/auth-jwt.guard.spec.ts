@@ -2,10 +2,12 @@ import { UnauthorizedException, type ExecutionContext } from '@nestjs/common';
 import type { Reflector } from '@nestjs/core';
 import type { JwtService } from '@nestjs/jwt';
 
+import type { IAuthUserValidatorPort } from '@acme-libs/contracts/auth';
+
 import { AuthJwtGuard } from '../auth-jwt.guard';
 
 describe('AuthJwtGuard', () => {
-  let handleValidate: jest.Mock;
+  let validator: jest.Mocked<IAuthUserValidatorPort>;
   let verifyAsync: jest.Mock;
   let getAllAndOverride: jest.Mock;
   let request: Record<string, unknown>;
@@ -13,10 +15,8 @@ describe('AuthJwtGuard', () => {
   let guard: AuthJwtGuard;
 
   beforeEach(() => {
-    handleValidate = jest.fn().mockResolvedValue({
-      id: 'user-1',
-      email: 'ann@example.com',
-    });
+    validator = { handleValidate: jest.fn() };
+    validator.handleValidate.mockResolvedValue({ id: 'user-1', email: 'ann@example.com' });
     verifyAsync = jest.fn().mockResolvedValue({ sub: 'user-1', roles: ['ignored'] });
     getAllAndOverride = jest.fn().mockReturnValue(undefined);
     request = { headers: { authorization: 'Bearer token' } };
@@ -26,7 +26,7 @@ describe('AuthJwtGuard', () => {
       switchToHttp: () => ({ getRequest: () => request }),
     } as unknown as ExecutionContext;
     guard = new AuthJwtGuard(
-      { handleValidate },
+      validator,
       { verifyAsync } as unknown as JwtService,
       { getAllAndOverride } as unknown as Reflector,
     );
@@ -37,7 +37,7 @@ describe('AuthJwtGuard', () => {
 
     expect(allowed).toBe(true);
     expect(verifyAsync).toHaveBeenCalledWith('token');
-    expect(handleValidate).toHaveBeenCalledWith({ sub: 'user-1' });
+    expect(validator.handleValidate).toHaveBeenCalledWith({ sub: 'user-1' });
     expect(request.user).toEqual({
       id: 'user-1',
       email: 'ann@example.com',
@@ -82,11 +82,11 @@ describe('AuthJwtGuard', () => {
     const allowed = guard.canActivate(context);
 
     await expect(allowed).rejects.toBeInstanceOf(UnauthorizedException);
-    expect(handleValidate).not.toHaveBeenCalled();
+    expect(validator.handleValidate).not.toHaveBeenCalled();
   });
 
   it('rejects a user that is gone or disabled with 401', async () => {
-    handleValidate.mockResolvedValue(null);
+    validator.handleValidate.mockResolvedValue(null);
 
     const allowed = guard.canActivate(context);
 
