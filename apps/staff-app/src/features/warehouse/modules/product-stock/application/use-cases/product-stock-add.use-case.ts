@@ -95,6 +95,7 @@ export class ProductStockAddUseCase {
 
   private async persist(command: IProductStockAddCommand): Promise<IProductStockAddWriteView> {
     const { productId, quantity, staffUserId, idempotencyKey } = command;
+
     await this.movement.lock({ productId });
 
     const productRecord = await this.repository.findById(productId);

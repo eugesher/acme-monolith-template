@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { PaginationHelper, type IPageWindow } from '@acme-libs/toolkit';
 
+import { CatalogProductListModel } from '../../domain';
 import {
   CATALOG_CACHE_PORT,
   CATALOG_CACHE_TTL_MS_DEFAULT_TOKEN,
@@ -36,7 +37,8 @@ export class CatalogProductListUseCase {
 
   private async listPage(pageWindow: IPageWindow): Promise<ICatalogProductListView> {
     const { page, limit, offset } = pageWindow;
-    const [data, total] = await this.repository.list({ limit, offset });
+    const [records, total] = await this.repository.list({ limit, offset });
+    const data = CatalogProductListModel.toViewData(records);
 
     return PaginationHelper.toPage({ data, page, limit, total });
   }

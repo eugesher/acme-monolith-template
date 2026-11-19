@@ -40,6 +40,7 @@ describe('CatalogProductListUseCase', () => {
 
       expect(page).toEqual({
         page: 2,
+        limit: 10,
         count: 1,
         pageCount: 3,
         total: 21,

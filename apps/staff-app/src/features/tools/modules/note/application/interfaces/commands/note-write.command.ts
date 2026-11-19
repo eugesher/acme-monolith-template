@@ -1,9 +1,7 @@
-export interface INoteWriteRunCommand {
-  noteId: string;
-}
+import type { Maybe } from '@acme-libs/toolkit';
 
-export interface INoteWriteReloadCommand {
+export interface INoteWriteCommand {
   noteId: string;
   authorId: string;
-  isSaved: boolean;
+  expectedVersion: Maybe<number>;
 }

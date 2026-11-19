@@ -5,6 +5,7 @@ import { OccRetryHelper } from '@acme-libs/toolkit';
 
 import {
   ProductNotFoundException,
+  ProductVersionConflictException,
   ProductVersionMismatchException,
   type IProductReconstitute,
   type ProductAggregate,
@@ -47,11 +48,15 @@ export class ProductWriteService {
       retryContext: (conflict) => ({ id: productId, version: conflict.currentVersion }),
       exhaustedContext: () => ({ id: productId }),
       onExhausted: (conflict, attempts) => {
-        throw new ProductVersionMismatchException(
-          productId,
-          conflict.currentVersion,
-          `Product ${productId} write lost the optimistic race after ${attempts} attempts`,
-        );
+        if (expectedVersion !== undefined) {
+          throw new ProductVersionMismatchException(
+            productId,
+            expectedVersion,
+            conflict.currentVersion,
+          );
+        }
+
+        throw new ProductVersionConflictException(productId, attempts, conflict.currentVersion);
       },
     });
   }

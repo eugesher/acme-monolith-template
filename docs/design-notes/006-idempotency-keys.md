@@ -16,7 +16,8 @@ in the processor with a repository of its own (see `009-scheduled-processor.md` 
 
 A feature root mounts `IdempotencyCoreModule` from `@acme-core/modules/idempotency` and reaches a
 port only from a core-adapter, like any core module. The `IdempotencyKey` decorator that reads the
-header lives in `@acme-libs/http`, so both apps parse the key the same way.
+header lives in `@acme-libs/http`, so both apps parse and describe the key the same way (see
+`039-api-surface.md`).
 
 **A malformed key is a bug of the caller, not a refusal.** `IdempotencyKeyHelper.parse` answers an
 empty key or a key over 128 characters with 400 before any core call, so the core module never
@@ -52,15 +53,21 @@ exactly one insert succeeds; the repository answers `DUPLICATE` to the other (se
 `BodyFingerprintHelper` hashes it canonically: object keys are sorted at every depth and array order
 is kept. The caller must leave out anything that changes on a retry, such as the correlation id.
 
-| Outcome     | When                               | What the caller does                                         |
-| ----------- | ---------------------------------- | ------------------------------------------------------------ |
-| `claimed`   | the insert succeeded               | the work, then `complete`, or `release` if it throws         |
-| `replay`    | same key, same body, completed     | answers `storedResponse` without doing the work again        |
-| `in-flight` | same key, same body, not completed | asks the client to retry shortly (409)                       |
-| `mismatch`  | same key, different body           | refuses (422): the stored answer belongs to another question |
+| Outcome     | When                               | What the caller does                                                                     |
+| ----------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| `claimed`   | the insert succeeded               | the work, then `complete`, or `release` if it throws                                     |
+| `replay`    | same key, same body, completed     | answers `storedResponse` without doing the work again                                    |
+| `in-flight` | same key, same body, not completed | asks the client to retry shortly: 409 `IDEMPOTENT_REQUEST_IN_FLIGHT`                     |
+| `mismatch`  | same key, different body           | refuses with 422 `IDEMPOTENCY_KEY_REUSED`: the stored answer belongs to another question |
 
 The outcome enum lives in the contract, not in `libs/kernel`, because only the core-adapters read
 it.
+
+**Every caller branches the same way.** `ProductStockAddUseCase` and customer `OrderPlaceUseCase`
+answer a `replay` first, refuse `in-flight` and `mismatch` next, each with an early exit, and do the
+work last, through a private `write` that runs it in a transaction and releases the key when it
+throws. The work completes the key inside the same transaction, so a stored answer never outlives a
+rolled-back write.
 
 **A key that vanished is in flight.** If the insert hits a duplicate but the row is gone when the
 module reads it, the holder has just released it. The answer is `in-flight`: the client retries and

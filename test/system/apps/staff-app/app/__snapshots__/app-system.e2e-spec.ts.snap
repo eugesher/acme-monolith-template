@@ -46,7 +46,7 @@ exports[`App Catalog Product POST /api/catalog/products should create a draft an
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should archive through core, drop the cached catalog and append its ledger entry 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/archive should archive through core, drop the cached catalog and append its ledger entry 1`] = `
 {
   "cache": {
     "keys": [],
@@ -95,7 +95,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/archive should
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/publish should publish a draft, drop the cached catalog and append its ledger entry 1`] = `
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should publish a draft, drop the cached catalog and append its ledger entry 1`] = `
 {
   "cache": {
     "keys": [],

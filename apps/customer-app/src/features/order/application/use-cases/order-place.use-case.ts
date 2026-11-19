@@ -47,31 +47,29 @@ export class OrderPlaceUseCase {
       body: { productIds },
     });
 
-    switch (idempotencyClaim.outcome) {
-      case OrderIdempotencyOutcomeEnum.IN_FLIGHT: {
-        throw new OrderIdempotentRequestInFlightException(idempotencyKey);
-      }
-      case OrderIdempotencyOutcomeEnum.MISMATCH: {
-        throw new OrderIdempotencyKeyReusedException(idempotencyKey);
-      }
-      case OrderIdempotencyOutcomeEnum.REPLAY: {
-        this.logger.info({ idempotencyKey }, 'Order placement replayed from the idempotency store');
+    if (idempotencyClaim.outcome === OrderIdempotencyOutcomeEnum.REPLAY) {
+      this.logger.info({ idempotencyKey }, 'Order placement replayed from the idempotency store');
 
-        return idempotencyClaim.storedResponse;
-      }
-      default: {
-        const order = await this.write(command);
-        const orderLedgerPayload = order.toLedgerPayload();
-        const orderLoggerPayload = order.toLoggerPayload();
-        const orderView = order.toSnapshot();
-
-        await this.ledger.recordPlaced(orderLedgerPayload);
-
-        this.logger.info(orderLoggerPayload, 'Order placed');
-
-        return orderView;
-      }
+      return idempotencyClaim.storedResponse;
     }
+
+    if (idempotencyClaim.outcome === OrderIdempotencyOutcomeEnum.IN_FLIGHT) {
+      throw new OrderIdempotentRequestInFlightException(idempotencyKey);
+    }
+
+    if (idempotencyClaim.outcome === OrderIdempotencyOutcomeEnum.MISMATCH) {
+      throw new OrderIdempotencyKeyReusedException(idempotencyKey);
+    }
+
+    const order = await this.write(command);
+    const orderLedgerPayload = order.toLedgerPayload();
+    const orderLoggerPayload = order.toLoggerPayload();
+
+    await this.ledger.recordPlaced(orderLedgerPayload);
+
+    this.logger.info(orderLoggerPayload, 'Order placed');
+
+    return order.toSnapshot();
   }
 
   private async write(command: IOrderPlaceCommand): Promise<OrderPlaceModel> {
@@ -88,8 +86,8 @@ export class OrderPlaceUseCase {
 
   private async persist(command: IOrderPlaceCommand): Promise<OrderPlaceModel> {
     const { customerId, productIds, idempotencyKey } = command;
-
     const orderCandidate = OrderCandidateModel.create({ customerId, productIds });
+
     orderCandidate.validate();
 
     const stockQuantities = await this.productStock.lock({
@@ -104,17 +102,18 @@ export class OrderPlaceUseCase {
 
     const orderInsertPayload = orderCandidate.toInsertPayload();
     const orderId = await this.repository.insertOrder(orderInsertPayload);
-
     const orderProducts = orderCandidate.createOrderProducts(orderId);
+
     await this.repository.insertOrderProducts(orderProducts);
 
     const orderRecord = await this.repository.findPlaced(orderId);
     const order = OrderPlaceModel.reconstitute(orderRecord);
-
     const movements = order.getProductStockMovements();
+
     await this.productStock.withdraw({ movements });
 
     const orderView = order.toSnapshot();
+
     await this.idempotency.complete({ customerId, key: idempotencyKey, response: orderView });
 
     return order;

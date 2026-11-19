@@ -20,6 +20,7 @@ import {
 } from '@nestjs/swagger';
 
 import { RequiresPermission } from '@acme-libs/auth';
+import { ApiErrorResponses } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import {
@@ -28,6 +29,7 @@ import {
   TagGetManyUseCase,
   TagRenameUseCase,
 } from '../../application';
+import { TagExceptionCodeEnum } from '../../domain';
 import {
   TagCreateRequestDto,
   TagGetManyQueryDto,
@@ -53,6 +55,11 @@ export class TagController {
   @RequiresPermission(PermissionCodeEnum.TAG_WRITE)
   @ApiOperation({ summary: 'Create a tag' })
   @ApiCreatedResponse({ type: TagResponseDto })
+  @ApiErrorResponses(
+    TagHttpExceptionFilter.STATUS,
+    TagExceptionCodeEnum.TAG_NAME_INVALID,
+    TagExceptionCodeEnum.TAG_NAME_TAKEN,
+  )
   public async handleCreate(@Body() body: TagCreateRequestDto): Promise<TagResponseDto> {
     const { name } = body;
 
@@ -73,6 +80,12 @@ export class TagController {
   @RequiresPermission(PermissionCodeEnum.TAG_WRITE)
   @ApiOperation({ summary: 'Rename a tag' })
   @ApiOkResponse({ type: TagResponseDto })
+  @ApiErrorResponses(
+    TagHttpExceptionFilter.STATUS,
+    TagExceptionCodeEnum.TAG_NAME_INVALID,
+    TagExceptionCodeEnum.TAG_NOT_FOUND,
+    TagExceptionCodeEnum.TAG_NAME_TAKEN,
+  )
   public async handleRename(
     @Param() params: TagIdParamDto,
     @Body() body: TagRenameRequestDto,
@@ -88,6 +101,7 @@ export class TagController {
   @RequiresPermission(PermissionCodeEnum.TAG_WRITE)
   @ApiOperation({ summary: 'Delete a tag and unlink it from every subject' })
   @ApiNoContentResponse()
+  @ApiErrorResponses(TagHttpExceptionFilter.STATUS, TagExceptionCodeEnum.TAG_NOT_FOUND)
   public async handleDelete(@Param() params: TagIdParamDto): Promise<void> {
     const { tagId } = params;
 

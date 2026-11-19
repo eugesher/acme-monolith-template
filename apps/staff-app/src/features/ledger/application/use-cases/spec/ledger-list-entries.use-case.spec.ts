@@ -33,7 +33,13 @@ describe('LedgerListEntriesUseCase', () => {
     it('reads the first page of 20 when the query names no window', async () => {
       list.mockResolvedValue([[], 0]);
 
-      await useCase.execute({ subjectType: 'product' });
+      await useCase.execute({
+        page: undefined,
+        limit: undefined,
+        subjectType: 'product',
+        subjectId: undefined,
+        correlationId: undefined,
+      });
 
       expect(list).toHaveBeenCalledWith({
         limit: 20,
@@ -47,7 +53,13 @@ describe('LedgerListEntriesUseCase', () => {
     it('caps the page limit at 100', async () => {
       list.mockResolvedValue([[], 0]);
 
-      await useCase.execute({ limit: 500 });
+      await useCase.execute({
+        page: undefined,
+        limit: 500,
+        subjectType: undefined,
+        subjectId: undefined,
+        correlationId: undefined,
+      });
 
       expect(list).toHaveBeenCalledWith({
         limit: 100,
@@ -76,10 +88,17 @@ describe('LedgerListEntriesUseCase', () => {
         1,
       ]);
 
-      const page = await useCase.execute({});
+      const page = await useCase.execute({
+        page: undefined,
+        limit: undefined,
+        subjectType: undefined,
+        subjectId: undefined,
+        correlationId: undefined,
+      });
 
       expect(page).toEqual({
         page: 1,
+        limit: 20,
         count: 1,
         pageCount: 1,
         total: 1,

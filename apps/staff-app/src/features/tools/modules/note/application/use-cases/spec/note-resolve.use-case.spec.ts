@@ -48,7 +48,6 @@ describe('NoteResolveUseCase', () => {
     const accessService = new NoteAccessService({ findOwned });
 
     useCase = new NoteResolveUseCase(
-      accessService,
       new NoteWriteService(accessService, 3, logger as unknown as PinoLogger),
       { update },
       logger as unknown as PinoLogger,
@@ -57,7 +56,11 @@ describe('NoteResolveUseCase', () => {
 
   describe('execute', () => {
     it('saves the resolved note against the version as read and answers the stored note', async () => {
-      const view = await useCase.execute({ noteId: '7', authorId: 'admin-1' });
+      const view = await useCase.execute({
+        noteId: '7',
+        authorId: 'admin-1',
+        expectedVersion: undefined,
+      });
       const [command] = update.mock.calls[0] as [INoteResolveUpdateQuery];
 
       expect(command.versionAsRead).toBe(2);
@@ -85,13 +88,20 @@ describe('NoteResolveUseCase', () => {
         }),
       );
 
-      await useCase.execute({ noteId: '7', authorId: 'admin-1' });
+      await useCase.execute({ noteId: '7', authorId: 'admin-1', expectedVersion: undefined });
 
       expect(update).toHaveBeenCalledTimes(2);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '7', version: 2, attempt: 1, maxAttempts: 3 },
         'Note write conflict — retrying with a fresh read',
       );
+    });
+
+    it('refuses a stale If-Match with VERSION_MISMATCH and writes nothing', async () => {
+      await expect(
+        useCase.execute({ noteId: '7', authorId: 'admin-1', expectedVersion: 1 }),
+      ).rejects.toMatchObject({ code: 'VERSION_MISMATCH', details: { currentVersion: 2 } });
+      expect(update).not.toHaveBeenCalled();
     });
 
     it('refuses a resolved note with NOTE_RESOLVED and writes nothing', async () => {
@@ -107,7 +117,9 @@ describe('NoteResolveUseCase', () => {
         updatedAt: new Date('2026-01-02T00:00:00.000Z'),
       });
 
-      await expect(useCase.execute({ noteId: '7', authorId: 'admin-1' })).rejects.toMatchObject({
+      await expect(
+        useCase.execute({ noteId: '7', authorId: 'admin-1', expectedVersion: undefined }),
+      ).rejects.toMatchObject({
         code: 'NOTE_RESOLVED',
       });
       expect(update).not.toHaveBeenCalled();

@@ -32,11 +32,7 @@ export class ProductArchiveUseCase {
     }
 
     if (outcome === ProductStatusArchiveOutcomeEnum.VERSION_MISMATCH) {
-      throw new ProductVersionMismatchException(
-        productId,
-        currentVersion,
-        `Product ${productId}: If-Match version ${String(expectedVersion)} does not match the current version ${String(currentVersion)}`,
-      );
+      throw new ProductVersionMismatchException(productId, expectedVersion, currentVersion);
     }
 
     if (outcome === ProductStatusArchiveOutcomeEnum.ALREADY_ARCHIVED) {

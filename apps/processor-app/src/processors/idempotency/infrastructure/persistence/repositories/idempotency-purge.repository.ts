@@ -5,7 +5,6 @@ import { IdempotencyStatusEnum } from '@acme-libs/kernel';
 
 import {
   IDEMPOTENCY_PURGE_REPOSITORY_PORT,
-  type IIdempotencyPurgeRecord,
   type IIdempotencyPurgeRepositoryPort,
 } from '../../../outbound';
 import { IdempotencyPersistenceHost } from '../host/idempotency-persistence.host';
@@ -20,14 +19,20 @@ export class IdempotencyPurgeRepository
     useClass: IdempotencyPurgeRepository,
   };
 
-  public async deleteCreatedBefore(cutoff: Date): Promise<IIdempotencyPurgeRecord> {
-    return await this.idempotencyKeyRepository.delete({ createdAt: LessThan(cutoff) });
+  public async deleteCreatedBefore(cutoff: Date): Promise<number> {
+    const deleteResult = await this.idempotencyKeyRepository.delete({
+      createdAt: LessThan(cutoff),
+    });
+
+    return deleteResult.affected ?? 0;
   }
 
-  public async deleteInFlightCreatedBefore(cutoff: Date): Promise<IIdempotencyPurgeRecord> {
-    return await this.idempotencyKeyRepository.delete({
+  public async deleteInFlightCreatedBefore(cutoff: Date): Promise<number> {
+    const deleteResult = await this.idempotencyKeyRepository.delete({
       status: IdempotencyStatusEnum.IN_FLIGHT,
       createdAt: LessThan(cutoff),
     });
+
+    return deleteResult.affected ?? 0;
   }
 }

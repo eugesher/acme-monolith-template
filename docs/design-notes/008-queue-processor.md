@@ -52,9 +52,11 @@ the same context, so its log lines carry the id too.
 `LedgerAppendUseCase` parses the instant, builds the entry under the correlation id of the job and
 appends it through `LEDGER_APPEND_REPOSITORY_PORT`. It lets a failed append throw, so Bull retries
 the job. Every failed attempt reaches `@OnQueueFailed`, and `LedgerAppendReportFailureUseCase` logs
-it: at `warn` while attempts are left, at `error` after the last one. A job that ran out of attempts
-stays in the failed set of the queue until someone returns it to the queue or deletes it through
-`/queues` (see `023-processor-app.md`).
+it through `JobFailureHelper.report` of `libs/toolkit`: at `warn` while attempts are left, at
+`error` after the last one, with the label and the context the use case passes, so every processor
+words the two lines the same way. A job that ran out of attempts stays in the failed set of the
+queue until someone returns it to the queue or deletes it through `/queues` (see
+`023-processor-app.md`).
 
 **The job is trusted.** The producers are the apps of the template, and they build the job from the
 type of the contract, so the processor does not validate it. A job of another shape, such as one an

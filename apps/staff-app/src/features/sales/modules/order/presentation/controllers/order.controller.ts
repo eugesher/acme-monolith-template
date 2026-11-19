@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Put, Query, UseFilters } from '@nestjs/co
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RequiresPermission } from '@acme-libs/auth';
+import { ApiErrorResponses } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import {
@@ -10,6 +11,7 @@ import {
   OrderGetTagsUseCase,
   OrderReplaceTagsUseCase,
 } from '../../application';
+import { OrderExceptionCodeEnum } from '../../domain';
 import {
   OrderGetManyQueryDto,
   OrderIdParamDto,
@@ -47,6 +49,7 @@ export class OrderController {
   @RequiresPermission(PermissionCodeEnum.ORDER_READ)
   @ApiOperation({ summary: 'Read one order with its products' })
   @ApiOkResponse({ type: OrderResponseDto })
+  @ApiErrorResponses(OrderHttpExceptionFilter.STATUS, OrderExceptionCodeEnum.ORDER_NOT_FOUND)
   public async handleGetOne(@Param() params: OrderIdParamDto): Promise<OrderResponseDto> {
     const { orderId } = params;
 
@@ -57,6 +60,7 @@ export class OrderController {
   @RequiresPermission(PermissionCodeEnum.ORDER_READ)
   @ApiOperation({ summary: 'Read the tags of an order, by name' })
   @ApiOkResponse({ type: OrderTagsResponseDto })
+  @ApiErrorResponses(OrderHttpExceptionFilter.STATUS, OrderExceptionCodeEnum.ORDER_NOT_FOUND)
   public async handleGetTags(@Param() params: OrderIdParamDto): Promise<OrderTagsResponseDto> {
     const { orderId } = params;
 
@@ -67,6 +71,11 @@ export class OrderController {
   @RequiresPermission(PermissionCodeEnum.ORDER_WRITE)
   @ApiOperation({ summary: 'Replace the tags of an order' })
   @ApiOkResponse({ type: OrderTagsResponseDto })
+  @ApiErrorResponses(
+    OrderHttpExceptionFilter.STATUS,
+    OrderExceptionCodeEnum.ORDER_NOT_FOUND,
+    OrderExceptionCodeEnum.ORDER_TAG_NOT_FOUND,
+  )
   public async handleReplaceTags(
     @Param() params: OrderIdParamDto,
     @Body() body: OrderTagsReplaceRequestDto,

@@ -1,8 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Matches } from 'class-validator';
+import { IsEntityId } from '@acme-libs/http';
 
 export class TagIdParamDto {
-  @ApiProperty({ example: '300', description: 'A positive integer of up to 20 digits' })
-  @Matches(/^[1-9]\d{0,19}$/, { message: 'tagId must be a positive integer' })
+  @IsEntityId({ example: '300' })
   public tagId: string;
 }

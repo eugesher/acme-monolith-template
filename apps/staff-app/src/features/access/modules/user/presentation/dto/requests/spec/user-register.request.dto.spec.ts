@@ -36,10 +36,22 @@ describe('UserRegisterRequestDto', () => {
       'isEmail',
     ],
     [
+      'an email longer than 255',
+      { email: `${'a'.repeat(244)}@example.com`, password: 'long-enough-password', roleIds: [] },
+      'email',
+      'maxLength',
+    ],
+    [
       'a password shorter than 12',
       { email: 'ann@example.com', password: 'short-pass1', roleIds: [] },
       'password',
       'minLength',
+    ],
+    [
+      'a password longer than 256',
+      { email: 'ann@example.com', password: 'p'.repeat(257), roleIds: [] },
+      'password',
+      'maxLength',
     ],
     [
       'a password that is not a string',

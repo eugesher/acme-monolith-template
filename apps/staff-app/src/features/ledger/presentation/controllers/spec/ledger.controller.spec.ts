@@ -16,7 +16,7 @@ describe('LedgerController', () => {
 
       const response = await controller.handleList({ subjectType: 'product', subjectId: '12' });
 
-      expect(response).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
+      expect(response).toEqual({ page: 1, limit: 20, count: 0, pageCount: 0, total: 0, data: [] });
       expect(list).toHaveBeenCalledWith({
         limit: 20,
         offset: 0,

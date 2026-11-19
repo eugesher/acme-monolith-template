@@ -17,5 +17,20 @@ describe('DomainException', () => {
     expect(exception.name).toBe('ItemArchivedException');
     expect(exception.message).toBe('item is archived');
     expect(exception.code).toBe('ITEM_ARCHIVED');
+    expect(exception.details).toBeUndefined();
+  });
+
+  it('carries the details of the refusal', () => {
+    class ItemVersionMismatchException extends DomainException {
+      public readonly code = 'VERSION_MISMATCH';
+
+      constructor() {
+        super('item version mismatch', { currentVersion: 4 });
+      }
+    }
+
+    const exception = new ItemVersionMismatchException();
+
+    expect(exception.details).toEqual({ currentVersion: 4 });
   });
 });

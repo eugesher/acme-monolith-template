@@ -26,6 +26,7 @@ describe('TagGetManyUseCase', () => {
       expect(list).toHaveBeenCalledWith({ limit: 20, offset: 20 });
       expect(page).toEqual({
         page: 2,
+        limit: 20,
         count: 1,
         pageCount: 2,
         total: 21,

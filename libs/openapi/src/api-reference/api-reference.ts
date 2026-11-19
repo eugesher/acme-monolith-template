@@ -6,6 +6,7 @@ import helmet, { type HelmetOptions } from 'helmet';
 import type { INestApplication } from '@nestjs/common';
 import type { IncomingMessage, ServerResponse } from 'http';
 
+import { ErrorResponseDto } from '@acme-libs/http';
 import { AppNameEnum } from '@acme-libs/kernel';
 
 export class ApiReference {
@@ -26,6 +27,8 @@ export class ApiReference {
         'The background worker: the staff login and the failed jobs of its queues; the rest of its work comes from queues and schedules.',
     },
   };
+  private static readonly ERROR_DESCRIPTION =
+    'Any other error: VALIDATION_FAILED for a request the DTO refuses, the code of a refused header, or the name of the HTTP status, such as UNAUTHORIZED, FORBIDDEN, TOO_MANY_REQUESTS or INTERNAL_SERVER_ERROR';
   private static readonly SCRIPT_HOST = 'https://cdn.jsdelivr.net';
   private static readonly FONT_HOST = 'https://fonts.scalar.com';
 
@@ -42,6 +45,11 @@ export class ApiReference {
       .setTitle(title)
       .setDescription(description)
       .addBearerAuth()
+      .addGlobalResponse({
+        status: 'default',
+        description: ApiReference.ERROR_DESCRIPTION,
+        type: ErrorResponseDto,
+      })
       .build();
     const document = SwaggerModule.createDocument(app, options);
     const nonces = new WeakMap<ServerResponse, string>();

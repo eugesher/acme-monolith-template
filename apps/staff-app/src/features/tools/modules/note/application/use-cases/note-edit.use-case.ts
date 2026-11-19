@@ -10,19 +10,12 @@ import {
   type INoteEditRepositoryPort,
   type INoteTransactionPort,
 } from '../../outbound';
-import { NoteAccessService } from '../services/note-access.service';
 import { NoteWriteService } from '../services/note-write.service';
-import type {
-  INoteEditCommand,
-  INoteEditOutcomeView,
-  INoteEditSaveCommand,
-  INoteView,
-} from '../interfaces';
+import type { INoteEditCommand, INoteEditSaveCommand, INoteView } from '../interfaces';
 
 @Injectable()
 export class NoteEditUseCase {
   constructor(
-    private readonly accessService: NoteAccessService,
     private readonly writeService: NoteWriteService,
     @Inject(NOTE_EDIT_REPOSITORY_PORT)
     private readonly repository: INoteEditRepositoryPort,
@@ -33,44 +26,24 @@ export class NoteEditUseCase {
   ) {}
 
   public async execute(command: INoteEditCommand): Promise<INoteView> {
-    const { noteId } = command;
-    const editOutcome = await this.writeService.run({ noteId }, () => this.attempt(command));
-    const message = editOutcome.edited ? 'Note edited' : 'Note edit was a no-op';
-    const noteLoggerPayload = editOutcome.note.toLoggerPayload();
+    const { noteId, body, editorId, expectedVersion } = command;
+    const writeResult = await this.writeService.write(
+      { noteId, authorId: editorId, expectedVersion },
+      NoteEditModel.reconstitute,
+      (note) => note.edit(body),
+      (saveCommand) => this.transaction.run(() => this.save({ ...saveCommand, editorId })),
+    );
+    const { note, answer: isEdited } = writeResult;
+    const message = isEdited ? 'Note edited' : 'Note edit was a no-op';
+    const noteLoggerPayload = note.toLoggerPayload();
 
     this.logger.info(noteLoggerPayload, message);
 
-    return editOutcome.note.toSnapshot();
-  }
-
-  private async attempt(command: INoteEditCommand): Promise<INoteEditOutcomeView> {
-    const { noteId, body, editorId } = command;
-    const note = await this.accessService.loadOwned(
-      { noteId, authorId: editorId },
-      NoteEditModel.reconstitute,
-    );
-    const versionAsRead = note.version;
-    const bodyBefore = note.body;
-
-    note.edit(body);
-
-    if (note.version === versionAsRead) {
-      return { note, edited: false };
-    }
-
-    const isSaved = await this.transaction.run(() =>
-      this.save({ note, versionAsRead, bodyBefore, editorId }),
-    );
-    const storedNote = await this.writeService.reload(
-      { noteId, authorId: editorId, isSaved },
-      NoteEditModel.reconstitute,
-    );
-
-    return { note: storedNote, edited: true };
+    return note.toSnapshot();
   }
 
   private async save(command: INoteEditSaveCommand): Promise<boolean> {
-    const { note, versionAsRead, bodyBefore, editorId } = command;
+    const { note, versionAsRead, editorId } = command;
     const noteUpdatePayload = note.toUpdatePayload(versionAsRead);
     const isUpdated = await this.repository.update(noteUpdatePayload);
 
@@ -79,11 +52,7 @@ export class NoteEditUseCase {
     }
 
     const correlationId = CorrelationContextHelper.current(NoteEditUseCase.name);
-    const noteRevisionInsertPayload = note.toRevisionInsertPayload({
-      bodyBefore,
-      editorId,
-      correlationId,
-    });
+    const noteRevisionInsertPayload = note.toRevisionInsertPayload({ editorId, correlationId });
 
     await this.repository.appendRevision(noteRevisionInsertPayload);
 

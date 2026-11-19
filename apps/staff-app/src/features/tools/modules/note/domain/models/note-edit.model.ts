@@ -7,36 +7,41 @@ import type {
 } from '../interfaces';
 
 export class NoteEditModel extends NoteAggregate {
-  public get body(): string {
-    return this.currentBody;
+  private readonly bodyAsRead: string;
+
+  protected constructor(record: INoteReconstitute) {
+    super(record);
+    this.bodyAsRead = this.currentBody;
   }
 
   public static reconstitute(this: void, record: INoteReconstitute): NoteEditModel {
     return new NoteEditModel(record);
   }
 
-  public edit(body: string): void {
+  public edit(body: string): boolean {
     this.assertOpen();
 
     const validBody = NoteEditModel.validBody(body);
 
     if (validBody === this.currentBody) {
-      return;
+      return false;
     }
 
     this.currentBody = validBody;
     this.bumpVersion();
+
+    return true;
   }
 
   public toRevisionInsertPayload(
     params: INoteEditRevisionInsertPayloadBuild,
   ): INoteEditRevisionInsertPayload {
-    const { bodyBefore, editorId, correlationId } = params;
+    const { editorId, correlationId } = params;
 
     return {
       noteId: this.id,
       noteVersion: this.version,
-      bodyBefore,
+      bodyBefore: this.bodyAsRead,
       bodyAfter: this.currentBody,
       editorId,
       correlationId,

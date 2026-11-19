@@ -33,7 +33,7 @@ export class QueueE2E {
 
   public listFailedJobs(): void {
     describe('GET /api/queues/:queueName/jobs/failed', () => {
-      it('should answer a page of the failed jobs as their JSON', async () => {
+      it('should answer a page of the failed jobs with the reason and the instants of the failure', async () => {
         const job = await this.ctx.ledgerRecordQueue.add(
           {
             operationKey: 'e2e-queue:1',
@@ -60,11 +60,12 @@ export class QueueE2E {
             body: {
               data: [
                 {
-                  id: expect.anything(),
-                  opts: { timestamp: expect.any(Number) },
-                  timestamp: expect.any(Number),
-                  processedOn: expect.any(Number),
-                  finishedOn: expect.any(Number),
+                  id: expect.stringMatching(/^\d+$/),
+                  createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                  processedAt: expect.stringMatching(
+                    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                  ),
+                  failedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
                   stacktrace: [expect.any(String)],
                 },
               ],
@@ -97,7 +98,7 @@ export class QueueE2E {
   }
 
   public retryFailedJob(): void {
-    describe('PUT /api/queues/:queueName/jobs/failed/:jobId', () => {
+    describe('POST /api/queues/:queueName/jobs/failed/:jobId/retry', () => {
       it('should return a failed record to the queue and append it once its cause is gone', async () => {
         const job = await this.ctx.ledgerRecordQueue.add(
           {
@@ -116,7 +117,7 @@ export class QueueE2E {
         await job.update({ ...job.data, subjectType: 'product' });
 
         await request(this.ctx.app.getHttpServer())
-          .put(`/api/queues/ledger-record/jobs/failed/${job.id}`)
+          .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NO_CONTENT);
 
@@ -150,7 +151,7 @@ export class QueueE2E {
         );
 
         const response = await request(this.ctx.app.getHttpServer())
-          .put(`/api/queues/ledger-record/jobs/failed/${job.id}`)
+          .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.CONFLICT);
 
@@ -169,7 +170,7 @@ export class QueueE2E {
 
       it('should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/queues/ledger-record/jobs/failed/999999')
+          .post('/api/queues/ledger-record/jobs/failed/999999/retry')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
 
@@ -178,7 +179,7 @@ export class QueueE2E {
 
       it('should refuse an unknown queue with 404 QUEUE_NOT_FOUND', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/queues/unknown/jobs/failed/1')
+          .post('/api/queues/unknown/jobs/failed/1/retry')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
 
@@ -187,7 +188,7 @@ export class QueueE2E {
 
       it('should refuse a user without queue:retry with 403', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/queues/ledger-record/jobs/failed/1')
+          .post('/api/queues/ledger-record/jobs/failed/1/retry')
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.FORBIDDEN);
 

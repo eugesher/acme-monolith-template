@@ -1,11 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, Matches } from 'class-validator';
-
-import { PageQueryDto } from '@acme-libs/http';
+import { IsEntityId, PageQueryDto } from '@acme-libs/http';
 
 export class OrderGetManyQueryDto extends PageQueryDto {
-  @ApiPropertyOptional({ example: '302', description: 'Only the orders with this tag' })
-  @IsOptional()
-  @Matches(/^[1-9]\d{0,19}$/, { message: 'tagId must be a positive integer' })
+  @IsEntityId({ example: '302', description: 'Only the orders with this tag', optional: true })
   public tagId?: string;
 }

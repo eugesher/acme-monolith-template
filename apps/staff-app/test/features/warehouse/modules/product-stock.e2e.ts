@@ -21,7 +21,7 @@ export class ProductStockE2E {
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000013')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 5 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         const records = await this.ctx.takeLedgerRecords();
 
@@ -67,7 +67,7 @@ export class ProductStockE2E {
           .set('Idempotency-Key', 'e2e-restock-draft-key')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .send({ quantity: 3 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         await this.ctx.takeLedgerRecords();
 
@@ -80,14 +80,14 @@ export class ProductStockE2E {
           .set('Idempotency-Key', 'e2e-restock-replay-key')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 2 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/warehouse/product-stock/100/add')
           .set('Idempotency-Key', 'e2e-restock-replay-key')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 2 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         await this.ctx.takeLedgerRecords();
 
@@ -108,7 +108,7 @@ export class ProductStockE2E {
           .set('Idempotency-Key', 'e2e-restock-reuse-key')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 1 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/warehouse/product-stock/102/add')
@@ -135,7 +135,7 @@ export class ProductStockE2E {
           .set('Idempotency-Key', 'e2e-restock-archived-key')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 5 })
-          .expect(HttpStatus.CREATED);
+          .expect(HttpStatus.OK);
 
         const records = await this.ctx.takeLedgerRecords();
 

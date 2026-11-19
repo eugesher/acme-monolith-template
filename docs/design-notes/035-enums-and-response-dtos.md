@@ -31,6 +31,9 @@ health lib and the health features of the apps name them.
 **An enum is never copied between a lib and an app.** The app imports the kernel enum the lib
 answers with, so a new value reaches both at once.
 
+**The exception codes of a module answer the client**, so their values and the statuses they map to
+follow the rules of `039-api-surface.md`.
+
 ## Response DTOs
 
 **A nested DTO is a class of the outer file and is not exported.** Only the DTO a controller returns
@@ -55,4 +58,10 @@ is declared with `@ApiProperty({ readOnly: true, nullable: true })`, because `@A
 takes no `nullable`. The client reads one shape and never checks for an absent key.
 
 **An enum field names its enum in the schema**: `@ApiResponseProperty({ enum, example })`, so the
-OpenAPI document lists the values and the client can generate the same enum.
+OpenAPI document lists the values and the client can generate the same enum. A list of enum values
+takes `@ApiProperty({ readOnly: true, enum, isArray: true, example })`, because
+`@ApiResponseProperty` takes no `isArray` and would describe the list as one string:
+`RoleResponseDto.permissionCodes`, `PermissionListResponseDto.codes`.
+
+**Every field has an example**, so the reference page shows a whole response and not an empty
+placeholder: an id as a string of digits, a token as a dotted JWT.

@@ -34,6 +34,13 @@ names the context: `CredentialsLibSignAccessTokenUseCase` is `signAccessToken`, 
 method and the use case name the action differently, each keeps its own: `handleReadiness` calls
 `checkReadiness`, `handleValidate` calls `validateSubject`.
 
+**A route and a processor follow the same rule.** `ProductController.handleGetMany` calls
+`this.getMany.execute(command)`, `HealthController.handleLiveness` calls `liveness`, and the e2e
+class of a feature names its methods after the handlers they test, `healthE2E.handleLiveness()`. The
+handler builds the command field by field from the request DTO and the caller,
+`const { id: authorId } = user`, and never hands the DTO on, so a field that a DTO gains does not
+reach the use case unseen.
+
 **Exception codes are named after the exceptions.** The enum lists the values of `code` on the
 `<Context>BaseException` subclasses of a module and the exception filter maps them to HTTP statuses,
 so the enum takes the word `Exception`, not `Error`. `IdentityExceptionCodeEnum` in `libs/kernel`

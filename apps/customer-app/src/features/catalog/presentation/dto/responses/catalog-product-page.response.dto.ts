@@ -1,5 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+import { PageResponseType } from '@acme-libs/http';
+
 class CatalogProductPageResponseItemDto {
   @ApiResponseProperty({ example: '12' })
   public id: string;
@@ -11,19 +13,6 @@ class CatalogProductPageResponseItemDto {
   public name: string;
 }
 
-export class CatalogProductPageResponseDto {
-  @ApiResponseProperty({ example: 1 })
-  public page: number;
-
-  @ApiResponseProperty({ example: 20 })
-  public count: number;
-
-  @ApiResponseProperty({ example: 3 })
-  public pageCount: number;
-
-  @ApiResponseProperty({ example: 42 })
-  public total: number;
-
-  @ApiResponseProperty({ type: [CatalogProductPageResponseItemDto] })
-  public data: CatalogProductPageResponseItemDto[];
-}
+export class CatalogProductPageResponseDto extends PageResponseType(
+  CatalogProductPageResponseItemDto,
+) {}

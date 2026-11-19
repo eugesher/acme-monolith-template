@@ -12,8 +12,8 @@ describe('IdempotencyPurgeUseCase', () => {
 
   beforeEach(() => {
     jest.useFakeTimers({ now: new Date('2026-01-02T12:00:00.000Z') });
-    deleteCreatedBefore = jest.fn().mockResolvedValue({ affected: 3 });
-    deleteInFlightCreatedBefore = jest.fn().mockResolvedValue({ affected: 2 });
+    deleteCreatedBefore = jest.fn().mockResolvedValue(3);
+    deleteInFlightCreatedBefore = jest.fn().mockResolvedValue(2);
     logger = makePinoLoggerMock();
     useCase = new IdempotencyPurgeUseCase(
       { deleteCreatedBefore, deleteInFlightCreatedBefore },
@@ -61,32 +61,11 @@ describe('IdempotencyPurgeUseCase', () => {
       ]);
     });
 
-    it('logs no removed keys when the database reports no affected count', async () => {
-      deleteCreatedBefore.mockResolvedValue({});
-      deleteInFlightCreatedBefore.mockResolvedValue({});
-
-      await useCase.execute();
-
-      expect(logger.info.mock.calls).toEqual([
-        [
-          {
-            cutoff: '2026-01-01T12:00:00.000Z',
-            removed: 0,
-            ttlHours: 24,
-            inFlightCutoff: '2026-01-02T11:55:00.000Z',
-            removedInFlight: 0,
-            inFlightTtlMinutes: 5,
-          },
-          'Expired idempotency keys purged',
-        ],
-      ]);
-    });
-
     it('skips a tick that arrives while the previous purge is still running', async () => {
-      let finish: (deleted: { affected: number }) => void = () => undefined;
+      let finish: (removed: number) => void = () => undefined;
 
       deleteCreatedBefore.mockReturnValueOnce(
-        new Promise<{ affected: number }>((resolve) => {
+        new Promise<number>((resolve) => {
           finish = resolve;
         }),
       );
@@ -94,7 +73,7 @@ describe('IdempotencyPurgeUseCase', () => {
       const first = useCase.execute();
 
       await useCase.execute();
-      finish({ affected: 0 });
+      finish(0);
       await first;
 
       expect(deleteCreatedBefore).toHaveBeenCalledTimes(1);

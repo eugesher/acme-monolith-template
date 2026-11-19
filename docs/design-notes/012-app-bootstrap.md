@@ -102,11 +102,14 @@ Every module in `app/setup/` is named `*SetupModule`.
 **One global filter answers every error.** `HttpExceptionFilter` of `libs/http` carries `@Catch()`
 with no type:
 
-| Error                                                      | Status and body                                  |
+| Error                                                      | Status and message                               |
 | ---------------------------------------------------------- | ------------------------------------------------ |
 | `HttpException`                                            | its own                                          |
 | `QueryFailedError` of a duplicate key (`MysqlErrorHelper`) | 409 `Resource already exists`                    |
 | any other                                                  | 500 `Internal Server Error`, without its message |
+
+**Every error answers one body**, `ErrorResponseDto` of `libs/http`; its codes and its place in the
+OpenAPI document are in `039-api-surface.md`.
 
 A repository maps every expected duplicate to an outcome of its port (see `003-authentication.md`),
 so the 409 of the filter answers an unexpected one, such as the last guard of

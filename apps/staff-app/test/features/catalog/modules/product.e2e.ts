@@ -38,7 +38,14 @@ export class ProductE2E {
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 
-        expect(response.body).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
+        expect(response.body).toEqual({
+          page: 1,
+          limit: 20,
+          count: 0,
+          pageCount: 0,
+          total: 0,
+          data: [],
+        });
       });
 
       it('should refuse a malformed tag id with 400 from validation', async () => {
@@ -193,13 +200,13 @@ export class ProductE2E {
         }).toMatchSnapshot();
       });
 
-      it('should refuse a stale If-Match with 409 and the current version', async () => {
+      it('should refuse a stale If-Match with 412 and the current version', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/catalog/products/101')
           .set('If-Match', '0')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ name: 'Stale update' })
-          .expect(HttpStatus.CONFLICT);
+          .expect(HttpStatus.PRECONDITION_FAILED);
 
         expect({
           response: { body: response.body },
@@ -254,12 +261,12 @@ export class ProductE2E {
   }
 
   public handleArchive(): void {
-    describe('PUT /api/catalog/products/:productId/archive', () => {
+    describe('POST /api/catalog/products/:productId/archive', () => {
       it('should archive, queue one ledger record under the correlation id and drop the cached customer catalog', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
 
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/103/archive')
+          .post('/api/catalog/products/103/archive')
           .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000015')
           .auth(this.ctx.editorToken, { type: 'bearer' })
@@ -283,7 +290,7 @@ export class ProductE2E {
 
       it('should refuse to archive an archived product with 409', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/105/archive')
+          .post('/api/catalog/products/105/archive')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .expect(HttpStatus.CONFLICT);
 
@@ -299,12 +306,12 @@ export class ProductE2E {
   }
 
   public handlePublish(): void {
-    describe('PUT /api/catalog/products/:productId/publish', () => {
+    describe('POST /api/catalog/products/:productId/publish', () => {
       it('should publish a draft, queue one ledger record under the correlation id and drop the cached customer catalog', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
 
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/101/publish')
+          .post('/api/catalog/products/101/publish')
           .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000016')
           .auth(this.ctx.editorToken, { type: 'bearer' })
@@ -328,7 +335,7 @@ export class ProductE2E {
 
       it('should keep a published product as is and queue nothing', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/100/publish')
+          .post('/api/catalog/products/100/publish')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 
@@ -343,7 +350,7 @@ export class ProductE2E {
 
       it('should publish an archived product again under a ledger record of its new version', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/105/publish')
+          .post('/api/catalog/products/105/publish')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000017')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
@@ -363,7 +370,7 @@ export class ProductE2E {
 
       it('should answer 404 for an unknown product', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/999/publish')
+          .post('/api/catalog/products/999/publish')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
 
@@ -372,7 +379,7 @@ export class ProductE2E {
 
       it('should refuse a publication by a viewer with 403', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/catalog/products/102/publish')
+          .post('/api/catalog/products/102/publish')
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.FORBIDDEN);
 

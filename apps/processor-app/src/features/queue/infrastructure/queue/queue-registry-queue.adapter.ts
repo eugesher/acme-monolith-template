@@ -4,11 +4,12 @@ import type { Queue } from 'bull';
 
 import { LEDGER_RECORD_QUEUE } from '@acme-core/contracts/ledger';
 import { PRODUCT_STOCK_POST_SUBTRACT_QUEUE } from '@acme-core/contracts/product-stock';
-import type { Nullable } from '@acme-libs/toolkit';
+import type { Maybe, Nullable } from '@acme-libs/toolkit';
 
 import {
   QUEUE_REGISTRY_PORT,
   type IQueueRegistryFailedJobsView,
+  type IQueueRegistryFailedJobView,
   type IQueueRegistryFindFailedJobsCommand,
   type IQueueRegistryJobCommand,
   type IQueueRegistryJobCountsView,
@@ -44,9 +45,16 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
 
     return await Promise.all(
       queues.map(async (queue) => {
-        const jobCounts = await queue.getJobCounts();
+        const [jobCounts, paused] = await Promise.all([
+          queue.getJobCounts(),
+          queue.getPausedCount(),
+        ]);
+        const { active, completed, failed, delayed, waiting } = jobCounts;
 
-        return { name: queue.name, jobCounts: { paused: null, ...jobCounts } };
+        return {
+          name: queue.name,
+          jobCounts: { active, completed, failed, delayed, waiting, paused },
+        };
       }),
     );
   }
@@ -61,9 +69,9 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
       queue.getFailed(offset, offset + limit - 1),
       queue.getFailedCount(),
     ]);
-    const jobViews = jobs.map((job) => ({ debounceId: null, ...job.toJSON() }));
+    const failedJobs = jobs.map((job) => QueueRegistryQueueAdapter.toFailedJob(job));
 
-    return [jobViews, total];
+    return [failedJobs, total];
   }
 
   public async findJobState(command: IQueueRegistryJobCommand): Promise<Nullable<string>> {
@@ -87,6 +95,34 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
     await job?.remove();
 
     return job?.data;
+  }
+
+  private static toFailedJob(
+    job: Awaited<ReturnType<Queue['getFailed']>>[number],
+  ): IQueueRegistryFailedJobView {
+    const { id, name, opts, attemptsMade, failedReason, stacktrace, timestamp } = job;
+    const { processedOn, finishedOn } = job;
+    const data: unknown = job.data;
+    const createdAt = new Date(timestamp).toISOString();
+    const processedAt = QueueRegistryQueueAdapter.toInstant(processedOn);
+    const failedAt = QueueRegistryQueueAdapter.toInstant(finishedOn);
+
+    return {
+      id: String(id),
+      name,
+      data,
+      attempts: opts.attempts ?? 1,
+      attemptsMade,
+      failedReason: failedReason ?? null,
+      stacktrace,
+      createdAt,
+      processedAt,
+      failedAt,
+    };
+  }
+
+  private static toInstant(epochMs: Maybe<number>): Nullable<string> {
+    return typeof epochMs === 'number' ? new Date(epochMs).toISOString() : null;
   }
 
   private queueOf(queueName: string): Queue {

@@ -196,7 +196,8 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refus
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -209,6 +210,7 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refus
   "response": {
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
+      "details": null,
       "message": "Job 999999 was not found in queue ledger-record",
       "statusCode": 404,
     },
@@ -251,6 +253,8 @@ exports[`App Queue GET /api/queues should refuse a request without a token with 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -258,14 +262,16 @@ exports[`App Queue GET /api/queues should refuse a request without a token with 
 }
 `;
 
-exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page of the failed jobs as their JSON 1`] = `
+exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page of the failed jobs with the reason and the instants of the failure 1`] = `
 {
   "response": {
     "body": {
       "count": 1,
       "data": [
         {
+          "attempts": 1,
           "attemptsMade": 1,
+          "createdAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "data": {
             "action": "ProductCreated",
             "correlationId": "e2e00000-0000-4000-8000-000000000009",
@@ -275,31 +281,17 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
             "subjectId": "200",
             "subjectType": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
           },
-          "debounceId": null,
-          "delay": 0,
+          "failedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "failedReason": "Data too long for column 'subject_type' at row 1",
-          "finishedOn": Any<Number>,
-          "id": Anything,
+          "id": StringMatching /\\^\\\\d\\+\\$/,
           "name": "__default__",
-          "opts": {
-            "attempts": 1,
-            "backoff": {
-              "delay": 1000,
-              "type": "exponential",
-            },
-            "delay": 0,
-            "removeOnComplete": true,
-            "timestamp": Any<Number>,
-          },
-          "processedOn": Any<Number>,
-          "progress": 0,
-          "returnvalue": null,
+          "processedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "stacktrace": [
             Any<String>,
           ],
-          "timestamp": Any<Number>,
         },
       ],
+      "limit": 10,
       "page": 1,
       "pageCount": 1,
       "total": 1,
@@ -312,11 +304,19 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse a malfor
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "page must be a positive number",
-        "page must be an integer number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "page",
+            "messages": [
+              "page must be a positive number",
+              "page must be an integer number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -328,6 +328,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unkno
   "response": {
     "body": {
       "code": "QUEUE_NOT_FOUND",
+      "details": null,
       "message": "Queue unknown was not found",
       "statusCode": 404,
     },
@@ -335,11 +336,12 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unkno
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED 1`] = `
 {
   "response": {
     "body": {
       "code": "QUEUE_JOB_NOT_FAILED",
+      "details": null,
       "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-record is delayed, not failed\\$/,
       "statusCode": 409,
     },
@@ -347,11 +349,12 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a user without queue:retry with 403 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a user without queue:retry with 403 1`] = `
 {
   "response": {
     "body": {
-      "error": "Forbidden",
+      "code": "FORBIDDEN",
+      "details": null,
       "message": "Insufficient permissions",
       "statusCode": 403,
     },
@@ -359,11 +362,12 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
 {
   "response": {
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
+      "details": null,
       "message": "Job 999999 was not found in queue ledger-record",
       "statusCode": 404,
     },
@@ -371,11 +375,12 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
 {
   "response": {
     "body": {
       "code": "QUEUE_NOT_FOUND",
+      "details": null,
       "message": "Queue unknown was not found",
       "statusCode": 404,
     },
@@ -383,7 +388,7 @@ exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should refuse a
 }
 `;
 
-exports[`App Queue PUT /api/queues/:queueName/jobs/failed/:jobId should return a failed record to the queue and append it once its cause is gone 1`] = `
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should return a failed record to the queue and append it once its cause is gone 1`] = `
 {
   "db": {
     "ledger_entry": [

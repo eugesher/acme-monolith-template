@@ -1,4 +1,4 @@
-import { ApiResponseProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 
@@ -9,8 +9,11 @@ export class RoleResponseDto {
   @ApiResponseProperty({ example: 'editor' })
   public name: string;
 
-  @ApiResponseProperty({
-    example: [PermissionCodeEnum.ACCESS_MANAGEMENT, PermissionCodeEnum.ACCESS_MANAGEMENT],
+  @ApiProperty({
+    readOnly: true,
+    enum: PermissionCodeEnum,
+    isArray: true,
+    example: [PermissionCodeEnum.PRODUCT_READ, PermissionCodeEnum.PRODUCT_WRITE],
   })
   public permissionCodes: readonly PermissionCodeEnum[];
 }

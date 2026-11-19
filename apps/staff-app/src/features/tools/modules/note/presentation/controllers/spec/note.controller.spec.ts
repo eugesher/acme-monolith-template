@@ -94,13 +94,14 @@ describe('NoteController', () => {
   });
 
   describe('handleEdit', () => {
-    it('edits the note of the path with the body of the request and the caller as editor', async () => {
+    it('edits the note of the path with the body of the request, the caller as editor and the If-Match version', async () => {
       edit.mockResolvedValue({ id: '17', version: 2 });
 
       const response = await controller.handleEdit(
         { noteId: '17' },
         { body: 'Refunded twice' },
         { id: 'user-1', email: 'ann@example.com' },
+        1,
       );
 
       expect(response).toEqual({ id: '17', version: 2 });
@@ -108,21 +109,27 @@ describe('NoteController', () => {
         noteId: '17',
         body: 'Refunded twice',
         editorId: 'user-1',
+        expectedVersion: 1,
       });
     });
   });
 
   describe('handleResolve', () => {
-    it('resolves the note of the path for the caller', async () => {
+    it('resolves the note of the path for the caller without an expected version', async () => {
       resolve.mockResolvedValue({ id: '17', resolved: true });
 
       const response = await controller.handleResolve(
         { noteId: '17' },
         { id: 'user-1', email: 'ann@example.com' },
+        undefined,
       );
 
       expect(response).toEqual({ id: '17', resolved: true });
-      expect(resolve).toHaveBeenCalledWith({ noteId: '17', authorId: 'user-1' });
+      expect(resolve).toHaveBeenCalledWith({
+        noteId: '17',
+        authorId: 'user-1',
+        expectedVersion: undefined,
+      });
     });
   });
 

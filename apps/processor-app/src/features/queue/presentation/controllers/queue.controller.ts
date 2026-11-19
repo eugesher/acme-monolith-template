@@ -5,13 +5,14 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Put,
+  Post,
   Query,
   UseFilters,
 } from '@nestjs/common';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser, RequiresPermission } from '@acme-libs/auth';
+import { ApiErrorResponses } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
@@ -21,6 +22,7 @@ import {
   QueueListUseCase,
   QueueRetryFailedJobUseCase,
 } from '../../application';
+import { QueueExceptionCodeEnum } from '../../domain';
 import {
   QueueFailedJobPageResponseDto,
   QueueJobParamDto,
@@ -53,6 +55,7 @@ export class QueueController {
   @RequiresPermission(PermissionCodeEnum.QUEUE_READ)
   @ApiOperation({ summary: 'Browse the failed jobs of a queue, newest first' })
   @ApiOkResponse({ type: QueueFailedJobPageResponseDto })
+  @ApiErrorResponses(QueueHttpExceptionFilter.STATUS, QueueExceptionCodeEnum.QUEUE_NOT_FOUND)
   public async handleListFailedJobs(
     @Param() params: QueueNameParamDto,
     @Query() query: QueueListFailedJobsQueryDto,
@@ -63,11 +66,17 @@ export class QueueController {
     return await this.listFailedJobs.execute({ queueName, page, limit });
   }
 
-  @Put(':queueName/jobs/failed/:jobId')
+  @Post(':queueName/jobs/failed/:jobId/retry')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequiresPermission(PermissionCodeEnum.QUEUE_RETRY)
   @ApiOperation({ summary: 'Return a failed job to the queue' })
   @ApiNoContentResponse()
+  @ApiErrorResponses(
+    QueueHttpExceptionFilter.STATUS,
+    QueueExceptionCodeEnum.QUEUE_NOT_FOUND,
+    QueueExceptionCodeEnum.QUEUE_JOB_NOT_FOUND,
+    QueueExceptionCodeEnum.QUEUE_JOB_NOT_FAILED,
+  )
   public async handleRetryFailedJob(
     @Param() params: QueueJobParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -83,6 +92,12 @@ export class QueueController {
   @RequiresPermission(PermissionCodeEnum.QUEUE_DELETE)
   @ApiOperation({ summary: 'Delete a failed job' })
   @ApiNoContentResponse()
+  @ApiErrorResponses(
+    QueueHttpExceptionFilter.STATUS,
+    QueueExceptionCodeEnum.QUEUE_NOT_FOUND,
+    QueueExceptionCodeEnum.QUEUE_JOB_NOT_FOUND,
+    QueueExceptionCodeEnum.QUEUE_JOB_NOT_FAILED,
+  )
   public async handleDeleteFailedJob(
     @Param() params: QueueJobParamDto,
     @CurrentUser() user: IAuthCurrentUserView,

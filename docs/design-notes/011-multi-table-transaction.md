@@ -19,19 +19,20 @@ interface INoteEditRepositoryPort {
 
 ## The transaction comes from the context
 
-The use case wraps the two calls in `run` of the transaction port of its module (see
-`026-transaction-port.md`), and the repository reads its tables through `ORM_PORT`, so the two
-statements share one transaction without passing anything to each other. A failed second insert
-fails `run`, and the first update rolls back with it.
+The use case hands `NoteWriteService.write` a `save` that wraps the two calls in `run` of the
+transaction port of its module (see `007-optimistic-concurrency.md` and `026-transaction-port.md`),
+and the repository reads its tables through `ORM_PORT`, so the two statements share one transaction
+without passing anything to each other. A failed second insert fails `run`, and the first update
+rolls back with it.
 
 ## Read before, re-read after
 
-One attempt:
+One attempt of the write service:
 
-1. load the row and remember its version;
+1. load the row, check the `If-Match` version and remember the version as read;
 2. apply the change; stop here if the version did not change;
-3. in a transaction: update where the version is still the one read, then insert the second row only
-   if the update changed a row;
+3. `save`, in a transaction: update where the version is still the one read, then insert the second
+   row only if the update changed a row;
 4. after the transaction: read the row again, and answer it or report the lost race.
 
 The `WHERE version = <as read>` of step 3 makes a read inside the transaction unnecessary. Keeping

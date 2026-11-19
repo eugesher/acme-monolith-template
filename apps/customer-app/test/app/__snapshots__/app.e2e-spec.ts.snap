@@ -4,6 +4,8 @@ exports[`App Auth GET /api/auth/me should refuse a caller without a token 1`] = 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -15,6 +17,8 @@ exports[`App Auth GET /api/auth/me should refuse the token of a customer issued 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -26,6 +30,8 @@ exports[`App Auth GET /api/auth/me should refuse the token of a disabled custome
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -37,6 +43,8 @@ exports[`App Auth GET /api/auth/me should refuse the token of a staff user signe
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -48,6 +56,8 @@ exports[`App Auth POST /api/auth/login should answer 429 to an address that spen
 {
   "blocked": {
     "body": {
+      "code": "TOO_MANY_REQUESTS",
+      "details": null,
       "message": "Too many requests",
       "statusCode": 429,
     },
@@ -56,6 +66,7 @@ exports[`App Auth POST /api/auth/login should answer 429 to an address that spen
   "other": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -90,6 +101,7 @@ exports[`App Auth POST /api/auth/login should refuse a disabled customer with 40
   "response": {
     "body": {
       "code": "AUTH_USER_INACTIVE",
+      "details": null,
       "message": "Customer 104 is disabled",
       "statusCode": 403,
     },
@@ -102,6 +114,7 @@ exports[`App Auth POST /api/auth/login should refuse a wrong password with the s
   "response": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -114,6 +127,7 @@ exports[`App Auth POST /api/auth/login should refuse an unknown email with the s
   "response": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -126,6 +140,7 @@ exports[`App Auth POST /api/auth/login should refuse the credentials of a staff 
   "response": {
     "body": {
       "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
       "message": "Invalid credentials",
       "statusCode": 401,
     },
@@ -183,6 +198,7 @@ exports[`App Auth POST /api/auth/register should let one of two simultaneous sig
   "refused": {
     "body": {
       "code": "AUTH_EMAIL_TAKEN",
+      "details": null,
       "message": "Email is already registered",
       "statusCode": 409,
     },
@@ -201,10 +217,18 @@ exports[`App Auth POST /api/auth/register should refuse a malformed email with 4
   },
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "email must be an email",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "email",
+            "messages": [
+              "email must be an email",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -218,10 +242,18 @@ exports[`App Auth POST /api/auth/register should refuse a password shorter than 
   },
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "password must be longer than or equal to 12 characters",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "password",
+            "messages": [
+              "password must be longer than or equal to 12 characters",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -241,6 +273,7 @@ exports[`App Auth POST /api/auth/register should refuse a taken email in another
   "response": {
     "body": {
       "code": "AUTH_EMAIL_TAKEN",
+      "details": null,
       "message": "Email is already registered",
       "statusCode": 409,
     },
@@ -260,6 +293,7 @@ exports[`App Catalog GET /api/products should answer a cached page without readi
           "sku": "SKU-CACHED",
         },
       ],
+      "limit": 20,
       "page": 1,
       "pageCount": 1,
       "total": 1,
@@ -280,6 +314,7 @@ exports[`App Catalog GET /api/products should answer the page of the window with
           "sku": "SKU-0004",
         },
       ],
+      "limit": 1,
       "page": 2,
       "pageCount": 3,
       "total": 3,
@@ -310,6 +345,7 @@ exports[`App Catalog GET /api/products should list every active product by id, w
           "sku": "SKU-0007",
         },
       ],
+      "limit": 20,
       "page": 1,
       "pageCount": 1,
       "total": 3,
@@ -322,6 +358,8 @@ exports[`App Catalog GET /api/products should refuse a caller without a token 1`
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -333,10 +371,18 @@ exports[`App Catalog GET /api/products should refuse a limit of zero with 400 fr
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "limit must be a positive number",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "limit",
+            "messages": [
+              "limit must be a positive number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -413,6 +459,7 @@ exports[`App Order GET /api/orders should list only the orders of the caller, ne
           "id": "601",
         },
       ],
+      "limit": 20,
       "page": 1,
       "pageCount": 1,
       "total": 2,
@@ -425,6 +472,8 @@ exports[`App Order GET /api/orders should refuse a caller without a token 1`] = 
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -437,6 +486,7 @@ exports[`App Order GET /api/orders/:orderId should answer an unknown order with 
   "response": {
     "body": {
       "code": "ORDER_NOT_FOUND",
+      "details": null,
       "message": "Order 999 was not found",
       "statusCode": 404,
     },
@@ -449,6 +499,7 @@ exports[`App Order GET /api/orders/:orderId should answer the order of another c
   "response": {
     "body": {
       "code": "ORDER_NOT_FOUND",
+      "details": null,
       "message": "Order 600 was not found",
       "statusCode": 404,
     },
@@ -502,6 +553,8 @@ exports[`App Order GET /api/orders/:orderId should refuse a caller without a tok
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -513,10 +566,18 @@ exports[`App Order GET /api/orders/:orderId should refuse an order id that is no
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "orderId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "orderId",
+            "messages": [
+              "orderId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -714,6 +775,8 @@ exports[`App Order POST /api/orders should refuse a caller without a token 1`] =
 {
   "response": {
     "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
       "message": "Unauthorized",
       "statusCode": 401,
     },
@@ -721,7 +784,7 @@ exports[`App Order POST /api/orders should refuse a caller without a token 1`] =
 }
 `;
 
-exports[`App Order POST /api/orders should refuse a deleted product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse a deleted product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -733,13 +796,13 @@ exports[`App Order POST /api/orders should refuse a deleted product with 404 and
         "productId": "107",
       },
       "message": "Product 107 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
 `;
 
-exports[`App Order POST /api/orders should refuse a draft product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse a draft product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -751,7 +814,7 @@ exports[`App Order POST /api/orders should refuse a draft product with 404 and w
         "productId": "101",
       },
       "message": "Product 101 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -765,6 +828,7 @@ exports[`App Order POST /api/orders should refuse a placement without a key with
   "response": {
     "body": {
       "code": "IDEMPOTENCY_KEY_REQUIRED",
+      "details": null,
       "message": "The Idempotency-Key header is required for this operation",
       "statusCode": 400,
     },
@@ -772,7 +836,7 @@ exports[`App Order POST /api/orders should refuse a placement without a key with
 }
 `;
 
-exports[`App Order POST /api/orders should refuse an archived product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse an archived product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -784,7 +848,7 @@ exports[`App Order POST /api/orders should refuse an archived product with 404 a
         "productId": "105",
       },
       "message": "Product 105 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -794,10 +858,18 @@ exports[`App Order POST /api/orders should refuse an empty list with 400 from va
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "productIds must contain at least 1 elements",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "productIds",
+            "messages": [
+              "productIds must contain at least 1 elements",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
@@ -808,17 +880,25 @@ exports[`App Order POST /api/orders should refuse an id that is not a number wit
 {
   "response": {
     "body": {
-      "error": "Bad Request",
-      "message": [
-        "each productId must be a positive integer",
-      ],
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "productIds",
+            "messages": [
+              "each value in productIds must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
       "statusCode": 400,
     },
   },
 }
 `;
 
-exports[`App Order POST /api/orders should refuse an unknown product with 404 and write nothing 1`] = `
+exports[`App Order POST /api/orders should refuse an unknown product with 422 and write nothing 1`] = `
 {
   "db": {
     "order": [],
@@ -830,7 +910,7 @@ exports[`App Order POST /api/orders should refuse an unknown product with 404 an
         "productId": "999",
       },
       "message": "Product 999 was not found",
-      "statusCode": 404,
+      "statusCode": 422,
     },
   },
 }
@@ -864,7 +944,8 @@ exports[`App Order POST /api/orders should refuse the same key with another body
   },
   "response": {
     "body": {
-      "code": "ORDER_IDEMPOTENCY_KEY_REUSED",
+      "code": "IDEMPOTENCY_KEY_REUSED",
+      "details": null,
       "message": "Idempotency-Key e2e-order-reuse-key was already used with a different request body",
       "statusCode": 422,
     },

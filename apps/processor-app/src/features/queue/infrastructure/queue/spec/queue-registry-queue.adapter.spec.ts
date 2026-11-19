@@ -4,20 +4,28 @@ import { QueueRegistryQueueAdapter } from '../queue-registry-queue.adapter';
 
 describe('QueueRegistryQueueAdapter', () => {
   let ledgerQueue: jest.Mocked<
-    Pick<Queue, 'name' | 'getJobCounts' | 'getFailed' | 'getFailedCount' | 'getJob'>
+    Pick<
+      Queue,
+      'name' | 'getJobCounts' | 'getPausedCount' | 'getFailed' | 'getFailedCount' | 'getJob'
+    >
   >;
-  let stockQueue: jest.Mocked<Pick<Queue, 'name' | 'getJobCounts'>>;
+  let stockQueue: jest.Mocked<Pick<Queue, 'name' | 'getJobCounts' | 'getPausedCount'>>;
   let adapter: QueueRegistryQueueAdapter;
 
   beforeEach(() => {
     ledgerQueue = {
       name: 'ledger-record',
       getJobCounts: jest.fn(),
+      getPausedCount: jest.fn(),
       getFailed: jest.fn(),
       getFailedCount: jest.fn(),
       getJob: jest.fn(),
     };
-    stockQueue = { name: 'product-stock-post-subtract', getJobCounts: jest.fn() };
+    stockQueue = {
+      name: 'product-stock-post-subtract',
+      getJobCounts: jest.fn(),
+      getPausedCount: jest.fn(),
+    };
     adapter = new QueueRegistryQueueAdapter(
       ledgerQueue as unknown as Queue,
       stockQueue as unknown as Queue,
@@ -33,7 +41,7 @@ describe('QueueRegistryQueueAdapter', () => {
   });
 
   describe('listJobCounts', () => {
-    it('answers every queue with its job counts', async () => {
+    it('answers every queue with its job counts and its paused jobs', async () => {
       ledgerQueue.getJobCounts.mockResolvedValue({
         active: 0,
         completed: 0,
@@ -41,21 +49,22 @@ describe('QueueRegistryQueueAdapter', () => {
         delayed: 0,
         waiting: 1,
       });
+      ledgerQueue.getPausedCount.mockResolvedValue(0);
       stockQueue.getJobCounts.mockResolvedValue({
         active: 1,
         completed: 0,
         failed: 0,
         delayed: 0,
         waiting: 0,
-        paused: 3,
-      } as never);
+      });
+      stockQueue.getPausedCount.mockResolvedValue(3);
 
       const queues = await adapter.listJobCounts();
 
       expect(queues).toEqual([
         {
           name: 'ledger-record',
-          jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1, paused: null },
+          jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1, paused: 0 },
         },
         {
           name: 'product-stock-post-subtract',
@@ -66,10 +75,32 @@ describe('QueueRegistryQueueAdapter', () => {
   });
 
   describe('findFailedJobs', () => {
-    it('answers the JSON of the failed jobs in the window and their total', async () => {
+    it('answers the failed jobs in the window with ISO instants, and their total', async () => {
       ledgerQueue.getFailed.mockResolvedValue([
-        { toJSON: () => ({ id: '7', name: '__default__' }) },
-        { toJSON: () => ({ id: '8', name: '__default__', debounceId: 'd-8' }) },
+        {
+          id: 7,
+          name: '__default__',
+          data: { operationKey: 'product-created:12' },
+          opts: { attempts: 3 },
+          attemptsMade: 3,
+          failedReason: 'Data too long for column',
+          stacktrace: ['Error: Data too long for column'],
+          timestamp: Date.UTC(2026, 0, 1, 0, 0, 0),
+          processedOn: Date.UTC(2026, 0, 1, 0, 0, 1),
+          finishedOn: Date.UTC(2026, 0, 1, 0, 0, 2),
+        },
+        {
+          id: '8',
+          name: '__default__',
+          data: {},
+          opts: {},
+          attemptsMade: 0,
+          failedReason: undefined,
+          stacktrace: [],
+          timestamp: Date.UTC(2026, 0, 1, 0, 0, 0),
+          processedOn: undefined,
+          finishedOn: null,
+        },
       ] as never);
       ledgerQueue.getFailedCount.mockResolvedValue(21);
 
@@ -81,8 +112,30 @@ describe('QueueRegistryQueueAdapter', () => {
 
       expect(failed).toEqual([
         [
-          { id: '7', name: '__default__', debounceId: null },
-          { id: '8', name: '__default__', debounceId: 'd-8' },
+          {
+            id: '7',
+            name: '__default__',
+            data: { operationKey: 'product-created:12' },
+            attempts: 3,
+            attemptsMade: 3,
+            failedReason: 'Data too long for column',
+            stacktrace: ['Error: Data too long for column'],
+            createdAt: '2026-01-01T00:00:00.000Z',
+            processedAt: '2026-01-01T00:00:01.000Z',
+            failedAt: '2026-01-01T00:00:02.000Z',
+          },
+          {
+            id: '8',
+            name: '__default__',
+            data: {},
+            attempts: 1,
+            attemptsMade: 0,
+            failedReason: null,
+            stacktrace: [],
+            createdAt: '2026-01-01T00:00:00.000Z',
+            processedAt: null,
+            failedAt: null,
+          },
         ],
         21,
       ]);

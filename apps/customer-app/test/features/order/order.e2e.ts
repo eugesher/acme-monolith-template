@@ -255,7 +255,7 @@ export class OrderE2E {
         ['an archived product', '105'],
         ['a deleted product', '107'],
         ['an unknown product', '999'],
-      ])('should refuse %s with 404 and write nothing', async (_, productId) => {
+      ])('should refuse %s with 422 and write nothing', async (_, productId) => {
         const [{ lastId }] = await this.ctx.dataSource.query(
           'SELECT MAX(id) AS lastId FROM `order`',
         );
@@ -265,7 +265,7 @@ export class OrderE2E {
           .set('Idempotency-Key', `e2e-order-missing-${productId}`)
           .auth(this.ctx.annToken, { type: 'bearer' })
           .send({ productIds: [productId] })
-          .expect(HttpStatus.NOT_FOUND);
+          .expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
         expect({
           response: { body: response.body },

@@ -27,6 +27,6 @@ export class PaginationHelper {
     const count = data.length;
     const pageCount = Math.ceil(total / limit);
 
-    return { page, count, pageCount, total, data };
+    return { page, limit, count, pageCount, total, data };
   }
 }

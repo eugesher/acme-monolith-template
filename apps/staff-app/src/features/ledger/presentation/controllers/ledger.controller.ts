@@ -19,6 +19,8 @@ export class LedgerController {
   public async handleList(
     @Query() query: LedgerListEntriesQueryDto,
   ): Promise<LedgerEntryPageResponseDto> {
-    return await this.listEntries.execute(query);
+    const { page, limit, subjectType, subjectId, correlationId } = query;
+
+    return await this.listEntries.execute({ page, limit, subjectType, subjectId, correlationId });
   }
 }

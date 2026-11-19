@@ -37,6 +37,7 @@ describe('ProductGetManyUseCase', () => {
       expect(findProductIds).not.toHaveBeenCalled();
       expect(page).toEqual({
         page: 2,
+        limit: 20,
         count: 1,
         pageCount: 3,
         total: 41,
@@ -80,7 +81,7 @@ describe('ProductGetManyUseCase', () => {
       const page = await useCase.execute({ page: 1, limit: 20, tagId: '300' });
 
       expect(list).not.toHaveBeenCalled();
-      expect(page).toEqual({ page: 1, count: 0, pageCount: 0, total: 0, data: [] });
+      expect(page).toEqual({ page: 1, limit: 20, count: 0, pageCount: 0, total: 0, data: [] });
     });
   });
 });

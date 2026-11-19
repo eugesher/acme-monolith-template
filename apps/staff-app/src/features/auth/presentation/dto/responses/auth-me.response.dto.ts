@@ -1,7 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
 export class AuthMeResponseDto {
-  @ApiResponseProperty()
+  @ApiResponseProperty({ example: '1' })
   public id: string;
 
   @ApiResponseProperty({ example: 'admin@example.com' })

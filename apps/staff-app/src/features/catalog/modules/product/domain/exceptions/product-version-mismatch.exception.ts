@@ -8,8 +8,9 @@ export class ProductVersionMismatchException extends ProductBaseException {
 
   constructor(
     productId: string,
+    expectedVersion: Maybe<number>,
     currentVersion: Maybe<number>,
-    message = `Product ${productId}: version does not match the current version ${String(currentVersion)}`,
+    message = `Product ${productId}: If-Match version ${String(expectedVersion)} does not match the current version ${String(currentVersion)}`,
   ) {
     super(message, { currentVersion });
   }

@@ -1,7 +1,9 @@
+import type { Maybe } from '@acme-libs/toolkit';
+
 export interface ILedgerListEntriesCommand {
-  page?: number;
-  limit?: number;
-  subjectType?: string;
-  subjectId?: string;
-  correlationId?: string;
+  page: Maybe<number>;
+  limit: Maybe<number>;
+  subjectType: Maybe<string>;
+  subjectId: Maybe<string>;
+  correlationId: Maybe<string>;
 }

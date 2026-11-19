@@ -106,7 +106,7 @@ describe('ProductWriteService', () => {
       );
     });
 
-    it('refuses with VERSION_MISMATCH once the budget is spent and logs a warning', async () => {
+    it('refuses with VERSION_CONFLICT once the budget is spent and logs a warning', async () => {
       update.mockResolvedValue(false);
 
       await expect(
@@ -116,7 +116,7 @@ describe('ProductWriteService', () => {
           (product) => product.update({ name: 'Desk lamp' }),
         ),
       ).rejects.toMatchObject({
-        code: 'VERSION_MISMATCH',
+        code: 'VERSION_CONFLICT',
         message: 'Product 12 write lost the optimistic race after 5 attempts',
         details: { currentVersion: 4 },
       });
@@ -127,7 +127,7 @@ describe('ProductWriteService', () => {
       );
     });
 
-    it('makes one attempt when the caller pinned a version', async () => {
+    it('makes one attempt when the caller pinned a version and refuses a lost race with VERSION_MISMATCH', async () => {
       update.mockResolvedValue(false);
 
       await expect(
@@ -138,7 +138,8 @@ describe('ProductWriteService', () => {
         ),
       ).rejects.toMatchObject({
         code: 'VERSION_MISMATCH',
-        message: 'Product 12 write lost the optimistic race after 1 attempts',
+        message: 'Product 12: If-Match version 3 does not match the current version 4',
+        details: { currentVersion: 4 },
       });
       expect(update).toHaveBeenCalledTimes(1);
     });

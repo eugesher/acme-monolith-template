@@ -1,18 +1,14 @@
 import type { IPage, Nullable } from '@acme-libs/toolkit';
 
 export type IQueueListFailedJobsView = IPage<{
-  id: string | number;
+  id: string;
   name: string;
   data: unknown;
-  opts: unknown;
-  progress: number;
-  delay: number;
-  timestamp: number;
+  attempts: number;
   attemptsMade: number;
-  failedReason: unknown;
-  stacktrace: Nullable<string[]>;
-  returnvalue: unknown;
-  debounceId: Nullable<string>;
-  finishedOn: Nullable<number>;
-  processedOn: Nullable<number>;
+  failedReason: Nullable<string>;
+  stacktrace: string[];
+  createdAt: string;
+  processedAt: Nullable<string>;
+  failedAt: Nullable<string>;
 }>;

@@ -43,7 +43,6 @@ describe('app entry points', () => {
   it.each([
     '@acme-staff/app/app.module',
     '@acme-staff/common/modules',
-    '@acme-staff/common/shared',
     '@acme-staff/features',
     '@acme-customer/app/app.module',
     '@acme-customer/features',
@@ -55,9 +54,12 @@ describe('app entry points', () => {
     expect(source).toResolve();
   });
 
-  it.each(['@acme-staff/processors'])('%s does not resolve', (source) => {
-    expect(source).not.toResolve();
-  });
+  it.each(['@acme-staff/processors', '@acme-staff/common/shared'])(
+    '%s does not resolve',
+    (source) => {
+      expect(source).not.toResolve();
+    },
+  );
 
   it.each([
     ['apps/staff-app/src/app/app.module.ts', '@acme-staff/features/health/health.module'],
@@ -67,11 +69,10 @@ describe('app entry points', () => {
       'apps/staff-app/src/features/product/__fixture__.ts',
       '@acme-staff/app/setup/config/config-setup.module',
     ],
-    ['apps/staff-app/src/features/product/__fixture__.ts', '@acme-staff/common/shared/concurrency'],
     ['apps/staff-app/src/features/product/__fixture__.ts', '@acme-staff/common/modules/tag'],
     [
-      'apps/staff-app/src/features/product/__fixture__.ts',
-      '@acme-staff/common/shared/concurrency/decorators/if-match.decorator',
+      'apps/processor-app/src/processors/ledger/__fixture__.ts',
+      '@acme-processor/common/shared/product-stock-post-subtract',
     ],
     [
       'apps/processor-app/src/processors/ledger/__fixture__.ts',
@@ -119,7 +120,10 @@ describe('app entry points', () => {
       'apps/processor-app/src/processors/idempotency/__fixture__.ts',
       '@acme-processor/app/app.module',
     ],
-    ['apps/staff-app/src/common/shared/concurrency/__fixture__.ts', '@acme-staff/app/app.module'],
+    [
+      'apps/processor-app/src/common/shared/ledger/__fixture__.ts',
+      '@acme-processor/app/app.module',
+    ],
   ])('%s may NOT import the AppModule, only main and the tests do', async (file, source) => {
     await expect({
       file,
@@ -252,10 +256,10 @@ describe('app entry points', () => {
     }).toPassArchitectureLint();
   });
 
-  it('a staff-app feature presentation MAY import the shared decorators by their aliases', async () => {
+  it('a staff-app feature presentation MAY import the header decorators of the http lib', async () => {
     await expect({
       file: 'apps/staff-app/src/features/health/presentation/controllers/__fixture__.ts',
-      code: 'import { IfMatch } from "@acme-staff/common/shared";\nimport { IdempotencyKey } from "@acme-libs/http";',
+      code: 'import { IdempotencyKey, IfMatch } from "@acme-libs/http";',
     }).toPassArchitectureLint();
   });
 
@@ -320,8 +324,8 @@ describe('app entry points', () => {
       '@acme-core/modules/idempotency',
     ],
     [
-      'apps/staff-app/src/features/product/infrastructure/queue/__fixture__.ts',
-      '@acme-staff/common/shared',
+      'apps/processor-app/src/features/queue/infrastructure/queue/__fixture__.ts',
+      '@acme-processor/common/shared',
     ],
   ])('%s may NOT import %s', async (file, source) => {
     await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
@@ -330,13 +334,13 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/customer-app/src/features/health/health.module.ts', '@acme-staff/common/shared'],
+    ['apps/customer-app/src/features/health/health.module.ts', '@acme-staff/common/modules'],
     [
       'apps/customer-app/src/features/health/presentation/controllers/__fixture__.ts',
-      '@acme-staff/common/shared',
+      '@acme-staff/common/modules',
     ],
-    ['apps/customer-app/src/app/app.module.ts', '@acme-staff/common/shared'],
-    ['apps/customer-app/src/features/auth/auth.module.ts', '@acme-staff/common/shared'],
+    ['apps/customer-app/src/app/app.module.ts', '@acme-staff/common/modules'],
+    ['apps/customer-app/src/features/auth/auth.module.ts', '@acme-staff/common/modules'],
     ['apps/customer-app/src/features/order/order.module.ts', '@acme-staff/common/modules'],
   ])('customer-app (%s) may NOT reach the staff-app %s', async (file, source) => {
     await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(

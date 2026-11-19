@@ -1,5 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+import { PageResponseType } from '@acme-libs/http';
+
 class LedgerEntryPageResponseItemDto {
   @ApiResponseProperty({ example: '4210' })
   public id: string;
@@ -29,19 +31,4 @@ class LedgerEntryPageResponseItemDto {
   public recordedAt: string;
 }
 
-export class LedgerEntryPageResponseDto {
-  @ApiResponseProperty({ example: 1 })
-  public page: number;
-
-  @ApiResponseProperty({ example: 20 })
-  public count: number;
-
-  @ApiResponseProperty({ example: 3 })
-  public pageCount: number;
-
-  @ApiResponseProperty({ example: 42 })
-  public total: number;
-
-  @ApiResponseProperty({ type: [LedgerEntryPageResponseItemDto] })
-  public data: LedgerEntryPageResponseItemDto[];
-}
+export class LedgerEntryPageResponseDto extends PageResponseType(LedgerEntryPageResponseItemDto) {}
