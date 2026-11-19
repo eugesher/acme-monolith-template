@@ -8,7 +8,7 @@ A row with a `version` column is changed through a write service that retries a 
 | conflict error    | `apps/staff-app/src/features/catalog/modules/product/application/errors/product-write-conflict.error.ts`                  |
 | repository update | `apps/staff-app/src/features/catalog/modules/product/infrastructure/persistence/repositories/product-write.repository.ts` |
 | retry helper      | `OccRetryHelper` in `libs/toolkit/src/concurrency/occ-retry.helper.ts`                                                    |
-| `If-Match`        | `apps/staff-app/src/common/shared/concurrency/decorators/if-match.decorator.ts`                                           |
+| `If-Match`        | `libs/http/src/concurrency/decorators/if-match.decorator.ts`                                                              |
 
 `NoteWriteService` in `apps/staff-app/src/features/tools/modules/note` has the same shape.
 
@@ -61,9 +61,10 @@ only for a read with an optimistic lock, and nothing reads that way: the version
 
 `3` and `"3"` both mean version 3; a missing or empty header means "no expectation". Anything that
 is not a non-negative integer, including a weak tag `W/"3"`, is refused with `IF_MATCH_INVALID`
-(400), so a typo cannot turn into an unconditional write. The decorator lives in `common/shared`,
-because only staff features read the header: the update, publish and archive of a product, and the
-edit and resolve of a note.
+(400), so a typo cannot turn into an unconditional write. The decorator and its helper live in
+`libs/http` next to `IdempotencyKey`, and `@ApiIfMatchHeader()` documents the header with the code
+of the helper, so the parser and its description cannot drift apart. The update, publish and archive
+of a product and the edit and resolve of a note read it.
 
 ## The change answers the ledger
 

@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
-  ApiHeader,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -21,8 +20,7 @@ import {
 } from '@nestjs/swagger';
 
 import { CurrentUser } from '@acme-libs/auth';
-import { ApiErrorResponses } from '@acme-libs/http';
-import { IfMatch } from '@acme-staff/common/shared';
+import { ApiErrorResponses, ApiIfMatchHeader, IfMatch } from '@acme-libs/http';
 import type { Maybe } from '@acme-libs/toolkit';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
@@ -113,7 +111,7 @@ export class NoteController {
   }
 
   @Patch(':noteId')
-  @ApiHeader({ name: 'If-Match', required: false, description: 'The note version, for OCC' })
+  @ApiIfMatchHeader()
   @ApiOperation({
     summary: 'Rewrite the body of one of your notes and record the revision with it',
   })
@@ -139,7 +137,7 @@ export class NoteController {
   }
 
   @Patch(':noteId/resolve')
-  @ApiHeader({ name: 'If-Match', required: false, description: 'The note version, for OCC' })
+  @ApiIfMatchHeader()
   @ApiOperation({ summary: 'Resolve one of your notes for good; it can no longer be edited' })
   @ApiOkResponse({ type: NoteResponseDto })
   @ApiErrorResponses(

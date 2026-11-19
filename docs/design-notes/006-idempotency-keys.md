@@ -16,7 +16,8 @@ in the processor with a repository of its own (see `009-scheduled-processor.md` 
 
 A feature root mounts `IdempotencyCoreModule` from `@acme-core/modules/idempotency` and reaches a
 port only from a core-adapter, like any core module. The `IdempotencyKey` decorator that reads the
-header lives in `@acme-libs/http`, so both apps parse the key the same way.
+header lives in `@acme-libs/http`, so both apps parse the key the same way, and
+`@ApiIdempotencyKeyHeader()` documents it with the length and the codes of the same helper.
 
 **A malformed key is a bug of the caller, not a refusal.** `IdempotencyKeyHelper.parse` answers an
 empty key or a key over 128 characters with 400 before any core call, so the core module never

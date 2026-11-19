@@ -1,5 +1,7 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 
+import { PageResponseType } from '@acme-libs/http';
+
 class QueueFailedJobPageResponseItemDto {
   @ApiResponseProperty({ example: '42' })
   public id: string | number;
@@ -44,19 +46,6 @@ class QueueFailedJobPageResponseItemDto {
   public processedOn: number | null;
 }
 
-export class QueueFailedJobPageResponseDto {
-  @ApiResponseProperty({ example: 1 })
-  public page: number;
-
-  @ApiResponseProperty({ example: 20 })
-  public count: number;
-
-  @ApiResponseProperty({ example: 3 })
-  public pageCount: number;
-
-  @ApiResponseProperty({ example: 42 })
-  public total: number;
-
-  @ApiResponseProperty({ type: [QueueFailedJobPageResponseItemDto] })
-  public data: QueueFailedJobPageResponseItemDto[];
-}
+export class QueueFailedJobPageResponseDto extends PageResponseType(
+  QueueFailedJobPageResponseItemDto,
+) {}

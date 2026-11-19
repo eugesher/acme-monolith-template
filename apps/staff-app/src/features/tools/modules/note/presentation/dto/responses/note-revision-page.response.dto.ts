@@ -1,5 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+import { PageResponseType } from '@acme-libs/http';
+
 class NoteRevisionPageResponseItemDto {
   @ApiResponseProperty({ example: '4210' })
   public id: string;
@@ -26,19 +28,6 @@ class NoteRevisionPageResponseItemDto {
   public recordedAt: string;
 }
 
-export class NoteRevisionPageResponseDto {
-  @ApiResponseProperty({ example: 1 })
-  public page: number;
-
-  @ApiResponseProperty({ example: 20 })
-  public count: number;
-
-  @ApiResponseProperty({ example: 3 })
-  public pageCount: number;
-
-  @ApiResponseProperty({ example: 42 })
-  public total: number;
-
-  @ApiResponseProperty({ type: [NoteRevisionPageResponseItemDto] })
-  public data: NoteRevisionPageResponseItemDto[];
-}
+export class NoteRevisionPageResponseDto extends PageResponseType(
+  NoteRevisionPageResponseItemDto,
+) {}

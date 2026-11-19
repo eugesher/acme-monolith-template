@@ -1426,7 +1426,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should re
           {
             "field": "tagIds",
             "messages": [
-              "each tagId must be a positive integer",
+              "each value in tagIds must be a positive integer",
             ],
           },
         ],
@@ -1945,7 +1945,7 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a wor
           {
             "field": "tagIds",
             "messages": [
-              "each tagId must be a positive integer",
+              "each value in tagIds must be a positive integer",
             ],
           },
         ],

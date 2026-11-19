@@ -1,8 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Matches } from 'class-validator';
+import { IsEntityId } from '@acme-libs/http';
 
 export class ProductStockProductIdParamDto {
-  @ApiProperty({ example: '12', description: 'A positive integer of up to 20 digits' })
-  @Matches(/^[1-9]\d{0,19}$/, { message: 'productId must be a positive integer' })
+  @IsEntityId({ example: '12' })
   public productId: string;
 }

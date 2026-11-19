@@ -882,7 +882,7 @@ exports[`App Order POST /api/orders should refuse an id that is not a number wit
           {
             "field": "productIds",
             "messages": [
-              "each productId must be a positive integer",
+              "each value in productIds must be a positive integer",
             ],
           },
         ],

@@ -1,14 +1,8 @@
 import { Body, Controller, Get, Param, Post, Query, UseFilters } from '@nestjs/common';
-import {
-  ApiCreatedResponse,
-  ApiHeader,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser } from '@acme-libs/auth';
-import { ApiErrorResponses, IdempotencyKey } from '@acme-libs/http';
+import { ApiErrorResponses, ApiIdempotencyKeyHeader, IdempotencyKey } from '@acme-libs/http';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import { OrderGetManyUseCase, OrderGetOneUseCase, OrderPlaceUseCase } from '../../application';
@@ -33,7 +27,7 @@ export class OrderController {
   ) {}
 
   @Post()
-  @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'At most 128 characters' })
+  @ApiIdempotencyKeyHeader()
   @ApiOperation({ summary: 'Place an order for active products in stock (idempotent)' })
   @ApiCreatedResponse({ type: OrderResponseDto })
   @ApiErrorResponses(

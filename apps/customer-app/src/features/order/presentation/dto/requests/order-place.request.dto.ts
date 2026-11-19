@@ -1,14 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMaxSize, ArrayMinSize, IsArray, Matches } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray } from 'class-validator';
+
+import { IsEntityId } from '@acme-libs/http';
 
 export class OrderPlaceRequestDto {
-  @ApiProperty({
+  @IsEntityId({
     example: ['100', '100', '103'],
     description: 'One product id per unit: a repeated id orders one more unit, 1-100 units',
+    each: true,
   })
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(100)
-  @Matches(/^[1-9]\d{0,19}$/, { each: true, message: 'each productId must be a positive integer' })
   public productIds: string[];
 }

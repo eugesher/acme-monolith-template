@@ -19,6 +19,13 @@ with an empty body. The OpenAPI description of each field names its cap from
 `PaginationHelper.MAX_PAGE` and `MAX_LIMIT`, the defaults of `clampPageWindow`, so the document and
 the cap cannot drift apart.
 
+**Every page response extends `PageResponseType(ItemDto)`.** The function of `libs/http` answers a
+class with `page`, `count`, `pageCount`, `total` and `data` of the item class, in the manner of
+`PartialType` of `@nestjs/swagger`, so the response DTO of a list declares only its item:
+`class ProductPageResponseDto extends PageResponseType(ProductResponseDto) {}`. The item of a page
+that is not a response of its own stays a class of the file, as any nested DTO (see
+`035-enums-and-response-dtos.md`).
+
 **The helper computes the offset.** `clampPageWindow({ query, options })` takes the `page` and
 `limit` of the query, here the command of the use case itself, and the defaults and caps of the
 options, and answers `{ page, limit, offset }`. The query of the repository carries only `limit` and
@@ -33,7 +40,10 @@ and no exception filter. Its domain holds only the read model `LedgerListEntries
 rebuilds each record of the page and answers its snapshot (see `038-domain-models.md`).
 
 **Ids of `bigint unsigned` are strings** from the row to the response, because they may exceed the
-safe integer range of a JavaScript number. Instants are ISO strings in UTC.
+safe integer range of a JavaScript number. Instants are ISO strings in UTC. `@IsEntityId` of
+`libs/http` checks an id of the path, the query or the body as a positive integer of up to 20
+digits, `each` for a list and `optional` for a filter, and documents it with that pattern, so the
+check and the OpenAPI document share one expression.
 
 **The app lists the entities of the modules it mounts** in `app/entities` and hands them to
 `OrmModule.forRoot`, because a repository reads only an entity registered on the connection.

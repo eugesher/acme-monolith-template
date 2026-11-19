@@ -1,8 +1,8 @@
 import { Body, Controller, Param, Post, UseFilters } from '@nestjs/common';
-import { ApiCreatedResponse, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser, RequiresPermission } from '@acme-libs/auth';
-import { ApiErrorResponses, IdempotencyKey } from '@acme-libs/http';
+import { ApiErrorResponses, ApiIdempotencyKeyHeader, IdempotencyKey } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
@@ -23,7 +23,7 @@ export class ProductStockController {
 
   @Post(':productId/add')
   @RequiresPermission(PermissionCodeEnum.PRODUCT_RESTOCK)
-  @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'At most 128 characters' })
+  @ApiIdempotencyKeyHeader()
   @ApiOperation({ summary: 'Add units to the stock of a product (idempotent)' })
   @ApiCreatedResponse({ type: ProductStockResponseDto })
   @ApiErrorResponses(

@@ -1,16 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, Put, Query, UseFilters } from '@nestjs/common';
-import {
-  ApiCreatedResponse,
-  ApiHeader,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RequiresPermission } from '@acme-libs/auth';
-import { ApiErrorResponses } from '@acme-libs/http';
+import { ApiErrorResponses, ApiIfMatchHeader, IfMatch } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
-import { IfMatch } from '@acme-staff/common/shared';
 import type { Maybe } from '@acme-libs/toolkit';
 
 import {
@@ -92,7 +85,7 @@ export class ProductController {
 
   @Patch(':productId')
   @RequiresPermission(PermissionCodeEnum.PRODUCT_WRITE)
-  @ApiHeader({ name: 'If-Match', required: false, description: 'The product version, for OCC' })
+  @ApiIfMatchHeader()
   @ApiOperation({ summary: 'Update the fields of a product (optimistic concurrency)' })
   @ApiOkResponse({ type: ProductResponseDto })
   @ApiErrorResponses(
@@ -115,7 +108,7 @@ export class ProductController {
 
   @Put(':productId/publish')
   @RequiresPermission(PermissionCodeEnum.PRODUCT_WRITE)
-  @ApiHeader({ name: 'If-Match', required: false, description: 'The product version, for OCC' })
+  @ApiIfMatchHeader()
   @ApiOperation({
     summary: 'Publish a draft product to the customer catalog (optimistic concurrency)',
   })
@@ -137,7 +130,7 @@ export class ProductController {
 
   @Put(':productId/archive')
   @RequiresPermission(PermissionCodeEnum.PRODUCT_ARCHIVE)
-  @ApiHeader({ name: 'If-Match', required: false, description: 'The product version, for OCC' })
+  @ApiIfMatchHeader()
   @ApiOperation({ summary: 'Archive a product (optimistic concurrency)' })
   @ApiOkResponse({ type: ProductResponseDto })
   @ApiErrorResponses(
