@@ -100,9 +100,10 @@ customer-app has its own secret, so its tokens fail the signature check in the s
 a secret shared by mistake would let customer 5 in as staff user 5. Each app passes
 `AuthAudienceEnum` of `libs/kernel` to `AuthJwtModule.forRoot()`, and staff-app and customer-app to
 `CredentialsLibModule.register()`: `staff` in staff-app and processor-app, `customer` in
-customer-app. The token carries it as `aud`, and the guard accepts only `HS256` and the audience of
-its app. An env variable could repeat the mistake of the secret; a constant in the module import
-cannot. The auth e2e of staff-app and of customer-app sends a token signed with the secret of the
-app for a subject of the app but the other audience and expects 401;
+customer-app. The token carries it as `aud`, and the guard accepts only the audience of its app and
+the algorithm of `AuthTokenAlgorithmEnum` of `libs/kernel`, `HS256`, which the credentials lib and
+the e2e contexts sign with too. An env variable could repeat the mistake of the secret; a constant
+in the module import cannot. The auth e2e of staff-app and of customer-app sends a token signed with
+the secret of the app for a subject of the app but the other audience and expects 401;
 `libs/auth/src/modules/spec/auth-jwt.module.spec.ts` checks another secret, another audience, no
 audience and `HS512`.
