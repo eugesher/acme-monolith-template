@@ -1,3 +1,5 @@
+import type { PermissionCodeEnum } from '@acme-libs/kernel';
+
 export interface IPermissionListView {
-  codes: string[];
+  codes: PermissionCodeEnum[];
 }

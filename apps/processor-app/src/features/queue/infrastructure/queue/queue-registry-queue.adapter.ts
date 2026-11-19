@@ -45,9 +45,16 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
 
     return await Promise.all(
       queues.map(async (queue) => {
-        const jobCounts = await queue.getJobCounts();
+        const [jobCounts, paused] = await Promise.all([
+          queue.getJobCounts(),
+          queue.getPausedCount(),
+        ]);
+        const { active, completed, failed, delayed, waiting } = jobCounts;
 
-        return { name: queue.name, jobCounts: { paused: null, ...jobCounts } };
+        return {
+          name: queue.name,
+          jobCounts: { active, completed, failed, delayed, waiting, paused },
+        };
       }),
     );
   }

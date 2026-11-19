@@ -8,7 +8,7 @@ export interface IQueueRegistryJobCountsView {
     failed: number;
     delayed: number;
     waiting: number;
-    paused: Nullable<number>;
+    paused: number;
   };
 }
 

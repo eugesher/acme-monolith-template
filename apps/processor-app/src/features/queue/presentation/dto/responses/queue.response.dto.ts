@@ -1,4 +1,4 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { ApiResponseProperty } from '@nestjs/swagger';
 
 class QueueResponseJobCountsDto {
   @ApiResponseProperty({ example: 0 })
@@ -16,8 +16,8 @@ class QueueResponseJobCountsDto {
   @ApiResponseProperty({ example: 5 })
   public waiting: number;
 
-  @ApiProperty({ readOnly: true, nullable: true, example: 0 })
-  public paused: number | null;
+  @ApiResponseProperty({ example: 0 })
+  public paused: number;
 }
 
 export class QueueResponseDto {

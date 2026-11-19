@@ -86,4 +86,10 @@ is declared with `@ApiProperty({ readOnly: true, nullable: true })`, because `@A
 takes no `nullable`. The client reads one shape and never checks for an absent key.
 
 **An enum field names its enum in the schema**: `@ApiResponseProperty({ enum, example })`, so the
-OpenAPI document lists the values and the client can generate the same enum.
+OpenAPI document lists the values and the client can generate the same enum. A list of enum values
+takes `@ApiProperty({ readOnly: true, enum, isArray: true, example })`, because
+`@ApiResponseProperty` takes no `isArray` and would describe the list as one string:
+`RoleResponseDto.permissionCodes`, `PermissionListResponseDto.codes`.
+
+**Every field has an example**, so the reference page shows a whole response and not an empty
+placeholder: an id as a string of digits, a token as a dotted JWT.
