@@ -80,15 +80,15 @@ the `acme:catalog:*` keys from Redis.
 
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
 `libs/testing/src/e2e/e2e.context.ts`, which holds only what all five contexts use: `init()`
-compiles the `AppModule` it is given with `@nestjs/testing`, sets the logger and the global prefix
-with `AppBootstrap.configure` of `libs/bootstrap`, as `main.ts` does, builds a `JwtService` with
-`JWT_SECRET` from the config and the audience of the app and spies on the root logger; `close()` and
-`takeRootWarnings()` round it off. The class is not abstract: a context passes its `AppModule` and
-its `AuthAudienceEnum` to the constructor, calls `super.init()` and adds its own. It signs one
-access token for each seeded account the cases use: admin, editor and viewer in staff-app, ann, bob
-and carol in customer-app, admin and viewer in processor-app. Everything the cases read is a getter
-that throws before `init()`. The contexts of staff-app and customer-app also hold the Redis client,
-through `@acme-libs/testing`.
+compiles the `AppModule` it is given with `@nestjs/testing`, starts it with
+`AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, builds a
+`JwtService` with `JWT_SECRET` from the config and the audience of the app and spies on the root
+logger; `close()` and `takeRootWarnings()` round it off. The class is not abstract: a context passes
+its `AppModule`, its `AppNameEnum` and its `AuthAudienceEnum` to the constructor, calls
+`super.init()` and adds its own. It signs one access token for each seeded account the cases use:
+admin, editor and viewer in staff-app, ann, bob and carol in customer-app, admin and viewer in
+processor-app. Everything the cases read is a getter that throws before `init()`. The contexts of
+staff-app and customer-app also hold the Redis client, through `@acme-libs/testing`.
 
 **A catalog case clears its own keys, not the database.** The Bull queue of the ledger records lives
 in the same Redis, so `FLUSHDB` would drop its jobs and counters. `hooks()` deletes the
@@ -127,6 +127,11 @@ a `:run` repeated within the window stays under them. The case that spends the a
 (`203.0.113.0/24`, a documentation range), reads the limit from the config, and then checks that a
 second address is still served. A repeated run finds that address blocked already, and the case
 asserts only the last call, so it passes either way.
+
+**An app under test listens on a port of its own.** The context starts the app as `main.ts` does,
+`listen` included, so `PORT` of `.env.test` is 3100, 3101 and 3102 for customer-app, staff-app and
+processor-app, next to the 3000, 3001 and 3002 of `.env.example`: a suite runs while the app runs
+locally.
 
 **`.env.test` allows one browser origin.** `HTTP_CORS_ORIGINS=https://app.example.test` lets the
 health suite of each app check the preflight of an allowed origin and the missing header for any
@@ -191,7 +196,9 @@ correlation id, `OrderPlaced` and `ProductArchived` of the sold-out product.
 
 **The apps share one environment.** Jest loads the `.env.test` of the API app, and processor-app
 adds the variables only it has from its own file. The two differ in `PORT` and `JWT_SECRET`, and no
-system case calls processor-app over HTTP.
+system case calls processor-app over HTTP, so the context creates its Nest application and calls
+`init()` without `listen`: its processors and schedules run, and it opens no port that would take
+the `PORT` of the API app.
 
 **`test/system` is not plain node.** It compiles project code, so it has its own `tsconfig.json`
 over the root one and the lint category `repo:system`: it sees its own files, the `AppModule` of

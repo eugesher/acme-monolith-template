@@ -28,7 +28,7 @@ describe('App', () => {
     await ctx.close();
   });
 
-  it.each(['/api/auth/me', '/api/products', '/api/orders', '/api/reference'])(
+  it.each(['/api/auth/me', '/api/products', '/api/orders'])(
     'should not mount the route %s',
     async (path) => {
       await request(ctx.app.getHttpServer()).get(path).expect(HttpStatus.NOT_FOUND);

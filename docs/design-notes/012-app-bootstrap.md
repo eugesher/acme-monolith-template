@@ -24,14 +24,15 @@ jobs of its queues, and runs the queue processors and the schedules (see `023-pr
 `main.ts` creates the app the way any Nest app does, and `AppBootstrap.execute` holds the steps
 every app takes after that, so the three apps cannot start differently:
 
-1. `AppBootstrap.configure(app)`: `app.useLogger(app.get(Logger))`, so Nest's own lines go through
-   pino too and the lines buffered before the logger existed are flushed through it, and the global
-   prefix from `API_PREFIX`.
-2. `enableShutdownHooks`, the API reference and `listen` on `PORT`.
-3. `<app> is listening on port <port>` through the logger of the app.
+1. `app.useLogger(app.get(Logger))`, so Nest's own lines go through pino too and the lines buffered
+   before the logger existed are flushed through it.
+2. The global prefix from `API_PREFIX`.
+3. `enableShutdownHooks`, the API reference and `listen` on `PORT`.
+4. `<app> is listening on port <port>` through the logger of the app.
 
-The e2e context calls `configure` too, so an app under test logs and routes as the running one; the
-steps that start a process stay in `execute` (see `014-e2e-suites.md`).
+The e2e context starts an app with `execute` too, so an app under test logs, routes, serves its API
+reference and listens as the running one (see `014-e2e-suites.md`). `AppBootstrap` has no public
+member for a part of the start.
 
 ## Environment
 

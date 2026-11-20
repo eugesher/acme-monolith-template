@@ -7,6 +7,7 @@ import type { AppNameEnum } from '@acme-libs/kernel';
 
 export class AppBootstrap {
   private readonly port: number;
+  private readonly prefix: string;
   private readonly logger: Logger;
 
   private constructor(
@@ -16,6 +17,7 @@ export class AppBootstrap {
     const config = app.get(ConfigService);
 
     this.port = config.getOrThrow<number>('PORT');
+    this.prefix = config.getOrThrow<string>('API_PREFIX');
     this.logger = app.get(Logger);
   }
 
@@ -23,18 +25,9 @@ export class AppBootstrap {
     return new AppBootstrap(app, appName);
   }
 
-  public static configure(app: INestApplication): void {
-    const config = app.get(ConfigService);
-    const prefix = config.getOrThrow<string>('API_PREFIX');
-    const logger = app.get(Logger);
-
-    app.useLogger(logger);
-    app.setGlobalPrefix(prefix);
-  }
-
   public async execute(): Promise<void> {
-    AppBootstrap.configure(this.app);
-
+    this.app.useLogger(this.logger);
+    this.app.setGlobalPrefix(this.prefix);
     this.app.enableShutdownHooks();
 
     ApiReference.setup(this.app, this.appName);

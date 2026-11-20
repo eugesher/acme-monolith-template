@@ -2,7 +2,7 @@ import { getQueueToken } from '@nestjs/bull';
 import type { Queue } from 'bull';
 import type { Redis } from 'ioredis';
 
-import { AuthAudienceEnum } from '@acme-libs/kernel';
+import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { E2EContext } from '@acme-libs/testing';
 import {
@@ -47,7 +47,7 @@ export class AppE2EContext extends E2EContext {
   }
 
   constructor() {
-    super(AppModule, AuthAudienceEnum.STAFF);
+    super(AppModule, AppNameEnum.STAFF_APP, AuthAudienceEnum.STAFF);
   }
 
   public override async init(): Promise<void> {
