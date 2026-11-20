@@ -1,57 +1,61 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { UserRegisterStaffUserInsertOutcomeEnum } from '../../../outbound';
+import {
+  UserRegisterStaffUserInsertOutcomeEnum,
+  type IUserCredentialsPort,
+  type IUserRegisterRepositoryPort,
+  type IUserTransactionPort,
+} from '../../../outbound';
 import { UserRegisterUseCase } from '../user-register.use-case';
 
 describe('UserRegisterUseCase', () => {
-  let outcomes: string[];
-  let repository: { insertUser: jest.Mock; findRoles: jest.Mock; insertUserRoles: jest.Mock };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
-  let credentials: { hashPassword: jest.Mock };
+  let calls: string[];
+  let repository: jest.Mocked<IUserRegisterRepositoryPort>;
+  let transaction: jest.Mocked<IUserTransactionPort>;
+  let credentials: jest.Mocked<IUserCredentialsPort>;
   let logger: PinoLoggerMock;
   let useCase: UserRegisterUseCase;
 
   beforeEach(() => {
-    outcomes = [];
-    repository = {
-      insertUser: jest.fn(() => {
-        outcomes.push('insert');
+    calls = [];
+    repository = { insertUser: jest.fn(), findRoles: jest.fn(), insertUserRoles: jest.fn() };
+    repository.insertUser.mockImplementation(() => {
+      calls.push('insertUser');
 
-        return Promise.resolve({
-          outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED,
-          id: '5',
-        });
-      }),
-      findRoles: jest.fn().mockResolvedValue([{ id: '2' }]),
-      insertUserRoles: jest.fn().mockResolvedValue(undefined),
-    };
-    transaction = {
-      afterCommit: jest.fn(),
-      run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+      return Promise.resolve({
+        outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED,
+        id: '5',
+      });
+    });
+    repository.findRoles.mockImplementation(() => {
+      calls.push('findRoles');
 
-        const result = await work();
+      return Promise.resolve([{ id: '2' }]);
+    });
+    repository.insertUserRoles.mockImplementation(() => {
+      calls.push('insertUserRoles');
 
-        outcomes.push('commit');
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
 
-        return result;
-      }),
-    };
-    credentials = { hashPassword: jest.fn().mockResolvedValue('argon-hash') };
+      const result = await work();
+
+      calls.push('commit');
+
+      return result;
+    });
+    credentials = { hashPassword: jest.fn() };
+    credentials.hashPassword.mockImplementation(() => {
+      calls.push('hashPassword');
+
+      return Promise.resolve('argon-hash');
+    });
     logger = makePinoLoggerMock();
-    useCase = new UserRegisterUseCase(
-      repository,
-      transaction,
-      credentials,
-      logger as unknown as PinoLogger,
-    );
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    useCase = new UserRegisterUseCase(repository, transaction, credentials, logger);
   });
 
   it('hashes the password and stores the user with its roles in one transaction', async () => {
@@ -70,7 +74,14 @@ describe('UserRegisterUseCase', () => {
     });
     expect(repository.findRoles).toHaveBeenCalledWith(['2']);
     expect(repository.insertUserRoles).toHaveBeenCalledWith([{ userId: '5', roleId: '2' }]);
-    expect(outcomes).toEqual(['begin', 'insert', 'commit']);
+    expect(calls).toEqual([
+      'hashPassword',
+      'begin',
+      'insertUser',
+      'findRoles',
+      'insertUserRoles',
+      'commit',
+    ]);
     expect(logger.info).toHaveBeenCalledWith({ id: '5' }, 'User registered');
   });
 
@@ -85,8 +96,7 @@ describe('UserRegisterUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
       message: 'Role 99 was not found',
     });
-    expect(repository.insertUserRoles).not.toHaveBeenCalled();
-    expect(outcomes).not.toContain('commit');
+    expect(calls).toEqual(['hashPassword', 'begin', 'insertUser', 'findRoles']);
   });
 
   it('rejects a weak password before hashing it', async () => {
@@ -130,7 +140,7 @@ describe('UserRegisterUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
       message: 'Email is already registered',
     });
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
     expect(logger.info).not.toHaveBeenCalled();
   });
 
@@ -144,7 +154,7 @@ describe('UserRegisterUseCase', () => {
     });
 
     await expect(register).rejects.toThrow('deadlock');
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
   });
 
   it('rolls the transaction back when the roles fail to store', async () => {
@@ -157,7 +167,7 @@ describe('UserRegisterUseCase', () => {
     });
 
     await expect(register).rejects.toThrow('deadlock');
-    expect(outcomes).toEqual(['begin', 'insert']);
+    expect(calls).not.toContain('commit');
     expect(logger.info).not.toHaveBeenCalled();
   });
 });

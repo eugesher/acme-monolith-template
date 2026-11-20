@@ -1,14 +1,16 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
+import type { ILedgerCorePort } from '@acme-core/contracts/ledger';
 
 import { ProductCoreLedgerCoreAdapter } from '../product-core-ledger-core.adapter';
 
 describe('ProductCoreLedgerCoreAdapter', () => {
-  let handleEnqueue: jest.Mock;
+  let ledger: jest.Mocked<ILedgerCorePort>;
   let adapter: ProductCoreLedgerCoreAdapter;
 
   beforeEach(() => {
-    handleEnqueue = jest.fn().mockResolvedValue(undefined);
-    adapter = new ProductCoreLedgerCoreAdapter({ handleEnqueue });
+    ledger = { handleEnqueue: jest.fn() };
+    ledger.handleEnqueue.mockResolvedValue();
+    adapter = new ProductCoreLedgerCoreAdapter(ledger);
   });
 
   describe('recordArchived', () => {
@@ -20,8 +22,8 @@ describe('ProductCoreLedgerCoreAdapter', () => {
         payload: { sku: 'SKU-0001', previousStatus: ProductStatusEnum.ACTIVE },
       });
 
-      expect(handleEnqueue).toHaveBeenCalledTimes(1);
-      expect(handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-archived:12:4',
         subjectType: 'product',
         subjectId: '12',

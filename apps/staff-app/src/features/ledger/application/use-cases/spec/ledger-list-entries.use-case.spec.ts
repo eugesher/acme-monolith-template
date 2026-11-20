@@ -1,17 +1,18 @@
 import { LedgerListEntriesUseCase } from '../ledger-list-entries.use-case';
+import type { ILedgerListEntriesRepositoryPort } from '../../../outbound';
 
 describe('LedgerListEntriesUseCase', () => {
-  let list: jest.Mock;
+  let repository: jest.Mocked<ILedgerListEntriesRepositoryPort>;
   let useCase: LedgerListEntriesUseCase;
 
   beforeEach(() => {
-    list = jest.fn();
-    useCase = new LedgerListEntriesUseCase({ list });
+    repository = { list: jest.fn() };
+    useCase = new LedgerListEntriesUseCase(repository);
   });
 
   describe('execute', () => {
     it('asks the ledger for the page and the filters of the query', async () => {
-      list.mockResolvedValue([[], 0]);
+      repository.list.mockResolvedValue([[], 0]);
 
       await useCase.execute({
         page: 2,
@@ -21,7 +22,7 @@ describe('LedgerListEntriesUseCase', () => {
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
       });
 
-      expect(list).toHaveBeenCalledWith({
+      expect(repository.list).toHaveBeenCalledWith({
         limit: 10,
         offset: 10,
         subjectType: 'product',
@@ -31,7 +32,7 @@ describe('LedgerListEntriesUseCase', () => {
     });
 
     it('reads the first page of 20 when the query names no window', async () => {
-      list.mockResolvedValue([[], 0]);
+      repository.list.mockResolvedValue([[], 0]);
 
       await useCase.execute({
         page: undefined,
@@ -41,7 +42,7 @@ describe('LedgerListEntriesUseCase', () => {
         correlationId: undefined,
       });
 
-      expect(list).toHaveBeenCalledWith({
+      expect(repository.list).toHaveBeenCalledWith({
         limit: 20,
         offset: 0,
         subjectType: 'product',
@@ -51,7 +52,7 @@ describe('LedgerListEntriesUseCase', () => {
     });
 
     it('caps the page limit at 100', async () => {
-      list.mockResolvedValue([[], 0]);
+      repository.list.mockResolvedValue([[], 0]);
 
       await useCase.execute({
         page: undefined,
@@ -61,7 +62,7 @@ describe('LedgerListEntriesUseCase', () => {
         correlationId: undefined,
       });
 
-      expect(list).toHaveBeenCalledWith({
+      expect(repository.list).toHaveBeenCalledWith({
         limit: 100,
         offset: 0,
         subjectType: undefined,
@@ -71,7 +72,7 @@ describe('LedgerListEntriesUseCase', () => {
     });
 
     it('answers the page of the ledger', async () => {
-      list.mockResolvedValue([
+      repository.list.mockResolvedValue([
         [
           {
             id: '7',

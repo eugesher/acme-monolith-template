@@ -1,41 +1,47 @@
-import { ProductNotFoundException, ProductTagNotFoundException } from '../../../domain';
+import {
+  ProductTagReplaceOutcomeEnum,
+  type IProductReplaceTagsRepositoryPort,
+  type IProductTagPort,
+  type IProductTransactionPort,
+} from '../../../outbound';
 import { ProductReplaceTagsUseCase } from '../product-replace-tags.use-case';
 
 describe('ProductReplaceTagsUseCase', () => {
-  let outcomes: string[];
-  let lockById: jest.Mock;
-  let replace: jest.Mock;
-  let run: jest.Mock;
+  let calls: string[];
+  let repository: jest.Mocked<IProductReplaceTagsRepositoryPort>;
+  let tag: jest.Mocked<IProductTagPort>;
+  let transaction: jest.Mocked<IProductTransactionPort>;
   let useCase: ProductReplaceTagsUseCase;
 
   beforeEach(() => {
-    outcomes = [];
-    lockById = jest.fn(() => {
-      outcomes.push('lock');
+    calls = [];
+    repository = { lockById: jest.fn() };
+    repository.lockById.mockImplementation(() => {
+      calls.push('lockById');
 
       return Promise.resolve({ id: '100' });
     });
-    replace = jest.fn(() => {
-      outcomes.push('replace');
+    tag = { find: jest.fn(), replace: jest.fn(), findProductIds: jest.fn() };
+    tag.replace.mockImplementation(() => {
+      calls.push('replace');
 
       return Promise.resolve({
-        outcome: 'replaced',
+        outcome: ProductTagReplaceOutcomeEnum.REPLACED,
         tags: [{ id: '300', name: 'fragile' }],
         missingTagIds: [],
       });
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
-    useCase = new ProductReplaceTagsUseCase(
-      { lockById },
-      { find: jest.fn(), replace, findProductIds: jest.fn() },
-      { run },
-    );
+    useCase = new ProductReplaceTagsUseCase(repository, tag, transaction);
   });
 
   describe('execute', () => {
@@ -43,30 +49,36 @@ describe('ProductReplaceTagsUseCase', () => {
       const view = await useCase.execute({ productId: '100', tagIds: ['300'] });
 
       expect(view).toEqual({ tags: [{ id: '300', name: 'fragile' }] });
-      expect(lockById).toHaveBeenCalledWith('100');
-      expect(replace).toHaveBeenCalledWith({ productId: '100', tagIds: ['300'] });
-      expect(outcomes).toEqual(['lock', 'replace', 'commit']);
+      expect(repository.lockById).toHaveBeenCalledWith('100');
+      expect(tag.replace).toHaveBeenCalledWith({ productId: '100', tagIds: ['300'] });
+      expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
     });
 
-    it('throws ProductNotFoundException and replaces nothing for an unknown product', async () => {
-      lockById.mockResolvedValue(null);
+    it('refuses an unknown product with PRODUCT_NOT_FOUND and replaces nothing', async () => {
+      repository.lockById.mockResolvedValue(null);
 
-      await expect(useCase.execute({ productId: '999', tagIds: ['300'] })).rejects.toThrow(
-        ProductNotFoundException,
-      );
-      expect(replace).not.toHaveBeenCalled();
+      await expect(useCase.execute({ productId: '999', tagIds: ['300'] })).rejects.toMatchObject({
+        code: 'PRODUCT_NOT_FOUND',
+        message: 'Product 999 was not found',
+      });
+      expect(tag.replace).not.toHaveBeenCalled();
     });
 
-    it('throws ProductTagNotFoundException with the missing tags, so the transaction rolls back', async () => {
-      replace.mockResolvedValue({ outcome: 'tag-not-found', tags: [], missingTagIds: ['999'] });
+    it('refuses missing tags with PRODUCT_TAG_NOT_FOUND and their ids, so the transaction rolls back', async () => {
+      tag.replace.mockResolvedValue({
+        outcome: ProductTagReplaceOutcomeEnum.TAG_NOT_FOUND,
+        tags: [],
+        missingTagIds: ['999'],
+      });
 
-      const error: unknown = await useCase
-        .execute({ productId: '100', tagIds: ['300', '999'] })
-        .catch((caught: unknown) => caught);
+      const replacing = useCase.execute({ productId: '100', tagIds: ['300', '999'] });
 
-      expect(error).toBeInstanceOf(ProductTagNotFoundException);
-      expect(error).toMatchObject({ details: { missingTagIds: ['999'] } });
-      expect(outcomes).not.toContain('commit');
+      await expect(replacing).rejects.toMatchObject({
+        code: 'PRODUCT_TAG_NOT_FOUND',
+        message: 'Some of the tags do not exist',
+        details: { missingTagIds: ['999'] },
+      });
+      expect(calls).not.toContain('commit');
     });
   });
 });

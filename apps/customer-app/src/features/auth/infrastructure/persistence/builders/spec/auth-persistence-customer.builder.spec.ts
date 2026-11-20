@@ -26,21 +26,12 @@ describe('AuthPersistenceCustomerBuilder', () => {
 
   describe('forByEmail', () => {
     it('selects the credentials and status of the customer with the email', () => {
-      const builder = new AuthPersistenceCustomerBuilder(baseBuilder);
-
-      builder.forByEmail('ann@example.com');
+      const builder = new AuthPersistenceCustomerBuilder(baseBuilder).forByEmail('ann@example.com');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Customer`.`id` AS `Customer_id`, `Customer`.`passwordHash` AS `Customer_passwordHash`, `Customer`.`status` AS `Customer_status` FROM `customer` `Customer` WHERE `Customer`.`email` = ?',
         ['ann@example.com'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new AuthPersistenceCustomerBuilder(baseBuilder);
-      const chained = builder.forByEmail('ann@example.com');
-
-      expect(chained).toBe(builder);
     });
   });
 });

@@ -15,6 +15,7 @@ module.exports = {
   testEnvironment: 'node',
   globalSetup: '<rootDir>/spec/support/global-setup.ts',
   setupFiles: ['reflect-metadata'],
+  restoreMocks: true,
   testRegex: '\\.spec.ts$',
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/'],
   transform: {
@@ -42,8 +43,6 @@ module.exports = {
     '!libs/openapi/src/api-reference/api-reference.ts',
   ],
   coverageThreshold: {
-    global: { statements: 95, branches: 95, functions: 95, lines: 95 },
-    './{apps/*/src/{features,processors}/*,apps/*/src/features/*/modules/*,apps/*/src/common/modules/*,core/modules/src/*}/{domain,application}/**/*.ts':
-      { statements: 95, branches: 95, functions: 95, lines: 95 },
+    './{apps,core,libs}/**/*.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
   },
 };

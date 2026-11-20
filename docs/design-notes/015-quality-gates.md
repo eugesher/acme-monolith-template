@@ -27,14 +27,23 @@ a threshold.
 | `libs/openapi/src/api-reference/api-reference.ts`                                  | mounts the reference page                                                                                             |
 | `libs/testing/**`, `apps/*/test/**`                                                | test code                                                                                                             |
 
-**The thresholds** are 95% for statements, branches, functions and lines, twice over:
+**The threshold is 100% for every counted file**, for statements, branches, functions and lines. The
+exclusions above take out what has no logic or belongs to the e2e suites, so a line below 100% is
+either untested or dead, and either way the change is not done. No line is taken out with an
+`istanbul ignore` comment.
 
-- for the whole tree;
-- for every file of `domain/` and `application/` in a feature, a nested feature module
-  (`features/<area>/modules/<module>`), a processor, a common module and a core module.
+**The key is per file, not global.** A global threshold measures the whole tree: with about 4,000
+statements, 95% lets 200 of them go untested, and a new adapter or helper without any spec barely
+moves the number. A per-file key fails on the file that lost its spec and names it in the report.
+Jest checks every file matched by `./{apps,core,libs}/**/*.ts` against it, and `collectCoverageFrom`
+decides which files are counted, including those no spec loads, which count at 0%.
 
-The per-file keys are what matter. One unit without a spec barely moves the global numbers, but its
-file drops to zero and fails its own key.
+**Some specs the coverage cannot ask for.** A controller is excluded above, yet its spec checks how
+a request becomes a command and that a failure is awaited. A DTO is covered the moment any file
+imports it, since its decorators run on import, yet only a spec checks its validation.
+`spec/required-specs.spec.ts` asks for a spec next to every controller and every request, query and
+param DTO that declares validation of its own; a DTO that only extends `PageQueryDto` declares none
+and inherits the spec of its parent.
 
 **ts-jest compiles the unit suite with type information** (`isolatedModules: false`). With
 `emitDecoratorMetadata`, a file compiled on its own cannot tell whether a constructor parameter type
@@ -145,6 +154,27 @@ by keeping its result. Where a declared type is narrower than the runtime value,
 `PinoLogger.root` before the logger starts or `JSON.stringify(undefined)`, the value is widened with
 `as Maybe<…>`: an annotated `const` is narrowed back by its initializer, and
 `no-unnecessary-condition` would then flag the check.
+
+## Test rules
+
+`lint/configs/specs.mjs` lays `eslint-plugin-jest`'s `flat/recommended` over every spec, e2e spec
+and e2e helper. Its warnings are errors here: `expect-expect`, `no-commented-out-tests` and
+`no-disabled-tests` would otherwise pass the pre-commit hook and fail only `lint:all` in CI. Jest
+itself runs a focused or skipped test without a complaint, so `no-focused-tests` and
+`no-disabled-tests` are what keep an `it.only` or an `it.skip` out of the main branch.
+
+- `jest/unbound-method` replaces `@typescript-eslint/unbound-method` in specs: it lets
+  `expect(port.method).toHaveBeenCalledWith(…)` through and still flags a method taken off its
+  object, so a typed mock is asserted where it lives.
+- `valid-expect` knows the asynchronous matchers of `spec/support/lint.ts` (`toBreakRule`,
+  `toPassArchitectureLint`): an architecture case that does not `await` one would pass before the
+  lint ran. `toResolve` is synchronous and stays out of the list.
+
+`lint/configs/e2e.mjs` adapts three rules to the shape of the e2e suites (see `014-e2e-suites.md`):
+`no-export` is off, because a section file exports the `execute()` that mounts its `describe`s; the
+root `afterEach` that fails a case on a root warning counts as a test block for
+`no-standalone-expect`; and the `.expect(status)` of a supertest chain counts as an assertion for
+`expect-expect`.
 
 ## Type imports
 

@@ -26,21 +26,15 @@ describe('ProductStockPersistenceProductBuilder', () => {
 
   describe('forActive', () => {
     it('selects the ids of the active products among the given ones in id order', () => {
-      const builder = new ProductStockPersistenceProductBuilder(baseBuilder);
-
-      builder.forActive(['100', '101']);
+      const builder = new ProductStockPersistenceProductBuilder(baseBuilder).forActive([
+        '100',
+        '101',
+      ]);
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE ( `Product`.`id` IN (?, ?) AND `Product`.`status` = ? ) AND ( `Product`.`deletedAt` IS NULL ) ORDER BY `Product_id` ASC',
         ['100', '101', 'active'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductStockPersistenceProductBuilder(baseBuilder);
-      const chained = builder.forActive(['100', '101']);
-
-      expect(chained).toBe(builder);
     });
   });
 });

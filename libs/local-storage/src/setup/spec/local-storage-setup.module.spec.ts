@@ -11,10 +11,6 @@ describe('LocalStorageSetupModule', () => {
     forRoot = jest.spyOn(ClsModule, 'forRoot');
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('mounts a global context middleware on every route', () => {
     LocalStorageSetupModule.forRoot();
     const [options] = forRoot.mock.calls[0] as [ClsModuleOptions];

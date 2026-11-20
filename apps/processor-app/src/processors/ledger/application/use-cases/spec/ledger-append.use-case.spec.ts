@@ -1,32 +1,27 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { LedgerAppendEntryInsertOutcomeEnum } from '../../../outbound';
+import {
+  LedgerAppendEntryInsertOutcomeEnum,
+  type ILedgerAppendRepositoryPort,
+} from '../../../outbound';
 import { LedgerAppendUseCase } from '../ledger-append.use-case';
 import type { ILedgerAppendEntryCandidate } from '../../../domain';
 
 describe('LedgerAppendUseCase', () => {
-  let insert: jest.Mock;
-  let findByOperationKey: jest.Mock;
+  let repository: jest.Mocked<ILedgerAppendRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: LedgerAppendUseCase;
 
   beforeEach(() => {
-    insert = jest
-      .fn()
-      .mockResolvedValue({ outcome: LedgerAppendEntryInsertOutcomeEnum.INSERTED, id: '4210' });
-    findByOperationKey = jest.fn().mockResolvedValue({ id: '4210' });
+    repository = { insert: jest.fn(), findByOperationKey: jest.fn() };
+    repository.insert.mockResolvedValue({
+      outcome: LedgerAppendEntryInsertOutcomeEnum.INSERTED,
+      id: '4210',
+    });
+    repository.findByOperationKey.mockResolvedValue({ id: '4210' });
     logger = makePinoLoggerMock();
-    useCase = new LedgerAppendUseCase(
-      { insert, findByOperationKey },
-      logger as unknown as PinoLogger,
-    );
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    useCase = new LedgerAppendUseCase(repository, logger);
   });
 
   describe('execute', () => {
@@ -42,7 +37,7 @@ describe('LedgerAppendUseCase', () => {
         }),
       );
 
-      const [candidate] = insert.mock.calls[0] as [ILedgerAppendEntryCandidate];
+      const [candidate] = repository.insert.mock.calls[0] as [ILedgerAppendEntryCandidate];
 
       expect(candidate).toEqual({
         operationKey: 'product-archived:12:2',
@@ -63,7 +58,9 @@ describe('LedgerAppendUseCase', () => {
     });
 
     it('logs a record the ledger already holds as already appended, without an error', async () => {
-      insert.mockResolvedValue({ outcome: LedgerAppendEntryInsertOutcomeEnum.DUPLICATE });
+      repository.insert.mockResolvedValue({
+        outcome: LedgerAppendEntryInsertOutcomeEnum.DUPLICATE,
+      });
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000002', () =>
         useCase.execute({
@@ -97,11 +94,11 @@ describe('LedgerAppendUseCase', () => {
       await expect(executing).rejects.toThrow(
         'occurredAt must be an ISO-8601 instant with an explicit timezone offset',
       );
-      expect(insert).not.toHaveBeenCalled();
+      expect(repository.insert).not.toHaveBeenCalled();
     });
 
     it('passes a failing append through, so Bull retries the job', async () => {
-      insert.mockRejectedValue(new Error('deadlock'));
+      repository.insert.mockRejectedValue(new Error('deadlock'));
 
       const executing = CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000004', () =>
         useCase.execute({

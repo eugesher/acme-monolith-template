@@ -26,21 +26,15 @@ describe('ProductStockCorePersistenceBuilder', () => {
 
   describe('forSumStock', () => {
     it('sums the stock of every given product under a shared lock', () => {
-      const builder = new ProductStockCorePersistenceBuilder(baseBuilder);
-
-      builder.forSumStock(['100', '101']);
+      const builder = new ProductStockCorePersistenceBuilder(baseBuilder).forSumStock([
+        '100',
+        '101',
+      ]);
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `ProductStock`.`productId` AS `productId`, SUM(`ProductStock`.`quantity`) AS `quantity` FROM `product_stock` `ProductStock` WHERE `ProductStock`.`productId` IN (?, ?) GROUP BY `ProductStock`.`productId` LOCK IN SHARE MODE',
         ['100', '101'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductStockCorePersistenceBuilder(baseBuilder);
-      const chained = builder.forSumStock(['100', '101']);
-
-      expect(chained).toBe(builder);
     });
   });
 });

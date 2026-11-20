@@ -1,41 +1,47 @@
-import { OrderNotFoundException, OrderTagNotFoundException } from '../../../domain';
+import {
+  OrderTagReplaceOutcomeEnum,
+  type IOrderReplaceTagsRepositoryPort,
+  type IOrderTagPort,
+  type IOrderTransactionPort,
+} from '../../../outbound';
 import { OrderReplaceTagsUseCase } from '../order-replace-tags.use-case';
 
 describe('OrderReplaceTagsUseCase', () => {
-  let outcomes: string[];
-  let lockById: jest.Mock;
-  let replace: jest.Mock;
-  let run: jest.Mock;
+  let calls: string[];
+  let repository: jest.Mocked<IOrderReplaceTagsRepositoryPort>;
+  let tag: jest.Mocked<IOrderTagPort>;
+  let transaction: jest.Mocked<IOrderTransactionPort>;
   let useCase: OrderReplaceTagsUseCase;
 
   beforeEach(() => {
-    outcomes = [];
-    lockById = jest.fn(() => {
-      outcomes.push('lock');
+    calls = [];
+    repository = { lockById: jest.fn() };
+    repository.lockById.mockImplementation(() => {
+      calls.push('lockById');
 
       return Promise.resolve({ id: '600' });
     });
-    replace = jest.fn(() => {
-      outcomes.push('replace');
+    tag = { find: jest.fn(), replace: jest.fn(), findOrderIds: jest.fn() };
+    tag.replace.mockImplementation(() => {
+      calls.push('replace');
 
       return Promise.resolve({
-        outcome: 'replaced',
+        outcome: OrderTagReplaceOutcomeEnum.REPLACED,
         tags: [{ id: '302', name: 'vip' }],
         missingTagIds: [],
       });
     });
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
-    useCase = new OrderReplaceTagsUseCase(
-      { lockById },
-      { find: jest.fn(), replace, findOrderIds: jest.fn() },
-      { run },
-    );
+    useCase = new OrderReplaceTagsUseCase(repository, tag, transaction);
   });
 
   describe('execute', () => {
@@ -43,30 +49,36 @@ describe('OrderReplaceTagsUseCase', () => {
       const view = await useCase.execute({ orderId: '600', tagIds: ['302'] });
 
       expect(view).toEqual({ tags: [{ id: '302', name: 'vip' }] });
-      expect(lockById).toHaveBeenCalledWith('600');
-      expect(replace).toHaveBeenCalledWith({ orderId: '600', tagIds: ['302'] });
-      expect(outcomes).toEqual(['lock', 'replace', 'commit']);
+      expect(repository.lockById).toHaveBeenCalledWith('600');
+      expect(tag.replace).toHaveBeenCalledWith({ orderId: '600', tagIds: ['302'] });
+      expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
     });
 
-    it('throws OrderNotFoundException and replaces nothing for an unknown order', async () => {
-      lockById.mockResolvedValue(null);
+    it('refuses an unknown order with ORDER_NOT_FOUND and replaces nothing', async () => {
+      repository.lockById.mockResolvedValue(null);
 
-      await expect(useCase.execute({ orderId: '999', tagIds: ['302'] })).rejects.toThrow(
-        OrderNotFoundException,
-      );
-      expect(replace).not.toHaveBeenCalled();
+      await expect(useCase.execute({ orderId: '999', tagIds: ['302'] })).rejects.toMatchObject({
+        code: 'ORDER_NOT_FOUND',
+        message: 'Order 999 was not found',
+      });
+      expect(tag.replace).not.toHaveBeenCalled();
     });
 
-    it('throws OrderTagNotFoundException with the missing tags, so the transaction rolls back', async () => {
-      replace.mockResolvedValue({ outcome: 'tag-not-found', tags: [], missingTagIds: ['999'] });
+    it('refuses missing tags with ORDER_TAG_NOT_FOUND and their ids, so the transaction rolls back', async () => {
+      tag.replace.mockResolvedValue({
+        outcome: OrderTagReplaceOutcomeEnum.TAG_NOT_FOUND,
+        tags: [],
+        missingTagIds: ['999'],
+      });
 
-      const error: unknown = await useCase
-        .execute({ orderId: '600', tagIds: ['302', '999'] })
-        .catch((caught: unknown) => caught);
+      const replacing = useCase.execute({ orderId: '600', tagIds: ['302', '999'] });
 
-      expect(error).toBeInstanceOf(OrderTagNotFoundException);
-      expect(error).toMatchObject({ details: { missingTagIds: ['999'] } });
-      expect(outcomes).not.toContain('commit');
+      await expect(replacing).rejects.toMatchObject({
+        code: 'ORDER_TAG_NOT_FOUND',
+        message: 'Some of the tags do not exist',
+        details: { missingTagIds: ['999'] },
+      });
+      expect(calls).not.toContain('commit');
     });
   });
 });

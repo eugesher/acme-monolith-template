@@ -3,10 +3,6 @@ import fs from 'fs';
 import { TlsHelper } from '../tls.helper';
 
 describe('TlsHelper', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('options', () => {
     it('reads the certificate authority from the path', () => {
       const readFileSync = jest

@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import type { HttpAdapterHost } from '@nestjs/core';
-import type { PinoLogger } from 'nestjs-pino';
 
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
@@ -36,7 +35,7 @@ describe('HttpExceptionFilter', () => {
           reply,
         },
       } as unknown as HttpAdapterHost,
-      logger as unknown as PinoLogger,
+      logger,
     );
   });
 

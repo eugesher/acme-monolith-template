@@ -1,20 +1,23 @@
+import { PermissionCodeEnum } from '@acme-libs/kernel';
+
 import { AuthGlobalValidateSubjectUseCase } from '../auth-global-validate-subject.use-case';
+import type { IAuthGlobalSubjectPort } from '../../../outbound';
 
 describe('AuthGlobalValidateSubjectUseCase', () => {
-  let findSubject: jest.Mock;
+  let subject: jest.Mocked<IAuthGlobalSubjectPort>;
   let useCase: AuthGlobalValidateSubjectUseCase;
 
   beforeEach(() => {
-    findSubject = jest.fn();
-    useCase = new AuthGlobalValidateSubjectUseCase({ findSubject });
+    subject = { findSubject: jest.fn() };
+    useCase = new AuthGlobalValidateSubjectUseCase(subject);
   });
 
   describe('execute', () => {
     it('answers the id, the email and the permission codes of the subject as the current user', async () => {
-      findSubject.mockResolvedValue({
+      subject.findSubject.mockResolvedValue({
         id: 'user-1',
         email: 'ann@example.com',
-        permissionCodes: ['ledger:read'],
+        permissionCodes: [PermissionCodeEnum.LEDGER_READ],
       });
 
       const user = await useCase.execute({ userId: 'user-1' });
@@ -24,11 +27,11 @@ describe('AuthGlobalValidateSubjectUseCase', () => {
         email: 'ann@example.com',
         permissionCodes: ['ledger:read'],
       });
-      expect(findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+      expect(subject.findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
     });
 
     it('answers no user when there is no active subject', async () => {
-      findSubject.mockResolvedValue(null);
+      subject.findSubject.mockResolvedValue(null);
 
       const user = await useCase.execute({ userId: 'user-1' });
 

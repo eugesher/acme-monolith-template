@@ -1,15 +1,17 @@
 import { AuthGlobalValidateSubjectUseCase } from '../auth-global-validate-subject.use-case';
+import type { IAuthGlobalValidateSubjectRepositoryPort } from '../../../outbound';
 
 describe('AuthGlobalValidateSubjectUseCase', () => {
-  let findActiveById: jest.Mock;
+  let repository: jest.Mocked<IAuthGlobalValidateSubjectRepositoryPort>;
   let useCase: AuthGlobalValidateSubjectUseCase;
 
   beforeEach(() => {
-    findActiveById = jest.fn().mockResolvedValue({
+    repository = { findActiveById: jest.fn() };
+    repository.findActiveById.mockResolvedValue({
       id: 'customer-1',
       email: 'ann@example.com',
     });
-    useCase = new AuthGlobalValidateSubjectUseCase({ findActiveById });
+    useCase = new AuthGlobalValidateSubjectUseCase(repository);
   });
 
   describe('execute', () => {
@@ -17,11 +19,11 @@ describe('AuthGlobalValidateSubjectUseCase', () => {
       const subject = await useCase.execute({ customerId: 'customer-1' });
 
       expect(subject).toEqual({ id: 'customer-1', email: 'ann@example.com' });
-      expect(findActiveById).toHaveBeenCalledWith('customer-1');
+      expect(repository.findActiveById).toHaveBeenCalledWith('customer-1');
     });
 
     it('returns nothing when no active customer matches', async () => {
-      findActiveById.mockResolvedValue(null);
+      repository.findActiveById.mockResolvedValue(null);
 
       const subject = await useCase.execute({ customerId: 'ghost' });
 

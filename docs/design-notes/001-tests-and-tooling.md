@@ -1,5 +1,8 @@
 # 001 — Tests and tooling
 
+This note covers the architecture specs of `spec/`. The unit specs next to the code follow
+`040-unit-specs.md`.
+
 ## `spec/` — architecture lint specs
 
 The architecture lint lives in `lint/`. `spec/architecture/*.spec.ts` keeps it honest: a rule that
@@ -11,9 +14,11 @@ rule has nothing left to complain about in the real tree.
 **Real config, no type information.** The matchers lint a fixture with `ESLint.lintText` against the
 real `eslint.config.mjs`, picked up from the repository root. Fixture paths are virtual and outside
 every `tsconfig.json` project, so `typescript-eslint`'s `disableTypeChecked` is laid over the
-config: type-aware rules would otherwise fail to parse the fixture. Only the architecture rules are
-counted (`boundaries/*`, `no-restricted-globals`, `no-restricted-imports`, `no-restricted-syntax`);
-style findings in a one-line fixture are noise.
+config: type-aware rules would otherwise fail to parse the fixture. Only the architecture rules run
+(`boundaries/*`, `no-restricted-globals`, `no-restricted-imports`, `no-restricted-syntax`), through
+the `ruleFilter` of `ESLint`: style findings in a one-line fixture are noise, and a type-aware rule
+of another plugin, such as `jest/unbound-method` on a `*.spec.ts` fixture, is not turned off by
+`disableTypeChecked` and would throw.
 
 **Type imports need the types.** `spec/architecture/type-imports.spec.ts` does not use these
 matchers: its rules ask the type checker. It scaffolds a file inside the root project and lints it

@@ -1,14 +1,16 @@
 import { TagCommonSubjectTypeEnum } from '@acme-staff/contracts/tag';
 
 import { TagCommonFindSubjectIdsUseCase } from '../tag-common-find-subject-ids.use-case';
+import type { ITagCommonFindSubjectIdsRepositoryPort } from '../../../outbound';
 
 describe('TagCommonFindSubjectIdsUseCase', () => {
-  let list: jest.Mock;
+  let repository: jest.Mocked<ITagCommonFindSubjectIdsRepositoryPort>;
   let useCase: TagCommonFindSubjectIdsUseCase;
 
   beforeEach(() => {
-    list = jest.fn().mockResolvedValue([{ subjectId: '100' }, { subjectId: '101' }]);
-    useCase = new TagCommonFindSubjectIdsUseCase({ list });
+    repository = { list: jest.fn() };
+    repository.list.mockResolvedValue([{ subjectId: '100' }, { subjectId: '101' }]);
+    useCase = new TagCommonFindSubjectIdsUseCase(repository);
   });
 
   describe('execute', () => {
@@ -18,7 +20,7 @@ describe('TagCommonFindSubjectIdsUseCase', () => {
         tagId: '300',
       });
 
-      expect(list).toHaveBeenCalledWith({ subjectType: 'product', tagId: '300' });
+      expect(repository.list).toHaveBeenCalledWith({ subjectType: 'product', tagId: '300' });
       expect(subjectIds).toEqual(['100', '101']);
     });
   });

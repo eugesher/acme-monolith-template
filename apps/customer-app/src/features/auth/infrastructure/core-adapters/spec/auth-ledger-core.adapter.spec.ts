@@ -1,12 +1,15 @@
+import type { ILedgerCorePort } from '@acme-core/contracts/ledger';
+
 import { AuthLedgerCoreAdapter } from '../auth-ledger-core.adapter';
 
 describe('AuthLedgerCoreAdapter', () => {
-  let handleEnqueue: jest.Mock;
+  let ledger: jest.Mocked<ILedgerCorePort>;
   let adapter: AuthLedgerCoreAdapter;
 
   beforeEach(() => {
-    handleEnqueue = jest.fn().mockResolvedValue(undefined);
-    adapter = new AuthLedgerCoreAdapter({ handleEnqueue });
+    ledger = { handleEnqueue: jest.fn() };
+    ledger.handleEnqueue.mockResolvedValue(undefined);
+    adapter = new AuthLedgerCoreAdapter(ledger);
   });
 
   describe('recordRegistered', () => {
@@ -16,8 +19,8 @@ describe('AuthLedgerCoreAdapter', () => {
         occurredAt: '2026-01-05T08:00:00.000Z',
       });
 
-      expect(handleEnqueue).toHaveBeenCalledTimes(1);
-      expect(handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
         operationKey: 'customer-registered:customer-1',
         subjectType: 'customer',
         subjectId: 'customer-1',

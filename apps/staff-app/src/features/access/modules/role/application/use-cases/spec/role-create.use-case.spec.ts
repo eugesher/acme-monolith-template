@@ -1,44 +1,45 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { RoleCreateStaffRoleInsertOutcomeEnum } from '../../../outbound';
+import {
+  RoleCreateStaffRoleInsertOutcomeEnum,
+  type IRoleCreateRepositoryPort,
+  type IRoleTransactionPort,
+} from '../../../outbound';
 import { RoleCreateUseCase } from '../role-create.use-case';
 
 describe('RoleCreateUseCase', () => {
-  let outcomes: string[];
-  let repository: { insertRole: jest.Mock; insertRolePermissions: jest.Mock };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
+  let calls: string[];
+  let repository: jest.Mocked<IRoleCreateRepositoryPort>;
+  let transaction: jest.Mocked<IRoleTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: RoleCreateUseCase;
 
   beforeEach(() => {
-    outcomes = [];
-    repository = {
-      insertRole: jest
-        .fn()
-        .mockResolvedValue({ outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: '7' }),
-      insertRolePermissions: jest.fn().mockResolvedValue(undefined),
-    };
-    transaction = {
-      afterCommit: jest.fn(),
-      run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+    calls = [];
+    repository = { insertRole: jest.fn(), insertRolePermissions: jest.fn() };
+    repository.insertRole.mockImplementation(() => {
+      calls.push('insertRole');
 
-        const result = await work();
+      return Promise.resolve({ outcome: RoleCreateStaffRoleInsertOutcomeEnum.INSERTED, id: '7' });
+    });
+    repository.insertRolePermissions.mockImplementation(() => {
+      calls.push('insertRolePermissions');
 
-        outcomes.push('commit');
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
 
-        return result;
-      }),
-    };
+      const result = await work();
+
+      calls.push('commit');
+
+      return result;
+    });
     logger = makePinoLoggerMock();
-    useCase = new RoleCreateUseCase(repository, transaction, logger as unknown as PinoLogger);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    useCase = new RoleCreateUseCase(repository, transaction, logger);
   });
 
   it('stores the role with its unique permission codes in one transaction', async () => {
@@ -61,7 +62,7 @@ describe('RoleCreateUseCase', () => {
       { roleId: '7', code: 'ledger:read' },
       { roleId: '7', code: 'order:read' },
     ]);
-    expect(outcomes).toEqual(['begin', 'commit']);
+    expect(calls).toEqual(['begin', 'insertRole', 'insertRolePermissions', 'commit']);
     expect(logger.info).toHaveBeenCalledWith({ id: '7' }, 'Role created');
   });
 
@@ -83,7 +84,8 @@ describe('RoleCreateUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN,
       message: 'Role name admin is already taken',
     });
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
+    expect(repository.insertRolePermissions).not.toHaveBeenCalled();
   });
 
   it('rethrows any other error of the repository', async () => {
@@ -104,7 +106,7 @@ describe('RoleCreateUseCase', () => {
     });
 
     await expect(create).rejects.toThrow('deadlock');
-    expect(outcomes).toEqual(['begin']);
+    expect(calls).not.toContain('commit');
     expect(logger.info).not.toHaveBeenCalled();
   });
 });

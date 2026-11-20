@@ -11,25 +11,27 @@ import type {
 
 describe('ProductStockPostSubtractProcessor', () => {
   let correlationIds: string[];
-  let execute: jest.Mock;
-  let report: jest.Mock;
+  let postSubtract: jest.Mocked<Pick<ProductStockPostSubtractUseCase, 'execute'>>;
+  let reportFailure: jest.Mocked<Pick<ProductStockPostSubtractReportFailureUseCase, 'execute'>>;
   let processor: ProductStockPostSubtractProcessor;
 
   beforeEach(() => {
     correlationIds = [];
-    execute = jest.fn().mockImplementation(() => {
+    postSubtract = { execute: jest.fn() };
+    postSubtract.execute.mockImplementation(() => {
       correlationIds.push(CorrelationContextHelper.current('ProductStockPostSubtractUseCase'));
 
       return Promise.resolve();
     });
-    report = jest.fn().mockImplementation(() => {
+    reportFailure = { execute: jest.fn() };
+    reportFailure.execute.mockImplementation(() => {
       correlationIds.push(
         CorrelationContextHelper.current('ProductStockPostSubtractReportFailureUseCase'),
       );
     });
     processor = new ProductStockPostSubtractProcessor(
-      { execute } as unknown as ProductStockPostSubtractUseCase,
-      { execute: report } as unknown as ProductStockPostSubtractReportFailureUseCase,
+      postSubtract as unknown as ProductStockPostSubtractUseCase,
+      reportFailure as unknown as ProductStockPostSubtractReportFailureUseCase,
     );
   });
 
@@ -39,12 +41,12 @@ describe('ProductStockPostSubtractProcessor', () => {
         data: { productIds: ['100', '106'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
       } as Job<IProductStockPostSubtractPayload>);
 
-      expect(execute).toHaveBeenCalledWith({ productIds: ['100', '106'] });
+      expect(postSubtract.execute).toHaveBeenCalledWith({ productIds: ['100', '106'] });
       expect(correlationIds).toEqual(['c0ffee00-0000-4000-8000-000000000001']);
     });
 
     it('passes a failing check through, so Bull retries the job', async () => {
-      execute.mockRejectedValue(new Error('deadlock'));
+      postSubtract.execute.mockRejectedValue(new Error('deadlock'));
 
       const handling = processor.handleRecord({
         data: { productIds: ['100'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
@@ -68,7 +70,7 @@ describe('ProductStockPostSubtractProcessor', () => {
         new Error('deadlock'),
       );
 
-      expect(report).toHaveBeenCalledWith({
+      expect(reportFailure.execute).toHaveBeenCalledWith({
         productIds: ['100', '106'],
         attempt: 2,
         attempts: 3,
@@ -87,7 +89,7 @@ describe('ProductStockPostSubtractProcessor', () => {
         new Error('deadlock'),
       );
 
-      expect(report).toHaveBeenCalledWith({
+      expect(reportFailure.execute).toHaveBeenCalledWith({
         productIds: ['100'],
         attempt: 1,
         attempts: 1,

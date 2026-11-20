@@ -1,56 +1,56 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { UserReassignRolesUseCase } from '../user-reassign-roles.use-case';
+import type { IUserReassignRolesRepositoryPort, IUserTransactionPort } from '../../../outbound';
 
 describe('UserReassignRolesUseCase', () => {
-  let outcomes: string[];
-  let repository: {
-    existsUser: jest.Mock;
-    findRoles: jest.Mock;
-    deleteUserRolesExcept: jest.Mock;
-    insertUserRolesIgnore: jest.Mock;
-  };
-  let transaction: { run: jest.Mock; afterCommit: jest.Mock };
+  let calls: string[];
+  let repository: jest.Mocked<IUserReassignRolesRepositoryPort>;
+  let transaction: jest.Mocked<IUserTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: UserReassignRolesUseCase;
 
   beforeEach(() => {
-    outcomes = [];
+    calls = [];
     repository = {
-      existsUser: jest.fn().mockResolvedValue(true),
-      findRoles: jest.fn().mockResolvedValue([{ id: '2' }, { id: '3' }]),
-      deleteUserRolesExcept: jest.fn(() => {
-        outcomes.push('delete');
-
-        return Promise.resolve();
-      }),
-      insertUserRolesIgnore: jest.fn(() => {
-        outcomes.push('insert');
-
-        return Promise.resolve();
-      }),
+      existsUser: jest.fn(),
+      findRoles: jest.fn(),
+      deleteUserRolesExcept: jest.fn(),
+      insertUserRolesIgnore: jest.fn(),
     };
-    transaction = {
-      afterCommit: jest.fn(),
-      run: jest.fn(async (work: () => Promise<unknown>) => {
-        outcomes.push('begin');
+    repository.existsUser.mockImplementation(() => {
+      calls.push('existsUser');
 
-        const result = await work();
+      return Promise.resolve(true);
+    });
+    repository.findRoles.mockImplementation(() => {
+      calls.push('findRoles');
 
-        outcomes.push('commit');
+      return Promise.resolve([{ id: '2' }, { id: '3' }]);
+    });
+    repository.deleteUserRolesExcept.mockImplementation(() => {
+      calls.push('deleteUserRolesExcept');
 
-        return result;
-      }),
-    };
+      return Promise.resolve();
+    });
+    repository.insertUserRolesIgnore.mockImplementation(() => {
+      calls.push('insertUserRolesIgnore');
+
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
+
+      const result = await work();
+
+      calls.push('commit');
+
+      return result;
+    });
     logger = makePinoLoggerMock();
-    useCase = new UserReassignRolesUseCase(
-      repository,
-      transaction,
-      logger as unknown as PinoLogger,
-    );
+    useCase = new UserReassignRolesUseCase(repository, transaction, logger);
   });
 
   it('deletes the other roles and inserts the given ones in one transaction', async () => {
@@ -65,7 +65,14 @@ describe('UserReassignRolesUseCase', () => {
       { userId: 'user-1', roleId: '2' },
       { userId: 'user-1', roleId: '3' },
     ]);
-    expect(outcomes).toEqual(['begin', 'delete', 'insert', 'commit']);
+    expect(calls).toEqual([
+      'existsUser',
+      'findRoles',
+      'begin',
+      'deleteUserRolesExcept',
+      'insertUserRolesIgnore',
+      'commit',
+    ]);
     expect(logger.info).toHaveBeenCalledWith(
       { id: 'user-1', userRoles: [{ roleId: '2' }, { roleId: '3' }] },
       'Roles reassigned',
@@ -90,7 +97,7 @@ describe('UserReassignRolesUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
       message: 'Role 99 was not found',
     });
-    expect(transaction.run).not.toHaveBeenCalled();
+    expect(calls).toEqual(['existsUser', 'findRoles']);
   });
 
   it('clears the roles with an empty list', async () => {

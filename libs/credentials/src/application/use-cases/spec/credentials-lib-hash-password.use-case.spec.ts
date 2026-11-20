@@ -1,18 +1,20 @@
 import { CredentialsLibHashPasswordUseCase } from '../credentials-lib-hash-password.use-case';
+import type { ICredentialsLibPasswordHasherPort } from '../../../outbound';
 
 describe('CredentialsLibHashPasswordUseCase', () => {
-  let hash: jest.Mock;
+  let passwordHasher: jest.Mocked<ICredentialsLibPasswordHasherPort>;
   let useCase: CredentialsLibHashPasswordUseCase;
 
   beforeEach(() => {
-    hash = jest.fn().mockResolvedValue('argon-hash');
-    useCase = new CredentialsLibHashPasswordUseCase({ hash, verify: jest.fn() });
+    passwordHasher = { hash: jest.fn(), verify: jest.fn() };
+    passwordHasher.hash.mockResolvedValue('argon-hash');
+    useCase = new CredentialsLibHashPasswordUseCase(passwordHasher);
   });
 
   it('hashes the password', async () => {
     const passwordHash = await useCase.execute('correct-horse-battery');
 
     expect(passwordHash).toBe('argon-hash');
-    expect(hash).toHaveBeenCalledWith('correct-horse-battery');
+    expect(passwordHasher.hash).toHaveBeenCalledWith('correct-horse-battery');
   });
 });

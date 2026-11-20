@@ -1,21 +1,24 @@
+import { PermissionCodeEnum } from '@acme-libs/kernel';
+import type { IStaffAuthCorePort } from '@acme-core/contracts/staff-auth';
+
 import { AuthGlobalSubjectCoreAdapter } from '../auth-global-subject-core.adapter';
 
 describe('AuthGlobalSubjectCoreAdapter', () => {
-  let handleFindSubject: jest.Mock;
+  let staffAuthCore: jest.Mocked<IStaffAuthCorePort>;
   let adapter: AuthGlobalSubjectCoreAdapter;
 
   beforeEach(() => {
-    handleFindSubject = jest.fn();
-    adapter = new AuthGlobalSubjectCoreAdapter({ handleFindSubject });
+    staffAuthCore = { handleFindSubject: jest.fn() };
+    adapter = new AuthGlobalSubjectCoreAdapter(staffAuthCore);
   });
 
   describe('findSubject', () => {
     it('answers the id, the email and the permission codes of the subject the core finds', async () => {
-      handleFindSubject.mockResolvedValue({
+      staffAuthCore.handleFindSubject.mockResolvedValue({
         id: 'user-1',
         email: 'ann@example.com',
         roles: ['admin'],
-        permissionCodes: ['ledger:read'],
+        permissionCodes: [PermissionCodeEnum.LEDGER_READ],
       });
 
       const subject = await adapter.findSubject({ userId: 'user-1' });
@@ -25,11 +28,11 @@ describe('AuthGlobalSubjectCoreAdapter', () => {
         email: 'ann@example.com',
         permissionCodes: ['ledger:read'],
       });
-      expect(handleFindSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+      expect(staffAuthCore.handleFindSubject).toHaveBeenCalledWith({ userId: 'user-1' });
     });
 
     it('answers no subject when the core finds no active staff user', async () => {
-      handleFindSubject.mockResolvedValue(null);
+      staffAuthCore.handleFindSubject.mockResolvedValue(null);
 
       const subject = await adapter.findSubject({ userId: 'user-1' });
 

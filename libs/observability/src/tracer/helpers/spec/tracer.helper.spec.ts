@@ -30,7 +30,6 @@ describe('TracerHelper', () => {
   afterEach(() => {
     process.env = env;
     jest.clearAllMocks();
-    jest.restoreAllMocks();
   });
 
   describe('start', () => {

@@ -1,19 +1,18 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { NoteCreateUseCase } from '../note-create.use-case';
 import type { INoteCreateCandidate } from '../../../domain';
+import type { INoteCreateRepositoryPort } from '../../../outbound';
 
 describe('NoteCreateUseCase', () => {
-  let insert: jest.Mock;
-  let findInserted: jest.Mock;
+  let repository: jest.Mocked<INoteCreateRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: NoteCreateUseCase;
 
   beforeEach(() => {
-    insert = jest.fn().mockResolvedValue('7');
-    findInserted = jest.fn().mockResolvedValue({
+    repository = { insert: jest.fn(), findInserted: jest.fn() };
+    repository.insert.mockResolvedValue('7');
+    repository.findInserted.mockResolvedValue({
       id: '7',
       subjectType: 'product',
       subjectId: '42',
@@ -25,7 +24,7 @@ describe('NoteCreateUseCase', () => {
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
     logger = makePinoLoggerMock();
-    useCase = new NoteCreateUseCase({ insert, findInserted }, logger as unknown as PinoLogger);
+    useCase = new NoteCreateUseCase(repository, logger);
   });
 
   describe('execute', () => {
@@ -36,7 +35,7 @@ describe('NoteCreateUseCase', () => {
         body: ' Check the supplier ',
         authorId: 'admin-1',
       });
-      const [note] = insert.mock.calls[0] as [INoteCreateCandidate];
+      const [note] = repository.insert.mock.calls[0] as [INoteCreateCandidate];
 
       expect(note.subjectId).toBe('42');
       expect(note.body).toBe('Check the supplier');
@@ -68,7 +67,7 @@ describe('NoteCreateUseCase', () => {
           authorId: 'admin-1',
         }),
       ).rejects.toMatchObject({ code: 'NOTE_SUBJECT_INVALID' });
-      expect(insert).not.toHaveBeenCalled();
+      expect(repository.insert).not.toHaveBeenCalled();
       expect(logger.info).not.toHaveBeenCalled();
     });
   });

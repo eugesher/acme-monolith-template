@@ -210,7 +210,8 @@ for the core ledger. `spec/architecture/e2e-sections.spec.ts` checks these edges
 
 The e2e code turns off `no-unsafe-argument`, `no-unsafe-assignment` and `no-unsafe-member-access`
 (`lint/configs/e2e.mjs`): a response body and a query result are untyped by nature, and the snapshot
-is what checks their shape.
+is what checks their shape. The same config adapts three test rules to the sections and the root
+`afterEach` (see `015-quality-gates.md`).
 
 ## HTTP collection
 

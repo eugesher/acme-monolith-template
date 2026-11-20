@@ -1,31 +1,32 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { QueueRetryFailedJobUseCase } from '../queue-retry-failed-job.use-case';
+import type { IQueueRegistryPort } from '../../../outbound';
 import type { QueueFailedJobService } from '../../services/queue-failed-job.service';
 
 describe('QueueRetryFailedJobUseCase', () => {
-  let ensure: jest.Mock;
-  let retryJob: jest.Mock;
+  let failedJobService: jest.Mocked<Pick<QueueFailedJobService, 'ensure'>>;
+  let registry: jest.Mocked<IQueueRegistryPort>;
   let logger: PinoLoggerMock;
   let useCase: QueueRetryFailedJobUseCase;
 
   beforeEach(() => {
-    ensure = jest.fn().mockResolvedValue(undefined);
-    retryJob = jest.fn().mockResolvedValue(undefined);
+    failedJobService = { ensure: jest.fn() };
+    failedJobService.ensure.mockResolvedValue(undefined);
+    registry = {
+      has: jest.fn(),
+      listJobCounts: jest.fn(),
+      findFailedJobs: jest.fn(),
+      findJobState: jest.fn(),
+      retryJob: jest.fn(),
+      removeJob: jest.fn(),
+    };
+    registry.retryJob.mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
     useCase = new QueueRetryFailedJobUseCase(
-      { ensure } as unknown as QueueFailedJobService,
-      {
-        has: jest.fn(),
-        listJobCounts: jest.fn(),
-        findFailedJobs: jest.fn(),
-        findJobState: jest.fn(),
-        retryJob,
-        removeJob: jest.fn(),
-      },
-      logger as unknown as PinoLogger,
+      failedJobService as unknown as QueueFailedJobService,
+      registry,
+      logger,
     );
   });
 
@@ -33,8 +34,11 @@ describe('QueueRetryFailedJobUseCase', () => {
     it('retries the job once it is known to be failed and logs who retried it', async () => {
       await useCase.execute({ queueName: 'ledger-record', jobId: '7', staffUserId: '1' });
 
-      expect(ensure).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
-      expect(retryJob).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
+      expect(failedJobService.ensure).toHaveBeenCalledWith({
+        queueName: 'ledger-record',
+        jobId: '7',
+      });
+      expect(registry.retryJob).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
       expect(logger.info).toHaveBeenCalledWith(
         { queueName: 'ledger-record', jobId: '7', staffUserId: '1' },
         'Failed job returned to the queue',
@@ -42,12 +46,12 @@ describe('QueueRetryFailedJobUseCase', () => {
     });
 
     it('retries nothing when the check refuses the job', async () => {
-      ensure.mockRejectedValue(new Error('not failed'));
+      failedJobService.ensure.mockRejectedValue(new Error('not failed'));
 
       await expect(
         useCase.execute({ queueName: 'ledger-record', jobId: '7', staffUserId: '1' }),
       ).rejects.toThrow('not failed');
-      expect(retryJob).not.toHaveBeenCalled();
+      expect(registry.retryJob).not.toHaveBeenCalled();
       expect(logger.info).not.toHaveBeenCalled();
     });
   });

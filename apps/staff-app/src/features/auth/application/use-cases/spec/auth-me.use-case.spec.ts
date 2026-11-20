@@ -1,27 +1,32 @@
 import { AuthBaseException } from '../../../domain';
 import { AuthMeUseCase } from '../auth-me.use-case';
+import type { IAuthIdentityPort } from '../../../outbound';
 
 describe('AuthMeUseCase', () => {
-  let findSubject: jest.Mock;
+  let identity: jest.Mocked<IAuthIdentityPort>;
   let useCase: AuthMeUseCase;
 
   beforeEach(() => {
-    findSubject = jest.fn();
-    useCase = new AuthMeUseCase({ findSubject });
+    identity = { findSubject: jest.fn() };
+    useCase = new AuthMeUseCase(identity);
   });
 
   describe('execute', () => {
     it('answers the id, the email and the roles identity reads for the user', async () => {
-      findSubject.mockResolvedValue({ id: 'user-1', email: 'ann@example.com', roles: ['admin'] });
+      identity.findSubject.mockResolvedValue({
+        id: 'user-1',
+        email: 'ann@example.com',
+        roles: ['admin'],
+      });
 
       const me = await useCase.execute({ userId: 'user-1' });
 
       expect(me).toEqual({ id: 'user-1', email: 'ann@example.com', roles: ['admin'] });
-      expect(findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+      expect(identity.findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
     });
 
     it('refuses with AUTH_USER_NOT_FOUND when identity no longer knows an active user', async () => {
-      findSubject.mockResolvedValue(null);
+      identity.findSubject.mockResolvedValue(null);
 
       const execution = useCase.execute({ userId: 'user-1' });
 

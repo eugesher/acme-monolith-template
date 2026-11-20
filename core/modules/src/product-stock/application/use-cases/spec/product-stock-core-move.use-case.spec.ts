@@ -1,41 +1,44 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { ProductStockCoreMovementKindEnum } from '@acme-core/contracts/product-stock';
 
 import { ProductStockCoreMoveUseCase } from '../product-stock-core-move.use-case';
+import type {
+  IProductStockCoreMoveRepositoryPort,
+  IProductStockCorePostSubtractPort,
+  IProductStockCoreTransactionPort,
+} from '../../../outbound';
 
 describe('ProductStockCoreMoveUseCase', () => {
-  let lockProducts: jest.Mock;
-  let insertMany: jest.Mock;
-  let sumStock: jest.Mock;
-  let enqueue: jest.Mock;
-  let afterCommit: jest.Mock;
+  let repository: jest.Mocked<IProductStockCoreMoveRepositoryPort>;
+  let postSubtract: jest.Mocked<IProductStockCorePostSubtractPort>;
+  let transaction: jest.Mocked<IProductStockCoreTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: ProductStockCoreMoveUseCase;
 
   beforeEach(() => {
-    lockProducts = jest.fn().mockResolvedValue([{ id: '100' }, { id: '103' }]);
-    insertMany = jest.fn().mockResolvedValue([
+    repository = { lockProducts: jest.fn(), insertMany: jest.fn(), sumStock: jest.fn() };
+    repository.lockProducts.mockResolvedValue([{ id: '100' }, { id: '103' }]);
+    repository.insertMany.mockResolvedValue([
       { id: '700', createdAt: new Date('2026-01-05T08:00:00.000Z') },
       { id: '701', createdAt: new Date('2026-01-05T08:00:00.000Z') },
       { id: '702', createdAt: new Date('2026-01-05T08:00:00.000Z') },
     ]);
-    sumStock = jest.fn().mockResolvedValue([
+    repository.sumStock.mockResolvedValue([
       { productId: '100', quantity: 6 },
       { productId: '103', quantity: 2 },
     ]);
-    enqueue = jest.fn().mockResolvedValue(undefined);
-    afterCommit = jest.fn();
+    postSubtract = { enqueue: jest.fn() };
+    postSubtract.enqueue.mockResolvedValue();
+    transaction = { run: jest.fn(), afterCommit: jest.fn() };
     logger = makePinoLoggerMock();
     useCase = new ProductStockCoreMoveUseCase(
-      { lockProducts, insertMany, sumStock },
-      { enqueue },
-      { run: jest.fn(), afterCommit },
+      repository,
+      postSubtract,
+      transaction,
       2,
       500,
-      logger as unknown as PinoLogger,
+      logger,
     );
   });
 
@@ -50,13 +53,13 @@ describe('ProductStockCoreMoveUseCase', () => {
         ],
       });
 
-      expect(lockProducts).toHaveBeenCalledWith(['100', '103']);
-      expect(insertMany).toHaveBeenCalledWith([
+      expect(repository.lockProducts).toHaveBeenCalledWith(['100', '103']);
+      expect(repository.insertMany).toHaveBeenCalledWith([
         { productId: '100', quantity: 5, orderProductId: null },
         { productId: '103', quantity: 2, orderProductId: null },
         { productId: '100', quantity: 1, orderProductId: null },
       ]);
-      expect(sumStock).toHaveBeenCalledWith(['100', '103']);
+      expect(repository.sumStock).toHaveBeenCalledWith(['100', '103']);
       expect(view).toEqual({
         productStocks: [
           { id: '700', createdAt: '2026-01-05T08:00:00.000Z' },
@@ -79,7 +82,7 @@ describe('ProductStockCoreMoveUseCase', () => {
         ],
       });
 
-      expect(insertMany).toHaveBeenCalledWith([
+      expect(repository.insertMany).toHaveBeenCalledWith([
         { productId: '100', quantity: -1, orderProductId: '620' },
         { productId: '103', quantity: -1, orderProductId: '621' },
       ]);
@@ -91,16 +94,16 @@ describe('ProductStockCoreMoveUseCase', () => {
         movements: [{ productId: '100', quantity: 5, orderProductId: null }],
       });
 
-      expect(lockProducts.mock.invocationCallOrder[0]).toBeLessThan(
-        insertMany.mock.invocationCallOrder[0],
+      expect(repository.lockProducts.mock.invocationCallOrder[0]).toBeLessThan(
+        repository.insertMany.mock.invocationCallOrder[0],
       );
-      expect(insertMany.mock.invocationCallOrder[0]).toBeLessThan(
-        sumStock.mock.invocationCallOrder[0],
+      expect(repository.insertMany.mock.invocationCallOrder[0]).toBeLessThan(
+        repository.sumStock.mock.invocationCallOrder[0],
       );
     });
 
     it('lets a failed lock reject before it writes', async () => {
-      lockProducts.mockRejectedValue(new Error('lock wait timeout'));
+      repository.lockProducts.mockRejectedValue(new Error('lock wait timeout'));
 
       const move = useCase.execute({
         kind: ProductStockCoreMovementKindEnum.ADD,
@@ -108,7 +111,7 @@ describe('ProductStockCoreMoveUseCase', () => {
       });
 
       await expect(move).rejects.toThrow('lock wait timeout');
-      expect(insertMany).not.toHaveBeenCalled();
+      expect(repository.insertMany).not.toHaveBeenCalled();
     });
 
     it('announces the subtracted products after the commit, under the correlation id of the request', async () => {
@@ -122,13 +125,13 @@ describe('ProductStockCoreMoveUseCase', () => {
         }),
       );
 
-      const [hook] = afterCommit.mock.calls[0] as [() => Promise<void>];
+      const [hook] = transaction.afterCommit.mock.calls[0];
 
-      expect(enqueue).not.toHaveBeenCalled();
+      expect(postSubtract.enqueue).not.toHaveBeenCalled();
 
       await hook();
 
-      expect(enqueue).toHaveBeenCalledWith({
+      expect(postSubtract.enqueue).toHaveBeenCalledWith({
         productIds: ['100'],
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
         timeoutMs: 500,
@@ -136,7 +139,7 @@ describe('ProductStockCoreMoveUseCase', () => {
     });
 
     it('retries a failed announcement and logs it for a replay once the budget is spent', async () => {
-      enqueue.mockRejectedValue(new Error('redis is down'));
+      postSubtract.enqueue.mockRejectedValue(new Error('redis is down'));
 
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
@@ -145,11 +148,11 @@ describe('ProductStockCoreMoveUseCase', () => {
         }),
       );
 
-      const [hook] = afterCommit.mock.calls[0] as [() => Promise<void>];
+      const [hook] = transaction.afterCommit.mock.calls[0];
 
       await hook();
 
-      expect(enqueue).toHaveBeenCalledTimes(2);
+      expect(postSubtract.enqueue).toHaveBeenCalledTimes(2);
       expect(logger.error).toHaveBeenCalledWith(
         {
           err: new Error('redis is down'),
@@ -166,7 +169,7 @@ describe('ProductStockCoreMoveUseCase', () => {
         movements: [{ productId: '100', quantity: 5, orderProductId: null }],
       });
 
-      expect(afterCommit).not.toHaveBeenCalled();
+      expect(transaction.afterCommit).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,22 +1,25 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { CacheLibDelByPrefixUseCase } from '../cache-lib-del-by-prefix.use-case';
-import type { ICacheLibTracerPort, ICacheLibTracerSpanCommand } from '../../../outbound';
+import type {
+  ICacheLibStorePort,
+  ICacheLibTracerPort,
+  ICacheLibTracerSpanCommand,
+} from '../../../outbound';
 
 describe('CacheLibDelByPrefixUseCase', () => {
-  let unlinkByPrefix: jest.Mock;
+  let store: jest.Mocked<ICacheLibStorePort>;
   let spans: { name: string; attributes: ICacheLibTracerSpanCommand<unknown>['attributes'] }[];
   let logger: PinoLoggerMock;
   let useCase: CacheLibDelByPrefixUseCase;
 
   beforeEach(() => {
-    unlinkByPrefix = jest.fn().mockResolvedValue(2);
+    store = { get: jest.fn(), set: jest.fn(), unlinkByPrefix: jest.fn() };
+    store.unlinkByPrefix.mockResolvedValue(2);
     spans = [];
     logger = makePinoLoggerMock();
     useCase = new CacheLibDelByPrefixUseCase(
-      { get: jest.fn(), set: jest.fn(), unlinkByPrefix },
+      store,
       {
         span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
           const attributes = { ...command.attributes };
@@ -26,7 +29,7 @@ describe('CacheLibDelByPrefixUseCase', () => {
           return await command.work(attributes);
         },
       } as ICacheLibTracerPort,
-      logger as unknown as PinoLogger,
+      logger,
     );
   });
 
@@ -34,7 +37,7 @@ describe('CacheLibDelByPrefixUseCase', () => {
     const unlinked = await useCase.execute('acme:r:1:');
 
     expect(unlinked).toBe(2);
-    expect(unlinkByPrefix).toHaveBeenCalledWith('acme:r:1:');
+    expect(store.unlinkByPrefix).toHaveBeenCalledWith('acme:r:1:');
     expect(spans).toEqual([
       {
         name: 'cache.delByPrefix',
@@ -44,7 +47,7 @@ describe('CacheLibDelByPrefixUseCase', () => {
   });
 
   it('logs a failed invalidation and returns 0 instead of failing the caller', async () => {
-    unlinkByPrefix.mockRejectedValue(new Error('scan failed'));
+    store.unlinkByPrefix.mockRejectedValue(new Error('scan failed'));
 
     const unlinked = await useCase.execute('acme:r:1:');
 

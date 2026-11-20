@@ -5,7 +5,6 @@ import { CorrelationIdHelper } from '../correlation-id.helper';
 
 describe('CorrelationIdHelper', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
     Object.assign(PinoLogger, { root: undefined });
   });
 

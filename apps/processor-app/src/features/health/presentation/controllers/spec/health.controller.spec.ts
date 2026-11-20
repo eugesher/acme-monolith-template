@@ -1,24 +1,34 @@
+import {
+  HealthDependencyStatusEnum,
+  HealthLivenessStatusEnum,
+  HealthReadinessStatusEnum,
+} from '@acme-libs/kernel';
+
 import { HealthController } from '../health.controller';
 import type { HealthLivenessUseCase, HealthReadinessUseCase } from '../../../application';
 
 describe('HealthController', () => {
-  let liveness: jest.Mock;
-  let readiness: jest.Mock;
+  let liveness: jest.Mocked<Pick<HealthLivenessUseCase, 'execute'>>;
+  let readiness: jest.Mocked<Pick<HealthReadinessUseCase, 'execute'>>;
   let response: { status: jest.Mock };
   let controller: HealthController;
 
   beforeEach(() => {
-    liveness = jest.fn();
-    readiness = jest.fn();
+    liveness = { execute: jest.fn() };
+    readiness = { execute: jest.fn() };
     response = { status: jest.fn() };
     controller = new HealthController(
-      { execute: liveness } as unknown as HealthLivenessUseCase,
-      { execute: readiness } as unknown as HealthReadinessUseCase,
+      liveness as unknown as HealthLivenessUseCase,
+      readiness as unknown as HealthReadinessUseCase,
     );
   });
 
   it('answers liveness with the view of the use case', () => {
-    liveness.mockReturnValue({ status: 'ok', app: 'processor-app', uptimeSeconds: 7 });
+    liveness.execute.mockReturnValue({
+      status: HealthLivenessStatusEnum.OK,
+      app: 'processor-app',
+      uptimeSeconds: 7,
+    });
 
     const body = controller.handleLiveness();
 
@@ -26,12 +36,12 @@ describe('HealthController', () => {
   });
 
   it('answers 200 with the dependencies when ready', async () => {
-    readiness.mockResolvedValue({
-      status: 'ready',
+    readiness.execute.mockResolvedValue({
+      status: HealthReadinessStatusEnum.READY,
       app: 'processor-app',
       dependencies: {
-        database: { status: 'ok', latencyMs: 2 },
-        cache: { status: 'ok', latencyMs: 1 },
+        database: { status: HealthDependencyStatusEnum.OK, latencyMs: 2 },
+        cache: { status: HealthDependencyStatusEnum.OK, latencyMs: 1 },
       },
     });
 
@@ -49,12 +59,12 @@ describe('HealthController', () => {
   });
 
   it('answers 503 with the dependencies when not ready', async () => {
-    readiness.mockResolvedValue({
-      status: 'not-ready',
+    readiness.execute.mockResolvedValue({
+      status: HealthReadinessStatusEnum.NOT_READY,
       app: 'processor-app',
       dependencies: {
-        database: { status: 'ok', latencyMs: 2 },
-        cache: { status: 'error', latencyMs: null },
+        database: { status: HealthDependencyStatusEnum.OK, latencyMs: 2 },
+        cache: { status: HealthDependencyStatusEnum.ERROR, latencyMs: null },
       },
     });
 

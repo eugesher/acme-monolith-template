@@ -1,18 +1,20 @@
 import { CredentialsLibSignAccessTokenUseCase } from '../credentials-lib-sign-access-token.use-case';
+import type { ICredentialsLibAccessTokenPort } from '../../../outbound';
 
 describe('CredentialsLibSignAccessTokenUseCase', () => {
-  let sign: jest.Mock;
+  let accessToken: jest.Mocked<ICredentialsLibAccessTokenPort>;
   let useCase: CredentialsLibSignAccessTokenUseCase;
 
   beforeEach(() => {
-    sign = jest.fn().mockResolvedValue('access-token');
-    useCase = new CredentialsLibSignAccessTokenUseCase({ sign });
+    accessToken = { sign: jest.fn() };
+    accessToken.sign.mockResolvedValue('access-token');
+    useCase = new CredentialsLibSignAccessTokenUseCase(accessToken);
   });
 
   it('signs an access token for the subject', async () => {
-    const accessToken = await useCase.execute({ sub: 'user-1' });
+    const token = await useCase.execute({ sub: 'user-1' });
 
-    expect(accessToken).toBe('access-token');
-    expect(sign).toHaveBeenCalledWith({ sub: 'user-1' });
+    expect(token).toBe('access-token');
+    expect(accessToken.sign).toHaveBeenCalledWith({ sub: 'user-1' });
   });
 });

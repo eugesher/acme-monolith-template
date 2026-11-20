@@ -1,14 +1,17 @@
 import { NoteGetRevisionsUseCase } from '../note-get-revisions.use-case';
+import type { INoteGetRevisionsRepositoryPort } from '../../../outbound';
 import type { NoteAccessService } from '../../services/note-access.service';
 
 describe('NoteGetRevisionsUseCase', () => {
-  let assertOwned: jest.Mock;
-  let listForNote: jest.Mock;
+  let accessService: jest.Mocked<Pick<NoteAccessService, 'assertOwned'>>;
+  let repository: jest.Mocked<INoteGetRevisionsRepositoryPort>;
   let useCase: NoteGetRevisionsUseCase;
 
   beforeEach(() => {
-    assertOwned = jest.fn().mockResolvedValue(undefined);
-    listForNote = jest.fn().mockResolvedValue([
+    accessService = { assertOwned: jest.fn() };
+    accessService.assertOwned.mockResolvedValue(undefined);
+    repository = { listForNote: jest.fn() };
+    repository.listForNote.mockResolvedValue([
       [
         {
           id: '11',
@@ -23,17 +26,18 @@ describe('NoteGetRevisionsUseCase', () => {
       ],
       1,
     ]);
-    useCase = new NoteGetRevisionsUseCase({ assertOwned } as unknown as NoteAccessService, {
-      listForNote,
-    });
+    useCase = new NoteGetRevisionsUseCase(
+      accessService as unknown as NoteAccessService,
+      repository,
+    );
   });
 
   describe('execute', () => {
     it('answers a page of the revisions of an existing note', async () => {
       const page = await useCase.execute({ noteId: '7', authorId: 'admin-1', page: 2, limit: 5 });
 
-      expect(assertOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
-      expect(listForNote).toHaveBeenCalledWith({ limit: 5, offset: 5, noteId: '7' });
+      expect(accessService.assertOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
+      expect(repository.listForNote).toHaveBeenCalledWith({ limit: 5, offset: 5, noteId: '7' });
       expect(page).toEqual({
         page: 2,
         limit: 5,
@@ -56,12 +60,12 @@ describe('NoteGetRevisionsUseCase', () => {
     });
 
     it('refuses the revisions of a missing note before listing them', async () => {
-      assertOwned.mockRejectedValue(new Error('Note 7 was not found'));
+      accessService.assertOwned.mockRejectedValue(new Error('Note 7 was not found'));
 
       await expect(
         useCase.execute({ noteId: '7', authorId: 'admin-1', page: undefined, limit: undefined }),
       ).rejects.toThrow('Note 7 was not found');
-      expect(listForNote).not.toHaveBeenCalled();
+      expect(repository.listForNote).not.toHaveBeenCalled();
     });
   });
 });

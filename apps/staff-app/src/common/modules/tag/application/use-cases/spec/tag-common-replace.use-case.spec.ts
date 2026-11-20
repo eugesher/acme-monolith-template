@@ -1,42 +1,54 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 import { TagCommonSubjectTypeEnum } from '@acme-staff/contracts/tag';
 
 import { TagCommonReplaceUseCase } from '../tag-common-replace.use-case';
+import type { ITagCommonReplaceRepositoryPort, ITagCommonTransactionPort } from '../../../outbound';
 
 describe('TagCommonReplaceUseCase', () => {
-  let outcomes: string[];
-  let lockTags: jest.Mock;
-  let findLinked: jest.Mock;
-  let link: jest.Mock;
-  let unlink: jest.Mock;
-  let run: jest.Mock;
+  let calls: string[];
+  let repository: jest.Mocked<ITagCommonReplaceRepositoryPort>;
+  let transaction: jest.Mocked<ITagCommonTransactionPort>;
   let logger: PinoLoggerMock;
   let useCase: TagCommonReplaceUseCase;
 
   beforeEach(() => {
-    outcomes = [];
-    lockTags = jest.fn().mockResolvedValue([
-      { id: '301', name: 'promo' },
-      { id: '302', name: 'vip' },
-    ]);
-    findLinked = jest.fn().mockResolvedValue([{ tagId: '300' }, { tagId: '301' }]);
-    link = jest.fn(() => Promise.resolve(void outcomes.push('link')));
-    unlink = jest.fn(() => Promise.resolve(void outcomes.push('unlink')));
-    run = jest.fn(async (work: () => Promise<unknown>) => {
+    calls = [];
+    repository = { lockTags: jest.fn(), findLinked: jest.fn(), link: jest.fn(), unlink: jest.fn() };
+    repository.lockTags.mockImplementation(() => {
+      calls.push('lockTags');
+
+      return Promise.resolve([
+        { id: '301', name: 'promo' },
+        { id: '302', name: 'vip' },
+      ]);
+    });
+    repository.findLinked.mockImplementation(() => {
+      calls.push('findLinked');
+
+      return Promise.resolve([{ tagId: '300' }, { tagId: '301' }]);
+    });
+    repository.link.mockImplementation(() => {
+      calls.push('link');
+
+      return Promise.resolve();
+    });
+    repository.unlink.mockImplementation(() => {
+      calls.push('unlink');
+
+      return Promise.resolve();
+    });
+    transaction = { run: jest.fn() };
+    transaction.run.mockImplementation(async (work) => {
+      calls.push('begin');
+
       const result = await work();
 
-      outcomes.push('commit');
+      calls.push('commit');
 
       return result;
     });
     logger = makePinoLoggerMock();
-    useCase = new TagCommonReplaceUseCase(
-      { lockTags, findLinked, link, unlink },
-      { run },
-      logger as unknown as PinoLogger,
-    );
+    useCase = new TagCommonReplaceUseCase(repository, transaction, logger);
   });
 
   describe('execute', () => {
@@ -55,19 +67,22 @@ describe('TagCommonReplaceUseCase', () => {
         ],
         missingTagIds: [],
       });
-      expect(lockTags).toHaveBeenCalledWith(['302', '301']);
-      expect(findLinked).toHaveBeenCalledWith({ subjectType: 'product', subjectId: '100' });
-      expect(unlink).toHaveBeenCalledWith({
+      expect(repository.lockTags).toHaveBeenCalledWith(['302', '301']);
+      expect(repository.findLinked).toHaveBeenCalledWith({
+        subjectType: 'product',
+        subjectId: '100',
+      });
+      expect(repository.unlink).toHaveBeenCalledWith({
         subjectType: 'product',
         subjectId: '100',
         tagIds: ['300'],
       });
-      expect(link).toHaveBeenCalledWith({
+      expect(repository.link).toHaveBeenCalledWith({
         subjectType: 'product',
         subjectId: '100',
         tagIds: ['302'],
       });
-      expect(outcomes).toEqual(['unlink', 'link', 'commit']);
+      expect(calls).toEqual(['begin', 'lockTags', 'findLinked', 'unlink', 'link', 'commit']);
       expect(logger.info).toHaveBeenCalledWith(
         {
           subjectType: 'product',
@@ -90,14 +105,12 @@ describe('TagCommonReplaceUseCase', () => {
         tags: [],
         missingTagIds: ['998', '999'],
       });
-      expect(findLinked).not.toHaveBeenCalled();
-      expect(link).not.toHaveBeenCalled();
-      expect(unlink).not.toHaveBeenCalled();
+      expect(calls).toEqual(['begin', 'lockTags', 'commit']);
       expect(logger.info).not.toHaveBeenCalled();
     });
 
     it('clears the tags of the subject for an empty list', async () => {
-      lockTags.mockResolvedValue([]);
+      repository.lockTags.mockResolvedValue([]);
 
       const view = await useCase.execute({
         subjectType: TagCommonSubjectTypeEnum.ORDER,
@@ -106,16 +119,20 @@ describe('TagCommonReplaceUseCase', () => {
       });
 
       expect(view).toEqual({ outcome: 'replaced', tags: [], missingTagIds: [] });
-      expect(unlink).toHaveBeenCalledWith({
+      expect(repository.unlink).toHaveBeenCalledWith({
         subjectType: 'order',
         subjectId: '600',
         tagIds: ['300', '301'],
       });
-      expect(link).toHaveBeenCalledWith({ subjectType: 'order', subjectId: '600', tagIds: [] });
+      expect(repository.link).toHaveBeenCalledWith({
+        subjectType: 'order',
+        subjectId: '600',
+        tagIds: [],
+      });
     });
 
     it('does not commit when a write fails', async () => {
-      link.mockRejectedValue(new Error('connection lost'));
+      repository.link.mockRejectedValue(new Error('connection lost'));
 
       await expect(
         useCase.execute({
@@ -124,12 +141,12 @@ describe('TagCommonReplaceUseCase', () => {
           tagIds: ['301', '302'],
         }),
       ).rejects.toThrow('connection lost');
-      expect(outcomes).toEqual(['unlink']);
+      expect(calls).not.toContain('commit');
       expect(logger.info).not.toHaveBeenCalled();
     });
 
     it('neither links nor commits when the unlink fails', async () => {
-      unlink.mockRejectedValue(new Error('connection lost'));
+      repository.unlink.mockRejectedValue(new Error('connection lost'));
 
       await expect(
         useCase.execute({
@@ -138,8 +155,8 @@ describe('TagCommonReplaceUseCase', () => {
           tagIds: ['301', '302'],
         }),
       ).rejects.toThrow('connection lost');
-      expect(link).not.toHaveBeenCalled();
-      expect(outcomes).toEqual([]);
+      expect(repository.link).not.toHaveBeenCalled();
+      expect(calls).not.toContain('commit');
     });
   });
 });

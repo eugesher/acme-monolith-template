@@ -34,6 +34,14 @@ hands every call to `TRANSACTION_PORT`. Only infrastructure may import
 a transaction of someone else declare it (see below); every other port has `run` alone, so a use
 case that owns its transaction cannot register a hook, and the mock of its spec has `run` alone too.
 
+**A spec sees the boundary in one journal.** The fake `run` of a use case spec pushes `begin` into
+an array `calls` before the work and `commit` after it, and every port mock pushes the name of its
+method. The main case asserts the whole journal, so it shows what runs before the transaction (an
+idempotency claim, a password hash), what runs inside it in which order (the lock first), and what
+runs after the commit (a ledger record, a cache invalidation). A case that fails inside the work
+asserts that `calls` holds no `commit`. A fake that only calls `work()` cannot tell a write inside
+the transaction from one after the commit.
+
 ## `run`
 
 `run` wraps `TransactionHost.withTransaction`. A repository reads its tables through `ORM_PORT`

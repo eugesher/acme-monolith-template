@@ -27,7 +27,7 @@ describe('ProductGetOneModel', () => {
     it.each([
       ['zero', 0],
       ['a fraction', 1.5],
-    ])('refuses a version of %s with PRODUCT_VERSION_INVALID', (_, version) => {
+    ])('refuses a version of %s with PRODUCT_VERSION_INVALID', (_case, version) => {
       expect(() =>
         ProductGetOneModel.reconstitute({
           id: '12',
@@ -132,7 +132,7 @@ describe('ProductGetOneModel', () => {
     it.each([
       ['no If-Match', undefined],
       ['the current version', 3],
-    ])('accepts %s', (_, expectedVersion) => {
+    ])('accepts %s', (_case, expectedVersion) => {
       expect(() => product.assertExpectedVersion(expectedVersion)).not.toThrow();
     });
 

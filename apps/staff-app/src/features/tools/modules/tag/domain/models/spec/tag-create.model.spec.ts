@@ -1,4 +1,3 @@
-import { TagNameInvalidException } from '../../exceptions/tag-name-invalid.exception';
 import { TagCreateModel } from '../tag-create.model';
 
 describe('TagCreateModel', () => {
@@ -14,7 +13,12 @@ describe('TagCreateModel', () => {
       ['a name of spaces', '   '],
       ['a name of 65 characters', 'a'.repeat(65)],
     ])('rejects %s', (_case, name) => {
-      expect(() => TagCreateModel.initCandidate({ name })).toThrow(TagNameInvalidException);
+      expect(() => TagCreateModel.initCandidate({ name })).toThrow(
+        expect.objectContaining({
+          code: 'TAG_NAME_INVALID',
+          message: 'Tag.name must be a non-empty string of at most 64 characters',
+        }) as Error,
+      );
     });
 
     it('accepts a name of 64 characters', () => {

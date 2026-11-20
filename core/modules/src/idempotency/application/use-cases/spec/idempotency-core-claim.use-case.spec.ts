@@ -1,30 +1,22 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdempotencyStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import {
   IdempotencyCoreClaimInsertOutcomeEnum,
-  type IIdempotencyCoreClaimInsertQuery,
+  type IIdempotencyCoreClaimRepositoryPort,
 } from '../../../outbound';
 import { IdempotencyCoreClaimUseCase } from '../idempotency-core-claim.use-case';
 
 describe('IdempotencyCoreClaimUseCase', () => {
-  let repository: { insert: jest.Mock; findByKey: jest.Mock };
+  let repository: jest.Mocked<IIdempotencyCoreClaimRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: IdempotencyCoreClaimUseCase;
 
   beforeEach(() => {
-    repository = {
-      insert: jest.fn().mockResolvedValue(IdempotencyCoreClaimInsertOutcomeEnum.INSERTED),
-      findByKey: jest.fn(),
-    };
+    repository = { insert: jest.fn(), findByKey: jest.fn() };
+    repository.insert.mockResolvedValue(IdempotencyCoreClaimInsertOutcomeEnum.INSERTED);
     logger = makePinoLoggerMock();
-    useCase = new IdempotencyCoreClaimUseCase(repository, logger as unknown as PinoLogger);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    useCase = new IdempotencyCoreClaimUseCase(repository, logger);
   });
 
   describe('execute', () => {
@@ -34,7 +26,7 @@ describe('IdempotencyCoreClaimUseCase', () => {
         key: 'key-1',
         body: { sku: 'A-1', name: 'Lamp' },
       });
-      const [command] = repository.insert.mock.calls[0] as [IIdempotencyCoreClaimInsertQuery];
+      const [command] = repository.insert.mock.calls[0];
 
       expect(claim).toEqual({ outcome: 'claimed', storedResponse: undefined });
       expect(command).toEqual({

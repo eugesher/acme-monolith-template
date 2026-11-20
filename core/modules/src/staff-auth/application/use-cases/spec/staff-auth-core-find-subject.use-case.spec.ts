@@ -1,16 +1,22 @@
+import { PermissionCodeEnum } from '@acme-libs/kernel';
+
 import { StaffAuthCoreFindSubjectUseCase } from '../staff-auth-core-find-subject.use-case';
+import type { IStaffAuthCoreFindSubjectRepositoryPort } from '../../../outbound';
 
 describe('StaffAuthCoreFindSubjectUseCase', () => {
-  let findActiveById: jest.Mock;
+  let repository: jest.Mocked<IStaffAuthCoreFindSubjectRepositoryPort>;
   let useCase: StaffAuthCoreFindSubjectUseCase;
 
   beforeEach(() => {
-    findActiveById = jest.fn().mockResolvedValue({
+    repository = { findActiveById: jest.fn() };
+    repository.findActiveById.mockResolvedValue({
       id: 'user-1',
       email: 'editor@example.com',
-      userRoles: [{ role: { name: 'editor', rolePermissions: [{ code: 'ledger:read' }] } }],
+      userRoles: [
+        { role: { name: 'editor', rolePermissions: [{ code: PermissionCodeEnum.LEDGER_READ }] } },
+      ],
     });
-    useCase = new StaffAuthCoreFindSubjectUseCase({ findActiveById });
+    useCase = new StaffAuthCoreFindSubjectUseCase(repository);
   });
 
   describe('execute', () => {
@@ -23,11 +29,11 @@ describe('StaffAuthCoreFindSubjectUseCase', () => {
         roles: ['editor'],
         permissionCodes: ['ledger:read'],
       });
-      expect(findActiveById).toHaveBeenCalledWith('user-1');
+      expect(repository.findActiveById).toHaveBeenCalledWith('user-1');
     });
 
     it('answers null when no active user matches', async () => {
-      findActiveById.mockResolvedValue(null);
+      repository.findActiveById.mockResolvedValue(null);
 
       const subject = await useCase.execute({ userId: 'ghost' });
 

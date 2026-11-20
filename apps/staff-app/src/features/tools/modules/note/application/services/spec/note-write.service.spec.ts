@@ -1,5 +1,3 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { NoteEditModel, type INoteReconstitute } from '../../../domain';
@@ -7,14 +5,14 @@ import { NoteWriteService } from '../note-write.service';
 import type { NoteAccessService } from '../note-access.service';
 
 describe('NoteWriteService', () => {
-  let loadOwned: jest.Mock;
+  let accessService: jest.Mocked<Pick<NoteAccessService, 'loadOwned'>>;
   let save: jest.Mock;
   let logger: PinoLoggerMock;
   let service: NoteWriteService;
 
   beforeEach(() => {
-    loadOwned = jest
-      .fn()
+    accessService = { loadOwned: jest.fn() };
+    accessService.loadOwned
       .mockImplementationOnce(
         (_command: unknown, reconstitute: (record: INoteReconstitute) => unknown) =>
           Promise.resolve(
@@ -49,11 +47,7 @@ describe('NoteWriteService', () => {
       );
     save = jest.fn().mockResolvedValue(true);
     logger = makePinoLoggerMock();
-    service = new NoteWriteService(
-      { loadOwned } as unknown as NoteAccessService,
-      5,
-      logger as unknown as PinoLogger,
-    );
+    service = new NoteWriteService(accessService as unknown as NoteAccessService, 5, logger);
   });
 
   describe('write', () => {
@@ -67,7 +61,7 @@ describe('NoteWriteService', () => {
 
       const [[saveCommand]] = save.mock.calls as [[{ note: NoteEditModel; versionAsRead: number }]];
 
-      expect(loadOwned).toHaveBeenNthCalledWith(
+      expect(accessService.loadOwned).toHaveBeenNthCalledWith(
         1,
         { noteId: '7', authorId: 'admin-1' },
         NoteEditModel.reconstitute,
@@ -77,7 +71,7 @@ describe('NoteWriteService', () => {
         body: 'Supplier confirmed',
         version: 4,
       });
-      expect(loadOwned).toHaveBeenNthCalledWith(
+      expect(accessService.loadOwned).toHaveBeenNthCalledWith(
         2,
         { noteId: '7', authorId: 'admin-1' },
         NoteEditModel.reconstitute,
@@ -96,7 +90,7 @@ describe('NoteWriteService', () => {
       );
 
       expect(save).not.toHaveBeenCalled();
-      expect(loadOwned).toHaveBeenCalledTimes(1);
+      expect(accessService.loadOwned).toHaveBeenCalledTimes(1);
       expect(written.note.version).toBe(3);
       expect(written.answer).toBe(false);
     });
@@ -112,7 +106,7 @@ describe('NoteWriteService', () => {
       );
 
       expect(save).toHaveBeenCalledTimes(2);
-      expect(loadOwned).toHaveBeenCalledTimes(4);
+      expect(accessService.loadOwned).toHaveBeenCalledTimes(4);
       expect(written.note.version).toBe(4);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '7', version: 4, attempt: 1, maxAttempts: 5 },
@@ -184,7 +178,7 @@ describe('NoteWriteService', () => {
           save,
         ),
       ).rejects.toMatchObject({ code: 'NOTE_BODY_INVALID' });
-      expect(loadOwned).toHaveBeenCalledTimes(1);
+      expect(accessService.loadOwned).toHaveBeenCalledTimes(1);
     });
   });
 });

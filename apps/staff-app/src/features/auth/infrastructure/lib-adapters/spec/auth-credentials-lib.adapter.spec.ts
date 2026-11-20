@@ -1,34 +1,34 @@
+import type { ICredentialsLibPort } from '@acme-libs/contracts/credentials';
+
 import { AuthCredentialsLibAdapter } from '../auth-credentials-lib.adapter';
 
 describe('AuthCredentialsLibAdapter', () => {
-  let handleSignAccessToken: jest.Mock;
-  let handleVerifyPassword: jest.Mock;
+  let credentials: jest.Mocked<ICredentialsLibPort>;
   let adapter: AuthCredentialsLibAdapter;
 
   beforeEach(() => {
-    handleSignAccessToken = jest.fn();
-    handleVerifyPassword = jest.fn();
-    adapter = new AuthCredentialsLibAdapter({
-      handleSignAccessToken,
+    credentials = {
+      handleSignAccessToken: jest.fn(),
       handleHashPassword: jest.fn(),
-      handleVerifyPassword,
-    });
+      handleVerifyPassword: jest.fn(),
+    };
+    adapter = new AuthCredentialsLibAdapter(credentials);
   });
 
   describe('issueAccessToken', () => {
     it('signs a token whose subject is the user', async () => {
-      handleSignAccessToken.mockResolvedValue('access-token');
+      credentials.handleSignAccessToken.mockResolvedValue('access-token');
 
       const accessToken = await adapter.issueAccessToken('user-1');
 
       expect(accessToken).toBe('access-token');
-      expect(handleSignAccessToken).toHaveBeenCalledWith({ sub: 'user-1' });
+      expect(credentials.handleSignAccessToken).toHaveBeenCalledWith({ sub: 'user-1' });
     });
   });
 
   describe('verifyPassword', () => {
     it('checks the password against its hash with the credentials lib', async () => {
-      handleVerifyPassword.mockResolvedValue(true);
+      credentials.handleVerifyPassword.mockResolvedValue(true);
 
       const valid = await adapter.verifyPassword({
         passwordHash: 'argon-hash',
@@ -36,7 +36,7 @@ describe('AuthCredentialsLibAdapter', () => {
       });
 
       expect(valid).toBe(true);
-      expect(handleVerifyPassword).toHaveBeenCalledWith({
+      expect(credentials.handleVerifyPassword).toHaveBeenCalledWith({
         passwordHash: 'argon-hash',
         password: 'correct-horse',
       });

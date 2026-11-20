@@ -94,18 +94,22 @@ describe('libs', () => {
       'toolkit',
     ];
 
-    for (const to of libs.filter((lib) => lib !== from)) {
-      if (allowed.includes(to)) {
-        await expect({
-          file: `libs/${from}/src/__fixture__.ts`,
-          code: `import { x } from "../../${to}/src";`,
-        }).toPassArchitectureLint();
-      } else {
-        await expect({
-          file: `libs/${from}/src/__fixture__.ts`,
-          code: `import { x } from "../../${to}/src";`,
-        }).toBreakRule('boundaries/dependencies');
-      }
+    const others = libs.filter((lib) => lib !== from);
+    const reachable = others.filter((lib) => allowed.includes(lib));
+    const unreachable = others.filter((lib) => !allowed.includes(lib));
+
+    for (const to of reachable) {
+      await expect({
+        file: `libs/${from}/src/__fixture__.ts`,
+        code: `import { x } from "../../${to}/src";`,
+      }).toPassArchitectureLint();
+    }
+
+    for (const to of unreachable) {
+      await expect({
+        file: `libs/${from}/src/__fixture__.ts`,
+        code: `import { x } from "../../${to}/src";`,
+      }).toBreakRule('boundaries/dependencies');
     }
   });
 
@@ -157,18 +161,21 @@ describe('libs', () => {
   ])('%s may import only the contracts of %j', async (from, allowed) => {
     const contracts = ['auth', 'cache', 'credentials', 'database', 'health', 'local-storage'];
 
-    for (const to of contracts) {
-      if (allowed.includes(to)) {
-        await expect({
-          file: `libs/${from}/src/infrastructure/__fixture__.ts`,
-          code: `import { x } from "../../../contracts/src/${to}";`,
-        }).toPassArchitectureLint();
-      } else {
-        await expect({
-          file: `libs/${from}/src/infrastructure/__fixture__.ts`,
-          code: `import { x } from "../../../contracts/src/${to}";`,
-        }).toBreakRule('boundaries/dependencies');
-      }
+    const reachable = contracts.filter((contract) => allowed.includes(contract));
+    const unreachable = contracts.filter((contract) => !allowed.includes(contract));
+
+    for (const to of reachable) {
+      await expect({
+        file: `libs/${from}/src/infrastructure/__fixture__.ts`,
+        code: `import { x } from "../../../contracts/src/${to}";`,
+      }).toPassArchitectureLint();
+    }
+
+    for (const to of unreachable) {
+      await expect({
+        file: `libs/${from}/src/infrastructure/__fixture__.ts`,
+        code: `import { x } from "../../../contracts/src/${to}";`,
+      }).toBreakRule('boundaries/dependencies');
     }
   });
 

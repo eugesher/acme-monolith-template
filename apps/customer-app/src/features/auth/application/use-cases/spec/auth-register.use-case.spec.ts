@@ -1,47 +1,38 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { AuthRegisterCustomerInsertOutcomeEnum } from '../../../outbound';
+import {
+  AuthRegisterCustomerInsertOutcomeEnum,
+  type IAuthCredentialsPort,
+  type IAuthLedgerPort,
+  type IAuthRegisterRepositoryPort,
+} from '../../../outbound';
 import { AuthRegisterUseCase } from '../auth-register.use-case';
 
 describe('AuthRegisterUseCase', () => {
-  let recordRegistered: jest.Mock;
-  let repository: { insert: jest.Mock };
-  let credentials: {
-    issueAccessToken: jest.Mock;
-    hashPassword: jest.Mock;
-    verifyPassword: jest.Mock;
-  };
+  let ledger: jest.Mocked<IAuthLedgerPort>;
+  let repository: jest.Mocked<IAuthRegisterRepositoryPort>;
+  let credentials: jest.Mocked<IAuthCredentialsPort>;
   let logger: PinoLoggerMock;
   let useCase: AuthRegisterUseCase;
 
   beforeEach(() => {
-    recordRegistered = jest.fn().mockResolvedValue(undefined);
-    repository = {
-      insert: jest.fn().mockResolvedValue({
-        outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED,
-        id: '105',
-        createdAt: new Date('2026-01-05T08:00:00.000Z'),
-      }),
-    };
+    ledger = { recordRegistered: jest.fn() };
+    ledger.recordRegistered.mockResolvedValue(undefined);
+    repository = { insert: jest.fn() };
+    repository.insert.mockResolvedValue({
+      outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED,
+      id: '105',
+      createdAt: new Date('2026-01-05T08:00:00.000Z'),
+    });
     credentials = {
       issueAccessToken: jest.fn(),
-      hashPassword: jest.fn().mockResolvedValue('argon-hash'),
+      hashPassword: jest.fn(),
       verifyPassword: jest.fn(),
     };
+    credentials.hashPassword.mockResolvedValue('argon-hash');
     logger = makePinoLoggerMock();
-    useCase = new AuthRegisterUseCase(
-      repository,
-      credentials,
-      { recordRegistered },
-      logger as unknown as PinoLogger,
-    );
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    useCase = new AuthRegisterUseCase(repository, credentials, ledger, logger);
   });
 
   it('hashes the password and stores an active customer', async () => {
@@ -98,14 +89,14 @@ describe('AuthRegisterUseCase', () => {
   it('records the registered customer in the ledger', async () => {
     await useCase.execute({ email: 'Eve@Example.com', password: 'correct-horse-battery' });
 
-    expect(recordRegistered).toHaveBeenCalledWith({
+    expect(ledger.recordRegistered).toHaveBeenCalledWith({
       subjectId: '105',
       occurredAt: '2026-01-05T08:00:00.000Z',
     });
   });
 
   it('lets a failed ledger record reject', async () => {
-    recordRegistered.mockRejectedValue(new Error('redis is down'));
+    ledger.recordRegistered.mockRejectedValue(new Error('redis is down'));
 
     const register = useCase.execute({
       email: 'eve@example.com',
@@ -124,6 +115,6 @@ describe('AuthRegisterUseCase', () => {
     });
 
     await expect(execution).rejects.toThrow('Email eve@example.com is already registered');
-    expect(recordRegistered).not.toHaveBeenCalled();
+    expect(ledger.recordRegistered).not.toHaveBeenCalled();
   });
 });

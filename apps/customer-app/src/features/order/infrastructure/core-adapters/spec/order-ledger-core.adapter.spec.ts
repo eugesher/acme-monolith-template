@@ -1,12 +1,15 @@
+import type { ILedgerCorePort } from '@acme-core/contracts/ledger';
+
 import { OrderLedgerCoreAdapter } from '../order-ledger-core.adapter';
 
 describe('OrderLedgerCoreAdapter', () => {
-  let handleEnqueue: jest.Mock;
+  let ledger: jest.Mocked<ILedgerCorePort>;
   let adapter: OrderLedgerCoreAdapter;
 
   beforeEach(() => {
-    handleEnqueue = jest.fn().mockResolvedValue(undefined);
-    adapter = new OrderLedgerCoreAdapter({ handleEnqueue });
+    ledger = { handleEnqueue: jest.fn() };
+    ledger.handleEnqueue.mockResolvedValue(undefined);
+    adapter = new OrderLedgerCoreAdapter(ledger);
   });
 
   describe('recordPlaced', () => {
@@ -23,8 +26,8 @@ describe('OrderLedgerCoreAdapter', () => {
         },
       });
 
-      expect(handleEnqueue).toHaveBeenCalledTimes(1);
-      expect(handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
         operationKey: 'order-placed:610',
         subjectType: 'order',
         subjectId: '610',

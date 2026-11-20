@@ -1,19 +1,19 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { TagDeleteModel } from '../../../domain';
 import { TagDeleteUseCase } from '../tag-delete.use-case';
+import type { ITagDeleteRepositoryPort } from '../../../outbound';
 import type { TagAccessService } from '../../services/tag-access.service';
 
 describe('TagDeleteUseCase', () => {
-  let load: jest.Mock;
-  let remove: jest.Mock;
+  let accessService: jest.Mocked<Pick<TagAccessService, 'load'>>;
+  let repository: jest.Mocked<ITagDeleteRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: TagDeleteUseCase;
 
   beforeEach(() => {
-    load = jest.fn().mockResolvedValue(
+    accessService = { load: jest.fn() };
+    accessService.load.mockResolvedValue(
       TagDeleteModel.reconstitute({
         id: '300',
         name: 'fragile',
@@ -21,12 +21,13 @@ describe('TagDeleteUseCase', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       }),
     );
-    remove = jest.fn().mockResolvedValue(undefined);
+    repository = { delete: jest.fn() };
+    repository.delete.mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
     useCase = new TagDeleteUseCase(
-      { load } as unknown as TagAccessService,
-      { delete: remove },
-      logger as unknown as PinoLogger,
+      accessService as unknown as TagAccessService,
+      repository,
+      logger,
     );
   });
 
@@ -34,16 +35,19 @@ describe('TagDeleteUseCase', () => {
     it('deletes an existing tag', async () => {
       await expect(useCase.execute({ tagId: '300' })).resolves.toBeUndefined();
 
-      expect(load).toHaveBeenCalledWith({ tagId: '300' }, TagDeleteModel.reconstitute);
-      expect(remove).toHaveBeenCalledWith('300');
+      expect(accessService.load).toHaveBeenCalledWith(
+        { tagId: '300' },
+        TagDeleteModel.reconstitute,
+      );
+      expect(repository.delete).toHaveBeenCalledWith('300');
       expect(logger.info).toHaveBeenCalledWith({ id: '300' }, 'Tag deleted');
     });
 
     it('deletes nothing for an unknown tag', async () => {
-      load.mockRejectedValue(new Error('not found'));
+      accessService.load.mockRejectedValue(new Error('not found'));
 
       await expect(useCase.execute({ tagId: '999' })).rejects.toThrow('not found');
-      expect(remove).not.toHaveBeenCalled();
+      expect(repository.delete).not.toHaveBeenCalled();
     });
   });
 });

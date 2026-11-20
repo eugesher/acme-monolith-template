@@ -2,22 +2,22 @@ import { AuthController } from '../auth.controller';
 import type { AuthLoginUseCase, AuthRegisterUseCase } from '../../../application';
 
 describe('AuthController', () => {
-  let register: jest.Mock;
-  let login: jest.Mock;
+  let register: jest.Mocked<Pick<AuthRegisterUseCase, 'execute'>>;
+  let login: jest.Mocked<Pick<AuthLoginUseCase, 'execute'>>;
   let controller: AuthController;
 
   beforeEach(() => {
-    register = jest.fn();
-    login = jest.fn();
+    register = { execute: jest.fn() };
+    login = { execute: jest.fn() };
     controller = new AuthController(
-      { execute: register } as unknown as AuthRegisterUseCase,
-      { execute: login } as unknown as AuthLoginUseCase,
+      register as unknown as AuthRegisterUseCase,
+      login as unknown as AuthLoginUseCase,
     );
   });
 
   describe('handleRegister', () => {
     it('answers the customer the register use case created', async () => {
-      register.mockResolvedValue({ id: 'customer-1', email: 'eve@example.com' });
+      register.execute.mockResolvedValue({ id: 'customer-1', email: 'eve@example.com' });
 
       const response = await controller.handleRegister({
         email: 'eve@example.com',
@@ -25,7 +25,7 @@ describe('AuthController', () => {
       });
 
       expect(response).toEqual({ id: 'customer-1', email: 'eve@example.com' });
-      expect(register).toHaveBeenCalledWith({
+      expect(register.execute).toHaveBeenCalledWith({
         email: 'eve@example.com',
         password: 'long-enough-password',
       });
@@ -34,7 +34,7 @@ describe('AuthController', () => {
 
   describe('handleLogin', () => {
     it('answers the access token of the login use case', async () => {
-      login.mockResolvedValue({ accessToken: 'access-1' });
+      login.execute.mockResolvedValue({ accessToken: 'access-1' });
 
       const response = await controller.handleLogin({
         email: 'ann@example.com',
@@ -42,7 +42,7 @@ describe('AuthController', () => {
       });
 
       expect(response).toEqual({ accessToken: 'access-1' });
-      expect(login).toHaveBeenCalledWith({ email: 'ann@example.com', password: 'secret' });
+      expect(login.execute).toHaveBeenCalledWith({ email: 'ann@example.com', password: 'secret' });
     });
   });
 

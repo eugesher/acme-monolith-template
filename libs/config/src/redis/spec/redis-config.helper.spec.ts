@@ -18,10 +18,6 @@ describe('RedisConfigHelper', () => {
     config = { getOrThrow: (key: string) => values[key] } as unknown as ConfigService;
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('connection', () => {
     it('answers the address and the password of REDIS_* without TLS for an empty REDIS_TLS_CA', () => {
       const connection = RedisConfigHelper.connection(config);

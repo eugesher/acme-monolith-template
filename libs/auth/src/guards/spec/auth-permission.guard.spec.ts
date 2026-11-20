@@ -36,21 +36,23 @@ describe('AuthPermissionGuard', () => {
     expect(allowed).toBe(true);
   });
 
-  it('refuses a user holding none of the required permissions with 403', () => {
-    request = { user: { id: 'user-1', permissionCodes: ['product:read'] } };
+  it.each([
+    [
+      'a user holding none of the required permissions',
+      { user: { id: 'user-1', permissionCodes: ['product:read'] } },
+    ],
+    ['a user whose validator gave no permissions', { user: { id: 'user-1' } }],
+    ['an anonymous request on a gated route', {}],
+  ])('refuses %s with 403', (_case, gatedRequest) => {
+    request = gatedRequest;
 
-    expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
-  });
+    const canActivate = (): unknown => guard.canActivate(context);
 
-  it('refuses a user whose validator gave no permissions with 403', () => {
-    request = { user: { id: 'user-1' } };
-
-    expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
-  });
-
-  it('refuses an anonymous request on a gated route with 403', () => {
-    request = {};
-
-    expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
+    expect(canActivate).toThrow(ForbiddenException);
+    expect(canActivate).toThrow(
+      expect.objectContaining({
+        response: { statusCode: 403, message: 'Insufficient permissions', error: 'Forbidden' },
+      }) as Error,
+    );
   });
 });

@@ -1,41 +1,35 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { TagNameInvalidException, TagNameTakenException } from '../../../domain';
-import { TagCreateInsertOutcomeEnum } from '../../../outbound';
+import { TagCreateInsertOutcomeEnum, type ITagCreateRepositoryPort } from '../../../outbound';
 import { TagCreateUseCase } from '../tag-create.use-case';
 
 describe('TagCreateUseCase', () => {
-  let insert: jest.Mock;
-  let findInserted: jest.Mock;
+  let repository: jest.Mocked<ITagCreateRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: TagCreateUseCase;
 
   beforeEach(() => {
-    insert = jest
-      .fn()
-      .mockResolvedValue({ outcome: TagCreateInsertOutcomeEnum.INSERTED, id: '303' });
-    findInserted = jest.fn().mockResolvedValue({
+    repository = { insert: jest.fn(), findInserted: jest.fn() };
+    repository.insert.mockResolvedValue({
+      outcome: TagCreateInsertOutcomeEnum.INSERTED,
+      id: '303',
+    });
+    repository.findInserted.mockResolvedValue({
       id: '303',
       name: 'heavy',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
     logger = makePinoLoggerMock();
-    useCase = new TagCreateUseCase({ insert, findInserted }, logger as unknown as PinoLogger);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    useCase = new TagCreateUseCase(repository, logger);
   });
 
   describe('execute', () => {
     it('stores the trimmed name and answers the stored tag', async () => {
       const view = await useCase.execute({ name: ' heavy ' });
 
-      expect(insert).toHaveBeenCalledWith({ name: 'heavy' });
-      expect(findInserted).toHaveBeenCalledWith('303');
+      expect(repository.insert).toHaveBeenCalledWith({ name: 'heavy' });
+      expect(repository.findInserted).toHaveBeenCalledWith('303');
       expect(view).toEqual({
         id: '303',
         name: 'heavy',
@@ -45,20 +39,26 @@ describe('TagCreateUseCase', () => {
       expect(logger.info).toHaveBeenCalledWith({ id: '303', name: 'heavy' }, 'Tag created');
     });
 
-    it('throws TagNameInvalidException and stores nothing for an empty name', async () => {
-      await expect(useCase.execute({ name: ' ' })).rejects.toThrow(TagNameInvalidException);
-      expect(insert).not.toHaveBeenCalled();
+    it('refuses an empty name with TAG_NAME_INVALID and stores nothing', async () => {
+      await expect(useCase.execute({ name: ' ' })).rejects.toMatchObject({
+        code: 'TAG_NAME_INVALID',
+        message: 'Tag.name must be a non-empty string of at most 64 characters',
+      });
+      expect(repository.insert).not.toHaveBeenCalled();
     });
 
-    it('turns a duplicate key into TagNameTakenException', async () => {
-      insert.mockResolvedValue({ outcome: TagCreateInsertOutcomeEnum.DUPLICATE });
+    it('turns a duplicate key into TAG_NAME_TAKEN', async () => {
+      repository.insert.mockResolvedValue({ outcome: TagCreateInsertOutcomeEnum.DUPLICATE });
 
-      await expect(useCase.execute({ name: 'fragile' })).rejects.toThrow(TagNameTakenException);
-      expect(findInserted).not.toHaveBeenCalled();
+      await expect(useCase.execute({ name: 'fragile' })).rejects.toMatchObject({
+        code: 'TAG_NAME_TAKEN',
+        message: 'A tag named fragile already exists',
+      });
+      expect(repository.findInserted).not.toHaveBeenCalled();
     });
 
     it('rethrows any other error of the insert', async () => {
-      insert.mockRejectedValue(new Error('connection lost'));
+      repository.insert.mockRejectedValue(new Error('connection lost'));
 
       await expect(useCase.execute({ name: 'fragile' })).rejects.toThrow('connection lost');
     });

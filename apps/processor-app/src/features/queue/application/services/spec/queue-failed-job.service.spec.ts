@@ -1,43 +1,47 @@
 import { QueueFailedJobService } from '../queue-failed-job.service';
+import type { IQueueRegistryPort } from '../../../outbound';
 
 describe('QueueFailedJobService', () => {
-  let has: jest.Mock;
-  let findJobState: jest.Mock;
+  let registry: jest.Mocked<IQueueRegistryPort>;
   let service: QueueFailedJobService;
 
   beforeEach(() => {
-    has = jest.fn().mockReturnValue(true);
-    findJobState = jest.fn().mockResolvedValue('failed');
-    service = new QueueFailedJobService({
-      has,
-      findJobState,
+    registry = {
+      has: jest.fn(),
+      findJobState: jest.fn(),
       listJobCounts: jest.fn(),
       findFailedJobs: jest.fn(),
       retryJob: jest.fn(),
       removeJob: jest.fn(),
-    });
+    };
+    registry.has.mockReturnValue(true);
+    registry.findJobState.mockResolvedValue('failed');
+    service = new QueueFailedJobService(registry);
   });
 
   describe('ensure', () => {
     it('passes a failed job of a known queue', async () => {
       await service.ensure({ queueName: 'ledger-record', jobId: '7' });
 
-      expect(has).toHaveBeenCalledWith('ledger-record');
-      expect(findJobState).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
+      expect(registry.has).toHaveBeenCalledWith('ledger-record');
+      expect(registry.findJobState).toHaveBeenCalledWith({
+        queueName: 'ledger-record',
+        jobId: '7',
+      });
     });
 
     it('refuses an unknown queue with QUEUE_NOT_FOUND', async () => {
-      has.mockReturnValue(false);
+      registry.has.mockReturnValue(false);
 
       await expect(service.ensure({ queueName: 'unknown', jobId: '7' })).rejects.toMatchObject({
         code: 'QUEUE_NOT_FOUND',
         message: 'Queue unknown was not found',
       });
-      expect(findJobState).not.toHaveBeenCalled();
+      expect(registry.findJobState).not.toHaveBeenCalled();
     });
 
     it('refuses a missing job with QUEUE_JOB_NOT_FOUND', async () => {
-      findJobState.mockResolvedValue(null);
+      registry.findJobState.mockResolvedValue(null);
 
       await expect(
         service.ensure({ queueName: 'ledger-record', jobId: '7' }),
@@ -48,7 +52,7 @@ describe('QueueFailedJobService', () => {
     });
 
     it('refuses a job that is not failed with QUEUE_JOB_NOT_FAILED', async () => {
-      findJobState.mockResolvedValue('waiting');
+      registry.findJobState.mockResolvedValue('waiting');
 
       await expect(
         service.ensure({ queueName: 'ledger-record', jobId: '7' }),

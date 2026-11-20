@@ -1,15 +1,20 @@
 import { CacheLibGetUseCase } from '../cache-lib-get.use-case';
-import type { ICacheLibTracerPort, ICacheLibTracerSpanCommand } from '../../../outbound';
+import type {
+  ICacheLibStorePort,
+  ICacheLibTracerPort,
+  ICacheLibTracerSpanCommand,
+} from '../../../outbound';
 
 describe('CacheLibGetUseCase', () => {
-  let get: jest.Mock;
+  let store: jest.Mocked<ICacheLibStorePort>;
   let spans: { name: string; attributes: ICacheLibTracerSpanCommand<unknown>['attributes'] }[];
   let useCase: CacheLibGetUseCase;
 
   beforeEach(() => {
-    get = jest.fn().mockResolvedValue(undefined);
+    store = { get: jest.fn(), set: jest.fn(), unlinkByPrefix: jest.fn() };
+    store.get.mockResolvedValue(undefined);
     spans = [];
-    useCase = new CacheLibGetUseCase({ get, set: jest.fn(), unlinkByPrefix: jest.fn() }, {
+    useCase = new CacheLibGetUseCase(store, {
       span: async (command: ICacheLibTracerSpanCommand<unknown>) => {
         const attributes = { ...command.attributes };
 
@@ -24,14 +29,14 @@ describe('CacheLibGetUseCase', () => {
     const value = await useCase.execute('k');
 
     expect(value).toBeUndefined();
-    expect(get).toHaveBeenCalledWith('k');
+    expect(store.get).toHaveBeenCalledWith('k');
     expect(spans).toEqual([
       { name: 'cache.get', attributes: { 'cache.key': 'k', 'cache.hit': false } },
     ]);
   });
 
   it('returns the stored value on a hit and marks the span as a hit', async () => {
-    get.mockResolvedValue({ a: 1 });
+    store.get.mockResolvedValue({ a: 1 });
 
     const value = await useCase.execute('k');
 
@@ -42,7 +47,7 @@ describe('CacheLibGetUseCase', () => {
   });
 
   it('lets a failed read reject', async () => {
-    get.mockRejectedValue(new Error('read failed'));
+    store.get.mockRejectedValue(new Error('read failed'));
 
     await expect(useCase.execute('k')).rejects.toThrow('read failed');
   });

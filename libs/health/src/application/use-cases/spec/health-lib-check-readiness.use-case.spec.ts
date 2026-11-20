@@ -1,5 +1,3 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { AppNameEnum, HealthDependencyStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
@@ -22,7 +20,7 @@ describe('HealthLibCheckReadinessUseCase', () => {
             cache: { status: HealthDependencyStatusEnum.OK, latencyMs: 1 },
           }),
       },
-      logger as unknown as PinoLogger,
+      logger,
     );
 
     const view = await useCase.execute();
@@ -48,7 +46,7 @@ describe('HealthLibCheckReadinessUseCase', () => {
             cache: { status: HealthDependencyStatusEnum.ERROR, latencyMs: null },
           }),
       },
-      logger as unknown as PinoLogger,
+      logger,
     );
 
     const view = await useCase.execute();

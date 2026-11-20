@@ -1,16 +1,23 @@
+import { HealthLivenessStatusEnum } from '@acme-libs/kernel';
+
 import { HealthLivenessUseCase } from '../health-liveness.use-case';
+import type { IHealthStatusPort } from '../../../outbound';
 
 describe('HealthLivenessUseCase', () => {
-  let liveness: jest.Mock;
+  let status: jest.Mocked<IHealthStatusPort>;
   let useCase: HealthLivenessUseCase;
 
   beforeEach(() => {
-    liveness = jest.fn();
-    useCase = new HealthLivenessUseCase({ liveness, readiness: jest.fn() });
+    status = { liveness: jest.fn(), readiness: jest.fn() };
+    useCase = new HealthLivenessUseCase(status);
   });
 
   it('answers the liveness of the process', () => {
-    liveness.mockReturnValue({ status: 'ok', app: 'staff-app', uptimeSeconds: 7 });
+    status.liveness.mockReturnValue({
+      status: HealthLivenessStatusEnum.OK,
+      app: 'staff-app',
+      uptimeSeconds: 7,
+    });
 
     const view = useCase.execute();
 

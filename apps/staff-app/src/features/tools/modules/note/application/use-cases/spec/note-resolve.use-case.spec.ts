@@ -1,21 +1,19 @@
-import type { PinoLogger } from 'nestjs-pino';
-
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
 import { NoteAccessService } from '../../services/note-access.service';
 import { NoteWriteService } from '../../services/note-write.service';
 import { NoteResolveUseCase } from '../note-resolve.use-case';
-import type { INoteResolveUpdateQuery } from '../../../outbound';
+import type { INoteAccessRepositoryPort, INoteResolveRepositoryPort } from '../../../outbound';
 
 describe('NoteResolveUseCase', () => {
-  let findOwned: jest.Mock;
-  let update: jest.Mock;
+  let accessRepository: jest.Mocked<INoteAccessRepositoryPort>;
+  let repository: jest.Mocked<INoteResolveRepositoryPort>;
   let logger: PinoLoggerMock;
   let useCase: NoteResolveUseCase;
 
   beforeEach(() => {
-    findOwned = jest
-      .fn()
+    accessRepository = { findOwned: jest.fn() };
+    accessRepository.findOwned
       .mockImplementationOnce(() =>
         Promise.resolve({
           id: '7',
@@ -42,15 +40,16 @@ describe('NoteResolveUseCase', () => {
           updatedAt: new Date('2026-01-03T00:00:00.000Z'),
         }),
       );
-    update = jest.fn().mockResolvedValue(true);
+    repository = { update: jest.fn() };
+    repository.update.mockResolvedValue(true);
     logger = makePinoLoggerMock();
 
-    const accessService = new NoteAccessService({ findOwned });
+    const accessService = new NoteAccessService(accessRepository);
 
     useCase = new NoteResolveUseCase(
-      new NoteWriteService(accessService, 3, logger as unknown as PinoLogger),
-      { update },
-      logger as unknown as PinoLogger,
+      new NoteWriteService(accessService, 3, logger),
+      repository,
+      logger,
     );
   });
 
@@ -61,7 +60,7 @@ describe('NoteResolveUseCase', () => {
         authorId: 'admin-1',
         expectedVersion: undefined,
       });
-      const [command] = update.mock.calls[0] as [INoteResolveUpdateQuery];
+      const [command] = repository.update.mock.calls[0];
 
       expect(command.versionAsRead).toBe(2);
       expect(command.resolved).toBe(true);
@@ -73,8 +72,8 @@ describe('NoteResolveUseCase', () => {
     });
 
     it('retries a lost race with a fresh read', async () => {
-      update.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
-      findOwned.mockReset().mockImplementation(() =>
+      repository.update.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      accessRepository.findOwned.mockReset().mockImplementation(() =>
         Promise.resolve({
           id: '7',
           subjectType: 'product',
@@ -90,7 +89,7 @@ describe('NoteResolveUseCase', () => {
 
       await useCase.execute({ noteId: '7', authorId: 'admin-1', expectedVersion: undefined });
 
-      expect(update).toHaveBeenCalledTimes(2);
+      expect(repository.update).toHaveBeenCalledTimes(2);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '7', version: 2, attempt: 1, maxAttempts: 3 },
         'Note write conflict — retrying with a fresh read',
@@ -101,11 +100,11 @@ describe('NoteResolveUseCase', () => {
       await expect(
         useCase.execute({ noteId: '7', authorId: 'admin-1', expectedVersion: 1 }),
       ).rejects.toMatchObject({ code: 'VERSION_MISMATCH', details: { currentVersion: 2 } });
-      expect(update).not.toHaveBeenCalled();
+      expect(repository.update).not.toHaveBeenCalled();
     });
 
     it('refuses a resolved note with NOTE_RESOLVED and writes nothing', async () => {
-      findOwned.mockReset().mockResolvedValue({
+      accessRepository.findOwned.mockReset().mockResolvedValue({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
@@ -122,7 +121,7 @@ describe('NoteResolveUseCase', () => {
       ).rejects.toMatchObject({
         code: 'NOTE_RESOLVED',
       });
-      expect(update).not.toHaveBeenCalled();
+      expect(repository.update).not.toHaveBeenCalled();
       expect(logger.info).not.toHaveBeenCalled();
     });
   });

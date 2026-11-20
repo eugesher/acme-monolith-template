@@ -2,22 +2,22 @@ import { AuthMeUseCase, type AuthLoginUseCase } from '../../../application';
 import { AuthController } from '../auth.controller';
 
 describe('AuthController', () => {
-  let login: jest.Mock;
-  let findSubject: jest.Mock;
+  let login: jest.Mocked<Pick<AuthLoginUseCase, 'execute'>>;
+  let identity: jest.Mocked<ConstructorParameters<typeof AuthMeUseCase>[0]>;
   let controller: AuthController;
 
   beforeEach(() => {
-    login = jest.fn();
-    findSubject = jest.fn();
+    login = { execute: jest.fn() };
+    identity = { findSubject: jest.fn() };
     controller = new AuthController(
-      { execute: login } as unknown as AuthLoginUseCase,
-      new AuthMeUseCase({ findSubject }),
+      login as unknown as AuthLoginUseCase,
+      new AuthMeUseCase(identity),
     );
   });
 
   describe('handleLogin', () => {
     it('answers the access token of the login use case', async () => {
-      login.mockResolvedValue({ accessToken: 'access-1' });
+      login.execute.mockResolvedValue({ accessToken: 'access-1' });
 
       const response = await controller.handleLogin({
         email: 'ann@example.com',
@@ -25,18 +25,22 @@ describe('AuthController', () => {
       });
 
       expect(response).toEqual({ accessToken: 'access-1' });
-      expect(login).toHaveBeenCalledWith({ email: 'ann@example.com', password: 'secret' });
+      expect(login.execute).toHaveBeenCalledWith({ email: 'ann@example.com', password: 'secret' });
     });
   });
 
   describe('handleMe', () => {
     it('answers the current user with the roles identity reads for them', async () => {
-      findSubject.mockResolvedValue({ id: 'user-1', email: 'ann@example.com', roles: ['admin'] });
+      identity.findSubject.mockResolvedValue({
+        id: 'user-1',
+        email: 'ann@example.com',
+        roles: ['admin'],
+      });
 
       const response = await controller.handleMe({ id: 'user-1', email: 'ann@example.com' });
 
       expect(response).toEqual({ id: 'user-1', email: 'ann@example.com', roles: ['admin'] });
-      expect(findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+      expect(identity.findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
     });
   });
 });

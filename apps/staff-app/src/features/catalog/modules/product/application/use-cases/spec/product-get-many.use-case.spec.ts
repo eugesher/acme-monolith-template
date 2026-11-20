@@ -1,14 +1,16 @@
 import { ProductStatusEnum } from '@acme-libs/kernel';
 
 import { ProductGetManyUseCase } from '../product-get-many.use-case';
+import type { IProductGetManyRepositoryPort, IProductTagPort } from '../../../outbound';
 
 describe('ProductGetManyUseCase', () => {
-  let list: jest.Mock;
-  let findProductIds: jest.Mock;
+  let repository: jest.Mocked<IProductGetManyRepositoryPort>;
+  let tag: jest.Mocked<IProductTagPort>;
   let useCase: ProductGetManyUseCase;
 
   beforeEach(() => {
-    list = jest.fn().mockResolvedValue([
+    repository = { list: jest.fn() };
+    repository.list.mockResolvedValue([
       [
         {
           id: '12',
@@ -22,19 +24,21 @@ describe('ProductGetManyUseCase', () => {
       ],
       41,
     ]);
-    findProductIds = jest.fn().mockResolvedValue(['12', '14']);
-    useCase = new ProductGetManyUseCase(
-      { list },
-      { find: jest.fn(), replace: jest.fn(), findProductIds },
-    );
+    tag = { find: jest.fn(), replace: jest.fn(), findProductIds: jest.fn() };
+    tag.findProductIds.mockResolvedValue(['12', '14']);
+    useCase = new ProductGetManyUseCase(repository, tag);
   });
 
   describe('execute', () => {
     it('answers a page of views', async () => {
       const page = await useCase.execute({ page: 2, limit: 20, tagId: undefined });
 
-      expect(list).toHaveBeenCalledWith({ limit: 20, offset: 20, productIds: undefined });
-      expect(findProductIds).not.toHaveBeenCalled();
+      expect(repository.list).toHaveBeenCalledWith({
+        limit: 20,
+        offset: 20,
+        productIds: undefined,
+      });
+      expect(tag.findProductIds).not.toHaveBeenCalled();
       expect(page).toEqual({
         page: 2,
         limit: 20,
@@ -58,17 +62,17 @@ describe('ProductGetManyUseCase', () => {
     it.each([
       ['defaults an absent window', undefined, undefined, { limit: 20, offset: 0 }],
       ['caps the limit at 100', 1, 500, { limit: 100, offset: 0 }],
-    ])('%s', async (_, page, limit, pageWindow) => {
+    ])('%s', async (_case, page, limit, pageWindow) => {
       await useCase.execute({ page, limit, tagId: undefined });
 
-      expect(list).toHaveBeenCalledWith({ ...pageWindow, productIds: undefined });
+      expect(repository.list).toHaveBeenCalledWith({ ...pageWindow, productIds: undefined });
     });
 
     it('lists only the products that carry the tag', async () => {
       await useCase.execute({ page: 1, limit: 20, tagId: '300' });
 
-      expect(findProductIds).toHaveBeenCalledWith({ tagId: '300' });
-      expect(list).toHaveBeenCalledWith({
+      expect(tag.findProductIds).toHaveBeenCalledWith({ tagId: '300' });
+      expect(repository.list).toHaveBeenCalledWith({
         limit: 20,
         offset: 0,
         productIds: ['12', '14'],
@@ -76,11 +80,11 @@ describe('ProductGetManyUseCase', () => {
     });
 
     it('answers an empty page without a query when no product carries the tag', async () => {
-      findProductIds.mockResolvedValue([]);
+      tag.findProductIds.mockResolvedValue([]);
 
       const page = await useCase.execute({ page: 1, limit: 20, tagId: '300' });
 
-      expect(list).not.toHaveBeenCalled();
+      expect(repository.list).not.toHaveBeenCalled();
       expect(page).toEqual({ page: 1, limit: 20, count: 0, pageCount: 0, total: 0, data: [] });
     });
   });

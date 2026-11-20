@@ -85,18 +85,21 @@ describe('libs by layer', () => {
       'toolkit',
     ];
 
-    for (const lib of libs) {
-      if (allowed.includes(lib)) {
-        await expect({
-          file: 'apps/__layers-fixture__/src/main.ts',
-          code: `import { x } from "../../../libs/${lib}/src";`,
-        }).toPassArchitectureLint();
-      } else {
-        await expect({
-          file: 'apps/__layers-fixture__/src/main.ts',
-          code: `import { x } from "../../../libs/${lib}/src";`,
-        }).toBreakRule('boundaries/dependencies');
-      }
+    const reachable = libs.filter((lib) => allowed.includes(lib));
+    const unreachable = libs.filter((lib) => !allowed.includes(lib));
+
+    for (const lib of reachable) {
+      await expect({
+        file: 'apps/__layers-fixture__/src/main.ts',
+        code: `import { x } from "../../../libs/${lib}/src";`,
+      }).toPassArchitectureLint();
+    }
+
+    for (const lib of unreachable) {
+      await expect({
+        file: 'apps/__layers-fixture__/src/main.ts',
+        code: `import { x } from "../../../libs/${lib}/src";`,
+      }).toBreakRule('boundaries/dependencies');
     }
   });
 
