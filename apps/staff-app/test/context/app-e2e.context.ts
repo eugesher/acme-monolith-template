@@ -1,10 +1,10 @@
 import { getQueueToken } from '@nestjs/bull';
-import type { Queue } from 'bull';
+import type { Job, Queue } from 'bull';
 import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
-import { E2EContext } from '@acme-libs/testing';
+import { AuthE2EContext } from '@acme-libs/testing';
 import {
   LEDGER_RECORD_QUEUE,
   type ILedgerRecordProcessorPayload,
@@ -14,14 +14,19 @@ import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {
   redis: Redis;
+  ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
   adminToken: string;
   editorToken: string;
   viewerToken: string;
 }
 
-export class AppE2EContext extends E2EContext {
+export class AppE2EContext extends AuthE2EContext {
   public get redis(): Redis {
     return this.started.redis;
+  }
+
+  public get ledgerRecordQueue(): Queue<ILedgerRecordProcessorPayload> {
+    return this.started.ledgerRecordQueue;
   }
 
   public get adminToken(): string {
@@ -54,21 +59,36 @@ export class AppE2EContext extends E2EContext {
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_LIB_REDIS_CLIENT_TOKEN);
+    const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
+      getQueueToken(LEDGER_RECORD_QUEUE),
+    );
     const adminToken = this.jwt.sign({ sub: '1' });
     const editorToken = this.jwt.sign({ sub: '2' });
     const viewerToken = this.jwt.sign({ sub: '3' });
 
-    this.state = { redis, adminToken, editorToken, viewerToken };
+    this.state = { redis, ledgerRecordQueue, adminToken, editorToken, viewerToken };
   }
 
   public async takeLedgerRecords(): Promise<ILedgerRecordProcessorPayload[]> {
-    const queue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LEDGER_RECORD_QUEUE),
-    );
-    const jobs = await queue.getWaiting();
+    const jobs = await this.ledgerRecordQueue.getWaiting();
 
-    await queue.empty();
+    await this.ledgerRecordQueue.empty();
 
     return jobs.map((job) => job.data);
+  }
+
+  public async failLedgerRecord(
+    record: ILedgerRecordProcessorPayload,
+  ): Promise<Job<ILedgerRecordProcessorPayload>> {
+    const added = await this.ledgerRecordQueue.add(record, { attempts: 1 });
+    const job = await this.ledgerRecordQueue.getNextJob();
+
+    if (job?.id !== added.id) {
+      throw new Error(`Job ${added.id} of queue ${LEDGER_RECORD_QUEUE} is not the next to fail`);
+    }
+
+    await job.moveToFailed(new Error('The e2e case failed the record'));
+
+    return job;
   }
 }

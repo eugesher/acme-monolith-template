@@ -54,7 +54,7 @@ describe('core domain (@acme-core/domain)', () => {
 
   it.each([
     'import { Product } from "@acme-core/entities";',
-    'import { StaffAuthCoreFacade } from "@acme-core/modules/staff-auth";',
+    'import { ProductCoreModule } from "@acme-core/modules/product";',
     'import { Injectable } from "@nestjs/common";',
   ])('the core domain may NOT take %s', async (code) => {
     await expect({

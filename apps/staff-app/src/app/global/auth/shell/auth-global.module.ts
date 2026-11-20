@@ -3,10 +3,10 @@ import { Global, Module } from '@nestjs/common';
 import { AuthJwtModule, AuthPermissionModule } from '@acme-libs/auth';
 import { AuthAudienceEnum } from '@acme-libs/kernel';
 import { AUTH_USER_VALIDATOR_PORT } from '@acme-libs/contracts/auth';
-import { StaffAuthCoreModule } from '@acme-core/modules/staff-auth';
+import { StaffAuthCommonModule } from '@acme-staff/common/modules';
 
 import { AuthGlobalValidateSubjectUseCase } from '../application';
-import { AuthGlobalSubjectCoreAdapter } from '../infrastructure';
+import { AuthGlobalSubjectCommonAdapter } from '../infrastructure';
 import { AuthGlobalFacade } from './auth-global.facade';
 
 @Global()
@@ -14,13 +14,13 @@ import { AuthGlobalFacade } from './auth-global.facade';
   imports: [
     AuthJwtModule.forRoot(AuthAudienceEnum.STAFF),
     AuthPermissionModule,
-    StaffAuthCoreModule,
+    StaffAuthCommonModule,
   ],
   exports: [AUTH_USER_VALIDATOR_PORT],
   providers: [
     { provide: AUTH_USER_VALIDATOR_PORT, useClass: AuthGlobalFacade },
     AuthGlobalValidateSubjectUseCase,
-    AuthGlobalSubjectCoreAdapter.provider,
+    AuthGlobalSubjectCommonAdapter.provider,
   ],
 })
 export class AuthGlobalModule {}

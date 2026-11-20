@@ -1,6 +1,6 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm';
 
-import { StaffRole, StaffRolePermission } from '@acme-core/entities';
+import { StaffRole, StaffRolePermission } from '@acme-staff/common/entities';
 
 import { UserPersistenceStaffRoleBuilder } from '../user-persistence-staff-role.builder';
 

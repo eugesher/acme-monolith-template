@@ -1,6 +1,6 @@
 import { SelectQueryBuilder } from 'typeorm';
 
-import type { StaffUser } from '@acme-core/entities';
+import type { StaffUser } from '@acme-staff/common/entities';
 
 export class AuthPersistenceStaffUserBuilder extends SelectQueryBuilder<StaffUser> {
   public forByEmail(email: string): this {

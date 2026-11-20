@@ -49,21 +49,23 @@ signs `HS256` tokens with that `aud`.
 Modules that read the same table keep models of their own, narrowed to what each uses (see
 `024-code-placement.md`). Example: `UserStaffUserCandidateModel`
 (`apps/staff-app/src/features/access/modules/user/domain/models`), `AuthStaffUserLoginModel`
-(`apps/staff-app/src/features/auth/domain/models`) and `StaffAuthCoreSubjectModel`
-(`core/modules/src/staff-auth/domain/models`) all map `staff_user`.
+(`apps/staff-app/src/features/auth/domain/models`) and `StaffAuthCommonSubjectModel`
+(`apps/staff-app/src/common/modules/staff-auth/domain/models`) all map `staff_user`.
 
-## A core module for the staff subject of two apps
+## A common module for the staff subject
 
-staff-app and processor-app both check the subject of every request, so the check lives in
-`core/modules/src/staff-auth` behind `STAFF_AUTH_CORE_PORT` (`core/contracts/src/staff-auth`):
-`handleFindSubject` for the guard of both apps and for `GET /auth/me` of staff-app. staff-app
-reaches it through `AuthIdentityCoreAdapter` in its `auth` feature, and both apps through
-`AuthGlobalSubjectCoreAdapter` in their global module. Only staff-app signs the staff in: its `auth`
-feature checks the password and signs the token behind `AuthCredentialsLibAdapter`, and
-processor-app takes that token. No core module reaches the credentials.
+staff-app checks the subject of every request in its guard and answers it at `GET /auth/me`, so the
+check lives in the common module `apps/staff-app/src/common/modules/staff-auth` behind
+`STAFF_AUTH_COMMON_PORT` (`apps/staff-app/src/contracts/staff-auth`): `handleFindSubject` for both.
+The `auth` feature reaches it through `AuthIdentityCommonAdapter`, the global module through
+`AuthGlobalSubjectCommonAdapter`. No other app asks for the staff: processor-app has no routes for
+people (see `023-processor-app.md`), so the module and the staff entities stay in staff-app (see
+`024-code-placement.md`). Only staff-app signs the staff in: its `auth` feature checks the password
+and signs the token behind `AuthCredentialsLibAdapter`. No common or core module reaches the
+credentials.
 
 ## Table naming
 
 Tables of one module share a prefix, and indexes and foreign keys repeat the table name, so a
 constraint error in a log points at the module at once. A prefix also avoids reserved words such as
-`user`. Examples: the entities of `core/entities/src/staff-identity/`.
+`user`. Examples: the entities of `apps/staff-app/src/common/entities/staff-identity/`.

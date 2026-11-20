@@ -4,7 +4,7 @@ import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
-import { E2EContext } from '@acme-libs/testing';
+import { AuthE2EContext } from '@acme-libs/testing';
 import {
   LEDGER_RECORD_QUEUE,
   type ILedgerRecordProcessorPayload,
@@ -23,7 +23,7 @@ interface IAppE2EState {
   carolToken: string;
 }
 
-export class AppE2EContext extends E2EContext {
+export class AppE2EContext extends AuthE2EContext {
   public get redis(): Redis {
     return this.started.redis;
   }

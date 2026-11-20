@@ -144,6 +144,30 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
 }
 `;
 
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should return a failed record to the queue and append it once its cause is gone 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductArchived",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000025",
+        "id": Any<String>,
+        "occurred_at": 2026-01-06T09:00:00.000Z,
+        "operation_key": "e2e-system-queue:1",
+        "payload": {
+          "previousStatus": "active",
+          "sku": "SKU-0004",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "201",
+        "subject_type": "product",
+      },
+    ],
+  },
+  "failed": 0,
+}
+`;
+
 exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should add the units and append the ledger entry of the stock row 1`] = `
 {
   "db": {

@@ -56,7 +56,7 @@ it through `JobFailureHelper.report` of `libs/toolkit`: at `warn` while attempts
 `error` after the last one, with the label and the context the use case passes, so every processor
 words the two lines the same way. A job that ran out of attempts stays in the failed set of the
 queue until someone returns it to the queue or deletes it through `/queues` (see
-`023-processor-app.md`).
+`041-failed-jobs.md`).
 
 **The job is trusted.** The producers are the apps of the template, and they build the job from the
 type of the contract, so the processor does not validate it. A job of another shape, such as one an

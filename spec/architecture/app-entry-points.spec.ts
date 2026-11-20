@@ -43,6 +43,7 @@ describe('app entry points', () => {
   it.each([
     '@acme-staff/app/app.module',
     '@acme-staff/common/modules',
+    '@acme-staff/common/shared',
     '@acme-staff/features',
     '@acme-customer/app/app.module',
     '@acme-customer/features',
@@ -54,12 +55,9 @@ describe('app entry points', () => {
     expect(source).toResolve();
   });
 
-  it.each(['@acme-staff/processors', '@acme-staff/common/shared'])(
-    '%s does not resolve',
-    (source) => {
-      expect(source).not.toResolve();
-    },
-  );
+  it.each(['@acme-staff/processors'])('%s does not resolve', (source) => {
+    expect(source).not.toResolve();
+  });
 
   it.each([
     ['apps/staff-app/src/app/app.module.ts', '@acme-staff/features/health/health.module'],
@@ -265,7 +263,7 @@ describe('app entry points', () => {
 
   it.each([
     'apps/processor-app/src/processors/ledger/presentation/processors/ledger-append.processor.ts',
-    'apps/processor-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
+    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
     'apps/processor-app/src/common/shared/ledger/ledger-queue.module.ts',
     'apps/staff-app/test/context/app-e2e.context.ts',
     'apps/customer-app/test/context/app-e2e.context.ts',
@@ -277,7 +275,7 @@ describe('app entry points', () => {
   });
 
   it.each([
-    'apps/processor-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
+    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
     'apps/processor-app/src/common/shared/product-stock-post-subtract/queues/product-stock-post-subtract-queue.module.ts',
   ])('%s MAY import the queue contract of the core product stock', async (file) => {
     await expect({
@@ -324,8 +322,8 @@ describe('app entry points', () => {
       '@acme-core/modules/idempotency',
     ],
     [
-      'apps/processor-app/src/features/queue/infrastructure/queue/__fixture__.ts',
-      '@acme-processor/common/shared',
+      'apps/staff-app/src/features/queue/infrastructure/queue/__fixture__.ts',
+      '@acme-staff/common/shared',
     ],
   ])('%s may NOT import %s', async (file, source) => {
     await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(

@@ -2,7 +2,7 @@ import { getQueueToken } from '@nestjs/bull';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import type { Queue } from 'bull';
 
-import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
+import { AppNameEnum } from '@acme-libs/kernel';
 import { E2EContext } from '@acme-libs/testing';
 import {
   LEDGER_RECORD_QUEUE,
@@ -18,8 +18,6 @@ import type { Maybe } from '@acme-libs/toolkit';
 interface IAppE2EState {
   ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
   postSubtractQueue: Queue<IProductStockPostSubtractPayload>;
-  adminToken: string;
-  viewerToken: string;
 }
 
 export class AppE2EContext extends E2EContext {
@@ -29,14 +27,6 @@ export class AppE2EContext extends E2EContext {
 
   public get postSubtractQueue(): Queue<IProductStockPostSubtractPayload> {
     return this.started.postSubtractQueue;
-  }
-
-  public get adminToken(): string {
-    return this.started.adminToken;
-  }
-
-  public get viewerToken(): string {
-    return this.started.viewerToken;
   }
 
   private static readonly POLL_INTERVAL_MS = 100;
@@ -53,7 +43,7 @@ export class AppE2EContext extends E2EContext {
   }
 
   constructor() {
-    super(AppModule, AppNameEnum.PROCESSOR_APP, AuthAudienceEnum.STAFF);
+    super(AppModule, AppNameEnum.PROCESSOR_APP);
   }
 
   public override async init(): Promise<void> {
@@ -65,10 +55,8 @@ export class AppE2EContext extends E2EContext {
     const postSubtractQueue = this.moduleFixture.get<Queue<IProductStockPostSubtractPayload>>(
       getQueueToken(PRODUCT_STOCK_POST_SUBTRACT_QUEUE),
     );
-    const adminToken = this.jwt.sign({ sub: '1' });
-    const viewerToken = this.jwt.sign({ sub: '3' });
 
-    this.state = { ledgerRecordQueue, postSubtractQueue, adminToken, viewerToken };
+    this.state = { ledgerRecordQueue, postSubtractQueue };
   }
 
   public fireSchedule(name: string): void {

@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 
 import { ORM_PORT, type IHostedRepository, type IOrmPort } from '@acme-libs/contracts/database';
-import { StaffUser } from '@acme-core/entities';
+import { StaffUser } from '@acme-staff/common/entities';
 
 import { AuthPersistenceStaffUserBuilder } from '../builders/auth-persistence-staff-user.builder';
 

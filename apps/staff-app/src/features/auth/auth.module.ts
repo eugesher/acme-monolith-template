@@ -3,18 +3,18 @@ import { Module } from '@nestjs/common';
 import { CredentialsLibModule } from '@acme-libs/credentials';
 import { HttpExceptionFilter } from '@acme-libs/http';
 import { AuthAudienceEnum } from '@acme-libs/kernel';
-import { StaffAuthCoreModule } from '@acme-core/modules/staff-auth';
+import { StaffAuthCommonModule } from '@acme-staff/common/modules';
 
 import { AuthLoginUseCase, AuthMeUseCase } from './application';
 import {
   AuthCredentialsLibAdapter,
-  AuthIdentityCoreAdapter,
+  AuthIdentityCommonAdapter,
   AuthLoginRepository,
 } from './infrastructure';
 import { AuthController } from './presentation';
 
 @Module({
-  imports: [CredentialsLibModule.register(AuthAudienceEnum.STAFF), StaffAuthCoreModule],
+  imports: [CredentialsLibModule.register(AuthAudienceEnum.STAFF), StaffAuthCommonModule],
   controllers: [AuthController],
   providers: [
     HttpExceptionFilter,
@@ -22,7 +22,7 @@ import { AuthController } from './presentation';
     AuthMeUseCase,
     AuthLoginRepository.provider,
     AuthCredentialsLibAdapter.provider,
-    AuthIdentityCoreAdapter.provider,
+    AuthIdentityCommonAdapter.provider,
   ],
 })
 export class AuthModule {}

@@ -1,0 +1,14 @@
+name: 03-without-queue-delete
+description: |-
+  e2e: Queue › DELETE /api/queues/:queueName/jobs/failed/:jobId › should refuse a user without queue:delete with 403
+
+  Expect: 403 Forbidden
+  User: viewer@example.com (token signed by scripts.py)
+method: DELETE
+url: $STAFF_APP_BASE_URL/queues/ledger-record/jobs/failed/1
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

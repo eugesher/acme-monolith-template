@@ -1,9 +1,15 @@
+import { getQueueToken } from '@nestjs/bull';
 import type { INestApplication } from '@nestjs/common';
+import type { Queue } from 'bull';
 import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
-import { E2EContext } from '@acme-libs/testing';
+import { AuthE2EContext } from '@acme-libs/testing';
+import {
+  LEDGER_RECORD_QUEUE,
+  type ILedgerRecordProcessorPayload,
+} from '@acme-core/contracts/ledger';
 import { AppModule as ProcessorAppModule } from '@acme-processor/app/app.module';
 import { AppModule } from '@acme-staff/app/app.module';
 import type { Maybe } from '@acme-libs/toolkit';
@@ -11,12 +17,22 @@ import type { Maybe } from '@acme-libs/toolkit';
 interface IAppE2EState {
   processor: INestApplication;
   redis: Redis;
+  ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
+  adminToken: string;
   editorToken: string;
 }
 
-export class AppE2EContext extends E2EContext {
+export class AppE2EContext extends AuthE2EContext {
   public get redis(): Redis {
     return this.started.redis;
+  }
+
+  public get ledgerRecordQueue(): Queue<ILedgerRecordProcessorPayload> {
+    return this.started.ledgerRecordQueue;
+  }
+
+  public get adminToken(): string {
+    return this.started.adminToken;
   }
 
   public get editorToken(): string {
@@ -48,9 +64,13 @@ export class AppE2EContext extends E2EContext {
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_LIB_REDIS_CLIENT_TOKEN);
+    const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
+      getQueueToken(LEDGER_RECORD_QUEUE),
+    );
+    const adminToken = this.jwt.sign({ sub: '1' });
     const editorToken = this.jwt.sign({ sub: '2' });
 
-    this.state = { processor, redis, editorToken };
+    this.state = { processor, redis, ledgerRecordQueue, adminToken, editorToken };
   }
 
   public override async close(): Promise<void> {

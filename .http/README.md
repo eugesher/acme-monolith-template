@@ -21,10 +21,12 @@ the test can be found in `apps/<app>/test`.
 
 `app` holds the cases that check a route of the other app is not mounted.
 
-Four e2e cases have no request:
+Eight e2e cases have no request:
 
 - the schema check of staff-app compares the migrated database with the entities;
 - the ledger case of staff-app enqueues one record twice through `LEDGER_CORE_PORT` inside the app;
+- the `queue` cases of staff-app that page, retry and delete a failed job, and the one that retries
+  a delayed job: the e2e makes the job through Bull, and no route of an app makes one;
 - the auth limit of each app sends logins from one address until the limit is spent and one more
   from another address; `auth/login/02-wrong-password` sent more than `THROTTLE_AUTH_LIMIT` times
   within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.

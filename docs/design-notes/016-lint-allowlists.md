@@ -138,7 +138,7 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `LEDGER_CORE_PORT` from `@acme-core/contracts/ledger`. The ledger reads the correlation id of the
   context itself, so no adapter needs the observability lib. What reads the queue takes the same
   contracts, as it takes those of any core module: the presentation of a processor, the queue
-  registry of processor-app in `infrastructure/queue`, `common/shared` and the e2e code.
+  registry of staff-app in `infrastructure/queue`, `common/shared`, the e2e code and `test/system`.
 - **A processor and a global module read tables.** Their infrastructure may import `typeorm`,
   `@acme-libs/contracts/database` and `@nestjs/common`, as feature infrastructure does.
 - **No module touches `@nestjs-cls`.** A repository injects `ORM_PORT` of
@@ -211,8 +211,8 @@ may reach `naming` and `orm/application` may reach `repository`.
 ### The testing lib is for tests only
 
 `libs/testing` holds the test helpers behind one barrel, `@acme-libs/testing`: `E2EContext` of
-`e2e/e2e.context.ts`, the Redis token of `cache/` and the logger mock of
-`observability/pino-logger.mock.ts`. Any `*.spec.ts` may import it, through a policy that matches
-the path, and so may the e2e code and `test/system`; no layer of production code lists it, so lint
-refuses it there. The lib reaches the `outbound` of the cache lib for the Redis token and the
-bootstrap lib for `AppBootstrap`, and nothing else of another lib.
+`e2e/e2e.context.ts` and `AuthE2EContext` of `e2e/auth-e2e.context.ts`, the Redis token of `cache/`
+and the logger mock of `observability/pino-logger.mock.ts`. Any `*.spec.ts` may import it, through a
+policy that matches the path, and so may the e2e code and `test/system`; no layer of production code
+lists it, so lint refuses it there. The lib reaches the `outbound` of the cache lib for the Redis
+token and the bootstrap lib for `AppBootstrap`, and nothing else of another lib.

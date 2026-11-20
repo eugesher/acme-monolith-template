@@ -1,6 +1,6 @@
 import { SelectQueryBuilder } from 'typeorm';
 
-import type { StaffRole } from '@acme-core/entities';
+import type { StaffRole } from '@acme-staff/common/entities';
 
 export class UserPersistenceStaffRoleBuilder extends SelectQueryBuilder<StaffRole> {
   public forByIds(ids: readonly string[]): this {

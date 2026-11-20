@@ -96,7 +96,7 @@ describe('repo', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['@nestjs/common', 'ioredis', 'supertest'])(
+    it.each(['@nestjs/bull', '@nestjs/common', 'bull', 'ioredis', 'supertest'])(
       'a system test MAY import %s',
       async (source) => {
         await expect({
@@ -105,6 +105,13 @@ describe('repo', () => {
         }).toPassArchitectureLint();
       },
     );
+
+    it('a system test MAY read the contracts of core, to name a queue and its job', async () => {
+      await expect({
+        file: 'test/system/apps/staff-app/context/__fixture__.ts',
+        code: 'import { x } from "@acme-core/contracts/ledger";',
+      }).toPassArchitectureLint();
+    });
 
     it('a system test MAY use the testing lib', async () => {
       await expect({

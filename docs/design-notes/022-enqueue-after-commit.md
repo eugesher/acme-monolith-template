@@ -45,8 +45,8 @@ back, so the log says the record may be absent, and a processor must tolerate a 
 `jobId: operationKey`, and Bull adds no job under an id it already holds, so the retries of one
 record leave one job in the queue. The id is free again once the job is recorded, because
 `removeOnComplete` drops it, while a job that ran out of attempts keeps its id in the failed set: it
-is replayed through `/queues`, not enqueued again. The post-subtract queue has no such key, and its
-processor writes nothing on a replay.
+is replayed through `/queues` (see `041-failed-jobs.md`), not enqueued again. The post-subtract
+queue has no such key, and its processor writes nothing on a replay.
 
 **The ledger is a core module with a facade.** `LedgerCoreModule` (`core/modules/src/ledger`)
 exposes `LEDGER_CORE_PORT` with one method, `handleEnqueue`. `LedgerCoreEnqueueUseCase` reads the

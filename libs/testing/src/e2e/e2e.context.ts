@@ -1,5 +1,3 @@
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { PinoLogger } from 'nestjs-pino';
 import { DataSource } from 'typeorm';
@@ -7,14 +5,13 @@ import type { INestApplication, Type } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 
 import { AppBootstrap } from '@acme-libs/bootstrap';
-import { AuthTokenAlgorithmEnum, type AppNameEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
+import type { AppNameEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IE2EContextState {
   app: INestApplication;
   moduleFixture: TestingModule;
   dataSource: DataSource;
-  jwt: JwtService;
   rootLoggerWarn: jest.SpiedFunction<PinoLogger['warn']>;
 }
 
@@ -31,10 +28,6 @@ export class E2EContext {
     return this.initialized.dataSource;
   }
 
-  public get jwt(): JwtService {
-    return this.initialized.jwt;
-  }
-
   private context: Maybe<IE2EContextState>;
 
   private get initialized(): IE2EContextState {
@@ -48,20 +41,15 @@ export class E2EContext {
   constructor(
     private readonly appModule: Type<unknown>,
     private readonly appName: AppNameEnum,
-    private readonly audience: AuthAudienceEnum,
   ) {}
 
   public async init(): Promise<void> {
     const moduleFixture = await E2EContext.compile(this.appModule);
     const dataSource = moduleFixture.get(DataSource);
-    const config = moduleFixture.get(ConfigService);
-    const secret = config.getOrThrow<string>('JWT_SECRET');
-    const algorithm = AuthTokenAlgorithmEnum.HS256;
-    const jwt = new JwtService({ secret, signOptions: { algorithm, audience: this.audience } });
     const app = await E2EContext.start(moduleFixture, this.appName);
     const rootLoggerWarn = jest.spyOn(PinoLogger.root, 'warn');
 
-    this.context = { app, moduleFixture, dataSource, jwt, rootLoggerWarn };
+    this.context = { app, moduleFixture, dataSource, rootLoggerWarn };
   }
 
   public async close(): Promise<void> {

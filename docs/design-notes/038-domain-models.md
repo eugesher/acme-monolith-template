@@ -42,7 +42,7 @@ Aggregates below).
 method names only what it answers: `AuthCustomerLoginModel.toLoggerPayload()`,
 `TagCommonSubjectTagsReplaceModel.toSnapshots`, `ProductStockCoreMovementsModel.toRows`. A child
 entity keeps its name, `createOrderProducts`. A model in another context takes it in front:
-`StaffAuthCoreSubjectModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
+`StaffAuthCommonSubjectModel`, `ProductCoreArchiveModel`, `ProductStockAddModel`.
 
 **A line of the log names the fields of the entity.** `{ id, sku }`, not `{ productId, sku }`, and
 `{ subjectType, subjectId, subjectTags: [{ tagId }] }` for the tags of a subject. A value derived
@@ -145,7 +145,7 @@ puts the snapshots on the page. A module that only reads has a domain for that a
 
 **A read model is a plain class unless it is a model of an aggregate.** A model with the columns of
 its own read takes no changes and keeps no identity, so it does not extend `Entity` of
-`libs/domain`, like `StaffAuthCoreSubjectModel`.
+`libs/domain`, like `StaffAuthCommonSubjectModel`.
 
 **A list model carries the columns of the list.** A page of orders carries no products, so
 `OrderGetManyModel` rebuilds it, not `OrderGetOneModel`, whose record requires them. Both live in

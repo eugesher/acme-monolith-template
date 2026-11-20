@@ -1,4 +1,4 @@
-import type { StaffRole, StaffUser } from '@acme-core/entities';
+import type { StaffRole, StaffUser } from '@acme-staff/common/entities';
 
 import type { UserRegisterStaffUserInsertOutcomeEnum } from '../../enums/user-register-staff-user-insert-outcome.enum';
 
