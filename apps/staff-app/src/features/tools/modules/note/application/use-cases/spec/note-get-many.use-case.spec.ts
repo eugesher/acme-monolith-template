@@ -90,7 +90,7 @@ describe('NoteGetManyUseCase', () => {
     it.each([
       ['only a subject type', 'product', undefined],
       ['only a subject id', undefined, '42'],
-    ])('refuses %s with NOTE_SUBJECT_INVALID', async (_, subjectType, subjectId) => {
+    ])('refuses %s with NOTE_SUBJECT_INVALID', async (_case, subjectType, subjectId) => {
       await expect(
         useCase.execute({
           page: undefined,

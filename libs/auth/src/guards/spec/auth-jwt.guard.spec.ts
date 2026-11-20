@@ -67,7 +67,7 @@ describe('AuthJwtGuard', () => {
     ['no authorization header', {}],
     ['another scheme', { authorization: 'Basic token' }],
     ['a scheme without a token', { authorization: 'Bearer' }],
-  ])('rejects %s with 401', async (_, headers) => {
+  ])('rejects %s with 401', async (_case, headers) => {
     request.headers = headers;
 
     const allowed = guard.canActivate(context);

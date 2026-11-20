@@ -22,7 +22,7 @@ describe('VersionedEntity', () => {
       ['zero', 0],
       ['a negative number', -1],
       ['a fraction', 1.5],
-    ])('refuses %s', (_, version) => {
+    ])('refuses %s', (_case, version) => {
       expect(VersionedEntity.isValidVersion(version)).toBe(false);
     });
   });
@@ -32,7 +32,7 @@ describe('VersionedEntity', () => {
       ['no expectation', undefined, true],
       ['the current version', 3, true],
       ['another version', 2, false],
-    ])('answers %s with %s', (_, expectedVersion, isExpected) => {
+    ])('answers %s with %s', (_case, expectedVersion, isExpected) => {
       class ItemEntity extends VersionedEntity {
         constructor() {
           super('item-1', 3);

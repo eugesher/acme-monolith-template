@@ -15,7 +15,7 @@ describe('ProductCreateModel', () => {
       ['a sku shorter than 3', 'AB'],
       ['a sku starting with a dash', '-ABC'],
       ['a sku longer than 64', `A${'B'.repeat(64)}`],
-    ])('refuses %s with PRODUCT_SKU_INVALID', (_, sku) => {
+    ])('refuses %s with PRODUCT_SKU_INVALID', (_case, sku) => {
       expect(() => ProductCreateModel.initCandidate({ sku, name: 'Lamp' })).toThrow(
         expect.objectContaining({ code: 'PRODUCT_SKU_INVALID' }) as Error,
       );
@@ -24,7 +24,7 @@ describe('ProductCreateModel', () => {
     it.each([
       ['a blank name', '   '],
       ['a name longer than 255', 'n'.repeat(256)],
-    ])('refuses %s with PRODUCT_NAME_INVALID', (_, name) => {
+    ])('refuses %s with PRODUCT_NAME_INVALID', (_case, name) => {
       expect(() => ProductCreateModel.initCandidate({ sku: 'SKU-0001', name })).toThrow(
         expect.objectContaining({
           code: 'PRODUCT_NAME_INVALID',

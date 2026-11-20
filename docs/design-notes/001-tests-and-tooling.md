@@ -1,5 +1,8 @@
 # 001 — Tests and tooling
 
+This note covers the architecture specs of `spec/`. The unit specs next to the code follow
+`040-unit-specs.md`.
+
 ## `spec/` — architecture lint specs
 
 The architecture lint lives in `lint/`. `spec/architecture/*.spec.ts` keeps it honest: a rule that

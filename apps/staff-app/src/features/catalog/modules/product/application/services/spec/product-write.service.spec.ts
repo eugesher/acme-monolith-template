@@ -173,7 +173,7 @@ describe('ProductWriteService', () => {
     it.each([
       ['after a lost race', false],
       ['after a saved change', true],
-    ])('refuses with PRODUCT_NOT_FOUND when the product vanished %s', async (_, updated) => {
+    ])('refuses with PRODUCT_NOT_FOUND when the product vanished %s', async (_case, updated) => {
       repository.update.mockResolvedValue(updated);
       repository.findById.mockResolvedValue(null);
 

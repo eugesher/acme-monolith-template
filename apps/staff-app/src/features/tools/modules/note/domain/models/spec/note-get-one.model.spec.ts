@@ -94,7 +94,7 @@ describe('NoteGetOneModel', () => {
     it.each([
       ['no If-Match', undefined],
       ['the current version', 3],
-    ])('accepts %s', (_, expectedVersion) => {
+    ])('accepts %s', (_case, expectedVersion) => {
       expect(() => note.assertExpectedVersion(expectedVersion)).not.toThrow();
     });
 
