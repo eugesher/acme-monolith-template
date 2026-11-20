@@ -26,21 +26,12 @@ describe('AuthGlobalPersistenceCustomerBuilder', () => {
 
   describe('forActiveById', () => {
     it('selects the id and email of the active customer', () => {
-      const builder = new AuthGlobalPersistenceCustomerBuilder(baseBuilder);
-
-      builder.forActiveById('1');
+      const builder = new AuthGlobalPersistenceCustomerBuilder(baseBuilder).forActiveById('1');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Customer`.`id` AS `Customer_id`, `Customer`.`email` AS `Customer_email` FROM `customer` `Customer` WHERE `Customer`.`id` = ? AND `Customer`.`status` = ?',
         ['1', 'active'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new AuthGlobalPersistenceCustomerBuilder(baseBuilder);
-      const chained = builder.forActiveById('1');
-
-      expect(chained).toBe(builder);
     });
   });
 });

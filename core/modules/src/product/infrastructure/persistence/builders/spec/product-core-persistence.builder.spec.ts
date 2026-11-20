@@ -26,9 +26,7 @@ describe('ProductCorePersistenceBuilder', () => {
 
   describe('forById', () => {
     it('selects the product with the time of its last update', () => {
-      const builder = new ProductCorePersistenceBuilder(baseBuilder);
-
-      builder.forById('100');
+      const builder = new ProductCorePersistenceBuilder(baseBuilder).forById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
@@ -39,21 +37,12 @@ describe('ProductCorePersistenceBuilder', () => {
 
   describe('forLockById', () => {
     it('selects the product under an exclusive lock', () => {
-      const builder = new ProductCorePersistenceBuilder(baseBuilder);
-
-      builder.forLockById('100');
+      const builder = new ProductCorePersistenceBuilder(baseBuilder).forLockById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL ) FOR UPDATE',
         ['100'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductCorePersistenceBuilder(baseBuilder);
-      const chained = builder.forLockById('100');
-
-      expect(chained).toBe(builder);
     });
   });
 });

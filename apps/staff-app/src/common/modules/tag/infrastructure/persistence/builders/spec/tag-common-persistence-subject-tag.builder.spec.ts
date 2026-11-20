@@ -26,41 +26,29 @@ describe('TagCommonPersistenceSubjectTagBuilder', () => {
 
   describe('forList', () => {
     it('selects the subjects of the type that carry the tag', () => {
-      const builder = new TagCommonPersistenceSubjectTagBuilder(baseBuilder);
-
-      builder.forList({ subjectType: 'product', tagId: '300' });
+      const builder = new TagCommonPersistenceSubjectTagBuilder(baseBuilder).forList({
+        subjectType: 'product',
+        tagId: '300',
+      });
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `SubjectTag`.`id` AS `SubjectTag_id`, `SubjectTag`.`subjectId` AS `SubjectTag_subjectId` FROM `subject_tag` `SubjectTag` WHERE `SubjectTag`.`tagId` = ? AND `SubjectTag`.`subjectType` = ?',
         ['300', 'product'],
       ]);
     });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new TagCommonPersistenceSubjectTagBuilder(baseBuilder);
-      const chained = builder.forList({ subjectType: 'product', tagId: '300' });
-
-      expect(chained).toBe(builder);
-    });
   });
 
   describe('forLinked', () => {
     it('selects the tag links of the subject', () => {
-      const builder = new TagCommonPersistenceSubjectTagBuilder(baseBuilder);
-
-      builder.forLinked({ subjectType: 'product', subjectId: '100' });
+      const builder = new TagCommonPersistenceSubjectTagBuilder(baseBuilder).forLinked({
+        subjectType: 'product',
+        subjectId: '100',
+      });
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `SubjectTag`.`id` AS `SubjectTag_id`, `SubjectTag`.`tagId` AS `SubjectTag_tagId` FROM `subject_tag` `SubjectTag` WHERE `SubjectTag`.`subjectType` = ? AND `SubjectTag`.`subjectId` = ?',
         ['product', '100'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new TagCommonPersistenceSubjectTagBuilder(baseBuilder);
-      const chained = builder.forLinked({ subjectType: 'product', subjectId: '100' });
-
-      expect(chained).toBe(builder);
     });
   });
 });

@@ -26,21 +26,14 @@ describe('LedgerPersistenceLedgerEntryBuilder', () => {
 
   describe('forByOperationKey', () => {
     it('selects the id of the entry with the operation key', () => {
-      const builder = new LedgerPersistenceLedgerEntryBuilder(baseBuilder);
-
-      builder.forByOperationKey('op-1');
+      const builder = new LedgerPersistenceLedgerEntryBuilder(baseBuilder).forByOperationKey(
+        'op-1',
+      );
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `LedgerEntry`.`id` AS `LedgerEntry_id` FROM `ledger_entry` `LedgerEntry` WHERE `LedgerEntry`.`operationKey` = ?',
         ['op-1'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new LedgerPersistenceLedgerEntryBuilder(baseBuilder);
-      const chained = builder.forByOperationKey('op-1');
-
-      expect(chained).toBe(builder);
     });
   });
 });

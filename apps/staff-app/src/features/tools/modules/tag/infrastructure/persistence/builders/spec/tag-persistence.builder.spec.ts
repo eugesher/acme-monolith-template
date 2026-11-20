@@ -26,41 +26,23 @@ describe('TagPersistenceBuilder', () => {
 
   describe('forById', () => {
     it('selects the tag by id', () => {
-      const builder = new TagPersistenceBuilder(baseBuilder);
-
-      builder.forById('300');
+      const builder = new TagPersistenceBuilder(baseBuilder).forById('300');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Tag`.`id` AS `Tag_id`, `Tag`.`name` AS `Tag_name`, `Tag`.`createdAt` AS `Tag_createdAt`, `Tag`.`updatedAt` AS `Tag_updatedAt` FROM `tag` `Tag` WHERE `Tag`.`id` = ?',
         ['300'],
       ]);
     });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new TagPersistenceBuilder(baseBuilder);
-      const chained = builder.forById('300');
-
-      expect(chained).toBe(builder);
-    });
   });
 
   describe('forList', () => {
     it('selects every tag by name inside the page window', () => {
-      const builder = new TagPersistenceBuilder(baseBuilder);
-
-      builder.forList({ limit: 20, offset: 40 });
+      const builder = new TagPersistenceBuilder(baseBuilder).forList({ limit: 20, offset: 40 });
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Tag`.`id` AS `Tag_id`, `Tag`.`name` AS `Tag_name`, `Tag`.`createdAt` AS `Tag_createdAt`, `Tag`.`updatedAt` AS `Tag_updatedAt` FROM `tag` `Tag` ORDER BY `Tag_name` ASC, `Tag_id` ASC LIMIT 20 OFFSET 40',
         [],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new TagPersistenceBuilder(baseBuilder);
-      const chained = builder.forList({ limit: 20, offset: 40 });
-
-      expect(chained).toBe(builder);
     });
   });
 });

@@ -26,29 +26,22 @@ describe('ProductPersistenceBuilder', () => {
 
   describe('forById', () => {
     it('selects the product by id', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-
-      builder.forById('100');
+      const builder = new ProductPersistenceBuilder(baseBuilder).forById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`createdAt` AS `Product_createdAt`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
         ['100'],
       ]);
     });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-      const chained = builder.forById('100');
-
-      expect(chained).toBe(builder);
-    });
   });
 
   describe('forList', () => {
     it('selects every product newest first inside the page window', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-
-      builder.forList({ limit: 20, offset: 40, productIds: undefined });
+      const builder = new ProductPersistenceBuilder(baseBuilder).forList({
+        limit: 20,
+        offset: 40,
+        productIds: undefined,
+      });
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`createdAt` AS `Product_createdAt`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE `Product`.`deletedAt` IS NULL ORDER BY `Product_id` DESC LIMIT 20 OFFSET 40',
@@ -57,41 +50,27 @@ describe('ProductPersistenceBuilder', () => {
     });
 
     it('keeps only the given products', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-
-      builder.forList({ limit: 20, offset: 0, productIds: ['100', '101'] });
+      const builder = new ProductPersistenceBuilder(baseBuilder).forList({
+        limit: 20,
+        offset: 0,
+        productIds: ['100', '101'],
+      });
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`createdAt` AS `Product_createdAt`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` IN (?, ?) ) AND ( `Product`.`deletedAt` IS NULL ) ORDER BY `Product_id` DESC LIMIT 20 OFFSET 0',
         ['100', '101'],
       ]);
     });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-      const chained = builder.forList({ limit: 20, offset: 40, productIds: undefined });
-
-      expect(chained).toBe(builder);
-    });
   });
 
   describe('forLockById', () => {
     it('selects the id of the product under an exclusive lock', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-
-      builder.forLockById('100');
+      const builder = new ProductPersistenceBuilder(baseBuilder).forLockById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL ) FOR UPDATE',
         ['100'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder);
-      const chained = builder.forLockById('100');
-
-      expect(chained).toBe(builder);
     });
   });
 });

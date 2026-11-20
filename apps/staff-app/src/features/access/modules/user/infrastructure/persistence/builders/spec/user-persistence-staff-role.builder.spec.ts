@@ -26,21 +26,12 @@ describe('UserPersistenceStaffRoleBuilder', () => {
 
   describe('forByIds', () => {
     it('selects the ids of the roles with the given ids', () => {
-      const builder = new UserPersistenceStaffRoleBuilder(baseBuilder);
-
-      builder.forByIds(['2', '3']);
+      const builder = new UserPersistenceStaffRoleBuilder(baseBuilder).forByIds(['2', '3']);
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `StaffRole`.`id` AS `StaffRole_id` FROM `staff_role` `StaffRole` WHERE `StaffRole`.`id` IN (?, ?)',
         ['2', '3'],
       ]);
-    });
-
-    it('returns the same builder for chaining', () => {
-      const builder = new UserPersistenceStaffRoleBuilder(baseBuilder);
-      const chained = builder.forByIds(['2', '3']);
-
-      expect(chained).toBe(builder);
     });
   });
 });
