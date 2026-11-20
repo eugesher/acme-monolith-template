@@ -42,16 +42,6 @@ export class NoteE2E {
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
 
-      it('should refuse a resolution that is not a boolean with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/tools/notes')
-          .query({ resolved: 'yes' })
-          .auth(this.ctx.adminToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
       it('should list only the notes of the caller, with no permission needed', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/tools/notes')
@@ -88,15 +78,6 @@ export class NoteE2E {
           .get('/api/tools/notes/200')
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse an id that is not a number with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/tools/notes/abc')
-          .auth(this.ctx.adminToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });

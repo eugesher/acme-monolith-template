@@ -83,9 +83,9 @@ the `acme:catalog:*` keys from Redis.
 `libs/testing/src/e2e/e2e.context.ts`, which holds what the contexts share: `init()` compiles the
 `AppModule` it is given with `@nestjs/testing`, starts it with
 `AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, and spies on the
-root logger; `close()`, `takeRootWarnings()` and `mountedRoutes()` round it off. The class is not
-abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor, calls
-`super.init()` and adds its own.
+root logger; `close()`, `takeRootWarnings()`, `mountedRoutes()` and `routeDtos()` round it off. The
+class is not abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor,
+calls `super.init()` and adds its own.
 
 **A context of an app with auth signs tokens.** `AuthE2EContext` of
 `libs/testing/src/e2e/auth-e2e.context.ts` extends `E2EContext` with the `AuthAudienceEnum` of the
@@ -113,6 +113,16 @@ the code each route asks for. Beyond it the suites keep one case per guard that 
 installed: 401 without a token, 403 to the viewer on `GET /api/access/permissions`, the permissions
 read from the database rather than the claims of the token, and a revoked permission refused at
 once.
+
+**A suite checks that each route validates, not what.** `routeDtos()` of `E2EContext` answers per
+route the classes of its `@Param()`, `@Query()` and `@Body()` arguments, in that order, read from
+the design types the global `ValidationPipe` validates with, and a second case of the entry of
+staff-app and customer-app compares them with a table. A parameter typed with an interface or a
+`Pick` reads as `Object`, and the pipe lets it through unchecked: typecheck and the spec of the
+controller pass, and only this table fails. The rules of a DTO are checked by its spec (see
+`015-quality-gates.md`), so a suite sends one invalid path parameter, query and body to show that
+the pipe is installed and how its 400 reads, a request without the key on each route that requires
+`Idempotency-Key`, and one malformed `If-Match`.
 
 **A catalog case clears its own keys, not the database.** The queues live in the same Redis, under
 `acme:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters. `hooks()`

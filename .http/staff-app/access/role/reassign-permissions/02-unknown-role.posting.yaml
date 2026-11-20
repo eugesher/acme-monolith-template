@@ -1,4 +1,4 @@
-name: 03-unknown-role
+name: 02-unknown-role
 description: |-
   e2e: Access › Role › PUT /api/access/roles/:roleId/permissions › should answer 404 for an unknown role
 

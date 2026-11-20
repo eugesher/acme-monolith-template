@@ -71,16 +71,6 @@ export class QueueE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a malformed page with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/queues/ledger-record/jobs/failed')
-          .query({ page: 'first' })
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 

@@ -94,16 +94,6 @@ export class TagE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a missing name with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/tools/tags')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({})
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 
@@ -163,16 +153,6 @@ export class TagE2E {
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ name: 'winter' })
           .expect(HttpStatus.NOT_FOUND);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a malformed tag id with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .patch('/api/tools/tags/abc')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ name: 'winter' })
-          .expect(HttpStatus.BAD_REQUEST);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });

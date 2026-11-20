@@ -37,6 +37,20 @@ describe('App', () => {
     ]);
   });
 
+  it('should validate each route with these DTOs of its path, query and body', () => {
+    expect(ctx.routeDtos()).toEqual([
+      ['POST /api/auth/login', 'AuthLoginRequestDto'],
+      ['GET /api/auth/me'],
+      ['POST /api/auth/register', 'AuthRegisterRequestDto'],
+      ['GET /api/health'],
+      ['GET /api/health/ready'],
+      ['GET /api/orders', 'OrderGetManyQueryDto'],
+      ['POST /api/orders', 'OrderPlaceRequestDto'],
+      ['GET /api/orders/:orderId', 'OrderIdParamDto'],
+      ['GET /api/products', 'CatalogProductListQueryDto'],
+    ]);
+  });
+
   describe('Health', () => {
     healthE2E.handleLiveness();
     healthE2E.handleReadiness();

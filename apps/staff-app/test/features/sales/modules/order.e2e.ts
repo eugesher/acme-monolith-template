@@ -57,26 +57,6 @@ export class OrderE2E {
           data: [],
         });
       });
-
-      it('should refuse a malformed tag id with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/sales/orders')
-          .query({ tagId: 'fragile' })
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a malformed page with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/sales/orders')
-          .query({ page: 'first' })
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 
@@ -228,16 +208,6 @@ export class OrderE2E {
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ tagIds: ['302'] })
           .expect(HttpStatus.NOT_FOUND);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a word among the tag ids with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/sales/orders/601/tags')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ tagIds: ['fragile'] })
-          .expect(HttpStatus.BAD_REQUEST);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });

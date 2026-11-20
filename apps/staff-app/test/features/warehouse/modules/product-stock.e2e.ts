@@ -167,34 +167,9 @@ export class ProductStockE2E {
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
 
-      it.each([
-        ['zero', 0],
-        ['a fraction', 2.5],
-      ])('should refuse a quantity of %s with 400 from validation', async (_, quantity) => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/warehouse/product-stock/100/add')
-          .set('Idempotency-Key', 'e2e-restock-invalid-key')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ quantity })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
       it('should refuse a restock without a key with 400', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/warehouse/product-stock/100/add')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ quantity: 5 })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a key of 129 characters with 400', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/warehouse/product-stock/100/add')
-          .set('Idempotency-Key', 'k'.repeat(129))
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 5 })
           .expect(HttpStatus.BAD_REQUEST);

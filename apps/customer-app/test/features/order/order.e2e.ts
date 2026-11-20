@@ -275,20 +275,6 @@ export class OrderE2E {
         }).toMatchSnapshot();
       });
 
-      it.each([
-        ['an empty list', { productIds: [] }],
-        ['an id that is not a number', { productIds: ['100', 'lamp'] }],
-      ])('should refuse %s with 400 from validation', async (_, body) => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/orders')
-          .set('Idempotency-Key', 'e2e-order-invalid-key')
-          .auth(this.ctx.annToken, { type: 'bearer' })
-          .send(body)
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
       it('should let one of two simultaneous orders for the last units through and refuse the other with 409', async () => {
         const responses = await Promise.all([
           request(this.ctx.app.getHttpServer())

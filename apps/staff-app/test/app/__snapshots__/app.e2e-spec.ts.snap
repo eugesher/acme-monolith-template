@@ -141,29 +141,6 @@ exports[`App Access Role POST /api/access/roles should create a role with its pe
 }
 `;
 
-exports[`App Access Role POST /api/access/roles should refuse a missing permission list with 400 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "permissionCodes",
-            "messages": [
-              "each value in permissionCodes must be one of the following values: ledger:read, access:manage, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
-              "permissionCodes must be an array",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Access Role POST /api/access/roles should refuse a taken name with 409 1`] = `
 {
   "response": {
@@ -216,52 +193,6 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should reassi
       "permissionCodes": [
         "product:write",
       ],
-    },
-  },
-}
-`;
-
-exports[`App Access Role PUT /api/access/roles/:roleId/permissions should refuse an unknown permission code with 400 1`] = `
-{
-  "db": {
-    "staff_role_permissions": [
-      {
-        "code": "ledger:read",
-        "role_id": "3",
-      },
-      {
-        "code": "order:read",
-        "role_id": "3",
-      },
-      {
-        "code": "product:read",
-        "role_id": "3",
-      },
-      {
-        "code": "queue:read",
-        "role_id": "3",
-      },
-      {
-        "code": "tag:read",
-        "role_id": "3",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "permissionCodes",
-            "messages": [
-              "each value in permissionCodes must be one of the following values: ledger:read, access:manage, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -429,66 +360,6 @@ exports[`App Access User PUT /api/access/users/:userId/roles should reassign the
         "2",
         "3",
       ],
-    },
-  },
-}
-`;
-
-exports[`App Access User PUT /api/access/users/:userId/roles should refuse a number with a suffix as the user id with 400 from validation and change nothing 1`] = `
-{
-  "db": {
-    "staff_user_roles": [
-      {
-        "role_id": "1",
-        "user_id": "1",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "userId",
-            "messages": [
-              "userId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Access User PUT /api/access/users/:userId/roles should refuse a word as the user id with 400 from validation and change nothing 1`] = `
-{
-  "db": {
-    "staff_user_roles": [
-      {
-        "role_id": "1",
-        "user_id": "1",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "userId",
-            "messages": [
-              "userId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -791,28 +662,6 @@ exports[`App Catalog Product GET /api/catalog/products should list the catalog, 
       "page": 1,
       "pageCount": 1,
       "total": 7,
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product GET /api/catalog/products should refuse a malformed tag id with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagId",
-            "messages": [
-              "tagId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -1325,28 +1174,6 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should li
 }
 `;
 
-exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should refuse a word among the tag ids with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagIds",
-            "messages": [
-              "each value in tagIds must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should refuse an unknown tag with 422 and keep the tags the product had 1`] = `
 {
   "response": {
@@ -1593,29 +1420,6 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
 }
 `;
 
-exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse a malformed page with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "page",
-            "messages": [
-              "page must be a positive number",
-              "page must be an integer number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
 {
   "response": {
@@ -1757,51 +1561,6 @@ exports[`App Sales Order GET /api/sales/orders should list the orders of every c
       "page": 1,
       "pageCount": 1,
       "total": 3,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders should refuse a malformed page with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "page",
-            "messages": [
-              "page must be a positive number",
-              "page must be an integer number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders should refuse a malformed tag id with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagId",
-            "messages": [
-              "tagId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -1963,28 +1722,6 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should link the tag
           "name": "vip",
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a word among the tag ids with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagIds",
-            "messages": [
-              "each value in tagIds must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -2184,28 +1921,6 @@ exports[`App Tools Note GET /api/tools/notes should list the notes of one subjec
 }
 `;
 
-exports[`App Tools Note GET /api/tools/notes should refuse a resolution that is not a boolean with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "resolved",
-            "messages": [
-              "resolved must be a boolean value",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Tools Note GET /api/tools/notes should refuse half of a subject filter with 400 1`] = `
 {
   "response": {
@@ -2258,28 +1973,6 @@ exports[`App Tools Note GET /api/tools/notes/:noteId should read one note 1`] = 
       "subjectType": "product",
       "updatedAt": "2026-01-01T00:00:00.000Z",
       "version": 2,
-    },
-  },
-}
-`;
-
-exports[`App Tools Note GET /api/tools/notes/:noteId should refuse an id that is not a number with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "noteId",
-            "messages": [
-              "noteId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -2839,28 +2532,6 @@ exports[`App Tools Tag PATCH /api/tools/tags/:tagId should answer the tag as it 
 }
 `;
 
-exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse a malformed tag id with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagId",
-            "messages": [
-              "tagId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse the name of another tag with 409 1`] = `
 {
   "response": {
@@ -2915,30 +2586,6 @@ exports[`App Tools Tag POST /api/tools/tags should create a tag with the trimmed
       "id": Any<String>,
       "name": "heavy",
       "updatedAt": Any<String>,
-    },
-  },
-}
-`;
-
-exports[`App Tools Tag POST /api/tools/tags should refuse a missing name with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "name",
-            "messages": [
-              "name must be shorter than or equal to 64 characters",
-              "name must be longer than or equal to 1 characters",
-              "name must be a string",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -3057,63 +2704,6 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       "details": null,
       "message": "Product 999 was not found",
       "statusCode": 404,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a key of 129 characters with 400 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "IDEMPOTENCY_KEY_INVALID",
-      "details": null,
-      "message": "The Idempotency-Key header must be at most 128 characters",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a quantity of a fraction with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "quantity",
-            "messages": [
-              "quantity must be an integer number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a quantity of zero with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "quantity",
-            "messages": [
-              "quantity must be a positive number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }

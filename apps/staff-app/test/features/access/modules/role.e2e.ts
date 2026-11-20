@@ -73,16 +73,6 @@ export class RoleE2E {
         }
       });
 
-      it('should refuse a missing permission list with 400', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/access/roles')
-          .auth(this.ctx.adminToken, { type: 'bearer' })
-          .send({ name: 'auditor' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
       it('should refuse a taken name with 409', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/access/roles')
@@ -131,23 +121,6 @@ export class RoleE2E {
             "INSERT INTO staff_role_permissions (role_id, code) VALUES (3, 'ledger:read'), (3, 'product:read'), (3, 'order:read'), (3, 'queue:read'), (3, 'tag:read')",
           );
         }
-      });
-
-      it('should refuse an unknown permission code with 400', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/access/roles/3/permissions')
-          .auth(this.ctx.adminToken, { type: 'bearer' })
-          .send({ permissionCodes: ['ledger:read', 'ledger:delete'] })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({
-          response: { body: response.body },
-          db: {
-            staff_role_permissions: await this.ctx.dataSource.query(
-              'SELECT * FROM staff_role_permissions WHERE role_id = 3 ORDER BY code',
-            ),
-          },
-        }).toMatchSnapshot();
       });
 
       it('should answer 404 for an unknown role', async () => {

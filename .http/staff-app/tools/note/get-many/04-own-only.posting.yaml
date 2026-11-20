@@ -1,4 +1,4 @@
-name: 05-own-only
+name: 04-own-only
 description: |-
   e2e: Tools › Note › GET /api/tools/notes › should list only the notes of the caller, with no permission needed
 

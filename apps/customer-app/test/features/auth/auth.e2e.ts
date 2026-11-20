@@ -125,13 +125,10 @@ export class AuthE2E {
         }).toMatchSnapshot();
       });
 
-      it.each([
-        ['a malformed email', { email: 'frank', password: 'frank-password-please-change' }],
-        ['a password shorter than 12', { email: 'frank@example.com', password: 'short-pass1' }],
-      ])('should refuse %s with 400 from validation and store nothing', async (_, body) => {
+      it('should refuse a malformed email with 400 from validation and store nothing', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/auth/register')
-          .send(body)
+          .send({ email: 'frank', password: 'frank-password-please-change' })
           .expect(HttpStatus.BAD_REQUEST);
 
         expect({

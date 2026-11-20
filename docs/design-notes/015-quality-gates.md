@@ -40,7 +40,8 @@ decides which files are counted, including those no spec loads, which count at 0
 
 **Some specs the coverage cannot ask for.** A controller is excluded above, yet its spec checks how
 a request becomes a command and that a failure is awaited. A DTO is covered the moment any file
-imports it, since its decorators run on import, yet only a spec checks its validation.
+imports it, since its decorators run on import, yet only a spec checks its validation, and only the
+table of the e2e suite that a route validates with it (see `014-e2e-suites.md`).
 `spec/required-specs.spec.ts` asks for a spec next to every controller and every request, query and
 param DTO that declares validation of its own; a DTO that only extends `PageQueryDto` declares none
 and inherits the spec of its parent.
