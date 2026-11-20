@@ -7,7 +7,7 @@ import type { INestApplication, Type } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 
 import { AppBootstrap } from '@acme-libs/bootstrap';
-import { AuthTokenAlgorithmEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
+import { AuthTokenAlgorithmEnum, type AppNameEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IE2EContextState {
@@ -47,6 +47,7 @@ export class E2EContext {
 
   constructor(
     private readonly appModule: Type<unknown>,
+    private readonly appName: AppNameEnum,
     private readonly audience: AuthAudienceEnum,
   ) {}
 
@@ -57,7 +58,7 @@ export class E2EContext {
     const secret = config.getOrThrow<string>('JWT_SECRET');
     const algorithm = AuthTokenAlgorithmEnum.HS256;
     const jwt = new JwtService({ secret, signOptions: { algorithm, audience: this.audience } });
-    const app = await E2EContext.start(moduleFixture);
+    const app = await E2EContext.start(moduleFixture, this.appName);
     const rootLoggerWarn = jest.spyOn(PinoLogger.root, 'warn');
 
     this.context = { app, moduleFixture, dataSource, jwt, rootLoggerWarn };
@@ -80,12 +81,14 @@ export class E2EContext {
     return await Test.createTestingModule({ imports: [appModule] }).compile();
   }
 
-  protected static async start(moduleFixture: TestingModule): Promise<INestApplication> {
+  private static async start(
+    moduleFixture: TestingModule,
+    appName: AppNameEnum,
+  ): Promise<INestApplication> {
     const app = moduleFixture.createNestApplication({ bufferLogs: true });
+    const bootstrap = AppBootstrap.create(app, appName);
 
-    AppBootstrap.configure(app);
-
-    await app.init();
+    await bootstrap.execute();
 
     return app;
   }

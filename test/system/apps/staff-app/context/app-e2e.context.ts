@@ -1,7 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import type { Redis } from 'ioredis';
 
-import { AuthAudienceEnum } from '@acme-libs/kernel';
+import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { E2EContext } from '@acme-libs/testing';
 import { AppModule as ProcessorAppModule } from '@acme-processor/app/app.module';
@@ -37,13 +37,14 @@ export class AppE2EContext extends E2EContext {
   }
 
   constructor() {
-    super(AppModule, AuthAudienceEnum.STAFF);
+    super(AppModule, AppNameEnum.STAFF_APP, AuthAudienceEnum.STAFF);
   }
 
   public override async init(): Promise<void> {
     const processorFixture = await AppE2EContext.compile(ProcessorAppModule);
-    const processor = await AppE2EContext.start(processorFixture);
+    const processor = processorFixture.createNestApplication();
 
+    await processor.init();
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_LIB_REDIS_CLIENT_TOKEN);

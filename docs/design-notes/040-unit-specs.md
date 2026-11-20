@@ -19,7 +19,9 @@ coverage thresholds and the lint of tests.
 
 **A spec lives next to its subject**, in `spec/<subject>.spec.ts` of the subject's folder, and
 imports the subject from `../`. It tests through the public members; a private member is reached
-through the public one that calls it.
+through the public one that calls it. No member is public for a test: neither a spec nor the e2e
+context reaches a part of a class that production code does not call, so what they check is the path
+the app takes (see `014-e2e-suites.md`).
 
 **Every file the coverage counts gets one**, because the threshold is 100% per file. A controller
 and a request, query or param DTO that declares validation of its own get one too, though the
