@@ -18,15 +18,15 @@ export class AuthCustomerRegisterModel {
     return new AuthCustomerRegisterModel(id, email, createdAt);
   }
 
-  public toSnapshot(): IAuthCustomerRegisterSnapshot {
-    return { id: this.id, email: this.email };
+  public toLoggerPayload(): IAuthCustomerRegisterLoggerPayload {
+    return { id: this.id };
   }
 
   public toLedgerPayload(): IAuthCustomerRegisterLedgerPayload {
     return { subjectId: this.id, occurredAt: this.createdAt.toISOString() };
   }
 
-  public toLoggerPayload(): IAuthCustomerRegisterLoggerPayload {
-    return { id: this.id };
+  public toSnapshot(): IAuthCustomerRegisterSnapshot {
+    return { id: this.id, email: this.email };
   }
 }

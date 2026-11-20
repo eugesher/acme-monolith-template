@@ -2,10 +2,10 @@ import { ServiceUnavailableException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 
 export class CredentialsLibPasswordHasherSemaphore {
+  private active = 0;
   private readonly maxConcurrency: number;
   private readonly queueTimeoutMs: number;
   private readonly waiting: (() => void)[] = [];
-  private active = 0;
 
   constructor(config: ConfigService) {
     this.maxConcurrency = config.getOrThrow<number>('AUTH_ARGON2_MAX_CONCURRENCY');

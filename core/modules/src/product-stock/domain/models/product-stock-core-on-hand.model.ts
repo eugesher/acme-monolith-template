@@ -6,6 +6,10 @@ import type {
 export class ProductStockCoreOnHandModel {
   private constructor(public readonly stock: readonly IProductStockCoreOnHandSnapshot[]) {}
 
+  public static toProductIds(products: { id: string }[]): string[] {
+    return products.map((product) => product.id);
+  }
+
   public static reconstitute(
     record: IProductStockCoreOnHandReconstitute,
   ): ProductStockCoreOnHandModel {
@@ -18,10 +22,6 @@ export class ProductStockCoreOnHandModel {
     });
 
     return new ProductStockCoreOnHandModel(stockOnHand);
-  }
-
-  public static toProductIds(products: { id: string }[]): string[] {
-    return products.map((product) => product.id);
   }
 
   public toSnapshot(): IProductStockCoreOnHandSnapshot[] {

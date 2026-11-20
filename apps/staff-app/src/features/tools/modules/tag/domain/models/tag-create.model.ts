@@ -22,6 +22,6 @@ export class TagCreateModel extends TagAggregate {
   }
 
   public toLoggerPayload(): ITagCreateLoggerPayload {
-    return { id: this.id, name: this.currentName };
+    return { id: this.id, name: this._name };
   }
 }

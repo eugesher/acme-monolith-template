@@ -1,19 +1,21 @@
 import { VersionedEntity } from '@acme-libs/domain';
 import type { Maybe } from '@acme-libs/toolkit';
 
-import { NoteBodyInvalidException } from '../exceptions/note-body-invalid.exception';
-import { NoteResolvedException } from '../exceptions/note-resolved.exception';
-import { NoteSubjectInvalidException } from '../exceptions/note-subject-invalid.exception';
-import { NoteVersionInvalidException } from '../exceptions/note-version-invalid.exception';
-import { NoteVersionMismatchException } from '../exceptions/note-version-mismatch.exception';
+import {
+  NoteBodyInvalidException,
+  NoteResolvedException,
+  NoteSubjectInvalidException,
+  NoteVersionInvalidException,
+  NoteVersionMismatchException,
+} from '../errors';
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
 
 export abstract class NoteAggregate extends VersionedEntity {
+  protected body: string;
+  protected resolved: boolean;
   protected readonly subjectType: string;
   protected readonly subjectId: string;
   protected readonly authorId: string;
-  protected currentBody: string;
-  protected currentResolved: boolean;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
@@ -31,34 +33,10 @@ export abstract class NoteAggregate extends VersionedEntity {
     this.subjectType = NoteAggregate.validSubjectType(subjectType);
     this.subjectId = NoteAggregate.validSubjectId(subjectId);
     this.authorId = authorId;
-    this.currentBody = NoteAggregate.validBody(body);
-    this.currentResolved = resolved;
+    this.body = NoteAggregate.validBody(body);
+    this.resolved = resolved;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-  }
-
-  public toSnapshot(): INoteSnapshot {
-    return {
-      id: this.id,
-      subjectType: this.subjectType,
-      subjectId: this.subjectId,
-      body: this.currentBody,
-      authorId: this.authorId,
-      resolved: this.currentResolved,
-      version: this.version,
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString(),
-    };
-  }
-
-  public toUpdatePayload(versionAsRead: number): INoteUpdatePayload {
-    return {
-      id: this.id,
-      versionAsRead,
-      body: this.currentBody,
-      resolved: this.currentResolved,
-      version: this.version,
-    };
   }
 
   public assertExpectedVersion(expectedVersion: Maybe<number>): void {
@@ -67,6 +45,30 @@ export abstract class NoteAggregate extends VersionedEntity {
     }
 
     throw new NoteVersionMismatchException(this.id, expectedVersion, this.version);
+  }
+
+  public toUpdatePayload(versionAsRead: number): INoteUpdatePayload {
+    return {
+      id: this.id,
+      versionAsRead,
+      body: this.body,
+      resolved: this.resolved,
+      version: this.version,
+    };
+  }
+
+  public toSnapshot(): INoteSnapshot {
+    return {
+      id: this.id,
+      subjectType: this.subjectType,
+      subjectId: this.subjectId,
+      body: this.body,
+      authorId: this.authorId,
+      resolved: this.resolved,
+      version: this.version,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 
   protected static validSubjectType(subjectType: string): string {
@@ -105,7 +107,7 @@ export abstract class NoteAggregate extends VersionedEntity {
   }
 
   protected assertOpen(): void {
-    if (this.currentResolved) {
+    if (this.resolved) {
       throw new NoteResolvedException(this.id);
     }
   }

@@ -1,6 +1,8 @@
-import { OrderEmptyException } from '../exceptions/order-empty.exception';
-import { OrderProductNotFoundException } from '../exceptions/order-product-not-found.exception';
-import { OrderStockInsufficientException } from '../exceptions/order-stock-insufficient.exception';
+import {
+  OrderEmptyException,
+  OrderProductNotFoundException,
+  OrderStockInsufficientException,
+} from '../errors';
 import type {
   IOrderCandidateActiveProduct,
   IOrderCandidateCreate,
@@ -11,28 +13,20 @@ import type {
 
 export class OrderCandidateModel {
   public get distinctProductIds(): readonly string[] {
-    return this.uniqueProductIds;
+    return this._distinctProductIds;
   }
 
   private constructor(
     private readonly customerId: string,
     private readonly productIds: readonly string[],
-    private readonly uniqueProductIds: readonly string[],
+    private readonly _distinctProductIds: readonly string[],
   ) {}
 
   public static create(proposal: IOrderCandidateCreate): OrderCandidateModel {
     const { customerId, productIds } = proposal;
-    const uniqueProductIds = [...new Set(productIds)];
+    const distinctProductIds = [...new Set(productIds)];
 
-    return new OrderCandidateModel(customerId, productIds, uniqueProductIds);
-  }
-
-  public toInsertPayload(): IOrderCandidateInsertPayload {
-    return { customerId: this.customerId };
-  }
-
-  public createOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
-    return this.productIds.map((productId) => ({ orderId, productId }));
+    return new OrderCandidateModel(customerId, productIds, distinctProductIds);
   }
 
   public validate(): void {
@@ -52,7 +46,7 @@ export class OrderCandidateModel {
   }
 
   public assertStockQuantities(stockQuantities: IOrderCandidateStockQuantity[]): void {
-    for (const productId of this.uniqueProductIds) {
+    for (const productId of this._distinctProductIds) {
       const requestedQuantity = this.productIds.filter((id) => id === productId).length;
       const productStock = stockQuantities.find((candidate) => candidate.productId === productId);
       const available = productStock?.quantity ?? 0;
@@ -61,5 +55,13 @@ export class OrderCandidateModel {
         throw new OrderStockInsufficientException(productId, requestedQuantity, available);
       }
     }
+  }
+
+  public toInsertPayload(): IOrderCandidateInsertPayload {
+    return { customerId: this.customerId };
+  }
+
+  public createOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
+    return this.productIds.map((productId) => ({ orderId, productId }));
   }
 }

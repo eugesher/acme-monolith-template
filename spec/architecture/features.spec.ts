@@ -10,6 +10,11 @@ describe('features', () => {
       'apps/__features-fixture__/src/features/index.ts',
       'apps/__features-fixture__/src/features/product/product.module.ts',
       'apps/__features-fixture__/src/features/product/domain/index.ts',
+      'apps/__features-fixture__/src/features/product/domain/errors/index.ts',
+      'apps/__features-fixture__/src/features/product/domain/errors/codes/product-exception-code.enum.ts',
+      'apps/__features-fixture__/src/features/product/domain/errors/exceptions/product-name-invalid.exception.ts',
+      'apps/__features-fixture__/src/features/product/domain/interfaces/index.ts',
+      'apps/__features-fixture__/src/features/product/domain/interfaces/params/product-create.interface.ts',
       'apps/__features-fixture__/src/features/product/domain/models/product.model.ts',
       'apps/__features-fixture__/src/features/product/outbound/index.ts',
       'apps/__features-fixture__/src/features/product/application/index.ts',
@@ -463,6 +468,57 @@ describe('features', () => {
         file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
         code: 'import { x } from "./infrastructure/persistence/repositories/product.repository";',
       }).toBreakRule('no-restricted-syntax');
+    });
+  });
+
+  describe('folder barrels', () => {
+    it('a domain import may NOT skip the barrel of errors', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/domain/models/__fixture__.ts',
+        code: 'import { x } from "../errors/exceptions/product-name-invalid.exception";',
+      }).toBreakRule('no-restricted-syntax');
+    });
+
+    it('the domain barrel may NOT skip the barrel of errors', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/domain/__fixture__.ts',
+        code: 'export * from "./errors/codes/product-exception-code.enum";',
+      }).toBreakRule('no-restricted-syntax');
+    });
+
+    it('a domain import may NOT skip the barrel of interfaces', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/domain/models/__fixture__.ts',
+        code: 'import type { x } from "../interfaces/params/product-create.interface";',
+      }).toBreakRule('no-restricted-syntax');
+    });
+
+    it('a domain import MAY go through the barrels of errors and interfaces', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/domain/models/__fixture__.ts',
+        code: 'import { x } from "../errors";\nimport type { y } from "../interfaces";',
+      }).toPassArchitectureLint();
+    });
+
+    it('an exception MAY reach its codes by a file path', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/domain/errors/exceptions/__fixture__.ts',
+        code: 'import { x } from "../codes/product-exception-code.enum";',
+      }).toPassArchitectureLint();
+    });
+
+    it('the errors folder of the HTTP lib MAY be reached by a file path', async () => {
+      await expect({
+        file: 'libs/http/src/__fixture__.ts',
+        code: 'export * from "./errors/helpers/domain-http-exception.helper";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a folder of interfaces without subfolders MAY be reached by a file path', async () => {
+      await expect({
+        file: 'libs/auth/src/guards/__fixture__.ts',
+        code: 'import type { x } from "../interfaces/auth-request.interface";',
+      }).toPassArchitectureLint();
     });
   });
 

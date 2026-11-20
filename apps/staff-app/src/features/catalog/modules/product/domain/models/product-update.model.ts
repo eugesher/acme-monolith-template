@@ -19,11 +19,11 @@ export class ProductUpdateModel extends ProductAggregate {
 
     const validName = ProductUpdateModel.validName(name);
 
-    if (validName === this.currentName) {
+    if (validName === this.name) {
       return;
     }
 
-    this.currentName = validName;
+    this.name = validName;
     this.bumpVersion();
   }
 

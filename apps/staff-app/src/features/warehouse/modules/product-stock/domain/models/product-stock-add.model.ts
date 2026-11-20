@@ -1,6 +1,6 @@
 import { Entity } from '@acme-libs/domain';
 
-import { ProductQuantityInvalidException } from '../exceptions/product-quantity-invalid.exception';
+import { ProductQuantityInvalidException } from '../errors';
 import type {
   IProductStockAddLedgerPayload,
   IProductStockAddLedgerPayloadBuild,
@@ -40,6 +40,10 @@ export class ProductStockAddModel extends Entity {
     this.addedQuantity = ProductStockAddModel.validQuantity(quantity);
   }
 
+  public toOnHandSnapshot(quantity: number): IProductStockOnHandSnapshot {
+    return { productId: this.id, quantity };
+  }
+
   public toLedgerPayload(
     params: IProductStockAddLedgerPayloadBuild,
   ): IProductStockAddLedgerPayload {
@@ -51,10 +55,6 @@ export class ProductStockAddModel extends Entity {
       occurredAt: createdAt,
       payload: { sku: this.sku, quantity: this.addedQuantity },
     };
-  }
-
-  public toOnHandSnapshot(quantity: number): IProductStockOnHandSnapshot {
-    return { productId: this.id, quantity };
   }
 
   private static validQuantity(quantity: number): number {

@@ -1,8 +1,7 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 import { EmailValue } from '@acme-core/domain';
 
-import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
-import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
+import { AuthEmailInvalidException, AuthPasswordTooWeakException } from '../errors';
 import type {
   IAuthCustomerCandidateCreate,
   IAuthCustomerCandidateInsertPayload,
@@ -17,17 +16,17 @@ export class AuthCustomerCandidateModel {
     private readonly passwordHash: string,
   ) {}
 
+  public static assertPasswordStrength(password: string): void {
+    if (password.length < AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH) {
+      throw new AuthPasswordTooWeakException(AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH);
+    }
+  }
+
   public static create(proposal: IAuthCustomerCandidateCreate): AuthCustomerCandidateModel {
     const { email, passwordHash } = proposal;
     const customerEmail = EmailValue.create(email);
 
     return new AuthCustomerCandidateModel(customerEmail, passwordHash);
-  }
-
-  public static assertPasswordStrength(password: string): void {
-    if (password.length < AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH) {
-      throw new AuthPasswordTooWeakException(AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH);
-    }
   }
 
   public assertEmail(): void {

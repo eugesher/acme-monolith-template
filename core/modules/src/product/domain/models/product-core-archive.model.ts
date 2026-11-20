@@ -8,18 +8,18 @@ import type {
 } from '../interfaces';
 
 export class ProductCoreArchiveModel extends VersionedEntity {
-  public get status(): ProductStatusEnum {
-    return this.currentStatus;
+  public get isArchived(): boolean {
+    return this._status === ProductStatusEnum.ARCHIVED;
   }
 
-  public get isArchived(): boolean {
-    return this.currentStatus === ProductStatusEnum.ARCHIVED;
+  public get status(): ProductStatusEnum {
+    return this._status;
   }
 
   private constructor(
     id: string,
     private readonly sku: string,
-    private currentStatus: ProductStatusEnum,
+    private _status: ProductStatusEnum,
     version: number,
     private readonly updatedAt: Date,
   ) {
@@ -37,7 +37,7 @@ export class ProductCoreArchiveModel extends VersionedEntity {
       return;
     }
 
-    this.currentStatus = ProductStatusEnum.ARCHIVED;
+    this._status = ProductStatusEnum.ARCHIVED;
     this.bumpVersion();
   }
 

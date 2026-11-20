@@ -2,16 +2,18 @@ import { VersionedEntity } from '@acme-libs/domain';
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
-import { ProductNameInvalidException } from '../exceptions/product-name-invalid.exception';
-import { ProductSkuInvalidException } from '../exceptions/product-sku-invalid.exception';
-import { ProductVersionInvalidException } from '../exceptions/product-version-invalid.exception';
-import { ProductVersionMismatchException } from '../exceptions/product-version-mismatch.exception';
+import {
+  ProductNameInvalidException,
+  ProductSkuInvalidException,
+  ProductVersionInvalidException,
+  ProductVersionMismatchException,
+} from '../errors';
 import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
 
 export abstract class ProductAggregate extends VersionedEntity {
+  protected name: string;
+  protected status: ProductStatusEnum;
   protected readonly sku: string;
-  protected currentName: string;
-  protected currentStatus: ProductStatusEnum;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
@@ -25,32 +27,10 @@ export abstract class ProductAggregate extends VersionedEntity {
     super(id, validVersion);
 
     this.sku = ProductAggregate.validSku(sku);
-    this.currentName = ProductAggregate.validName(name);
-    this.currentStatus = status;
+    this.name = ProductAggregate.validName(name);
+    this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-  }
-
-  public toSnapshot(): IProductSnapshot {
-    return {
-      id: this.id,
-      sku: this.sku,
-      name: this.currentName,
-      status: this.currentStatus,
-      version: this.version,
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString(),
-    };
-  }
-
-  public toUpdatePayload(versionAsRead: number): IProductUpdatePayload {
-    return {
-      id: this.id,
-      versionAsRead,
-      name: this.currentName,
-      status: this.currentStatus,
-      version: this.version,
-    };
   }
 
   public assertExpectedVersion(expectedVersion: Maybe<number>): void {
@@ -59,6 +39,28 @@ export abstract class ProductAggregate extends VersionedEntity {
     }
 
     throw new ProductVersionMismatchException(this.id, expectedVersion, this.version);
+  }
+
+  public toUpdatePayload(versionAsRead: number): IProductUpdatePayload {
+    return {
+      id: this.id,
+      versionAsRead,
+      name: this.name,
+      status: this.status,
+      version: this.version,
+    };
+  }
+
+  public toSnapshot(): IProductSnapshot {
+    return {
+      id: this.id,
+      sku: this.sku,
+      name: this.name,
+      status: this.status,
+      version: this.version,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 
   protected static validSku(sku: string): string {

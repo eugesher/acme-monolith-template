@@ -26,7 +26,7 @@ export class ProductCreateModel extends ProductAggregate {
     return {
       subjectId: this.id,
       occurredAt: this.createdAt.toISOString(),
-      payload: { sku: this.sku, name: this.currentName },
+      payload: { sku: this.sku, name: this.name },
     };
   }
 

@@ -7,7 +7,7 @@ import type {
 
 export class TagRenameModel extends TagAggregate {
   public get name(): string {
-    return this.currentName;
+    return this._name;
   }
 
   public static reconstitute(this: void, record: ITagReconstitute): TagRenameModel {
@@ -18,14 +18,14 @@ export class TagRenameModel extends TagAggregate {
   }
 
   public rename(name: string): void {
-    this.currentName = TagRenameModel.validName(name);
+    this._name = TagRenameModel.validName(name);
   }
 
   public toUpdatePayload(): ITagRenameUpdatePayload {
-    return { id: this.id, name: this.currentName };
+    return { id: this.id, name: this._name };
   }
 
   public toLoggerPayload(): ITagRenameLoggerPayload {
-    return { id: this.id, name: this.currentName };
+    return { id: this.id, name: this._name };
   }
 }

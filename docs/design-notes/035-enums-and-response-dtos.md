@@ -10,7 +10,7 @@ An enum lives with the narrowest code that reads all of its values:
 
 | Folder                                  | What it holds                                         | Example                                                                |
 | --------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------- |
-| `domain/enums`                          | the exception codes of a module                       | `ProductExceptionCodeEnum`                                             |
+| `domain/errors/codes`                   | the exception codes of a module                       | `ProductExceptionCodeEnum`                                             |
 | `outbound/enums`                        | the outcomes of a port of the module                  | `ProductStatusArchiveOutcomeEnum`                                      |
 | `core/contracts/src/<module>/enums`     | the outcomes and kinds a core module answers or takes | `ProductCoreArchiveOutcomeEnum`                                        |
 | `apps/<app>/src/contracts/<name>/enums` | the same for a common module of the app               | `TagCommonReplaceOutcomeEnum`, `TagCommonSubjectTypeEnum`              |

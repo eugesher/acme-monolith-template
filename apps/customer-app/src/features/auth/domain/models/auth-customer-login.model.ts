@@ -1,6 +1,6 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import { AuthUserInactiveException } from '../exceptions/auth-user-inactive.exception';
+import { AuthUserInactiveException } from '../errors';
 import type {
   IAuthCustomerLoginLoggerPayload,
   IAuthCustomerLoginReconstitute,
@@ -19,13 +19,13 @@ export class AuthCustomerLoginModel {
     return new AuthCustomerLoginModel(id, passwordHash, status);
   }
 
-  public toLoggerPayload(): IAuthCustomerLoginLoggerPayload {
-    return { id: this.id };
-  }
-
   public assertActive(): void {
     if (this.status !== UserStatusEnum.ACTIVE) {
       throw new AuthUserInactiveException(this.id);
     }
+  }
+
+  public toLoggerPayload(): IAuthCustomerLoginLoggerPayload {
+    return { id: this.id };
   }
 }

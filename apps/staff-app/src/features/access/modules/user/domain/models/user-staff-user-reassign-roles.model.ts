@@ -1,4 +1,4 @@
-import { UserRoleNotFoundException } from '../exceptions/user-role-not-found.exception';
+import { UserRoleNotFoundException } from '../errors';
 import type {
   IUserStaffUserReassignRolesCreate,
   IUserStaffUserReassignRolesLoggerPayload,
@@ -35,13 +35,13 @@ export class UserStaffUserReassignRolesModel {
     return this.roleIds.map((roleId) => ({ userId: this.userId, roleId }));
   }
 
-  public toSnapshot(): IUserStaffUserReassignRolesSnapshot {
-    return { id: this.userId, roleIds: this.roleIds };
-  }
-
   public toLoggerPayload(): IUserStaffUserReassignRolesLoggerPayload {
     const userRoles = this.roleIds.map((roleId) => ({ roleId }));
 
     return { id: this.userId, userRoles };
+  }
+
+  public toSnapshot(): IUserStaffUserReassignRolesSnapshot {
+    return { id: this.userId, roleIds: this.roleIds };
   }
 }
