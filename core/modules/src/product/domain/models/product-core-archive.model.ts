@@ -8,12 +8,12 @@ import type {
 } from '../interfaces';
 
 export class ProductCoreArchiveModel extends VersionedEntity {
-  public get status(): ProductStatusEnum {
-    return this.currentStatus;
-  }
-
   public get isArchived(): boolean {
     return this.currentStatus === ProductStatusEnum.ARCHIVED;
+  }
+
+  public get status(): ProductStatusEnum {
+    return this.currentStatus;
   }
 
   private constructor(

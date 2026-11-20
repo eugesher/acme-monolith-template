@@ -31,16 +31,12 @@ export abstract class ProductAggregate extends VersionedEntity {
     this.updatedAt = updatedAt;
   }
 
-  public toSnapshot(): IProductSnapshot {
-    return {
-      id: this.id,
-      sku: this.sku,
-      name: this.currentName,
-      status: this.currentStatus,
-      version: this.version,
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString(),
-    };
+  public assertExpectedVersion(expectedVersion: Maybe<number>): void {
+    if (this.isExpectedVersion(expectedVersion)) {
+      return;
+    }
+
+    throw new ProductVersionMismatchException(this.id, expectedVersion, this.version);
   }
 
   public toUpdatePayload(versionAsRead: number): IProductUpdatePayload {
@@ -53,12 +49,16 @@ export abstract class ProductAggregate extends VersionedEntity {
     };
   }
 
-  public assertExpectedVersion(expectedVersion: Maybe<number>): void {
-    if (this.isExpectedVersion(expectedVersion)) {
-      return;
-    }
-
-    throw new ProductVersionMismatchException(this.id, expectedVersion, this.version);
+  public toSnapshot(): IProductSnapshot {
+    return {
+      id: this.id,
+      sku: this.sku,
+      name: this.currentName,
+      status: this.currentStatus,
+      version: this.version,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 
   protected static validSku(sku: string): string {

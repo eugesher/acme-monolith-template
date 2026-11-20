@@ -27,14 +27,6 @@ export class OrderCandidateModel {
     return new OrderCandidateModel(customerId, productIds, uniqueProductIds);
   }
 
-  public toInsertPayload(): IOrderCandidateInsertPayload {
-    return { customerId: this.customerId };
-  }
-
-  public createOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
-    return this.productIds.map((productId) => ({ orderId, productId }));
-  }
-
   public validate(): void {
     if (this.productIds.length === 0) {
       throw new OrderEmptyException();
@@ -61,5 +53,13 @@ export class OrderCandidateModel {
         throw new OrderStockInsufficientException(productId, requestedQuantity, available);
       }
     }
+  }
+
+  public toInsertPayload(): IOrderCandidateInsertPayload {
+    return { customerId: this.customerId };
+  }
+
+  public createOrderProducts(orderId: string): IOrderCandidateOrderProduct[] {
+    return this.productIds.map((productId) => ({ orderId, productId }));
   }
 }

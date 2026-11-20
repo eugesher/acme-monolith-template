@@ -18,11 +18,11 @@ export class UserStaffUserRegisterModel {
     return new UserStaffUserRegisterModel(id, email);
   }
 
-  public toSnapshot(): IUserStaffUserRegisterSnapshot {
-    return { id: this.id, email: this.email };
-  }
-
   public toLoggerPayload(): IUserStaffUserRegisterLoggerPayload {
     return { id: this.id };
+  }
+
+  public toSnapshot(): IUserStaffUserRegisterSnapshot {
+    return { id: this.id, email: this.email };
   }
 }

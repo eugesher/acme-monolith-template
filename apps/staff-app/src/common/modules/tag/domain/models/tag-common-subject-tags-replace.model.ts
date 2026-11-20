@@ -14,15 +14,6 @@ export class TagCommonSubjectTagsReplaceModel {
     private readonly tagIds: ReadonlySet<string>,
   ) {}
 
-  public static reconstitute(
-    record: ITagCommonSubjectTagsReplaceReconstitute,
-  ): TagCommonSubjectTagsReplaceModel {
-    const { subjectType, subjectId, subjectTags } = record;
-    const tagIds = new Set(subjectTags.map((subjectTag) => subjectTag.tagId));
-
-    return new TagCommonSubjectTagsReplaceModel(subjectType, subjectId, tagIds);
-  }
-
   public static missingTagIds(
     requested: readonly string[],
     foundTags: readonly ITagCommonSubjectTagsReplaceTag[],
@@ -31,6 +22,15 @@ export class TagCommonSubjectTagsReplaceModel {
     const distinct = new Set(requested);
 
     return [...distinct].filter((tagId) => !known.has(tagId));
+  }
+
+  public static reconstitute(
+    record: ITagCommonSubjectTagsReplaceReconstitute,
+  ): TagCommonSubjectTagsReplaceModel {
+    const { subjectType, subjectId, subjectTags } = record;
+    const tagIds = new Set(subjectTags.map((subjectTag) => subjectTag.tagId));
+
+    return new TagCommonSubjectTagsReplaceModel(subjectType, subjectId, tagIds);
   }
 
   public static toSnapshots(

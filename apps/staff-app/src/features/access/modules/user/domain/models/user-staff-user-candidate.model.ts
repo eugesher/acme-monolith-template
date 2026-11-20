@@ -25,17 +25,17 @@ export class UserStaffUserCandidateModel {
     private readonly roleIds: readonly string[],
   ) {}
 
+  public static assertPasswordStrength(password: string): void {
+    if (password.length < UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH) {
+      throw new UserPasswordTooWeakException(UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH);
+    }
+  }
+
   public static create(proposal: IUserStaffUserCandidateCreate): UserStaffUserCandidateModel {
     const { email, passwordHash, roleIds } = proposal;
     const userEmail = EmailValue.create(email);
 
     return new UserStaffUserCandidateModel(userEmail, passwordHash, [...new Set(roleIds)]);
-  }
-
-  public static assertPasswordStrength(password: string): void {
-    if (password.length < UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH) {
-      throw new UserPasswordTooWeakException(UserStaffUserCandidateModel.MIN_PASSWORD_LENGTH);
-    }
   }
 
   public assertEmail(): void {

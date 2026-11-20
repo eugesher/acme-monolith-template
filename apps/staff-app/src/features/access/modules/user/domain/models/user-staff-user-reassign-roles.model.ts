@@ -35,13 +35,13 @@ export class UserStaffUserReassignRolesModel {
     return this.roleIds.map((roleId) => ({ userId: this.userId, roleId }));
   }
 
-  public toSnapshot(): IUserStaffUserReassignRolesSnapshot {
-    return { id: this.userId, roleIds: this.roleIds };
-  }
-
   public toLoggerPayload(): IUserStaffUserReassignRolesLoggerPayload {
     const userRoles = this.roleIds.map((roleId) => ({ roleId }));
 
     return { id: this.userId, userRoles };
+  }
+
+  public toSnapshot(): IUserStaffUserReassignRolesSnapshot {
+    return { id: this.userId, roleIds: this.roleIds };
   }
 }

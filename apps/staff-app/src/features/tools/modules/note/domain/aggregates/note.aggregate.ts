@@ -37,18 +37,12 @@ export abstract class NoteAggregate extends VersionedEntity {
     this.updatedAt = updatedAt;
   }
 
-  public toSnapshot(): INoteSnapshot {
-    return {
-      id: this.id,
-      subjectType: this.subjectType,
-      subjectId: this.subjectId,
-      body: this.currentBody,
-      authorId: this.authorId,
-      resolved: this.currentResolved,
-      version: this.version,
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString(),
-    };
+  public assertExpectedVersion(expectedVersion: Maybe<number>): void {
+    if (this.isExpectedVersion(expectedVersion)) {
+      return;
+    }
+
+    throw new NoteVersionMismatchException(this.id, expectedVersion, this.version);
   }
 
   public toUpdatePayload(versionAsRead: number): INoteUpdatePayload {
@@ -61,12 +55,18 @@ export abstract class NoteAggregate extends VersionedEntity {
     };
   }
 
-  public assertExpectedVersion(expectedVersion: Maybe<number>): void {
-    if (this.isExpectedVersion(expectedVersion)) {
-      return;
-    }
-
-    throw new NoteVersionMismatchException(this.id, expectedVersion, this.version);
+  public toSnapshot(): INoteSnapshot {
+    return {
+      id: this.id,
+      subjectType: this.subjectType,
+      subjectId: this.subjectId,
+      body: this.currentBody,
+      authorId: this.authorId,
+      resolved: this.currentResolved,
+      version: this.version,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 
   protected static validSubjectType(subjectType: string): string {

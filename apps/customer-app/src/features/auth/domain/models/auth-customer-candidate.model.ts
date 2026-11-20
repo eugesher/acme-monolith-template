@@ -17,17 +17,17 @@ export class AuthCustomerCandidateModel {
     private readonly passwordHash: string,
   ) {}
 
+  public static assertPasswordStrength(password: string): void {
+    if (password.length < AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH) {
+      throw new AuthPasswordTooWeakException(AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH);
+    }
+  }
+
   public static create(proposal: IAuthCustomerCandidateCreate): AuthCustomerCandidateModel {
     const { email, passwordHash } = proposal;
     const customerEmail = EmailValue.create(email);
 
     return new AuthCustomerCandidateModel(customerEmail, passwordHash);
-  }
-
-  public static assertPasswordStrength(password: string): void {
-    if (password.length < AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH) {
-      throw new AuthPasswordTooWeakException(AuthCustomerCandidateModel.MIN_PASSWORD_LENGTH);
-    }
   }
 
   public assertEmail(): void {

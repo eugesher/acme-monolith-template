@@ -20,12 +20,6 @@ export class IdempotencyCoreClaimModel {
     Object.freeze(this);
   }
 
-  public static reconstitute(record: IIdempotencyCoreClaimReconstitute): IdempotencyCoreClaimModel {
-    const { requestFingerprint, status, responseBody } = record;
-
-    return new IdempotencyCoreClaimModel(requestFingerprint, status, responseBody);
-  }
-
   public static initCandidate(
     proposal: IIdempotencyCoreClaimCandidateInit,
   ): IIdempotencyCoreClaimCandidate {
@@ -46,6 +40,12 @@ export class IdempotencyCoreClaimModel {
       status: IdempotencyStatusEnum.IN_FLIGHT,
       responseBody: null,
     };
+  }
+
+  public static reconstitute(record: IIdempotencyCoreClaimReconstitute): IdempotencyCoreClaimModel {
+    const { requestFingerprint, status, responseBody } = record;
+
+    return new IdempotencyCoreClaimModel(requestFingerprint, status, responseBody);
   }
 
   public static toLoggerPayload(
