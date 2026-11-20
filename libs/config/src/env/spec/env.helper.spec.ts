@@ -68,10 +68,6 @@ describe('EnvHelper', () => {
   });
 
   describe('appEnvFilePaths', () => {
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
     it.each(['development', 'production'])(
       'returns the .env of the app under the repository root when NODE_ENV is %s',
       (nodeEnv) => {

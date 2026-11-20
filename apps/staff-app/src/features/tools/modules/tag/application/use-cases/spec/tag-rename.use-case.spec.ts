@@ -40,10 +40,6 @@ describe('TagRenameUseCase', () => {
     );
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('execute', () => {
     it('stores the new name and answers the stored tag', async () => {
       const view = await useCase.execute({ tagId: '300', name: ' handle-with-care ' });

@@ -33,10 +33,6 @@ describe('CacheLibTracerAdapter', () => {
     tracer = new CacheLibTracerAdapter();
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('runs the work in an active span of the cache tracer and returns its result', async () => {
     const result = await tracer.span({
       name: 'cache.get',

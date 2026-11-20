@@ -24,10 +24,6 @@ describe('TagCreateUseCase', () => {
     useCase = new TagCreateUseCase(repository, logger);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('execute', () => {
     it('stores the trimmed name and answers the stored tag', async () => {
       const view = await useCase.execute({ name: ' heavy ' });

@@ -35,10 +35,6 @@ describe('AuthRegisterUseCase', () => {
     useCase = new AuthRegisterUseCase(repository, credentials, ledger, logger);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('hashes the password and stores an active customer', async () => {
     const view = await useCase.execute({
       email: 'Eve@Example.com',

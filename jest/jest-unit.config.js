@@ -15,6 +15,7 @@ module.exports = {
   testEnvironment: 'node',
   globalSetup: '<rootDir>/spec/support/global-setup.ts',
   setupFiles: ['reflect-metadata'],
+  restoreMocks: true,
   testRegex: '\\.spec.ts$',
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/'],
   transform: {

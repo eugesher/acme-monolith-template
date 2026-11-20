@@ -24,10 +24,6 @@ describe('LedgerAppendUseCase', () => {
     useCase = new LedgerAppendUseCase(repository, logger);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('execute', () => {
     it('appends the entry under the correlation id of the context and logs the start and the result', async () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>

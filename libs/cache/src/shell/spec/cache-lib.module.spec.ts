@@ -63,7 +63,6 @@ describe('CacheLibModule', () => {
 
   afterEach(async () => {
     await context.close();
-    jest.restoreAllMocks();
     Object.assign(PinoLogger, { root: undefined });
   });
 

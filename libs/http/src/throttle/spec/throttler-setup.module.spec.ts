@@ -73,7 +73,6 @@ describe('ThrottlerSetupModule', () => {
 
   afterEach(async () => {
     await app.close();
-    jest.restoreAllMocks();
     Object.assign(PinoLogger, { root: undefined });
   });
 

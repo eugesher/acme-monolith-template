@@ -18,7 +18,6 @@ describe('LoggerSetupConfig', () => {
 
   afterEach(() => {
     process.env = env;
-    jest.restoreAllMocks();
   });
 
   it('logs every route', () => {

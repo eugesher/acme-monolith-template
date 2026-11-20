@@ -42,10 +42,6 @@ describe('RoleCreateUseCase', () => {
     useCase = new RoleCreateUseCase(repository, transaction, logger);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('stores the role with its unique permission codes in one transaction', async () => {
     const view = await useCase.execute({
       name: 'auditor',

@@ -19,10 +19,6 @@ describe('IdempotencyCoreClaimUseCase', () => {
     useCase = new IdempotencyCoreClaimUseCase(repository, logger);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('execute', () => {
     it('claims a new key in the scope with the fingerprint of the body', async () => {
       const claim = await useCase.execute({

@@ -43,10 +43,6 @@ describe('ThrottleRedisStorage', () => {
     storage = new ThrottleRedisStorage(config, logger);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('connects with REDIS_*, fails fast while disconnected and bounds every command', () => {
     expect(Redis).toHaveBeenCalledWith({
       host: '127.0.0.1',

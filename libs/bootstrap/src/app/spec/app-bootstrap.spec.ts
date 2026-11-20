@@ -34,10 +34,6 @@ describe('AppBootstrap', () => {
     setupReference = jest.spyOn(ApiReference, 'setup').mockReturnValue();
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('configure', () => {
     it('routes the logs of Nest through pino and sets the prefix, without starting the app', () => {
       AppBootstrap.configure(app as unknown as INestApplication);
