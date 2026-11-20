@@ -1,10 +1,8 @@
 import { getQueueToken } from '@nestjs/bullmq';
 import type { INestApplication } from '@nestjs/common';
 import type { Queue } from 'bullmq';
-import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
-import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
 import {
   LEDGER_RECORD_QUEUE,
@@ -16,17 +14,12 @@ import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {
   processor: INestApplication;
-  redis: Redis;
   ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
   adminToken: string;
   editorToken: string;
 }
 
 export class AppE2EContext extends AuthE2EContext {
-  public get redis(): Redis {
-    return this.started.redis;
-  }
-
   public get ledgerRecordQueue(): Queue<ILedgerRecordProcessorPayload> {
     return this.started.ledgerRecordQueue;
   }
@@ -63,14 +56,13 @@ export class AppE2EContext extends AuthE2EContext {
     await processor.init();
     await super.init();
 
-    const redis = this.moduleFixture.get<Redis>(CACHE_LIB_REDIS_CLIENT_TOKEN);
     const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
       getQueueToken(LEDGER_RECORD_QUEUE),
     );
     const adminToken = this.jwt.sign({ sub: '1' });
     const editorToken = this.jwt.sign({ sub: '2' });
 
-    this.state = { processor, redis, ledgerRecordQueue, adminToken, editorToken };
+    this.state = { processor, ledgerRecordQueue, adminToken, editorToken };
   }
 
   public override async close(): Promise<void> {

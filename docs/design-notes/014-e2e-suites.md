@@ -234,9 +234,12 @@ Redis. It has the layout of `apps/<app>/test`: the entry `app/app-system.e2e-spe
 `context/app-e2e.context.ts` and the classes of `features/`. An app suite reads the waiting job and
 stops there, a processor suite adds the job by hand, so neither proves that what a producer writes
 is what the processor reads. A system suite covers that seam and nothing else: one case per producer
-of a queue, checked like an app case, with the result of the job in place of the job. A route that
-returns a failed job to the queue is a producer too: the suite of staff-app lets processor-app fail
-a record, fixes it, retries it through `/queues` and waits for its ledger entry.
+of a queue, and its snapshot holds the result of the job alone, the rows processor-app wrote and the
+cache keys it dropped. What the API app answers and writes is already in the snapshot of its app
+suite, so a system case sends the request with `.expect(status)` and keeps of the answer only the id
+its exact checks compare with the ledger entry. A route that returns a failed job to the queue is a
+producer too: the suite of staff-app lets processor-app fail a record, fixes it, retries it through
+`/queues` and waits for its ledger entry.
 
 **A job is awaited by its result.** `pollUntil(read, isDone)` waits first and reads after, 30
 attempts 500 ms apart, and answers the last read, so a job that never lands fails on the snapshot. A
