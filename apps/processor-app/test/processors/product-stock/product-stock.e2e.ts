@@ -52,6 +52,29 @@ export class ProductStockE2E {
           },
         }).toMatchSnapshot();
       });
+
+      it('should complete without a write when every product keeps stock, as after most orders', async () => {
+        await this.ctx.postSubtractQueue.add('product-stock-post-subtract', {
+          productIds: ['100'],
+          correlationId: 'e2e00000-0000-4000-8000-000000000027',
+        });
+
+        await this.ctx.waitForPostSubtractQueue();
+        await this.ctx.waitForLedgerRecordQueue();
+
+        expect({
+          db: {
+            product: await this.ctx.dataSource.query(
+              'SELECT id, status, version FROM product WHERE id = 100',
+            ),
+            ledger_entry: await this.ctx.dataSource.query(
+              'SELECT operation_key FROM ledger_entry WHERE correlation_id = ?',
+              ['e2e00000-0000-4000-8000-000000000027'],
+            ),
+          },
+          failed: await this.ctx.postSubtractQueue.getFailedCount(),
+        }).toMatchSnapshot();
+      });
     });
   }
 }

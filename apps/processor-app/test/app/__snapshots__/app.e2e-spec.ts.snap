@@ -165,6 +165,22 @@ exports[`App ProductStock queue product-stock-post-subtract should archive a pub
 }
 `;
 
+exports[`App ProductStock queue product-stock-post-subtract should complete without a write when every product keeps stock, as after most orders 1`] = `
+{
+  "db": {
+    "ledger_entry": [],
+    "product": [
+      {
+        "id": "100",
+        "status": "active",
+        "version": 1,
+      },
+    ],
+  },
+  "failed": 0,
+}
+`;
+
 exports[`App ProductStock queue product-stock-post-subtract should leave a published product with stock and a draft without stock as they are 1`] = `
 {
   "db": {

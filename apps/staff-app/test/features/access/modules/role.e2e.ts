@@ -132,6 +132,29 @@ export class RoleE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
+
+      it('should clear the permissions of the role for an empty list', async () => {
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .put('/api/access/roles/3/permissions')
+            .auth(this.ctx.adminToken, { type: 'bearer' })
+            .send({ permissionCodes: [] })
+            .expect(HttpStatus.OK);
+
+          expect({
+            response: { body: response.body },
+            db: {
+              staff_role_permissions: await this.ctx.dataSource.query(
+                'SELECT * FROM staff_role_permissions WHERE role_id = 3 ORDER BY code',
+              ),
+            },
+          }).toMatchSnapshot();
+        } finally {
+          await this.ctx.dataSource.query(
+            "INSERT INTO staff_role_permissions (role_id, code) VALUES (3, 'ledger:read'), (3, 'product:read'), (3, 'order:read'), (3, 'queue:read'), (3, 'tag:read')",
+          );
+        }
+      });
     });
   }
 }

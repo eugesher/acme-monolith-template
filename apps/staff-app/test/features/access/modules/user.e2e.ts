@@ -145,6 +145,38 @@ export class UserE2E {
           },
         }).toMatchSnapshot();
       });
+
+      it('should create a user without roles for an empty list', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .post('/api/access/users')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({
+            email: 'no-role@example.com',
+            password: 'no-role-password-please-change',
+            roleIds: [],
+          })
+          .expect(HttpStatus.CREATED);
+
+        const actual = {
+          response: { body: response.body },
+          db: {
+            staff_user: await this.ctx.dataSource.query(
+              'SELECT id, email FROM staff_user WHERE email = ? ORDER BY id',
+              ['no-role@example.com'],
+            ),
+            staff_user_roles: await this.ctx.dataSource.query(
+              'SELECT * FROM staff_user_roles WHERE user_id = ? ORDER BY role_id',
+              [response.body.id],
+            ),
+          },
+        };
+
+        expect(actual).toMatchSnapshot({
+          response: { body: { id: expect.any(String) } },
+          db: { staff_user: [{ id: expect.any(String) }] },
+        });
+        expect(actual).toMatchObject({ db: { staff_user: [{ id: response.body.id }] } });
+      });
     });
   }
 

@@ -167,6 +167,21 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should answer
 }
 `;
 
+exports[`App Access Role PUT /api/access/roles/:roleId/permissions should clear the permissions of the role for an empty list 1`] = `
+{
+  "db": {
+    "staff_role_permissions": [],
+  },
+  "response": {
+    "body": {
+      "id": "3",
+      "name": "viewer",
+      "permissionCodes": [],
+    },
+  },
+}
+`;
+
 exports[`App Access Role PUT /api/access/roles/:roleId/permissions should reassign the permissions and refuse the same token at once 1`] = `
 {
   "before": {
@@ -220,6 +235,26 @@ exports[`App Access User POST /api/access/users should create a user who can log
   "response": {
     "body": {
       "email": "new-viewer@example.com",
+      "id": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Access User POST /api/access/users should create a user without roles for an empty list 1`] = `
+{
+  "db": {
+    "staff_user": [
+      {
+        "email": "no-role@example.com",
+        "id": Any<String>,
+      },
+    ],
+    "staff_user_roles": [],
+  },
+  "response": {
+    "body": {
+      "email": "no-role@example.com",
       "id": Any<String>,
     },
   },
@@ -1273,6 +1308,33 @@ exports[`App Health GET /api/health/ready should report readiness of the databas
         },
       },
       "status": "ready",
+    },
+  },
+}
+`;
+
+exports[`App Ledger GET /api/ledger should list the entries of one correlation id 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "action": "ProductCreated",
+          "correlationId": "e2e00000-0000-4000-8000-000000000026",
+          "id": "490",
+          "occurredAt": "2026-01-07T08:00:00.000Z",
+          "operationKey": "e2e-ledger:1",
+          "payload": {},
+          "recordedAt": "2026-01-07T08:00:00.000Z",
+          "subjectId": "101",
+          "subjectType": "product",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
     },
   },
 }

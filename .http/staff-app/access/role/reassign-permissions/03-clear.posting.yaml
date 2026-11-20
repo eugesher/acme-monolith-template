@@ -1,0 +1,23 @@
+name: 03-clear
+description: |-
+  e2e: Access › Role › PUT /api/access/roles/:roleId/permissions › should clear the permissions of the role for an empty list
+
+  Expect: 200 OK, the viewer role without permissions and no row of role 3 in staff_role_permissions
+  User: admin@example.com (token signed by scripts.py)
+  After: SQL: INSERT INTO staff_role_permissions (role_id, code) VALUES (3, 'ledger:read'), (3, 'product:read'), (3, 'order:read'), (3, 'queue:read'), (3, 'tag:read')
+method: PUT
+url: $STAFF_APP_BASE_URL/access/roles/3/permissions
+body:
+  content: |-
+    {
+      "permissionCodes": []
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin
