@@ -1,22 +1,22 @@
 # 023 — Processor app
 
-`apps/processor-app` runs the background work of the template: the queue processors and the
-schedules. staff-app and customer-app enqueue, and staff-app serves the staff the failed jobs (see
+`apps/processor-app` runs the background work of the template: the queue processors, one of them
+scheduled. staff-app and customer-app enqueue, and staff-app serves the staff the failed jobs (see
 `041-failed-jobs.md`). All three apps share one database and one Redis.
 
-| Processor       | Entered by                                       | What it does                                                                      |
-| --------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
-| `ledger`        | a job of the `ledger-record` queue               | appends the record (see `008-queue-processor.md`)                                 |
-| `idempotency`   | `@Cron(EVERY_5_MINUTES)`                         | deletes the expired and stuck idempotency keys (see `009-scheduled-processor.md`) |
-| `product-stock` | a job of the `product-stock-post-subtract` queue | a transaction over two core modules (see below)                                   |
+| Processor       | Entered by                                          | What it does                                                                      |
+| --------------- | --------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `ledger`        | a job of the `ledger-record` queue                  | appends the record (see `008-queue-processor.md`)                                 |
+| `idempotency`   | a job of the `idempotency-purge` queue, every 5 min | deletes the expired and stuck idempotency keys (see `009-scheduled-processor.md`) |
+| `product-stock` | a job of the `product-stock-post-subtract` queue    | a transaction over two core modules (see below)                                   |
 
 ## Why a third app
 
 **Background work scales and fails apart from HTTP.** A processor inside an HTTP app shares the
-event loop of the requests, a job that runs the process out of memory takes the API down with it,
-and a schedule inside it runs once per replica: three replicas of staff-app would purge three times
-on every tick. processor-app is a process type of its own, so the HTTP apps scale with traffic and
-processor-app with the queue.
+event loop of the requests, and a job that runs the process out of memory takes the API down with
+it. processor-app is a process type of its own, so the HTTP apps scale with traffic and
+processor-app with the queue. A schedule needs no app of its own: a job scheduler of BullMQ keeps it
+in Redis and adds one job per tick however many replicas run (see `009-scheduled-processor.md`).
 
 **No HTTP app owns this work.** The queues are written by several apps, and a processor of one HTTP
 app would serve the others through a shared Redis anyway; a third app says so.
@@ -30,13 +30,14 @@ no `JWT_SECRET` and no staff entities.
 
 The app has the folders of an HTTP app and uses fewer of them:
 
-| Folder                | What it holds                                                                     |
-| --------------------- | --------------------------------------------------------------------------------- |
-| `src/main.ts`         | the same bootstrap as the other apps; it listens for the health probes            |
-| `src/app/setup`       | config and schedule; processor-app is the only app with `ScheduleSetupModule`     |
-| `src/common/shared`   | the registrations of the `ledger-record` and `product-stock-post-subtract` queues |
-| `src/features/health` | `GET /health` and `GET /health/ready` for the orchestrator                        |
-| `src/processors`      | the three processors                                                              |
+| Folder                | What it holds                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| `src/main.ts`         | the same bootstrap as the other apps; it listens for the health probes                                 |
+| `src/app/setup`       | config                                                                                                 |
+| `src/common/shared`   | the registrations of the `ledger-record`, `product-stock-post-subtract` and `idempotency-purge` queues |
+| `src/contracts`       | `IDEMPOTENCY_PURGE_QUEUE`, the queue only processor-app writes and reads                               |
+| `src/features/health` | `GET /health` and `GET /health/ready` for the orchestrator                                             |
+| `src/processors`      | the three processors                                                                                   |
 
 **HTTP serves the probes.** The health routes are the only ones, and no guard runs, so they carry no
 `@Public()`. `APP_PIPE`, `APP_FILTER`, `HttpSecurityModule` and `ThrottlerSetupModule` are those of
@@ -68,10 +69,10 @@ comes after it waits (see `021-pessimistic-locking.md`).
 **A replay writes nothing**, because the rows the first run changed are no longer picked.
 
 **A failed check is logged as a failed ledger record is.** Every failed attempt reaches
-`@OnQueueFailed`, and `ProductStockPostSubtractReportFailureUseCase` logs it with the product ids
-through the same `JobFailureHelper.report` (see `008-queue-processor.md`): at `warn` while attempts
-are left, at `error` after the last one. A sold-out product the check did not archive then shows in
-the logs, not only among the failed jobs (see `041-failed-jobs.md`).
+`@OnWorkerEvent('failed')`, and `ProductStockPostSubtractReportFailureUseCase` logs it with the
+product ids through the same `JobFailureHelper.report` (see `008-queue-processor.md`): at `warn`
+while attempts are left, at `error` after the last one. A sold-out product the check did not archive
+then shows in the logs, not only among the failed jobs (see `041-failed-jobs.md`).
 
 ## Running
 

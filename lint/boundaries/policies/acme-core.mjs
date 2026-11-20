@@ -46,7 +46,7 @@ export const acmeCore = [
     layer('infrastructure:queue'),
     ownContracts,
     baseLibs(),
-    packages('@nestjs/bull', '@nestjs/common', 'bull'),
+    packages('@nestjs/bullmq', '@nestjs/common', 'bullmq'),
   ]),
   from('acme-core:modules:infrastructure:core-adapters', [
     layer('outbound'),

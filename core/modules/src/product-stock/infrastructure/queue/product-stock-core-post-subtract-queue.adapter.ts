@@ -1,6 +1,6 @@
-import { InjectQueue } from '@nestjs/bull';
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, type ClassProvider } from '@nestjs/common';
-import type { Queue } from 'bull';
+import type { Queue } from 'bullmq';
 
 import { DeadlineHelper } from '@acme-libs/toolkit';
 import {
@@ -29,9 +29,9 @@ export class ProductStockCorePostSubtractQueueAdapter implements IProductStockCo
   public async enqueue(command: IProductStockCorePostSubtractEnqueueCommand): Promise<void> {
     const { productIds, correlationId, timeoutMs } = command;
 
-    await DeadlineHelper.race(() => this.queue.add({ productIds, correlationId }), {
-      timeoutMs,
-      message: `Enqueue timed out after ${timeoutMs} ms`,
-    });
+    await DeadlineHelper.race(
+      () => this.queue.add(PRODUCT_STOCK_POST_SUBTRACT_QUEUE, { productIds, correlationId }),
+      { timeoutMs, message: `Enqueue timed out after ${timeoutMs} ms` },
+    );
   }
 }

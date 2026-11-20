@@ -1,22 +1,19 @@
-import type { Queue } from 'bull';
+import type { Queue } from 'bullmq';
 
 import { QueueRegistryQueueAdapter } from '../queue-registry-queue.adapter';
 
 describe('QueueRegistryQueueAdapter', () => {
   let ledgerQueue: jest.Mocked<
-    Pick<
-      Queue,
-      'name' | 'getJobCounts' | 'getPausedCount' | 'getFailed' | 'getFailedCount' | 'getJob'
-    >
+    Pick<Queue, 'name' | 'getJobCounts' | 'isPaused' | 'getFailed' | 'getFailedCount' | 'getJob'>
   >;
-  let stockQueue: jest.Mocked<Pick<Queue, 'name' | 'getJobCounts' | 'getPausedCount'>>;
+  let stockQueue: jest.Mocked<Pick<Queue, 'name' | 'getJobCounts' | 'isPaused'>>;
   let adapter: QueueRegistryQueueAdapter;
 
   beforeEach(() => {
     ledgerQueue = {
       name: 'ledger-record',
       getJobCounts: jest.fn(),
-      getPausedCount: jest.fn(),
+      isPaused: jest.fn(),
       getFailed: jest.fn(),
       getFailedCount: jest.fn(),
       getJob: jest.fn(),
@@ -24,7 +21,7 @@ describe('QueueRegistryQueueAdapter', () => {
     stockQueue = {
       name: 'product-stock-post-subtract',
       getJobCounts: jest.fn(),
-      getPausedCount: jest.fn(),
+      isPaused: jest.fn(),
     };
     adapter = new QueueRegistryQueueAdapter(
       ledgerQueue as unknown as Queue,
@@ -41,7 +38,7 @@ describe('QueueRegistryQueueAdapter', () => {
   });
 
   describe('listJobCounts', () => {
-    it('answers every queue with its job counts and its paused jobs', async () => {
+    it('answers every queue with its pause and the five counts it asks for', async () => {
       ledgerQueue.getJobCounts.mockResolvedValue({
         active: 0,
         completed: 0,
@@ -49,28 +46,38 @@ describe('QueueRegistryQueueAdapter', () => {
         delayed: 0,
         waiting: 1,
       });
-      ledgerQueue.getPausedCount.mockResolvedValue(0);
+      ledgerQueue.isPaused.mockResolvedValue(false);
       stockQueue.getJobCounts.mockResolvedValue({
         active: 1,
         completed: 0,
         failed: 0,
         delayed: 0,
-        waiting: 0,
+        waiting: 3,
+        prioritized: 4,
       });
-      stockQueue.getPausedCount.mockResolvedValue(3);
+      stockQueue.isPaused.mockResolvedValue(true);
 
       const queues = await adapter.listJobCounts();
 
       expect(queues).toEqual([
         {
           name: 'ledger-record',
-          jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1, paused: 0 },
+          paused: false,
+          jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1 },
         },
         {
           name: 'product-stock-post-subtract',
-          jobCounts: { active: 1, completed: 0, failed: 0, delayed: 0, waiting: 0, paused: 3 },
+          paused: true,
+          jobCounts: { active: 1, completed: 0, failed: 0, delayed: 0, waiting: 3 },
         },
       ]);
+      expect(ledgerQueue.getJobCounts).toHaveBeenCalledWith(
+        'active',
+        'completed',
+        'failed',
+        'delayed',
+        'waiting',
+      );
     });
   });
 
@@ -78,8 +85,8 @@ describe('QueueRegistryQueueAdapter', () => {
     it('answers the failed jobs in the window with ISO instants, and their total', async () => {
       ledgerQueue.getFailed.mockResolvedValue([
         {
-          id: 7,
-          name: '__default__',
+          id: '7',
+          name: 'ledger-record',
           data: { operationKey: 'product-created:12' },
           opts: { attempts: 3 },
           attemptsMade: 3,
@@ -91,15 +98,15 @@ describe('QueueRegistryQueueAdapter', () => {
         },
         {
           id: '8',
-          name: '__default__',
+          name: 'ledger-record',
           data: {},
           opts: {},
           attemptsMade: 0,
-          failedReason: undefined,
-          stacktrace: [],
+          failedReason: '',
+          stacktrace: null,
           timestamp: Date.UTC(2026, 0, 1, 0, 0, 0),
           processedOn: undefined,
-          finishedOn: null,
+          finishedOn: undefined,
         },
       ] as never);
       ledgerQueue.getFailedCount.mockResolvedValue(21);
@@ -114,7 +121,7 @@ describe('QueueRegistryQueueAdapter', () => {
         [
           {
             id: '7',
-            name: '__default__',
+            name: 'ledger-record',
             data: { operationKey: 'product-created:12' },
             attempts: 3,
             attemptsMade: 3,
@@ -126,11 +133,11 @@ describe('QueueRegistryQueueAdapter', () => {
           },
           {
             id: '8',
-            name: '__default__',
+            name: 'ledger-record',
             data: {},
             attempts: 1,
             attemptsMade: 0,
-            failedReason: null,
+            failedReason: '',
             stacktrace: [],
             createdAt: '2026-01-01T00:00:00.000Z',
             processedAt: null,
@@ -162,7 +169,7 @@ describe('QueueRegistryQueueAdapter', () => {
     });
 
     it('answers null for a job the queue does not hold', async () => {
-      ledgerQueue.getJob.mockResolvedValue(null);
+      ledgerQueue.getJob.mockResolvedValue(undefined);
 
       const state = await adapter.findJobState({ queueName: 'ledger-record', jobId: '7' });
 
@@ -182,7 +189,7 @@ describe('QueueRegistryQueueAdapter', () => {
     });
 
     it('does nothing for a job that is gone', async () => {
-      ledgerQueue.getJob.mockResolvedValue(null);
+      ledgerQueue.getJob.mockResolvedValue(undefined);
 
       await expect(
         adapter.retryJob({ queueName: 'ledger-record', jobId: '7' }),
@@ -206,7 +213,7 @@ describe('QueueRegistryQueueAdapter', () => {
     });
 
     it('does nothing for a job that is gone', async () => {
-      ledgerQueue.getJob.mockResolvedValue(null);
+      ledgerQueue.getJob.mockResolvedValue(undefined);
 
       await expect(
         adapter.removeJob({ queueName: 'ledger-record', jobId: '7' }),

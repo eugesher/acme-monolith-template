@@ -252,15 +252,15 @@ describe('features', () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
         code: [
-          'import { InjectQueue } from "@nestjs/bull";',
+          'import { InjectQueue } from "@nestjs/bullmq";',
           'import { Injectable } from "@nestjs/common";',
-          'import type { Queue } from "bull";',
+          'import type { Queue } from "bullmq";',
           'import { x } from "../../../../contracts/ledger-record";',
         ].join('\n'),
       }).toPassArchitectureLint();
     });
 
-    it.each(['import { BullModule } from "@nestjs/bull";', 'import type { Job } from "bull";'])(
+    it.each(['import { BullModule } from "@nestjs/bullmq";', 'import type { Job } from "bullmq";'])(
       'infrastructure/queue may NOT take more than InjectQueue and the Queue type (%s)',
       async (code) => {
         await expect({

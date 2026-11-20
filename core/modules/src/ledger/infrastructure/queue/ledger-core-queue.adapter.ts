@@ -1,6 +1,6 @@
-import { InjectQueue } from '@nestjs/bull';
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, type ClassProvider } from '@nestjs/common';
-import type { Queue } from 'bull';
+import type { Queue } from 'bullmq';
 
 import { DeadlineHelper } from '@acme-libs/toolkit';
 import {
@@ -34,8 +34,9 @@ export class LedgerCoreQueueAdapter implements ILedgerCoreQueuePort {
     await DeadlineHelper.race(
       () =>
         this.queue.add(
+          LEDGER_RECORD_QUEUE,
           { operationKey, subjectType, subjectId, action, payload, occurredAt, correlationId },
-          { jobId: operationKey },
+          { deduplication: { id: operationKey } },
         ),
       { timeoutMs, message: `Enqueue timed out after ${timeoutMs} ms` },
     );

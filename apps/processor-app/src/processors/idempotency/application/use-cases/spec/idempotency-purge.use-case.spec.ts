@@ -57,35 +57,6 @@ describe('IdempotencyPurgeUseCase', () => {
       ]);
     });
 
-    it('skips a tick that arrives while the previous purge is still running', async () => {
-      let finish: (removed: number) => void = () => undefined;
-
-      repository.deleteCreatedBefore.mockReturnValueOnce(
-        new Promise<number>((resolve) => {
-          finish = resolve;
-        }),
-      );
-
-      const first = useCase.execute();
-
-      await useCase.execute();
-      finish(0);
-      await first;
-
-      expect(repository.deleteCreatedBefore).toHaveBeenCalledTimes(1);
-      expect(logger.info.mock.calls[0]).toEqual([
-        {},
-        'Idempotency purge still running, this tick is skipped',
-      ]);
-    });
-
-    it('purges again on the tick after the previous purge finished', async () => {
-      await useCase.execute();
-      await useCase.execute();
-
-      expect(repository.deleteCreatedBefore).toHaveBeenCalledTimes(2);
-    });
-
     it('logs a failed purge as a warning instead of throwing', async () => {
       const error = new Error('database is down');
 
@@ -97,15 +68,6 @@ describe('IdempotencyPurgeUseCase', () => {
         [{ err: error }, 'Idempotency purge failed, the next tick retries'],
       ]);
       expect(logger.info).not.toHaveBeenCalled();
-    });
-
-    it('purges again on the tick after a failed purge', async () => {
-      repository.deleteCreatedBefore.mockRejectedValueOnce(new Error('database is down'));
-
-      await useCase.execute();
-      await useCase.execute();
-
-      expect(repository.deleteCreatedBefore).toHaveBeenCalledTimes(2);
     });
   });
 });

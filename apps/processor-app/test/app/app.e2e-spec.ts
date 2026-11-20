@@ -40,14 +40,15 @@ describe('App', () => {
   });
 
   describe('Ledger', () => {
-    ledgerE2E.handleRecord();
+    ledgerE2E.process();
   });
 
   describe('Idempotency', () => {
-    idempotencyE2E.handleTick();
+    idempotencyE2E.onApplicationBootstrap();
+    idempotencyE2E.process();
   });
 
   describe('ProductStock', () => {
-    productStockE2E.handleRecord();
+    productStockE2E.process();
   });
 });

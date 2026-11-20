@@ -15,14 +15,14 @@ class QueueResponseJobCountsDto {
 
   @ApiResponseProperty({ example: 5 })
   public waiting: number;
-
-  @ApiResponseProperty({ example: 0 })
-  public paused: number;
 }
 
 export class QueueResponseDto {
   @ApiResponseProperty({ example: 'ledger-record' })
   public name: string;
+
+  @ApiResponseProperty({ example: false })
+  public paused: boolean;
 
   @ApiResponseProperty({ type: QueueResponseJobCountsDto })
   public jobCounts: QueueResponseJobCountsDto;

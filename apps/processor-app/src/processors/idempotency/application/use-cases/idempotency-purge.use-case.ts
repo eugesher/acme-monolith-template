@@ -11,8 +11,6 @@ import {
 
 @Injectable()
 export class IdempotencyPurgeUseCase {
-  private running = false;
-
   constructor(
     @Inject(IDEMPOTENCY_PURGE_REPOSITORY_PORT)
     private readonly repository: IIdempotencyPurgeRepositoryPort,
@@ -25,20 +23,10 @@ export class IdempotencyPurgeUseCase {
   ) {}
 
   public async execute(): Promise<void> {
-    if (this.running) {
-      this.logger.info({}, 'Idempotency purge still running, this tick is skipped');
-
-      return;
-    }
-
-    this.running = true;
-
     try {
       await this.purge();
     } catch (error) {
       this.logger.warn({ err: error }, 'Idempotency purge failed, the next tick retries');
-    } finally {
-      this.running = false;
     }
   }
 

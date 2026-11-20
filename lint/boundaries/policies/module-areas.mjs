@@ -110,7 +110,7 @@ export const moduleAreas = [
     infrastructure: [packages('@nestjs/common', 'typeorm')],
     commonAdapters: [packages('@nestjs/common')],
     libAdapters: [libContracts('credentials', 'health'), packages('@nestjs/common')],
-    queue: [packages('@nestjs/bull', '@nestjs/common', 'bull')],
+    queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
     presentation: [
       to('acme-app:common:shared:index', own('app')),
       libContracts('auth'),
@@ -125,12 +125,12 @@ export const moduleAreas = [
     infrastructure: [packages('@nestjs/common', 'typeorm')],
     commonAdapters: [],
     libAdapters: [],
-    queue: [],
+    queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
     presentation: [
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
       baseLibs('observability'),
-      packages('@nestjs/bull', '@nestjs/schedule', 'bull'),
+      packages('@nestjs/bullmq', 'bullmq'),
     ],
     module: [baseLibs()],
   }),

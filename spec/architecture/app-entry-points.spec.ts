@@ -25,6 +25,8 @@ describe('app entry points', () => {
       '@acme-processor/app/*',
       '@acme-processor/common',
       '@acme-processor/common/*',
+      '@acme-processor/contracts',
+      '@acme-processor/contracts/*',
       '@acme-processor/features',
       '@acme-processor/features/*',
       '@acme-processor/processors',

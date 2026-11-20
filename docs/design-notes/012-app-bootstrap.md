@@ -95,8 +95,7 @@ change.
 | `TracerSetupModule.forRoot()`       | `libs/observability`                                 | closes the tracer once the queues have closed                                                           |
 | `LocalStorageSetupModule.forRoot()` | `libs/local-storage`                                 | the CLS context of every request under its correlation id                                               |
 | `OrmModule.forRoot(entities)`       | `libs/database`, the entities of `app/entities`      | the connection, the entities of the app, `ORM_PORT`, `TRANSACTION_PORT` (see `026-transaction-port.md`) |
-| `ScheduleSetupModule`               | `app/setup/schedule`, processor-app only             | `ScheduleModule.forRoot()` for `@Cron`                                                                  |
-| `BullSetupModule.forRoot()`         | `libs/queue`                                         | the Bull connection to Redis, the job options of every queue                                            |
+| `BullSetupModule.forRoot()`         | `libs/queue`                                         | the BullMQ connection to Redis, the prefix and the job options of every queue                           |
 | `CacheLibModule`                    | `libs/cache`                                         | global `CACHE_LIB_PORT`                                                                                 |
 | `HttpSecurityModule.forRoot()`      | `libs/http`                                          | the security headers of `helmet` and CORS from `HTTP_CORS_ORIGINS` (see `037-http-edge.md`)             |
 | `ThrottlerSetupModule.forRoot()`    | `libs/http`                                          | the global request limits over Redis and `trust proxy` (see `003-authentication.md`)                    |
@@ -135,8 +134,8 @@ domain exceptions of that feature first and hands the response to `HttpException
 is mounted on every route and opens the context with `run`, never with `enterWith`. It stores the id
 under `CLS_ID`. `LocalStorageTransactionalModule` of the same lib, which `OrmModule` imports, adds
 the transactional plugin with `ClsModule.registerPlugins`, and `TRANSACTION_PORT.run` opens a nested
-context with `ifNested: 'inherit'`, so the id stays inside the transaction. A queue job or a tick
-has no request, so `CorrelationContextHelper.run` opens a context of its own
+context with `ifNested: 'inherit'`, so the id stays inside the transaction. A queue job or the start
+of the app has no request, so `CorrelationContextHelper.run` opens a context of its own
 (`ifNested: 'override'`).
 
 **The context and the request logger see one id.** Both call `CorrelationIdHelper.resolve`, which
@@ -170,14 +169,15 @@ exits would end the process while Nest is still closing it, cutting the job a pr
 
 Nest closes in phases: `onModuleDestroy`, `beforeApplicationShutdown`, the HTTP server, then
 `onApplicationShutdown`. Each phase walks the modules from the root down, and the global modules
-come last. In the last phase:
+come last. In the first phase `@nestjs/bullmq` closes the workers, and `worker.close()` waits for
+the job a processor runs. In the last phase:
 
-| Hook                | Where                                          | What it waits for              |
-| ------------------- | ---------------------------------------------- | ------------------------------ |
-| `queue.close()`     | the queue modules of `@nestjs/bull`            | the job a processor is running |
-| the `DataSource`    | `TypeOrmCoreModule` of `OrmModule`             | the pool                       |
-| the Redis clients   | `CacheLibStoreAdapter`, `ThrottleRedisStorage` | `quit`                         |
-| `TracerSetupModule` | `libs/observability`                           | the export of the spans left   |
+| Hook                | Where                                          | What it waits for            |
+| ------------------- | ---------------------------------------------- | ---------------------------- |
+| `queue.close()`     | the queue modules of `@nestjs/bullmq`          | its connections              |
+| the `DataSource`    | `TypeOrmCoreModule` of `OrmModule`             | the pool                     |
+| the Redis clients   | `CacheLibStoreAdapter`, `ThrottleRedisStorage` | `quit`                       |
+| `TracerSetupModule` | `libs/observability`                           | the export of the spans left |
 
 **The tracer closes after the queues.** `@acme-libs/observability/tracer` starts the SDK before Nest
 loads and hands it to `TracerSetupModule.track`. The module is global, so its hook runs after the

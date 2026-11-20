@@ -38,7 +38,7 @@ export const acmeApp = [
     to('acme-core:entities'),
     to('acme-app:common:entities', own('app')),
     baseLibs('config'),
-    packages('@nestjs/common', '@nestjs/config', '@nestjs/schedule', 'joi'),
+    packages('@nestjs/common', '@nestjs/config', 'joi'),
   ]),
   from('acme-app:common:shared', [
     to('acme-app:common:shared', own('app')),
@@ -125,11 +125,10 @@ export const acmeApp = [
     to('acme-app:common:entities', own('app')),
     baseLibs('database', 'observability', 'testing'),
     packages(
-      '@nestjs/bull',
+      '@nestjs/bullmq',
       '@nestjs/common',
       '@nestjs/config',
-      '@nestjs/schedule',
-      'bull',
+      'bullmq',
       'ioredis',
       'supertest',
       'typeorm',

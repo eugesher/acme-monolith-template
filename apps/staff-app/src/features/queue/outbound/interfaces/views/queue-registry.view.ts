@@ -2,13 +2,13 @@ import type { Nullable } from '@acme-libs/toolkit';
 
 export interface IQueueRegistryJobCountsView {
   name: string;
+  paused: boolean;
   jobCounts: {
     active: number;
     completed: number;
     failed: number;
     delayed: number;
     waiting: number;
-    paused: number;
   };
 }
 

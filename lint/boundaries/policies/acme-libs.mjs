@@ -91,7 +91,10 @@ export const acmeLibs = [
       'typeorm',
     ),
   ]),
-  fromLib('queue', [libs('config'), packages('@nestjs/bull', '@nestjs/common', '@nestjs/config')]),
+  fromLib('queue', [
+    libs('config'),
+    packages('@nestjs/bullmq', '@nestjs/common', '@nestjs/config'),
+  ]),
   fromLib('openapi', [
     libs('http'),
     packages(

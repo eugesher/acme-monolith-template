@@ -1,10 +1,11 @@
-import { BullModule, type BullRootModuleOptions } from '@nestjs/bull';
+import { BullModule, type BullRootModuleOptions } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
 import type { DynamicModule } from '@nestjs/common';
 
 import { RedisConfigHelper } from '@acme-libs/config';
 
 export class BullSetupModule {
+  private static readonly PREFIX = 'acme:queue';
   private static readonly DEFAULT_JOB_OPTIONS: BullRootModuleOptions['defaultJobOptions'] = {
     attempts: 3,
     backoff: { type: 'exponential', delay: 1000 },
@@ -23,8 +24,12 @@ export class BullSetupModule {
   }
 
   private static options(config: ConfigService): BullRootModuleOptions {
-    const redis = RedisConfigHelper.connection(config);
+    const connection = RedisConfigHelper.connection(config);
 
-    return { redis, defaultJobOptions: BullSetupModule.DEFAULT_JOB_OPTIONS };
+    return {
+      connection,
+      prefix: BullSetupModule.PREFIX,
+      defaultJobOptions: BullSetupModule.DEFAULT_JOB_OPTIONS,
+    };
   }
 }

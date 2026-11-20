@@ -3,16 +3,18 @@
 `apps/processor-app/src/processors/idempotency` deletes expired and stuck rows of `idempotency_key`
 on a schedule. The keys are written by the core idempotency module (see `006-idempotency-keys.md`),
 but nothing else deletes them, so the delete lives here with a repository of its own (see
-`024-code-placement.md`). It is a processor: a schedule enters it, not an HTTP request.
+`024-code-placement.md`). It is a processor: a job of the `idempotency-purge` queue enters it, and a
+job scheduler of BullMQ adds that job every five minutes.
 
-| Layer                        | What it holds                                                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `presentation/processors`    | `IdempotencyPurgeProcessor`, `@Cron(CronExpression.EVERY_5_MINUTES)`                                              |
-| `application`                | `IdempotencyPurgeUseCase`                                                                                         |
-| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                    |
-| `outbound`                   | `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN` |
-| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                      |
-| `infrastructure/config`      | `IdempotencyConfigKeyTtlHoursProvider`, `IdempotencyConfigInFlightTtlMinutesProvider`                             |
+| Layer                        | What it holds                                                                                                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `presentation/processors`    | `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                 |
+| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                         |
+| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                       |
+| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN` |
+| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`                                                                                                               |
+| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                         |
+| `infrastructure/config`      | `IdempotencyConfigKeyTtlHoursProvider`, `IdempotencyConfigInFlightTtlMinutesProvider`                                                                |
 
 The processor owns both TTLs: its `infrastructure/config` binds `IDEMPOTENCY_KEY_TTL_HOURS` and
 `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` to their tokens (see `030-config-values.md`). The core module
@@ -31,37 +33,43 @@ must outlast the longest write that holds a key, lock waits included: a key dele
 holder lets a retry claim it and do the work twice. The five-minute tick bounds the wait for a
 client to the in-flight TTL plus one tick.
 
-## The schedule decides only when
+## One purge per tick
 
-**The processor opens a correlation context and nothing else.** A tick is not a request, so no
-middleware has opened a context for it. `handleTick` runs the use case inside
-`CorrelationContextHelper.run` with no inbound id, which mints a new id for every tick. Everything
-the tick logs carries it, and nothing logs the root warning about a missing context.
+**The schedule lives in Redis, not in a process.** On start every replica of processor-app calls
+`upsertJobScheduler` with the id `idempotency-purge` and the pattern `*/5 * * * *`. BullMQ keeps one
+scheduler per id, so the second replica updates the scheduler the first one made instead of adding
+another, and the scheduler keeps one delayed job for the next tick. A worker of any replica takes
+that job, so each tick runs one purge however many replicas there are, and no replica has to be the
+one that schedules. A replica that restarts upserts the same scheduler again.
 
-**Every replica purges.** processor-app scales with its queues (see `023-processor-app.md`), and
-`@Cron` fires in every replica, so each tick runs one purge per replica. That is harmless: a purge
-deletes by its cutoffs, so a concurrent one waits on the same row locks and then finds the rows
-gone. A deadlock between two of them fails one purge, which logs its warning, and the next tick
-retries. The guard below covers only the ticks of its own replica.
+**A slow purge may meet the next one.** BullMQ adds the job of the next tick when the current one
+starts, so a purge longer than five minutes can run beside the next tick on another replica. That is
+harmless: a purge deletes by its cutoffs, so a concurrent one waits on the same row locks and then
+finds the rows gone; a deadlock fails one purge, which logs its warning. One replica never runs two
+purges at once: its worker processes one job at a time.
 
-**The cadence is a constant.** A decorator argument is evaluated when the class is defined, before
-DI can resolve a configured value. A configured cadence would need `SchedulerRegistry` and an
-interval that `onModuleDestroy` removes, or the timer would keep the process alive.
+**The cadence is a constant of the use case.** `IdempotencyPurgeScheduleUseCase` passes its private
+`PATTERN` to `IDEMPOTENCY_PURGE_SCHEDULE_PORT.register`, and `IdempotencyPurgeScheduleQueueAdapter`
+upserts the scheduler under the name of the queue, with a job named the same. A changed pattern
+replaces the stored one on the next start, since the id stays. A failed registration throws out of
+`onApplicationBootstrap`, so processor-app does not start without its schedule.
 
-## The use case owns the outcome
+## Entries and outcomes
 
-The use case, not the processor, holds the guard and the logs, because a processor does not log:
-outcomes are logged by the application.
+**The processor opens a correlation context and nothing else.** Neither the start of the app nor a
+job is a request, so no middleware has opened a context for them. `onApplicationBootstrap` and
+`process` run their use case inside `CorrelationContextHelper.run` with no inbound id, which mints a
+new id for the start and for every job. Everything they log carries it, and nothing logs the root
+warning about a missing context.
 
-- **An overlapping tick is skipped, not raced.** `@Cron` fires on its cadence whatever the previous
-  callback is doing. While a purge runs, the next tick logs
-  `Idempotency purge still running, this tick is skipped` at `info` and returns. Nest makes the use
-  case a singleton, so the flag is shared by every tick.
-- **The flag is cleared in `finally`.** A throw must not leave it set and silence every later tick.
+**The use cases own the outcomes**, because a processor does not log: outcomes are logged by the
+application.
+
+- **A registration logs one line**, `Idempotency purge scheduled`, with the pattern.
 - **A failed purge is logged, not thrown.** It logs
-  `Idempotency purge failed, the next tick retries` at `warn` with the error. Expired keys only cost
-  space until the next tick.
-
+  `Idempotency purge failed, the next tick retries` at `warn` with the error, and the job completes.
+  Expired keys only cost space until the next tick, so the queue keeps no failed purge and `/queues`
+  does not list it (see `041-failed-jobs.md`).
 - **A successful purge logs one line**, `Expired idempotency keys purged`, with each cutoff, the
   count of keys it deleted and its TTL. Each delete of the repository answers that count as a
   number, `affected` of the `DeleteResult` of TypeORM or 0, so the shape of the ORM stays in
@@ -69,10 +77,16 @@ outcomes are logged by the application.
 
 ## Wiring
 
-processor-app mounts `IdempotencyModule` through `@acme-processor/processors`. `@Cron` only marks
-the method: the tick fires because processor-app imports `ScheduleSetupModule`, which imports
-`ScheduleModule.forRoot()`. The schedule is named `idempotency-purge`, so the e2e suite fires it
-through `SchedulerRegistry`.
+The queue name `IDEMPOTENCY_PURGE_QUEUE` lives in `apps/processor-app/src/contracts/idempotency`:
+the registration of the queue in `common/shared/idempotency`, the processor and the queue adapter
+all read it, and an app contract is what those layers share. processor-app mounts
+`IdempotencyModule` through `@acme-processor/processors`, and the module imports
+`IdempotencyPurgeQueueModule`.
 
-Lint lets a processor take only `Cron` and `CronExpression` from `@nestjs/schedule`, the app only
-`ScheduleModule`, and the e2e code only `SchedulerRegistry`. No other layer imports the package.
+**The start of the app is an entry.** `IdempotencyPurgeProcessor` implements
+`OnApplicationBootstrap`, so lint lets the presentation of a processor take that name from
+`@nestjs/common` next to the DI names (see `016-lint-allowlists.md`). No layer imports
+`@nestjs/schedule`.
+
+The e2e suite adds a job to the queue itself and reads the rows, and it checks that the start left
+exactly one scheduler with the pattern (see `014-e2e-suites.md`).

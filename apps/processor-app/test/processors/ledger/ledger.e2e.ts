@@ -7,10 +7,10 @@ export class LedgerE2E {
     return new LedgerE2E(ctx);
   }
 
-  public handleRecord(): void {
+  public process(): void {
     describe('queue ledger-record', () => {
       it('should append the record as a ledger entry under its correlation id', async () => {
-        await this.ctx.ledgerRecordQueue.add({
+        await this.ctx.ledgerRecordQueue.add('ledger-record', {
           operationKey: 'e2e-record:1',
           subjectType: 'product',
           subjectId: '100',
@@ -45,8 +45,8 @@ export class LedgerE2E {
           correlationId: 'e2e00000-0000-4000-8000-000000000007',
         };
 
-        await this.ctx.ledgerRecordQueue.add(record);
-        await this.ctx.ledgerRecordQueue.add(record);
+        await this.ctx.ledgerRecordQueue.add('ledger-record', record);
+        await this.ctx.ledgerRecordQueue.add('ledger-record', record);
         await this.ctx.waitForLedgerRecordQueue();
 
         expect({
@@ -61,6 +61,7 @@ export class LedgerE2E {
 
       it('should keep a record that fails its last attempt among the failed jobs', async () => {
         const job = await this.ctx.ledgerRecordQueue.add(
+          'ledger-record',
           {
             operationKey: 'e2e-record:3',
             subjectType: 'p'.repeat(65),

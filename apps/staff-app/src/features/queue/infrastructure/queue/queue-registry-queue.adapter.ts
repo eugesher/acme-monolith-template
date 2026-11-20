@@ -1,6 +1,6 @@
-import { InjectQueue } from '@nestjs/bull';
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, type ClassProvider } from '@nestjs/common';
-import type { Queue } from 'bull';
+import type { Queue } from 'bullmq';
 
 import { LEDGER_RECORD_QUEUE } from '@acme-core/contracts/ledger';
 import { PRODUCT_STOCK_POST_SUBTRACT_QUEUE } from '@acme-core/contracts/product-stock';
@@ -46,14 +46,15 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
     return await Promise.all(
       queues.map(async (queue) => {
         const [jobCounts, paused] = await Promise.all([
-          queue.getJobCounts(),
-          queue.getPausedCount(),
+          queue.getJobCounts('active', 'completed', 'failed', 'delayed', 'waiting'),
+          queue.isPaused(),
         ]);
         const { active, completed, failed, delayed, waiting } = jobCounts;
 
         return {
           name: queue.name,
-          jobCounts: { active, completed, failed, delayed, waiting, paused },
+          paused,
+          jobCounts: { active, completed, failed, delayed, waiting },
         };
       }),
     );
@@ -113,8 +114,8 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
       data,
       attempts: opts.attempts ?? 1,
       attemptsMade,
-      failedReason: failedReason ?? null,
-      stacktrace,
+      failedReason,
+      stacktrace: stacktrace ?? [],
       createdAt,
       processedAt,
       failedAt,

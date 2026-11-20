@@ -383,16 +383,19 @@ describe('libs', () => {
   it('the queue lib MAY import the packages Bull setup needs', async () => {
     await expect({
       file: 'libs/queue/src/bull/__fixture__.ts',
-      code: 'import { BullModule } from "@nestjs/bull";\nimport { DynamicModule } from "@nestjs/common";\nimport { ConfigService } from "@nestjs/config";',
+      code: 'import { BullModule } from "@nestjs/bullmq";\nimport { DynamicModule } from "@nestjs/common";\nimport { ConfigService } from "@nestjs/config";',
     }).toPassArchitectureLint();
   });
 
-  it.each(['bull', 'ioredis', 'nestjs-pino'])('the queue lib may NOT import %s', async (source) => {
-    await expect({
-      file: 'libs/queue/src/bull/__fixture__.ts',
-      code: `import { x } from "${source}";`,
-    }).toBreakRule('boundaries/dependencies');
-  });
+  it.each(['bullmq', 'ioredis', 'nestjs-pino'])(
+    'the queue lib may NOT import %s',
+    async (source) => {
+      await expect({
+        file: 'libs/queue/src/bull/__fixture__.ts',
+        code: `import { x } from "${source}";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
 
   it('the credentials lib MAY import the packages hashing and signing need', async () => {
     await expect({

@@ -96,7 +96,7 @@ describe('repo', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['@nestjs/bull', '@nestjs/common', 'bull', 'ioredis', 'supertest'])(
+    it.each(['@nestjs/bullmq', '@nestjs/common', 'bullmq', 'ioredis', 'supertest'])(
       'a system test MAY import %s',
       async (source) => {
         await expect({
