@@ -1,5 +1,6 @@
+import { HealthE2E } from '@acme-libs/testing';
+
 import { AppE2EContext } from '../context/app-e2e.context';
-import { HealthE2E } from '../features';
 import { IdempotencyE2E, LedgerE2E, ProductStockE2E } from '../processors';
 
 describe('App', () => {

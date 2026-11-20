@@ -54,6 +54,7 @@ export const acmeLibs = [
       '@nestjs/jwt',
       '@nestjs/testing',
       'nestjs-pino',
+      'supertest',
       'typeorm',
     ),
   ]),

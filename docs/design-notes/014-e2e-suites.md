@@ -79,6 +79,13 @@ method wraps the `describe` of that endpoint. `ProductE2E.of(ctx)` builds it ove
 feature that needs a hook before each case has `hooks()`, as `CatalogE2E` of customer-app deletes
 the `acme:catalog:*` keys from Redis.
 
+**A section every app runs alike lives in the testing lib.** The health endpoints, the headers of
+helmet, CORS and the correlation id answer the same in the three apps, so `HealthE2E` of
+`libs/testing/src/e2e/health.e2e.ts` holds their cases once and takes any `E2EContext`. Each entry
+still mounts it in its `describe('Health')`: every app wires its edge itself, and the cases show
+that each one did. processor-app has no `features/` left. The lint treats the file as e2e code
+(`lint/configs/e2e.mjs` and `specs.mjs`), and the testing lib may import `supertest` for it.
+
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
 `libs/testing/src/e2e/e2e.context.ts`, which holds what the contexts share: `init()` compiles the
 `AppModule` it is given with `@nestjs/testing`, starts it with

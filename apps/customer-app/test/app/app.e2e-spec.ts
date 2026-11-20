@@ -1,5 +1,7 @@
+import { HealthE2E } from '@acme-libs/testing';
+
 import { AppE2EContext } from '../context/app-e2e.context';
-import { AuthE2E, CatalogE2E, HealthE2E, OrderE2E } from '../features';
+import { AuthE2E, CatalogE2E, OrderE2E } from '../features';
 
 describe('App', () => {
   jest.setTimeout(90000);

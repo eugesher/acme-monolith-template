@@ -127,6 +127,13 @@ describe('libs', () => {
     }).toPassArchitectureLint();
   });
 
+  it('the testing lib MAY import supertest for the e2e sections the apps share', async () => {
+    await expect({
+      file: 'libs/testing/src/e2e/__fixture__.e2e.ts',
+      code: 'import request from "supertest";',
+    }).toPassArchitectureLint();
+  });
+
   it('a lib may NOT import the testing lib outside its specs', async () => {
     await expect({
       file: 'libs/cache/src/application/__fixture__.ts',

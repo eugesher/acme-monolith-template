@@ -4,7 +4,13 @@ import { barrelBypassSelectors } from '../syntax/barrel-bypass.selectors.mjs';
 import { namedImportSelectors } from '../syntax/named-imports.selectors.mjs';
 
 export const specs = {
-  files: ['**/*.spec.ts', '**/*.e2e-spec.ts', 'apps/*/test/**/*.ts', 'test/system/**/*.ts'],
+  files: [
+    '**/*.spec.ts',
+    '**/*.e2e-spec.ts',
+    'apps/*/test/**/*.ts',
+    'test/system/**/*.ts',
+    'libs/testing/src/**/*.e2e.ts',
+  ],
   extends: [jestPlugin.configs['flat/recommended']],
   rules: {
     '@typescript-eslint/no-extraneous-class': [

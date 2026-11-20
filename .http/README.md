@@ -17,7 +17,8 @@ Script paths in the requests are relative to the collection root, so the root mu
 
 One request per e2e case of the app. The folder is the endpoint, the number in the file name is the
 order of the case in the e2e. The first line of a description is the full name of the e2e test, so
-the test can be found in `apps/<app>/test`.
+the test can be found in `apps/<app>/test`, or in `libs/testing/src/e2e/health.e2e.ts` for the
+health cases every app shares.
 
 Ten e2e cases have no request:
 

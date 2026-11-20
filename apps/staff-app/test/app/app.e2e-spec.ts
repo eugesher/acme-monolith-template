@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 import { SnakeNamingStrategy } from '@acme-libs/database';
+import { HealthE2E } from '@acme-libs/testing';
 import * as coreEntities from '@acme-core/entities';
 import * as staffEntities from '@acme-staff/common/entities';
 
@@ -10,7 +11,6 @@ import {
   AccessE2E,
   AuthE2E,
   CatalogE2E,
-  HealthE2E,
   LedgerE2E,
   QueueE2E,
   SalesE2E,
