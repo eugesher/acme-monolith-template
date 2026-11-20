@@ -377,6 +377,13 @@ describe('libs', () => {
     }).toPassArchitectureLint();
   });
 
+  it('the auth lib MAY import @nestjs/swagger, so a public route needs no token in the OpenAPI document either', async () => {
+    await expect({
+      file: 'libs/auth/src/decorators/__fixture__.ts',
+      code: 'import { applyDecorators } from "@nestjs/common";\nimport { ApiSecurity } from "@nestjs/swagger";',
+    }).toPassArchitectureLint();
+  });
+
   it.each(['typeorm', 'nestjs-pino', 'argon2'])(
     'the auth lib may NOT import %s',
     async (source) => {

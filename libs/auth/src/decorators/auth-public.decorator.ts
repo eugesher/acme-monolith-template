@@ -1,5 +1,7 @@
-import { SetMetadata, type CustomDecorator } from '@nestjs/common';
+import { applyDecorators, SetMetadata } from '@nestjs/common';
+import { ApiSecurity } from '@nestjs/swagger';
 
 import { AuthMetadataKeyEnum } from '../enums/auth-metadata-key.enum';
 
-export const Public = (): CustomDecorator => SetMetadata(AuthMetadataKeyEnum.PUBLIC, true);
+export const Public = (): MethodDecorator & ClassDecorator =>
+  applyDecorators(SetMetadata(AuthMetadataKeyEnum.PUBLIC, true), ApiSecurity({}));

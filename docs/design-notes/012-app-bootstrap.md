@@ -84,7 +84,9 @@ accepts only `false` with `NODE_ENV=production`, so a production process never s
 its API. The document lists no server, so the page calls the origin it is served from. The title and
 the description of each app sit in `ApiReference`, and the description names every area of the API:
 a feature that adds a controller with a new tag extends the description of its app in the same
-change.
+change. Next to them `bearer` says whether the app has auth: the documents of staff-app and
+customer-app declare the `bearer` scheme and require it of every operation that `@Public()` does not
+open (see `002-global-auth-guards.md`); processor-app has no auth and declares no scheme.
 
 ## AppModule
 

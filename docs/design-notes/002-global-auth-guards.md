@@ -77,6 +77,14 @@ it is visible in the controller. Health endpoints are public: an orchestrator pr
 credentials. The e2e suite of each API app compares every route it mounts, with `public`, its
 permission code or `authenticated`, to a table (see `014-e2e-suites.md`).
 
+**The OpenAPI document denies by default too.** The documents of staff-app and customer-app require
+the `bearer` scheme of every operation, and `@Public()` lifts it with an empty requirement
+(`ApiSecurity({})`) next to its guard metadata, so the page and a generated client ask for a token
+exactly where the guard does (see `012-app-bootstrap.md`). The decorator is the one source: no
+controller marks its routes for the document apart from it. `@nestjs/swagger` drops an empty array
+of requirements when it merges the metadata of a controller and its method, so the decorator sets
+one empty requirement, which OpenAPI reads as no authentication.
+
 ## The user is re-derived
 
 **The token names the subject and nothing else.** The `auth` feature of the app signs `{ sub }`, and

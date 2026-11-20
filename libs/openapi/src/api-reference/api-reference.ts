@@ -10,21 +10,27 @@ import { ErrorResponseDto } from '@acme-libs/http';
 import { AppNameEnum } from '@acme-libs/kernel';
 
 export class ApiReference {
-  private static readonly DOCUMENTS: Record<AppNameEnum, { title: string; description: string }> = {
+  private static readonly DOCUMENTS: Record<
+    AppNameEnum,
+    { title: string; description: string; bearer: boolean }
+  > = {
     [AppNameEnum.STAFF_APP]: {
       title: 'ACME staff API',
       description:
         'The back-office surface: staff users, roles and permissions, the product catalog, sales orders, warehouse stock, the ledger, and the notes and tags of the staff.',
+      bearer: true,
     },
     [AppNameEnum.CUSTOMER_APP]: {
       title: 'ACME customer API',
       description:
         'The customer-facing surface: sign-up and sign-in, the product catalog, and the orders of the signed-in customer.',
+      bearer: true,
     },
     [AppNameEnum.PROCESSOR_APP]: {
       title: 'ACME processor app',
       description:
-        'The background worker: its queues and their failed jobs, listed, retried and removed with the token of a staff login to the staff API; the rest of its work comes from queues and schedules.',
+        'The background worker: it appends the ledger records the APIs enqueue, archives a published product an order leaves without stock, and purges expired and stuck idempotency keys every five minutes; it serves the health probes alone.',
+      bearer: false,
     },
   };
   private static readonly ERROR_DESCRIPTION =
@@ -40,17 +46,21 @@ export class ApiReference {
     }
 
     const prefix = config.getOrThrow<string>('API_PREFIX');
-    const { title, description } = ApiReference.DOCUMENTS[appName];
-    const options = new DocumentBuilder()
+    const { title, description, bearer } = ApiReference.DOCUMENTS[appName];
+    const builder = new DocumentBuilder()
       .setTitle(title)
       .setDescription(description)
-      .addBearerAuth()
       .addGlobalResponse({
         status: 'default',
         description: ApiReference.ERROR_DESCRIPTION,
         type: ErrorResponseDto,
-      })
-      .build();
+      });
+
+    if (bearer) {
+      builder.addBearerAuth().addSecurityRequirements('bearer');
+    }
+
+    const options = builder.build();
     const document = SwaggerModule.createDocument(app, options);
     const nonces = new WeakMap<ServerResponse, string>();
     const assignNonce = (_req: IncomingMessage, res: ServerResponse, next: () => void): void => {
