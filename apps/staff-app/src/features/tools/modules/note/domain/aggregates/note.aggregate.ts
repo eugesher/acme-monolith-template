@@ -11,8 +11,8 @@ import {
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
 
 export abstract class NoteAggregate extends VersionedEntity {
-  protected currentBody: string;
-  protected currentResolved: boolean;
+  protected body: string;
+  protected resolved: boolean;
   protected readonly subjectType: string;
   protected readonly subjectId: string;
   protected readonly authorId: string;
@@ -33,8 +33,8 @@ export abstract class NoteAggregate extends VersionedEntity {
     this.subjectType = NoteAggregate.validSubjectType(subjectType);
     this.subjectId = NoteAggregate.validSubjectId(subjectId);
     this.authorId = authorId;
-    this.currentBody = NoteAggregate.validBody(body);
-    this.currentResolved = resolved;
+    this.body = NoteAggregate.validBody(body);
+    this.resolved = resolved;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -51,8 +51,8 @@ export abstract class NoteAggregate extends VersionedEntity {
     return {
       id: this.id,
       versionAsRead,
-      body: this.currentBody,
-      resolved: this.currentResolved,
+      body: this.body,
+      resolved: this.resolved,
       version: this.version,
     };
   }
@@ -62,9 +62,9 @@ export abstract class NoteAggregate extends VersionedEntity {
       id: this.id,
       subjectType: this.subjectType,
       subjectId: this.subjectId,
-      body: this.currentBody,
+      body: this.body,
       authorId: this.authorId,
-      resolved: this.currentResolved,
+      resolved: this.resolved,
       version: this.version,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
@@ -107,7 +107,7 @@ export abstract class NoteAggregate extends VersionedEntity {
   }
 
   protected assertOpen(): void {
-    if (this.currentResolved) {
+    if (this.resolved) {
       throw new NoteResolvedException(this.id);
     }
   }

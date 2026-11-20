@@ -14,13 +14,13 @@ export class ProductPublishModel extends ProductAggregate {
   }
 
   public publish(): Maybe<ProductStatusEnum> {
-    if (this.currentStatus === ProductStatusEnum.ACTIVE) {
+    if (this.status === ProductStatusEnum.ACTIVE) {
       return undefined;
     }
 
-    const previousStatus = this.currentStatus;
+    const previousStatus = this.status;
 
-    this.currentStatus = ProductStatusEnum.ACTIVE;
+    this.status = ProductStatusEnum.ACTIVE;
     this.bumpVersion();
 
     return previousStatus;

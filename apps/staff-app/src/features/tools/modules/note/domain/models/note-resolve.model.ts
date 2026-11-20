@@ -9,7 +9,7 @@ export class NoteResolveModel extends NoteAggregate {
   public resolve(): void {
     this.assertOpen();
 
-    this.currentResolved = true;
+    this.resolved = true;
     this.bumpVersion();
   }
 

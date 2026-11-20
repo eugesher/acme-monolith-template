@@ -13,20 +13,20 @@ import type {
 
 export class OrderCandidateModel {
   public get distinctProductIds(): readonly string[] {
-    return this.uniqueProductIds;
+    return this._distinctProductIds;
   }
 
   private constructor(
     private readonly customerId: string,
     private readonly productIds: readonly string[],
-    private readonly uniqueProductIds: readonly string[],
+    private readonly _distinctProductIds: readonly string[],
   ) {}
 
   public static create(proposal: IOrderCandidateCreate): OrderCandidateModel {
     const { customerId, productIds } = proposal;
-    const uniqueProductIds = [...new Set(productIds)];
+    const distinctProductIds = [...new Set(productIds)];
 
-    return new OrderCandidateModel(customerId, productIds, uniqueProductIds);
+    return new OrderCandidateModel(customerId, productIds, distinctProductIds);
   }
 
   public validate(): void {
@@ -46,7 +46,7 @@ export class OrderCandidateModel {
   }
 
   public assertStockQuantities(stockQuantities: IOrderCandidateStockQuantity[]): void {
-    for (const productId of this.uniqueProductIds) {
+    for (const productId of this._distinctProductIds) {
       const requestedQuantity = this.productIds.filter((id) => id === productId).length;
       const productStock = stockQuantities.find((candidate) => candidate.productId === productId);
       const available = productStock?.quantity ?? 0;

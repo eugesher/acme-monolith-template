@@ -11,8 +11,8 @@ import {
 import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
 
 export abstract class ProductAggregate extends VersionedEntity {
-  protected currentName: string;
-  protected currentStatus: ProductStatusEnum;
+  protected name: string;
+  protected status: ProductStatusEnum;
   protected readonly sku: string;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
@@ -27,8 +27,8 @@ export abstract class ProductAggregate extends VersionedEntity {
     super(id, validVersion);
 
     this.sku = ProductAggregate.validSku(sku);
-    this.currentName = ProductAggregate.validName(name);
-    this.currentStatus = status;
+    this.name = ProductAggregate.validName(name);
+    this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -45,8 +45,8 @@ export abstract class ProductAggregate extends VersionedEntity {
     return {
       id: this.id,
       versionAsRead,
-      name: this.currentName,
-      status: this.currentStatus,
+      name: this.name,
+      status: this.status,
       version: this.version,
     };
   }
@@ -55,8 +55,8 @@ export abstract class ProductAggregate extends VersionedEntity {
     return {
       id: this.id,
       sku: this.sku,
-      name: this.currentName,
-      status: this.currentStatus,
+      name: this.name,
+      status: this.status,
       version: this.version,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),

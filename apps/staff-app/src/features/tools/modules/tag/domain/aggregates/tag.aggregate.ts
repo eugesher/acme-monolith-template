@@ -8,7 +8,7 @@ export abstract class TagAggregate extends Entity {
 
   protected constructor(
     id: string,
-    protected currentName: string,
+    protected _name: string,
     protected readonly createdAt: Date,
     protected readonly updatedAt: Date,
   ) {
@@ -18,7 +18,7 @@ export abstract class TagAggregate extends Entity {
   public toSnapshot(): ITagSnapshot {
     return {
       id: this.id,
-      name: this.currentName,
+      name: this._name,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };

@@ -225,3 +225,12 @@ field the use case decides on stays public, as `AuthCustomerLoginModel.passwordH
 of the password. An id that an error only puts in its message is a plain parameter of the
 constructor, not a field. The getters of the repositories in a persistence host stay protected for
 the repositories that extend it (see `034-orm-lib.md`).
+
+**A field behind a getter takes the name of the getter with `_`.** A getter lets others read a field
+that only its class changes, and a field cannot share its name with an accessor, so the field takes
+the name of its getter with a leading `_`: `Entity._id` behind `id`, `VersionedEntity._version`
+behind `version`, `ProductCoreArchiveModel._status` behind `status`,
+`OrderCandidateModel._distinctProductIds` behind `distinctProductIds`. `TagAggregate` holds `_name`
+because `TagRenameModel` reads it through `get name()`, and a subclass cannot turn a field of its
+base into an accessor. A field without a getter keeps the plain name, as `name` and `status` of
+`ProductAggregate` and `body` and `resolved` of `NoteAggregate`.

@@ -11,7 +11,7 @@ export class NoteEditModel extends NoteAggregate {
 
   protected constructor(record: INoteReconstitute) {
     super(record);
-    this.bodyAsRead = this.currentBody;
+    this.bodyAsRead = this.body;
   }
 
   public static reconstitute(this: void, record: INoteReconstitute): NoteEditModel {
@@ -23,11 +23,11 @@ export class NoteEditModel extends NoteAggregate {
 
     const validBody = NoteEditModel.validBody(body);
 
-    if (validBody === this.currentBody) {
+    if (validBody === this.body) {
       return false;
     }
 
-    this.currentBody = validBody;
+    this.body = validBody;
     this.bumpVersion();
 
     return true;
@@ -42,7 +42,7 @@ export class NoteEditModel extends NoteAggregate {
       noteId: this.id,
       noteVersion: this.version,
       bodyBefore: this.bodyAsRead,
-      bodyAfter: this.currentBody,
+      bodyAfter: this.body,
       editorId,
       correlationId,
     };

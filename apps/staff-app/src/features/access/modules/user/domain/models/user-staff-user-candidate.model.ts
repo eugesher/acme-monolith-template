@@ -16,7 +16,7 @@ import type {
 
 export class UserStaffUserCandidateModel {
   public get distinctRoleIds(): readonly string[] {
-    return this.roleIds;
+    return this._distinctRoleIds;
   }
 
   private static readonly MIN_PASSWORD_LENGTH = 12;
@@ -24,7 +24,7 @@ export class UserStaffUserCandidateModel {
   private constructor(
     private readonly email: EmailValue,
     private readonly passwordHash: string,
-    private readonly roleIds: readonly string[],
+    private readonly _distinctRoleIds: readonly string[],
   ) {}
 
   public static assertPasswordStrength(password: string): void {
@@ -55,7 +55,7 @@ export class UserStaffUserCandidateModel {
   }
 
   public assertRoles(storedRoles: IUserStaffUserStoredRole[]): void {
-    for (const roleId of this.roleIds) {
+    for (const roleId of this._distinctRoleIds) {
       const isRoleStored = storedRoles.some((storedRole) => storedRole.id === roleId);
 
       if (!isRoleStored) {
@@ -65,7 +65,7 @@ export class UserStaffUserCandidateModel {
   }
 
   public createUserRoles(userId: string): IUserStaffUserRole[] {
-    return this.roleIds.map((roleId) => ({ userId, roleId }));
+    return this._distinctRoleIds.map((roleId) => ({ userId, roleId }));
   }
 
   public toRegistered(id: string): IUserStaffUserRegisterReconstitute {
