@@ -38,6 +38,13 @@ moves the number. A per-file key fails on the file that lost its spec and names 
 Jest checks every file matched by `./{apps,core,libs}/**/*.ts` against it, and `collectCoverageFrom`
 decides which files are counted, including those no spec loads, which count at 0%.
 
+**Some specs the coverage cannot ask for.** A controller is excluded above, yet its spec checks how
+a request becomes a command and that a failure is awaited. A DTO is covered the moment any file
+imports it, since its decorators run on import, yet only a spec checks its validation.
+`spec/required-specs.spec.ts` asks for a spec next to every controller and every request, query and
+param DTO that declares validation of its own; a DTO that only extends `PageQueryDto` declares none
+and inherits the spec of its parent.
+
 **ts-jest compiles the unit suite with type information** (`isolatedModules: false`). With
 `emitDecoratorMetadata`, a file compiled on its own cannot tell whether a constructor parameter type
 is a class, so it guards the reference: `typeof X === "undefined" ? Object : X`. Istanbul counts
