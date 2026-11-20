@@ -122,14 +122,15 @@ lines; a blank line starts a new run, so a barrel can keep its folders apart.
 (`type: 'unsorted'`):
 
 1. fields and accessors: public, protected, then private; in each, static fields, then decorated
-   instance fields, then plain ones;
+   instance fields, then plain ones; among static and among plain fields, the `readonly` ones come
+   last;
 2. the static block, then the constructor;
 3. methods: public, protected, then private, static before instance in each.
 
 Groups are separated by one blank line. Static fields and plain instance fields stand together
-without one. A decorated field of a DTO or an entity spans several lines, so decorated fields and
-the members of a getter or method group are separated by one. The rule tells the two kinds of field
-apart by the decorator, not by the number of lines.
+without one, the `readonly` ones included. A decorated field of a DTO or an entity spans several
+lines, so decorated fields and the members of a getter or method group are separated by one. The
+rule tells the two kinds of field apart by the decorator, not by the number of lines.
 
 **Module keys** (`modules.mjs`, `sort-objects`) go `module`, `global`, `imports`, `exports`,
 `controllers`, `providers`: what the module takes and shows comes before how it is built. The rule

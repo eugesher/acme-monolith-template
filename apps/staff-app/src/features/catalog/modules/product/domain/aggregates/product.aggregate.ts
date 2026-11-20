@@ -9,9 +9,9 @@ import { ProductVersionMismatchException } from '../exceptions/product-version-m
 import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
 
 export abstract class ProductAggregate extends VersionedEntity {
-  protected readonly sku: string;
   protected currentName: string;
   protected currentStatus: ProductStatusEnum;
+  protected readonly sku: string;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 

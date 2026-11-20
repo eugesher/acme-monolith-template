@@ -9,11 +9,11 @@ import { NoteVersionMismatchException } from '../exceptions/note-version-mismatc
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
 
 export abstract class NoteAggregate extends VersionedEntity {
+  protected currentBody: string;
+  protected currentResolved: boolean;
   protected readonly subjectType: string;
   protected readonly subjectId: string;
   protected readonly authorId: string;
-  protected currentBody: string;
-  protected currentResolved: boolean;
   protected readonly createdAt: Date;
   protected readonly updatedAt: Date;
 
