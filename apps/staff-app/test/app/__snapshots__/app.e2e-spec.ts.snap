@@ -91,19 +91,6 @@ exports[`App Access Role GET /api/access/roles should list the roles with their 
 }
 `;
 
-exports[`App Access Role GET /api/access/roles should refuse a caller without access:manage 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Access Role POST /api/access/roles should create a role with an empty permission list 1`] = `
 {
   "db": {
@@ -149,19 +136,6 @@ exports[`App Access Role POST /api/access/roles should create a role with its pe
         "ledger:read",
         "order:read",
       ],
-    },
-  },
-}
-`;
-
-exports[`App Access Role POST /api/access/roles should refuse a caller without access:manage 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -997,33 +971,6 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should refus
 }
 `;
 
-exports[`App Catalog Product PATCH /api/catalog/products/:productId should refuse an update by a viewer with 403 1`] = `
-{
-  "db": {
-    "product": [
-      {
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "id": "103",
-        "name": "Product to archive",
-        "sku": "SKU-0004",
-        "status": "active",
-        "updated_at": 2026-01-01T00:00:00.000Z,
-        "version": 1,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Catalog Product PATCH /api/catalog/products/:productId should update the name with a quoted If-Match, bump the version and drop the cached customer catalog 1`] = `
 {
   "cache": {
@@ -1332,33 +1279,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
 }
 `;
 
-exports[`App Catalog Product POST /api/catalog/products/:productId/publish should refuse a publication by a viewer with 403 1`] = `
-{
-  "db": {
-    "product": [
-      {
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "id": "102",
-        "name": "Renamed product",
-        "sku": "SKU-0003",
-        "status": "draft",
-        "updated_at": Any<Date>,
-        "version": 2,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should answer an unknown product with 404 1`] = `
 {
   "response": {
@@ -1400,19 +1320,6 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should li
           "name": "promo",
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should refuse a role without product:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -1604,19 +1511,6 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should delet
 }
 `;
 
-exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refuse a user without queue:delete with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
 {
   "response": {
@@ -1657,19 +1551,6 @@ exports[`App Queue GET /api/queues should list the queues with their job counts 
         "paused": false,
       },
     ],
-  },
-}
-`;
-
-exports[`App Queue GET /api/queues should refuse a request without a token with 401 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
   },
 }
 `;
@@ -1756,19 +1637,6 @@ exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should r
       "details": null,
       "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-record is delayed, not failed\\$/,
       "statusCode": 409,
-    },
-  },
-}
-`;
-
-exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a user without queue:retry with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -1894,19 +1762,6 @@ exports[`App Sales Order GET /api/sales/orders should list the orders of every c
 }
 `;
 
-exports[`App Sales Order GET /api/sales/orders should refuse a caller without a token with 401 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Sales Order GET /api/sales/orders should refuse a malformed page with 400 from validation 1`] = `
 {
   "response": {
@@ -1947,19 +1802,6 @@ exports[`App Sales Order GET /api/sales/orders should refuse a malformed tag id 
       },
       "message": "The request is not valid",
       "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders should refuse a role without order:read with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -2030,19 +1872,6 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should read the order of
 }
 `;
 
-exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a caller without a token with 401 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a malformed order id with 400 from validation 1`] = `
 {
   "response": {
@@ -2060,19 +1889,6 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a malforme
       },
       "message": "The request is not valid",
       "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a role without order:read with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -2147,19 +1963,6 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should link the tag
           "name": "vip",
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a role without order:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -2954,19 +2757,6 @@ exports[`App Tools Tag DELETE /api/tools/tags/:tagId should answer an unknown ta
 }
 `;
 
-exports[`App Tools Tag DELETE /api/tools/tags/:tagId should refuse a role without tag:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Tools Tag GET /api/tools/tags should answer the page window it was asked for 1`] = `
 {
   "response": {
@@ -3018,19 +2808,6 @@ exports[`App Tools Tag GET /api/tools/tags should list the tags by name 1`] = `
       "page": 1,
       "pageCount": 1,
       "total": 3,
-    },
-  },
-}
-`;
-
-exports[`App Tools Tag GET /api/tools/tags should refuse a role without tag:read with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -3193,19 +2970,6 @@ exports[`App Tools Tag POST /api/tools/tags should refuse a name that differs fr
 }
 `;
 
-exports[`App Tools Tag POST /api/tools/tags should refuse a role without tag:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should add the units to a sold-out product, record the key, queue the ledger record under the correlation id and keep the cached customer catalog 1`] = `
 {
   "cache": {
@@ -3350,19 +3114,6 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       },
       "message": "The request is not valid",
       "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a restock by a viewer with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }

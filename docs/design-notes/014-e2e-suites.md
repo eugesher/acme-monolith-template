@@ -80,12 +80,12 @@ feature that needs a hook before each case has `hooks()`, as `CatalogE2E` of cus
 the `acme:catalog:*` keys from Redis.
 
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
-`libs/testing/src/e2e/e2e.context.ts`, which holds only what all five contexts use: `init()`
-compiles the `AppModule` it is given with `@nestjs/testing`, starts it with
+`libs/testing/src/e2e/e2e.context.ts`, which holds what the contexts share: `init()` compiles the
+`AppModule` it is given with `@nestjs/testing`, starts it with
 `AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, and spies on the
-root logger; `close()` and `takeRootWarnings()` round it off. The class is not abstract: a context
-passes its `AppModule` and its `AppNameEnum` to the constructor, calls `super.init()` and adds its
-own.
+root logger; `close()`, `takeRootWarnings()` and `mountedRoutes()` round it off. The class is not
+abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor, calls
+`super.init()` and adds its own.
 
 **A context of an app with auth signs tokens.** `AuthE2EContext` of
 `libs/testing/src/e2e/auth-e2e.context.ts` extends `E2EContext` with the `AuthAudienceEnum` of the
@@ -96,6 +96,23 @@ customer-app. processor-app has no auth and no `JWT_SECRET`, so its context exte
 signs nothing. A subclass rather than an optional audience keeps both classes free of a branch.
 Everything the cases read is a getter that throws before `init()`. The contexts of staff-app and
 customer-app also hold the Redis client, through `@acme-libs/testing`.
+
+**Each app suite pins the routes it mounts.** A case of its entry compares a literal table with what
+the controllers of the started app declare. `mountedRoutes()` walks the controllers of the
+`ModulesContainer` and answers `<METHOD> /<prefix>/<path>` per route, sorted by path; processor-app
+compares that list alone. `routeAccess()` of `AuthE2EContext` pairs each route with what the guards
+of `002-global-auth-guards.md` read, `getAllAndOverride` over the handler and its class: `public`,
+the code of `@RequiresPermission`, or `authenticated` for a route that needs a token and no code.
+`libs/auth` does not export its metadata keys, so the context names `auth:public` and
+`auth:permission` itself. The table is the whole set: a route of the other app, a new route without
+a row and a route that lost its decorator fail the case alike, the last because a route without a
+code is open to every signed-in staff user. The notes are open on purpose: their use cases answer
+only the notes of the caller, and their cases check that. The controller specs read no metadata, and
+the specs of `libs/auth` check the guards on a route of their own, so the table is the only check of
+the code each route asks for. Beyond it the suites keep one case per guard that shows it is
+installed: 401 without a token, 403 to the viewer on `GET /api/access/permissions`, the permissions
+read from the database rather than the claims of the token, and a revoked permission refused at
+once.
 
 **A catalog case clears its own keys, not the database.** The queues live in the same Redis, under
 `acme:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters. `hooks()`
@@ -234,9 +251,9 @@ contracts of core let a case put a failing job into a queue, which no route of a
 `apps/*/test/**` is the category `acme-app:test`. It sees its own app's tests, its `AppModule`, its
 contracts, the contracts of core, `@acme-core/entities`, the libs `kernel`, `toolkit`, `domain`,
 `database`, `observability` and `testing`, and the packages `@nestjs/bullmq`, `@nestjs/common`,
-`@nestjs/config`, `bullmq`, `ioredis`, `supertest` and `typeorm`. `@nestjs/testing` and
-`nestjs-pino` stay in the testing lib. The observability lib opens a correlation context for a case
-that calls a port directly, outside a request, as `LedgerE2E` does for the core ledger.
+`@nestjs/config`, `bullmq`, `ioredis`, `supertest` and `typeorm`. `@nestjs/core`, `@nestjs/testing`
+and `nestjs-pino` stay in the testing lib. The observability lib opens a correlation context for a
+case that calls a port directly, outside a request, as `LedgerE2E` does for the core ledger.
 `spec/architecture/e2e-sections.spec.ts` checks these edges.
 
 The e2e code turns off `no-unsafe-argument`, `no-unsafe-assignment` and `no-unsafe-member-access`

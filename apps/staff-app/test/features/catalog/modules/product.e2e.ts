@@ -225,19 +225,6 @@ export class ProductE2E {
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
 
-      it('should refuse an update by a viewer with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .patch('/api/catalog/products/103')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .send({ name: 'Viewer update' })
-          .expect(HttpStatus.FORBIDDEN);
-
-        expect({
-          response: { body: response.body },
-          db: { product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 103') },
-        }).toMatchSnapshot();
-      });
-
       it('should apply every one of concurrent updates without If-Match', async () => {
         const responses = await Promise.all(
           [1, 2, 3, 4, 5].map((index) =>
@@ -376,20 +363,6 @@ export class ProductE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a publication by a viewer with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/catalog/products/102/publish')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.FORBIDDEN);
-
-        expect({
-          response: { body: response.body },
-          db: {
-            product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 102'),
-          },
-        }).toMatchSnapshot({ db: { product: [{ updated_at: expect.any(Date) }] } });
-      });
     });
   }
 
@@ -513,26 +486,6 @@ export class ProductE2E {
           .expect(HttpStatus.BAD_REQUEST);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a role without product:write with 403', async () => {
-        try {
-          await this.ctx.dataSource.query(
-            "DELETE FROM staff_role_permissions WHERE role_id = 2 AND code = 'product:write'",
-          );
-
-          const response = await request(this.ctx.app.getHttpServer())
-            .put('/api/catalog/products/103/tags')
-            .auth(this.ctx.editorToken, { type: 'bearer' })
-            .send({ tagIds: ['300'] })
-            .expect(HttpStatus.FORBIDDEN);
-
-          expect({ response: { body: response.body } }).toMatchSnapshot();
-        } finally {
-          await this.ctx.dataSource.query(
-            "INSERT INTO staff_role_permissions (role_id, code) VALUES (2, 'product:write')",
-          );
-        }
       });
     });
   }

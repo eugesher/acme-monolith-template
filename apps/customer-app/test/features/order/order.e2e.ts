@@ -318,16 +318,6 @@ export class OrderE2E {
           db: { product_stock: { quantity: Number(quantity) } },
         }).toMatchSnapshot();
       });
-
-      it('should refuse a caller without a token', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/orders')
-          .set('Idempotency-Key', 'e2e-order-anonymous-key')
-          .send({ productIds: ['100'] })
-          .expect(HttpStatus.UNAUTHORIZED);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 
@@ -338,14 +328,6 @@ export class OrderE2E {
           .get('/api/orders')
           .auth(this.ctx.bobToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a caller without a token', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/orders')
-          .expect(HttpStatus.UNAUTHORIZED);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
@@ -389,14 +371,6 @@ export class OrderE2E {
           .get('/api/orders/latest')
           .auth(this.ctx.bobToken, { type: 'bearer' })
           .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a caller without a token', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/orders/601')
-          .expect(HttpStatus.UNAUTHORIZED);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });

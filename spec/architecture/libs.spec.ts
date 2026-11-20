@@ -120,6 +120,13 @@ describe('libs', () => {
     }).toPassArchitectureLint();
   });
 
+  it('the testing lib MAY import the Nest packages an e2e context compiles an app with and reads its routes from', async () => {
+    await expect({
+      file: 'libs/testing/src/e2e/__fixture__.ts',
+      code: 'import { RequestMethod } from "@nestjs/common";\nimport { ModulesContainer, Reflector } from "@nestjs/core";\nimport { Test } from "@nestjs/testing";',
+    }).toPassArchitectureLint();
+  });
+
   it('a lib may NOT import the testing lib outside its specs', async () => {
     await expect({
       file: 'libs/cache/src/application/__fixture__.ts',

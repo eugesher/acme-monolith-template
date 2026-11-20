@@ -30,25 +30,6 @@ export class TagE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a role without tag:read with 403', async () => {
-        try {
-          await this.ctx.dataSource.query(
-            "DELETE FROM staff_role_permissions WHERE role_id = 3 AND code = 'tag:read'",
-          );
-
-          const response = await request(this.ctx.app.getHttpServer())
-            .get('/api/tools/tags')
-            .auth(this.ctx.viewerToken, { type: 'bearer' })
-            .expect(HttpStatus.FORBIDDEN);
-
-          expect({ response: { body: response.body } }).toMatchSnapshot();
-        } finally {
-          await this.ctx.dataSource.query(
-            "INSERT INTO staff_role_permissions (role_id, code) VALUES (3, 'tag:read')",
-          );
-        }
-      });
     });
   }
 
@@ -120,16 +101,6 @@ export class TagE2E {
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({})
           .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a role without tag:write with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/tools/tags')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .send({ name: 'heavy' })
-          .expect(HttpStatus.FORBIDDEN);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
@@ -243,15 +214,6 @@ export class TagE2E {
           .delete('/api/tools/tags/999')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a role without tag:write with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .delete('/api/tools/tags/300')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.FORBIDDEN);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });

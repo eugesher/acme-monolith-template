@@ -48,6 +48,7 @@ export const acmeLibs = [
     packages(
       '@nestjs/common',
       '@nestjs/config',
+      '@nestjs/core',
       '@nestjs/jwt',
       '@nestjs/testing',
       'nestjs-pino',

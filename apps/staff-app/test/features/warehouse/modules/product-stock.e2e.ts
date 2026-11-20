@@ -201,17 +201,6 @@ export class ProductStockE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a restock by a viewer with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/warehouse/product-stock/100/add')
-          .set('Idempotency-Key', 'e2e-restock-viewer-key')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .send({ quantity: 5 })
-          .expect(HttpStatus.FORBIDDEN);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 }

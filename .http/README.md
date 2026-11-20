@@ -19,10 +19,10 @@ One request per e2e case of the app. The folder is the endpoint, the number in t
 order of the case in the e2e. The first line of a description is the full name of the e2e test, so
 the test can be found in `apps/<app>/test`.
 
-`app` holds the cases that check a route of the other app is not mounted.
+Ten e2e cases have no request:
 
-Eight e2e cases have no request:
-
+- the route table of staff-app and of customer-app reads the mounted routes and the access of each
+  from the controllers;
 - the schema check of staff-app compares the migrated database with the entities;
 - the ledger case of staff-app enqueues one record twice through `LEDGER_CORE_PORT` inside the app;
 - the `queue` cases of staff-app that page, retry and delete a failed job, and the one that retries
@@ -35,7 +35,7 @@ A case that sends more than one request has the file of the request it checks, a
 `Note:` says what else the e2e sends:
 
 - the concurrent updates of a product send five requests at once,
-  `catalog/product/update/06-concurrent` sends one;
+  `catalog/product/update/05-concurrent` sends one;
 - the replays of a restock and an order send the same request twice, as
   `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with

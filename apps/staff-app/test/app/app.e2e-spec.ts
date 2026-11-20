@@ -1,6 +1,4 @@
-import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import request from 'supertest';
 import { DataSource } from 'typeorm';
 
 import { SnakeNamingStrategy } from '@acme-libs/database';
@@ -71,11 +69,48 @@ describe('App', () => {
     }
   });
 
-  it('should not mount the customer-app route POST /api/auth/register', async () => {
-    await request(ctx.app.getHttpServer())
-      .post('/api/auth/register')
-      .send({ email: 'new@example.com', password: 'secret-password' })
-      .expect(HttpStatus.NOT_FOUND);
+  it('should mount these routes, each behind its access', () => {
+    expect(ctx.routeAccess()).toEqual([
+      ['GET /api/access/permissions', 'access:manage'],
+      ['GET /api/access/roles', 'access:manage'],
+      ['POST /api/access/roles', 'access:manage'],
+      ['PUT /api/access/roles/:roleId/permissions', 'access:manage'],
+      ['POST /api/access/users', 'access:manage'],
+      ['PUT /api/access/users/:userId/roles', 'access:manage'],
+      ['POST /api/auth/login', 'public'],
+      ['GET /api/auth/me', 'authenticated'],
+      ['GET /api/catalog/products', 'product:read'],
+      ['POST /api/catalog/products', 'product:write'],
+      ['GET /api/catalog/products/:productId', 'product:read'],
+      ['PATCH /api/catalog/products/:productId', 'product:write'],
+      ['POST /api/catalog/products/:productId/archive', 'product:archive'],
+      ['POST /api/catalog/products/:productId/publish', 'product:write'],
+      ['GET /api/catalog/products/:productId/tags', 'product:read'],
+      ['PUT /api/catalog/products/:productId/tags', 'product:write'],
+      ['GET /api/health', 'public'],
+      ['GET /api/health/ready', 'public'],
+      ['GET /api/ledger', 'ledger:read'],
+      ['GET /api/queues', 'queue:read'],
+      ['GET /api/queues/:queueName/jobs/failed', 'queue:read'],
+      ['DELETE /api/queues/:queueName/jobs/failed/:jobId', 'queue:delete'],
+      ['POST /api/queues/:queueName/jobs/failed/:jobId/retry', 'queue:retry'],
+      ['GET /api/sales/orders', 'order:read'],
+      ['GET /api/sales/orders/:orderId', 'order:read'],
+      ['GET /api/sales/orders/:orderId/tags', 'order:read'],
+      ['PUT /api/sales/orders/:orderId/tags', 'order:write'],
+      ['GET /api/tools/notes', 'authenticated'],
+      ['POST /api/tools/notes', 'authenticated'],
+      ['DELETE /api/tools/notes/:noteId', 'authenticated'],
+      ['GET /api/tools/notes/:noteId', 'authenticated'],
+      ['PATCH /api/tools/notes/:noteId', 'authenticated'],
+      ['POST /api/tools/notes/:noteId/resolve', 'authenticated'],
+      ['GET /api/tools/notes/:noteId/revisions', 'authenticated'],
+      ['GET /api/tools/tags', 'tag:read'],
+      ['POST /api/tools/tags', 'tag:write'],
+      ['DELETE /api/tools/tags/:tagId', 'tag:write'],
+      ['PATCH /api/tools/tags/:tagId', 'tag:write'],
+      ['POST /api/warehouse/product-stock/:productId/add', 'product:restock'],
+    ]);
   });
 
   describe('Health', () => {

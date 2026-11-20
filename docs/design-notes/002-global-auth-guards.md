@@ -74,7 +74,8 @@ spec of the permission module checks that a gated route without a token answers 
 
 **Deny by default.** A route without decorators needs a token. `@Public()` is the only way out, and
 it is visible in the controller. Health endpoints are public: an orchestrator probes them without
-credentials.
+credentials. The e2e suite of each API app compares every route it mounts, with `public`, its
+permission code or `authenticated`, to a table (see `014-e2e-suites.md`).
 
 ## The user is re-derived
 

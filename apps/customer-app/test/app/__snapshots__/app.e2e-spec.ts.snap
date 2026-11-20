@@ -354,19 +354,6 @@ exports[`App Catalog GET /api/products should list every active product by id, w
 }
 `;
 
-exports[`App Catalog GET /api/products should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Catalog GET /api/products should refuse a limit of zero with 400 from validation 1`] = `
 {
   "response": {
@@ -468,19 +455,6 @@ exports[`App Order GET /api/orders should list only the orders of the caller, ne
 }
 `;
 
-exports[`App Order GET /api/orders should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Order GET /api/orders/:orderId should answer an unknown order with the same 404 1`] = `
 {
   "response": {
@@ -544,19 +518,6 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
           },
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Order GET /api/orders/:orderId should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
     },
   },
 }
@@ -766,19 +727,6 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
           },
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Order POST /api/orders should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
     },
   },
 }

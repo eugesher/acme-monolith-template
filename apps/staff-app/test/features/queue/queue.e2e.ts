@@ -20,14 +20,6 @@ export class QueueE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a request without a token with 401', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/queues')
-          .expect(HttpStatus.UNAUTHORIZED);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 
@@ -167,15 +159,6 @@ export class QueueE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a user without queue:retry with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/queues/ledger-record/jobs/failed/1/retry')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.FORBIDDEN);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 
@@ -208,15 +191,6 @@ export class QueueE2E {
           .delete('/api/queues/ledger-record/jobs/failed/999999')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a user without queue:delete with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .delete('/api/queues/ledger-record/jobs/failed/1')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.FORBIDDEN);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });

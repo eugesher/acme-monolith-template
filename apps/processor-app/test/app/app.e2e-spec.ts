@@ -1,6 +1,3 @@
-import { HttpStatus } from '@nestjs/common';
-import request from 'supertest';
-
 import { AppE2EContext } from '../context/app-e2e.context';
 import { HealthE2E } from '../features';
 import { IdempotencyE2E, LedgerE2E, ProductStockE2E } from '../processors';
@@ -27,12 +24,9 @@ describe('App', () => {
     await ctx.close();
   });
 
-  it.each(['/api/auth/me', '/api/products', '/api/orders', '/api/queues'])(
-    'should not mount the route %s',
-    async (path) => {
-      await request(ctx.app.getHttpServer()).get(path).expect(HttpStatus.NOT_FOUND);
-    },
-  );
+  it('should mount the health routes alone', () => {
+    expect(ctx.mountedRoutes()).toEqual(['GET /api/health', 'GET /api/health/ready']);
+  });
 
   describe('Health', () => {
     healthE2E.handleLiveness();

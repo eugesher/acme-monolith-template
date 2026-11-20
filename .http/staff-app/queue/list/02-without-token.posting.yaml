@@ -1,6 +1,0 @@
-name: 02-without-token
-description: |-
-  e2e: Queue › GET /api/queues › should refuse a request without a token with 401
-
-  Expect: 401 Unauthorized
-url: $STAFF_APP_BASE_URL/queues

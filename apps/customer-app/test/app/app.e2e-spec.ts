@@ -1,6 +1,3 @@
-import { HttpStatus } from '@nestjs/common';
-import request from 'supertest';
-
 import { AppE2EContext } from '../context/app-e2e.context';
 import { AuthE2E, CatalogE2E, HealthE2E, OrderE2E } from '../features';
 
@@ -26,15 +23,19 @@ describe('App', () => {
     await ctx.close();
   });
 
-  it.each(['/api/access/roles', '/api/ledger', '/api/tools/notes'])(
-    'should not mount the staff-app route %s',
-    async (path) => {
-      await request(ctx.app.getHttpServer())
-        .get(path)
-        .auth(ctx.bobToken, { type: 'bearer' })
-        .expect(HttpStatus.NOT_FOUND);
-    },
-  );
+  it('should mount these routes, each behind its access', () => {
+    expect(ctx.routeAccess()).toEqual([
+      ['POST /api/auth/login', 'public'],
+      ['GET /api/auth/me', 'authenticated'],
+      ['POST /api/auth/register', 'public'],
+      ['GET /api/health', 'public'],
+      ['GET /api/health/ready', 'public'],
+      ['GET /api/orders', 'authenticated'],
+      ['POST /api/orders', 'authenticated'],
+      ['GET /api/orders/:orderId', 'authenticated'],
+      ['GET /api/products', 'authenticated'],
+    ]);
+  });
 
   describe('Health', () => {
     healthE2E.handleLiveness();
