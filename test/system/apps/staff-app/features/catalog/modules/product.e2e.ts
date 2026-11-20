@@ -21,11 +21,7 @@ export class ProductE2E {
           .expect(HttpStatus.CREATED);
 
         const actual = {
-          response: { body: response.body },
           db: {
-            product: await this.ctx.dataSource.query('SELECT * FROM product WHERE sku = ?', [
-              'SYS-0001',
-            ]),
             ledger_entry: await this.ctx.pollUntil<Record<string, unknown>[]>(
               () =>
                 this.ctx.dataSource.query('SELECT * FROM ledger_entry WHERE correlation_id = ?', [
@@ -37,21 +33,7 @@ export class ProductE2E {
         };
 
         expect(actual).toMatchSnapshot({
-          response: {
-            body: {
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              updatedAt: expect.any(String),
-            },
-          },
           db: {
-            product: [
-              {
-                id: expect.any(String),
-                created_at: expect.any(Date),
-                updated_at: expect.any(Date),
-              },
-            ],
             ledger_entry: [
               {
                 id: expect.any(String),
@@ -65,7 +47,6 @@ export class ProductE2E {
         });
         expect(actual).toMatchObject({
           db: {
-            product: [{ id: response.body.id }],
             ledger_entry: [
               {
                 operation_key: `product-created:${response.body.id}`,
@@ -80,10 +61,8 @@ export class ProductE2E {
 
   public handleArchive(): void {
     describe('POST /api/catalog/products/:productId/archive', () => {
-      it('should archive through core, drop the cached catalog and append its ledger entry', async () => {
-        await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
-
-        const response = await request(this.ctx.app.getHttpServer())
+      it('should append the ledger entry of the archive under the correlation id', async () => {
+        await request(this.ctx.app.getHttpServer())
           .post('/api/catalog/products/103/archive')
           .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000021')
@@ -91,9 +70,7 @@ export class ProductE2E {
           .expect(HttpStatus.OK);
 
         expect({
-          response: { body: response.body },
           db: {
-            product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 103'),
             ledger_entry: await this.ctx.pollUntil<Record<string, unknown>[]>(
               () =>
                 this.ctx.dataSource.query('SELECT * FROM ledger_entry WHERE correlation_id = ?', [
@@ -102,11 +79,8 @@ export class ProductE2E {
               (rows) => rows.length >= 1,
             ),
           },
-          cache: { keys: await this.ctx.redis.keys('acme:catalog:*') },
         }).toMatchSnapshot({
-          response: { body: { updatedAt: expect.any(String) } },
           db: {
-            product: [{ updated_at: expect.any(Date) }],
             ledger_entry: [
               {
                 id: expect.any(String),
@@ -122,10 +96,8 @@ export class ProductE2E {
 
   public handlePublish(): void {
     describe('POST /api/catalog/products/:productId/publish', () => {
-      it('should publish a draft, drop the cached catalog and append its ledger entry', async () => {
-        await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
-
-        const response = await request(this.ctx.app.getHttpServer())
+      it('should append the ledger entry of the publication under the correlation id', async () => {
+        await request(this.ctx.app.getHttpServer())
           .post('/api/catalog/products/101/publish')
           .set('If-Match', '1')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000022')
@@ -133,9 +105,7 @@ export class ProductE2E {
           .expect(HttpStatus.OK);
 
         expect({
-          response: { body: response.body },
           db: {
-            product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 101'),
             ledger_entry: await this.ctx.pollUntil<Record<string, unknown>[]>(
               () =>
                 this.ctx.dataSource.query('SELECT * FROM ledger_entry WHERE correlation_id = ?', [
@@ -144,11 +114,8 @@ export class ProductE2E {
               (rows) => rows.length >= 1,
             ),
           },
-          cache: { keys: await this.ctx.redis.keys('acme:catalog:*') },
         }).toMatchSnapshot({
-          response: { body: { updatedAt: expect.any(String) } },
           db: {
-            product: [{ updated_at: expect.any(Date) }],
             ledger_entry: [
               {
                 id: expect.any(String),

@@ -91,19 +91,6 @@ exports[`App Access Role GET /api/access/roles should list the roles with their 
 }
 `;
 
-exports[`App Access Role GET /api/access/roles should refuse a caller without access:manage 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Access Role POST /api/access/roles should create a role with an empty permission list 1`] = `
 {
   "db": {
@@ -154,42 +141,6 @@ exports[`App Access Role POST /api/access/roles should create a role with its pe
 }
 `;
 
-exports[`App Access Role POST /api/access/roles should refuse a caller without access:manage 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
-exports[`App Access Role POST /api/access/roles should refuse a missing permission list with 400 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "permissionCodes",
-            "messages": [
-              "each value in permissionCodes must be one of the following values: ledger:read, access:manage, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
-              "permissionCodes must be an array",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Access Role POST /api/access/roles should refuse a taken name with 409 1`] = `
 {
   "response": {
@@ -211,6 +162,21 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should answer
       "details": null,
       "message": "Role 99 was not found",
       "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Access Role PUT /api/access/roles/:roleId/permissions should clear the permissions of the role for an empty list 1`] = `
+{
+  "db": {
+    "staff_role_permissions": [],
+  },
+  "response": {
+    "body": {
+      "id": "3",
+      "name": "viewer",
+      "permissionCodes": [],
     },
   },
 }
@@ -247,52 +213,6 @@ exports[`App Access Role PUT /api/access/roles/:roleId/permissions should reassi
 }
 `;
 
-exports[`App Access Role PUT /api/access/roles/:roleId/permissions should refuse an unknown permission code with 400 1`] = `
-{
-  "db": {
-    "staff_role_permissions": [
-      {
-        "code": "ledger:read",
-        "role_id": "3",
-      },
-      {
-        "code": "order:read",
-        "role_id": "3",
-      },
-      {
-        "code": "product:read",
-        "role_id": "3",
-      },
-      {
-        "code": "queue:read",
-        "role_id": "3",
-      },
-      {
-        "code": "tag:read",
-        "role_id": "3",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "permissionCodes",
-            "messages": [
-              "each value in permissionCodes must be one of the following values: ledger:read, access:manage, product:read, product:write, product:archive, product:restock, order:read, order:write, queue:read, queue:retry, queue:delete, tag:read, tag:write",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Access User POST /api/access/users should create a user who can log in at once 1`] = `
 {
   "db": {
@@ -315,6 +235,26 @@ exports[`App Access User POST /api/access/users should create a user who can log
   "response": {
     "body": {
       "email": "new-viewer@example.com",
+      "id": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Access User POST /api/access/users should create a user without roles for an empty list 1`] = `
+{
+  "db": {
+    "staff_user": [
+      {
+        "email": "no-role@example.com",
+        "id": Any<String>,
+      },
+    ],
+    "staff_user_roles": [],
+  },
+  "response": {
+    "body": {
+      "email": "no-role@example.com",
       "id": Any<String>,
     },
   },
@@ -455,66 +395,6 @@ exports[`App Access User PUT /api/access/users/:userId/roles should reassign the
         "2",
         "3",
       ],
-    },
-  },
-}
-`;
-
-exports[`App Access User PUT /api/access/users/:userId/roles should refuse a number with a suffix as the user id with 400 from validation and change nothing 1`] = `
-{
-  "db": {
-    "staff_user_roles": [
-      {
-        "role_id": "1",
-        "user_id": "1",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "userId",
-            "messages": [
-              "userId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Access User PUT /api/access/users/:userId/roles should refuse a word as the user id with 400 from validation and change nothing 1`] = `
-{
-  "db": {
-    "staff_user_roles": [
-      {
-        "role_id": "1",
-        "user_id": "1",
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "userId",
-            "messages": [
-              "userId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -822,28 +702,6 @@ exports[`App Catalog Product GET /api/catalog/products should list the catalog, 
 }
 `;
 
-exports[`App Catalog Product GET /api/catalog/products should refuse a malformed tag id with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagId",
-            "messages": [
-              "tagId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Catalog Product GET /api/catalog/products/:productId should answer an unknown product with 404 1`] = `
 {
   "response": {
@@ -992,33 +850,6 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should refus
       },
       "message": "Product 101: If-Match version 0 does not match the current version 1",
       "statusCode": 412,
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product PATCH /api/catalog/products/:productId should refuse an update by a viewer with 403 1`] = `
-{
-  "db": {
-    "product": [
-      {
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "id": "103",
-        "name": "Product to archive",
-        "sku": "SKU-0004",
-        "status": "active",
-        "updated_at": 2026-01-01T00:00:00.000Z,
-        "version": 1,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -1332,33 +1163,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
 }
 `;
 
-exports[`App Catalog Product POST /api/catalog/products/:productId/publish should refuse a publication by a viewer with 403 1`] = `
-{
-  "db": {
-    "product": [
-      {
-        "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
-        "id": "102",
-        "name": "Renamed product",
-        "sku": "SKU-0003",
-        "status": "draft",
-        "updated_at": Any<Date>,
-        "version": 2,
-      },
-    ],
-  },
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should answer an unknown product with 404 1`] = `
 {
   "response": {
@@ -1400,41 +1204,6 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should li
           "name": "promo",
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should refuse a role without product:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
-exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should refuse a word among the tag ids with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagIds",
-            "messages": [
-              "each value in tagIds must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -1544,6 +1313,33 @@ exports[`App Health GET /api/health/ready should report readiness of the databas
 }
 `;
 
+exports[`App Ledger GET /api/ledger should list the entries of one correlation id 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "action": "ProductCreated",
+          "correlationId": "e2e00000-0000-4000-8000-000000000026",
+          "id": "490",
+          "occurredAt": "2026-01-07T08:00:00.000Z",
+          "operationKey": "e2e-ledger:1",
+          "payload": {},
+          "recordedAt": "2026-01-07T08:00:00.000Z",
+          "subjectId": "101",
+          "subjectType": "product",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
 exports[`App Ledger GET /api/ledger should list the entries of one subject 1`] = `
 {
   "response": {
@@ -1604,19 +1400,6 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should delet
 }
 `;
 
-exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refuse a user without queue:delete with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
 {
   "response": {
@@ -1661,19 +1444,6 @@ exports[`App Queue GET /api/queues should list the queues with their job counts 
 }
 `;
 
-exports[`App Queue GET /api/queues should refuse a request without a token with 401 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page of the failed jobs with the reason and the instants of the failure 1`] = `
 {
   "response": {
@@ -1712,29 +1482,6 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
 }
 `;
 
-exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse a malformed page with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "page",
-            "messages": [
-              "page must be a positive number",
-              "page must be an integer number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
 {
   "response": {
@@ -1756,19 +1503,6 @@ exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should r
       "details": null,
       "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-record is delayed, not failed\\$/,
       "statusCode": 409,
-    },
-  },
-}
-`;
-
-exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a user without queue:retry with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -1894,77 +1628,6 @@ exports[`App Sales Order GET /api/sales/orders should list the orders of every c
 }
 `;
 
-exports[`App Sales Order GET /api/sales/orders should refuse a caller without a token with 401 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders should refuse a malformed page with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "page",
-            "messages": [
-              "page must be a positive number",
-              "page must be an integer number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders should refuse a malformed tag id with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagId",
-            "messages": [
-              "tagId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders should refuse a role without order:read with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Sales Order GET /api/sales/orders/:orderId should answer an unknown order with 404 1`] = `
 {
   "response": {
@@ -2030,19 +1693,6 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should read the order of
 }
 `;
 
-exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a caller without a token with 401 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a malformed order id with 400 from validation 1`] = `
 {
   "response": {
@@ -2060,19 +1710,6 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a malforme
       },
       "message": "The request is not valid",
       "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a role without order:read with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -2147,41 +1784,6 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should link the tag
           "name": "vip",
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a role without order:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse a word among the tag ids with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagIds",
-            "messages": [
-              "each value in tagIds must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -2381,28 +1983,6 @@ exports[`App Tools Note GET /api/tools/notes should list the notes of one subjec
 }
 `;
 
-exports[`App Tools Note GET /api/tools/notes should refuse a resolution that is not a boolean with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "resolved",
-            "messages": [
-              "resolved must be a boolean value",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Tools Note GET /api/tools/notes should refuse half of a subject filter with 400 1`] = `
 {
   "response": {
@@ -2455,28 +2035,6 @@ exports[`App Tools Note GET /api/tools/notes/:noteId should read one note 1`] = 
       "subjectType": "product",
       "updatedAt": "2026-01-01T00:00:00.000Z",
       "version": 2,
-    },
-  },
-}
-`;
-
-exports[`App Tools Note GET /api/tools/notes/:noteId should refuse an id that is not a number with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "noteId",
-            "messages": [
-              "noteId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -2954,19 +2512,6 @@ exports[`App Tools Tag DELETE /api/tools/tags/:tagId should answer an unknown ta
 }
 `;
 
-exports[`App Tools Tag DELETE /api/tools/tags/:tagId should refuse a role without tag:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Tools Tag GET /api/tools/tags should answer the page window it was asked for 1`] = `
 {
   "response": {
@@ -3023,19 +2568,6 @@ exports[`App Tools Tag GET /api/tools/tags should list the tags by name 1`] = `
 }
 `;
 
-exports[`App Tools Tag GET /api/tools/tags should refuse a role without tag:read with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
-    },
-  },
-}
-`;
-
 exports[`App Tools Tag PATCH /api/tools/tags/:tagId should answer an unknown tag with 404 1`] = `
 {
   "response": {
@@ -3057,28 +2589,6 @@ exports[`App Tools Tag PATCH /api/tools/tags/:tagId should answer the tag as it 
       "id": "390",
       "name": "seasonal",
       "updatedAt": "2026-01-01T00:00:00.000Z",
-    },
-  },
-}
-`;
-
-exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse a malformed tag id with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "tagId",
-            "messages": [
-              "tagId must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }
@@ -3143,30 +2653,6 @@ exports[`App Tools Tag POST /api/tools/tags should create a tag with the trimmed
 }
 `;
 
-exports[`App Tools Tag POST /api/tools/tags should refuse a missing name with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "name",
-            "messages": [
-              "name must be shorter than or equal to 64 characters",
-              "name must be longer than or equal to 1 characters",
-              "name must be a string",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
 exports[`App Tools Tag POST /api/tools/tags should refuse a name of spaces with 400 from the domain 1`] = `
 {
   "response": {
@@ -3188,19 +2674,6 @@ exports[`App Tools Tag POST /api/tools/tags should refuse a name that differs fr
       "details": null,
       "message": "A tag named Fragile already exists",
       "statusCode": 409,
-    },
-  },
-}
-`;
-
-exports[`App Tools Tag POST /api/tools/tags should refuse a role without tag:write with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
-      "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
     },
   },
 }
@@ -3298,71 +2771,24 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
 }
 `;
 
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a key of 129 characters with 400 1`] = `
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a key still in flight with 409 and add nothing 1`] = `
 {
-  "response": {
-    "body": {
-      "code": "IDEMPOTENCY_KEY_INVALID",
-      "details": null,
-      "message": "The Idempotency-Key header must be at most 128 characters",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a quantity of a fraction with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "quantity",
-            "messages": [
-              "quantity must be an integer number",
-            ],
-          },
-        ],
+  "db": {
+    "idempotency_key": [
+      {
+        "response_body": null,
+        "scope": "staff:2",
+        "status": "in_flight",
       },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
+    ],
+    "product_stock": [],
   },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a quantity of zero with 400 from validation 1`] = `
-{
   "response": {
     "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "quantity",
-            "messages": [
-              "quantity must be a positive number",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a restock by a viewer with 403 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "FORBIDDEN",
+      "code": "IDEMPOTENT_REQUEST_IN_FLIGHT",
       "details": null,
-      "message": "Insufficient permissions",
-      "statusCode": 403,
+      "message": "Idempotency-Key e2e-restock-in-flight-key is still being processed, retry shortly",
+      "statusCode": 409,
     },
   },
 }

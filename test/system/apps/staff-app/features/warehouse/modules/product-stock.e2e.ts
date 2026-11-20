@@ -13,7 +13,11 @@ export class ProductStockE2E {
   public handleAdd(): void {
     describe('POST /api/warehouse/product-stock/:productId/add', () => {
       it('should add the units and append the ledger entry of the stock row', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
+        const [{ lastId }] = await this.ctx.dataSource.query(
+          'SELECT MAX(id) AS lastId FROM product_stock',
+        );
+
+        await request(this.ctx.app.getHttpServer())
           .post('/api/warehouse/product-stock/106/add')
           .set('Idempotency-Key', 'system-restock-key')
           .set('x-correlation-id', 'e2e00000-0000-4000-8000-000000000019')
@@ -21,16 +25,12 @@ export class ProductStockE2E {
           .send({ quantity: 5 })
           .expect(HttpStatus.OK);
 
+        const [{ id: stockId }] = await this.ctx.dataSource.query(
+          'SELECT id FROM product_stock WHERE id > ?',
+          [lastId],
+        );
         const actual = {
-          response: { body: response.body },
           db: {
-            product_stock: await this.ctx.dataSource.query(
-              'SELECT * FROM product_stock WHERE product_id = 106 ORDER BY id',
-            ),
-            idempotency_key: await this.ctx.dataSource.query(
-              'SELECT * FROM idempotency_key WHERE idempotency_key = ?',
-              ['system-restock-key'],
-            ),
             ledger_entry: await this.ctx.pollUntil<Record<string, unknown>[]>(
               () =>
                 this.ctx.dataSource.query('SELECT * FROM ledger_entry WHERE correlation_id = ?', [
@@ -43,14 +43,6 @@ export class ProductStockE2E {
 
         expect(actual).toMatchSnapshot({
           db: {
-            product_stock: [{}, {}, { id: expect.any(String), created_at: expect.any(Date) }],
-            idempotency_key: [
-              {
-                id: expect.any(String),
-                response_body: expect.any(String),
-                created_at: expect.any(Date),
-              },
-            ],
             ledger_entry: [
               {
                 id: expect.any(String),
@@ -61,10 +53,7 @@ export class ProductStockE2E {
             ],
           },
         });
-        expect(actual.db.ledger_entry[0].operation_key).toBe(
-          `product-restocked:${actual.db.product_stock[2].id}`,
-        );
-        expect(JSON.parse(actual.db.idempotency_key[0].response_body)).toEqual(response.body);
+        expect(actual.db.ledger_entry[0].operation_key).toBe(`product-restocked:${stockId}`);
       });
     });
   }

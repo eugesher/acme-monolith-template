@@ -120,6 +120,20 @@ describe('libs', () => {
     }).toPassArchitectureLint();
   });
 
+  it('the testing lib MAY import the Nest packages an e2e context compiles an app with and reads its routes from', async () => {
+    await expect({
+      file: 'libs/testing/src/e2e/__fixture__.ts',
+      code: 'import { RequestMethod } from "@nestjs/common";\nimport { ModulesContainer, Reflector } from "@nestjs/core";\nimport { Test } from "@nestjs/testing";',
+    }).toPassArchitectureLint();
+  });
+
+  it('the testing lib MAY import supertest for the e2e sections the apps share', async () => {
+    await expect({
+      file: 'libs/testing/src/e2e/__fixture__.e2e.ts',
+      code: 'import request from "supertest";',
+    }).toPassArchitectureLint();
+  });
+
   it('a lib may NOT import the testing lib outside its specs', async () => {
     await expect({
       file: 'libs/cache/src/application/__fixture__.ts',
@@ -367,6 +381,13 @@ describe('libs', () => {
     await expect({
       file: 'libs/auth/src/guards/__fixture__.ts',
       code: 'import { Injectable } from "@nestjs/common";\nimport { ConfigService } from "@nestjs/config";\nimport { Reflector } from "@nestjs/core";\nimport { JwtService } from "@nestjs/jwt";',
+    }).toPassArchitectureLint();
+  });
+
+  it('the auth lib MAY import @nestjs/swagger, so a public route needs no token in the OpenAPI document either', async () => {
+    await expect({
+      file: 'libs/auth/src/decorators/__fixture__.ts',
+      code: 'import { applyDecorators } from "@nestjs/common";\nimport { ApiSecurity } from "@nestjs/swagger";',
     }).toPassArchitectureLint();
   });
 

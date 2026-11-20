@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import type { Type } from '@nestjs/common';
 
@@ -15,6 +16,9 @@ export class AuthE2EContext extends E2EContext {
 
     return this.signer;
   }
+
+  private static readonly PUBLIC_METADATA = 'auth:public';
+  private static readonly PERMISSION_METADATA = 'auth:permission';
 
   private signer: Maybe<JwtService>;
 
@@ -34,5 +38,22 @@ export class AuthE2EContext extends E2EContext {
     const algorithm = AuthTokenAlgorithmEnum.HS256;
 
     this.signer = new JwtService({ secret, signOptions: { algorithm, audience: this.audience } });
+  }
+
+  public routeAccess(): [string, string][] {
+    const reflector = this.app.get(Reflector);
+
+    return this.routes().map(({ route, targets }) => {
+      const isPublic = reflector.getAllAndOverride<Maybe<boolean>>(
+        AuthE2EContext.PUBLIC_METADATA,
+        targets,
+      );
+      const permission = reflector.getAllAndOverride<Maybe<string>>(
+        AuthE2EContext.PERMISSION_METADATA,
+        targets,
+      );
+
+      return [route, isPublic ? 'public' : (permission ?? 'authenticated')];
+    });
   }
 }

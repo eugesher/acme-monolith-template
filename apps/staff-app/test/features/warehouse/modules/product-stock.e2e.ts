@@ -1,6 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
+import { BodyFingerprintHelper } from '@acme-libs/toolkit';
+
 import type { AppE2EContext } from '../../../context/app-e2e.context';
 
 export class ProductStockE2E {
@@ -167,20 +169,6 @@ export class ProductStockE2E {
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
 
-      it.each([
-        ['zero', 0],
-        ['a fraction', 2.5],
-      ])('should refuse a quantity of %s with 400 from validation', async (_, quantity) => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/warehouse/product-stock/100/add')
-          .set('Idempotency-Key', 'e2e-restock-invalid-key')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ quantity })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
       it('should refuse a restock without a key with 400', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .post('/api/warehouse/product-stock/100/add')
@@ -191,26 +179,43 @@ export class ProductStockE2E {
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
 
-      it('should refuse a key of 129 characters with 400', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/warehouse/product-stock/100/add')
-          .set('Idempotency-Key', 'k'.repeat(129))
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ quantity: 5 })
-          .expect(HttpStatus.BAD_REQUEST);
+      it('should refuse a key still in flight with 409 and add nothing', async () => {
+        const fingerprint = BodyFingerprintHelper.compute({ productId: '100', quantity: 5 });
+        const [{ lastId }] = await this.ctx.dataSource.query(
+          'SELECT MAX(id) AS lastId FROM product_stock',
+        );
 
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
+        await this.ctx.dataSource.query(
+          "INSERT INTO idempotency_key (scope, idempotency_key, request_fingerprint, status, response_body, created_at) VALUES ('staff:2', 'e2e-restock-in-flight-key', ?, 'in_flight', NULL, CURRENT_TIMESTAMP)",
+          [fingerprint],
+        );
 
-      it('should refuse a restock by a viewer with 403', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/warehouse/product-stock/100/add')
-          .set('Idempotency-Key', 'e2e-restock-viewer-key')
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .send({ quantity: 5 })
-          .expect(HttpStatus.FORBIDDEN);
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .post('/api/warehouse/product-stock/100/add')
+            .set('Idempotency-Key', 'e2e-restock-in-flight-key')
+            .auth(this.ctx.editorToken, { type: 'bearer' })
+            .send({ quantity: 5 })
+            .expect(HttpStatus.CONFLICT);
 
-        expect({ response: { body: response.body } }).toMatchSnapshot();
+          expect({
+            response: { body: response.body },
+            db: {
+              product_stock: await this.ctx.dataSource.query(
+                'SELECT id FROM product_stock WHERE id > ?',
+                [lastId],
+              ),
+              idempotency_key: await this.ctx.dataSource.query(
+                'SELECT scope, status, response_body FROM idempotency_key WHERE idempotency_key = ?',
+                ['e2e-restock-in-flight-key'],
+              ),
+            },
+          }).toMatchSnapshot();
+        } finally {
+          await this.ctx.dataSource.query(
+            "DELETE FROM idempotency_key WHERE idempotency_key = 'e2e-restock-in-flight-key'",
+          );
+        }
       });
     });
   }

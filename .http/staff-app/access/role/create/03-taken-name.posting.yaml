@@ -1,14 +1,14 @@
-name: 03-missing-permissions
+name: 03-taken-name
 description: |-
-  e2e: Access › Role › POST /api/access/roles › should refuse a missing permission list with 400
+  e2e: Access › Role › POST /api/access/roles › should refuse a taken name with 409
 
-  Expect: 400 Bad Request, code VALIDATION_FAILED, field permissionCodes
+  Expect: 409 Conflict, code AUTH_ROLE_NAME_TAKEN
   User: admin@example.com (token signed by scripts.py)
 method: POST
 url: $STAFF_APP_BASE_URL/access/roles
 body:
   content: |-
-    { "name": "auditor" }
+    { "name": "admin", "permissionCodes": [] }
 auth:
   type: bearer_token
   bearer_token:

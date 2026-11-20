@@ -1,12 +1,12 @@
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
-import type { AppE2EContext } from '../../context/app-e2e.context';
+import type { E2EContext } from './e2e.context';
 
 export class HealthE2E {
-  private constructor(private readonly ctx: AppE2EContext) {}
+  private constructor(private readonly ctx: E2EContext) {}
 
-  public static of(ctx: AppE2EContext): HealthE2E {
+  public static of(ctx: E2EContext): HealthE2E {
     return new HealthE2E(ctx);
   }
 
@@ -52,6 +52,7 @@ export class HealthE2E {
           ],
         ]);
       });
+
       it('should set the security headers of helmet', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/health')

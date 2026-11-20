@@ -20,11 +20,7 @@ export class AuthE2E {
           .expect(HttpStatus.CREATED);
 
         const actual = {
-          response: { body: response.body },
           db: {
-            customer: await this.ctx.dataSource.query('SELECT * FROM customer WHERE email = ?', [
-              'eve@example.com',
-            ]),
             ledger_entry: await this.ctx.pollUntil<Record<string, unknown>[]>(
               () =>
                 this.ctx.dataSource.query('SELECT * FROM ledger_entry WHERE correlation_id = ?', [
@@ -36,15 +32,7 @@ export class AuthE2E {
         };
 
         expect(actual).toMatchSnapshot({
-          response: { body: { id: expect.any(String) } },
           db: {
-            customer: [
-              {
-                id: expect.any(String),
-                password_hash: expect.any(String),
-                created_at: expect.any(Date),
-              },
-            ],
             ledger_entry: [
               {
                 id: expect.any(String),
@@ -58,7 +46,6 @@ export class AuthE2E {
         });
         expect(actual).toMatchObject({
           db: {
-            customer: [{ id: response.body.id }],
             ledger_entry: [
               {
                 operation_key: `customer-registered:${response.body.id}`,

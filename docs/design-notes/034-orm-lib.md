@@ -104,6 +104,15 @@ read it back into `generatedMaps`, and sends nothing for an empty list; it is fo
 `ProductStockCoreBaseRepository.sumStock` turns the sum into a number. Nothing past a repository
 sees `number | string`.
 
+**An empty list sends no query.** A repository method that takes a list answers `[]`, or returns,
+for an empty one before it builds anything: `IN (:...ids)` without ids is a syntax error in MySQL.
+TypeORM sends nothing for an empty `insert` by itself, and the check before one keeps the rule
+visible in every method. The e2e suites run the empty list wherever a request or a job can send one:
+a staff user registered without roles, a role cleared of its permissions, and the post-subtract job
+of an order that leaves every product in stock, which is the job of most orders. Without its check
+that job fails on the syntax error. A list that no caller can send empty, such as the products of an
+order, keeps the check all the same.
+
 ## Who sees the lib
 
 | Importer                                | Uses                                       |

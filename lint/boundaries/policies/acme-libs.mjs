@@ -41,16 +41,20 @@ export const acmeLibs = [
     libs('observability', 'openapi'),
     packages('@nestjs/common', '@nestjs/config', 'nestjs-pino'),
   ]),
-  fromLib('auth', [packages('@nestjs/common', '@nestjs/config', '@nestjs/core', '@nestjs/jwt')]),
+  fromLib('auth', [
+    packages('@nestjs/common', '@nestjs/config', '@nestjs/core', '@nestjs/jwt', '@nestjs/swagger'),
+  ]),
   fromLib('testing', [
     libs('bootstrap'),
     to('acme-libs', { lib: 'cache', file: 'outbound/**' }),
     packages(
       '@nestjs/common',
       '@nestjs/config',
+      '@nestjs/core',
       '@nestjs/jwt',
       '@nestjs/testing',
       'nestjs-pino',
+      'supertest',
       'typeorm',
     ),
   ]),

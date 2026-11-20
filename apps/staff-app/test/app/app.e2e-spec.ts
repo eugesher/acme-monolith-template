@@ -1,9 +1,8 @@
-import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import request from 'supertest';
 import { DataSource } from 'typeorm';
 
 import { SnakeNamingStrategy } from '@acme-libs/database';
+import { HealthE2E } from '@acme-libs/testing';
 import * as coreEntities from '@acme-core/entities';
 import * as staffEntities from '@acme-staff/common/entities';
 
@@ -12,7 +11,6 @@ import {
   AccessE2E,
   AuthE2E,
   CatalogE2E,
-  HealthE2E,
   LedgerE2E,
   QueueE2E,
   SalesE2E,
@@ -71,11 +69,108 @@ describe('App', () => {
     }
   });
 
-  it('should not mount the customer-app route POST /api/auth/register', async () => {
-    await request(ctx.app.getHttpServer())
-      .post('/api/auth/register')
-      .send({ email: 'new@example.com', password: 'secret-password' })
-      .expect(HttpStatus.NOT_FOUND);
+  it('should mount these routes, each behind its access', () => {
+    expect(ctx.routeAccess()).toEqual([
+      ['GET /api/access/permissions', 'access:manage'],
+      ['GET /api/access/roles', 'access:manage'],
+      ['POST /api/access/roles', 'access:manage'],
+      ['PUT /api/access/roles/:roleId/permissions', 'access:manage'],
+      ['POST /api/access/users', 'access:manage'],
+      ['PUT /api/access/users/:userId/roles', 'access:manage'],
+      ['POST /api/auth/login', 'public'],
+      ['GET /api/auth/me', 'authenticated'],
+      ['GET /api/catalog/products', 'product:read'],
+      ['POST /api/catalog/products', 'product:write'],
+      ['GET /api/catalog/products/:productId', 'product:read'],
+      ['PATCH /api/catalog/products/:productId', 'product:write'],
+      ['POST /api/catalog/products/:productId/archive', 'product:archive'],
+      ['POST /api/catalog/products/:productId/publish', 'product:write'],
+      ['GET /api/catalog/products/:productId/tags', 'product:read'],
+      ['PUT /api/catalog/products/:productId/tags', 'product:write'],
+      ['GET /api/health', 'public'],
+      ['GET /api/health/ready', 'public'],
+      ['GET /api/ledger', 'ledger:read'],
+      ['GET /api/queues', 'queue:read'],
+      ['GET /api/queues/:queueName/jobs/failed', 'queue:read'],
+      ['DELETE /api/queues/:queueName/jobs/failed/:jobId', 'queue:delete'],
+      ['POST /api/queues/:queueName/jobs/failed/:jobId/retry', 'queue:retry'],
+      ['GET /api/sales/orders', 'order:read'],
+      ['GET /api/sales/orders/:orderId', 'order:read'],
+      ['GET /api/sales/orders/:orderId/tags', 'order:read'],
+      ['PUT /api/sales/orders/:orderId/tags', 'order:write'],
+      ['GET /api/tools/notes', 'authenticated'],
+      ['POST /api/tools/notes', 'authenticated'],
+      ['DELETE /api/tools/notes/:noteId', 'authenticated'],
+      ['GET /api/tools/notes/:noteId', 'authenticated'],
+      ['PATCH /api/tools/notes/:noteId', 'authenticated'],
+      ['POST /api/tools/notes/:noteId/resolve', 'authenticated'],
+      ['GET /api/tools/notes/:noteId/revisions', 'authenticated'],
+      ['GET /api/tools/tags', 'tag:read'],
+      ['POST /api/tools/tags', 'tag:write'],
+      ['DELETE /api/tools/tags/:tagId', 'tag:write'],
+      ['PATCH /api/tools/tags/:tagId', 'tag:write'],
+      ['POST /api/warehouse/product-stock/:productId/add', 'product:restock'],
+    ]);
+  });
+
+  it('should validate each route with these DTOs of its path, query and body', () => {
+    expect(ctx.routeDtos()).toEqual([
+      ['GET /api/access/permissions'],
+      ['GET /api/access/roles'],
+      ['POST /api/access/roles', 'RoleCreateRequestDto'],
+      [
+        'PUT /api/access/roles/:roleId/permissions',
+        'RoleIdParamDto',
+        'RolePermissionsReassignRequestDto',
+      ],
+      ['POST /api/access/users', 'UserRegisterRequestDto'],
+      ['PUT /api/access/users/:userId/roles', 'UserIdParamDto', 'UserRolesReassignRequestDto'],
+      ['POST /api/auth/login', 'AuthLoginRequestDto'],
+      ['GET /api/auth/me'],
+      ['GET /api/catalog/products', 'ProductGetManyQueryDto'],
+      ['POST /api/catalog/products', 'ProductCreateRequestDto'],
+      ['GET /api/catalog/products/:productId', 'ProductIdParamDto'],
+      ['PATCH /api/catalog/products/:productId', 'ProductIdParamDto', 'ProductUpdateRequestDto'],
+      ['POST /api/catalog/products/:productId/archive', 'ProductIdParamDto'],
+      ['POST /api/catalog/products/:productId/publish', 'ProductIdParamDto'],
+      ['GET /api/catalog/products/:productId/tags', 'ProductIdParamDto'],
+      [
+        'PUT /api/catalog/products/:productId/tags',
+        'ProductIdParamDto',
+        'ProductTagsReplaceRequestDto',
+      ],
+      ['GET /api/health'],
+      ['GET /api/health/ready'],
+      ['GET /api/ledger', 'LedgerListEntriesQueryDto'],
+      ['GET /api/queues'],
+      [
+        'GET /api/queues/:queueName/jobs/failed',
+        'QueueNameParamDto',
+        'QueueListFailedJobsQueryDto',
+      ],
+      ['DELETE /api/queues/:queueName/jobs/failed/:jobId', 'QueueJobParamDto'],
+      ['POST /api/queues/:queueName/jobs/failed/:jobId/retry', 'QueueJobParamDto'],
+      ['GET /api/sales/orders', 'OrderGetManyQueryDto'],
+      ['GET /api/sales/orders/:orderId', 'OrderIdParamDto'],
+      ['GET /api/sales/orders/:orderId/tags', 'OrderIdParamDto'],
+      ['PUT /api/sales/orders/:orderId/tags', 'OrderIdParamDto', 'OrderTagsReplaceRequestDto'],
+      ['GET /api/tools/notes', 'NoteGetManyQueryDto'],
+      ['POST /api/tools/notes', 'NoteCreateRequestDto'],
+      ['DELETE /api/tools/notes/:noteId', 'NoteIdParamDto'],
+      ['GET /api/tools/notes/:noteId', 'NoteIdParamDto'],
+      ['PATCH /api/tools/notes/:noteId', 'NoteIdParamDto', 'NoteEditRequestDto'],
+      ['POST /api/tools/notes/:noteId/resolve', 'NoteIdParamDto'],
+      ['GET /api/tools/notes/:noteId/revisions', 'NoteIdParamDto', 'NoteGetRevisionsQueryDto'],
+      ['GET /api/tools/tags', 'TagGetManyQueryDto'],
+      ['POST /api/tools/tags', 'TagCreateRequestDto'],
+      ['DELETE /api/tools/tags/:tagId', 'TagIdParamDto'],
+      ['PATCH /api/tools/tags/:tagId', 'TagIdParamDto', 'TagRenameRequestDto'],
+      [
+        'POST /api/warehouse/product-stock/:productId/add',
+        'ProductStockProductIdParamDto',
+        'ProductStockAddRequestDto',
+      ],
+    ]);
   });
 
   describe('Health', () => {

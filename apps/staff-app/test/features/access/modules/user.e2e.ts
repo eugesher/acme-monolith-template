@@ -145,6 +145,38 @@ export class UserE2E {
           },
         }).toMatchSnapshot();
       });
+
+      it('should create a user without roles for an empty list', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .post('/api/access/users')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({
+            email: 'no-role@example.com',
+            password: 'no-role-password-please-change',
+            roleIds: [],
+          })
+          .expect(HttpStatus.CREATED);
+
+        const actual = {
+          response: { body: response.body },
+          db: {
+            staff_user: await this.ctx.dataSource.query(
+              'SELECT id, email FROM staff_user WHERE email = ? ORDER BY id',
+              ['no-role@example.com'],
+            ),
+            staff_user_roles: await this.ctx.dataSource.query(
+              'SELECT * FROM staff_user_roles WHERE user_id = ? ORDER BY role_id',
+              [response.body.id],
+            ),
+          },
+        };
+
+        expect(actual).toMatchSnapshot({
+          response: { body: { id: expect.any(String) } },
+          db: { staff_user: [{ id: expect.any(String) }] },
+        });
+        expect(actual).toMatchObject({ db: { staff_user: [{ id: response.body.id }] } });
+      });
     });
   }
 
@@ -210,25 +242,6 @@ export class UserE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it.each([
-        ['a word', 'abc'],
-        ['a number with a suffix', '1abc'],
-      ])(
-        'should refuse %s as the user id with 400 from validation and change nothing',
-        async (_, userId) => {
-          const response = await request(this.ctx.app.getHttpServer())
-            .put(`/api/access/users/${userId}/roles`)
-            .auth(this.ctx.adminToken, { type: 'bearer' })
-            .send({ roleIds: [] })
-            .expect(HttpStatus.BAD_REQUEST);
-
-          expect({
-            response: { body: response.body },
-            db: { staff_user_roles: await staffUserRolesOf('1') },
-          }).toMatchSnapshot();
-        },
-      );
     });
   }
 }

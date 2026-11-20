@@ -39,6 +39,24 @@ export class LedgerE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
+
+      it('should list the entries of one correlation id', async () => {
+        await this.ctx.dataSource.query(
+          "INSERT INTO ledger_entry (id, operation_key, subject_type, subject_id, action, payload, correlation_id, occurred_at, recorded_at) VALUES (490, 'e2e-ledger:1', 'product', '101', 'ProductCreated', '{}', 'e2e00000-0000-4000-8000-000000000026', '2026-01-07 08:00:00.000', '2026-01-07 08:00:00.000')",
+        );
+
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .get('/api/ledger')
+            .query({ correlationId: 'e2e00000-0000-4000-8000-000000000026' })
+            .auth(this.ctx.viewerToken, { type: 'bearer' })
+            .expect(HttpStatus.OK);
+
+          expect({ response: { body: response.body } }).toMatchSnapshot();
+        } finally {
+          await this.ctx.dataSource.query('DELETE FROM ledger_entry WHERE id = 490');
+        }
+      });
     });
   }
 

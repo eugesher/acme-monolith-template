@@ -57,53 +57,6 @@ export class OrderE2E {
           data: [],
         });
       });
-
-      it('should refuse a malformed tag id with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/sales/orders')
-          .query({ tagId: 'fragile' })
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a malformed page with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/sales/orders')
-          .query({ page: 'first' })
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a role without order:read with 403', async () => {
-        try {
-          await this.ctx.dataSource.query(
-            "DELETE FROM staff_role_permissions WHERE role_id = 3 AND code = 'order:read'",
-          );
-
-          const response = await request(this.ctx.app.getHttpServer())
-            .get('/api/sales/orders')
-            .auth(this.ctx.viewerToken, { type: 'bearer' })
-            .expect(HttpStatus.FORBIDDEN);
-
-          expect({ response: { body: response.body } }).toMatchSnapshot();
-        } finally {
-          await this.ctx.dataSource.query(
-            "INSERT INTO staff_role_permissions (role_id, code) VALUES (3, 'order:read')",
-          );
-        }
-      });
-
-      it('should refuse a caller without a token with 401', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/sales/orders')
-          .expect(HttpStatus.UNAUTHORIZED);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 
@@ -141,33 +94,6 @@ export class OrderE2E {
           .get('/api/sales/orders/abc')
           .auth(this.ctx.viewerToken, { type: 'bearer' })
           .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a role without order:read with 403', async () => {
-        try {
-          await this.ctx.dataSource.query(
-            "DELETE FROM staff_role_permissions WHERE role_id = 3 AND code = 'order:read'",
-          );
-
-          const response = await request(this.ctx.app.getHttpServer())
-            .get('/api/sales/orders/600')
-            .auth(this.ctx.viewerToken, { type: 'bearer' })
-            .expect(HttpStatus.FORBIDDEN);
-
-          expect({ response: { body: response.body } }).toMatchSnapshot();
-        } finally {
-          await this.ctx.dataSource.query(
-            "INSERT INTO staff_role_permissions (role_id, code) VALUES (3, 'order:read')",
-          );
-        }
-      });
-
-      it('should refuse a caller without a token with 401', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/sales/orders/600')
-          .expect(HttpStatus.UNAUTHORIZED);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
@@ -284,36 +210,6 @@ export class OrderE2E {
           .expect(HttpStatus.NOT_FOUND);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a word among the tag ids with 400 from validation', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .put('/api/sales/orders/601/tags')
-          .auth(this.ctx.editorToken, { type: 'bearer' })
-          .send({ tagIds: ['fragile'] })
-          .expect(HttpStatus.BAD_REQUEST);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should refuse a role without order:write with 403', async () => {
-        try {
-          await this.ctx.dataSource.query(
-            "DELETE FROM staff_role_permissions WHERE role_id = 2 AND code = 'order:write'",
-          );
-
-          const response = await request(this.ctx.app.getHttpServer())
-            .put('/api/sales/orders/601/tags')
-            .auth(this.ctx.editorToken, { type: 'bearer' })
-            .send({ tagIds: ['302'] })
-            .expect(HttpStatus.FORBIDDEN);
-
-          expect({ response: { body: response.body } }).toMatchSnapshot();
-        } finally {
-          await this.ctx.dataSource.query(
-            "INSERT INTO staff_role_permissions (role_id, code) VALUES (2, 'order:write')",
-          );
-        }
       });
     });
   }

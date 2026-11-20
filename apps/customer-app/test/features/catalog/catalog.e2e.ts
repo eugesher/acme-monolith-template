@@ -87,14 +87,6 @@ export class CatalogE2E {
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
       });
-
-      it('should refuse a caller without a token', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/products')
-          .expect(HttpStatus.UNAUTHORIZED);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
     });
   }
 }

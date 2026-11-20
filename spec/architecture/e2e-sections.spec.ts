@@ -66,14 +66,21 @@ describe('e2e sections', () => {
   it('an e2e spec MAY mount the e2e sections and the context of its app', async () => {
     await expect({
       file: 'apps/staff-app/test/app/__fixture__.e2e-spec.ts',
-      code: 'import { HealthE2E } from "../features";import { AppE2EContext } from "../context/app-e2e.context";',
+      code: 'import { AuthE2E } from "../features";import { AppE2EContext } from "../context/app-e2e.context";',
+    }).toPassArchitectureLint();
+  });
+
+  it('an e2e spec MAY mount a section the apps share from the testing lib', async () => {
+    await expect({
+      file: 'apps/processor-app/test/app/__fixture__.e2e-spec.ts',
+      code: 'import { HealthE2E } from "@acme-libs/testing";',
     }).toPassArchitectureLint();
   });
 
   it('an e2e spec may NOT mount the e2e sections of another app', async () => {
     await expect({
       file: 'apps/customer-app/test/app/__fixture__.e2e-spec.ts',
-      code: 'import { HealthE2E } from "../../../staff-app/test/features";',
+      code: 'import { AuthE2E } from "../../../staff-app/test/features";',
     }).toBreakRule('boundaries/dependencies');
   });
 });

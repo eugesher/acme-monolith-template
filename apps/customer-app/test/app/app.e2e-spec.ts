@@ -1,8 +1,7 @@
-import { HttpStatus } from '@nestjs/common';
-import request from 'supertest';
+import { HealthE2E } from '@acme-libs/testing';
 
 import { AppE2EContext } from '../context/app-e2e.context';
-import { AuthE2E, CatalogE2E, HealthE2E, OrderE2E } from '../features';
+import { AuthE2E, CatalogE2E, OrderE2E } from '../features';
 
 describe('App', () => {
   jest.setTimeout(90000);
@@ -26,15 +25,33 @@ describe('App', () => {
     await ctx.close();
   });
 
-  it.each(['/api/access/roles', '/api/ledger', '/api/tools/notes'])(
-    'should not mount the staff-app route %s',
-    async (path) => {
-      await request(ctx.app.getHttpServer())
-        .get(path)
-        .auth(ctx.bobToken, { type: 'bearer' })
-        .expect(HttpStatus.NOT_FOUND);
-    },
-  );
+  it('should mount these routes, each behind its access', () => {
+    expect(ctx.routeAccess()).toEqual([
+      ['POST /api/auth/login', 'public'],
+      ['GET /api/auth/me', 'authenticated'],
+      ['POST /api/auth/register', 'public'],
+      ['GET /api/health', 'public'],
+      ['GET /api/health/ready', 'public'],
+      ['GET /api/orders', 'authenticated'],
+      ['POST /api/orders', 'authenticated'],
+      ['GET /api/orders/:orderId', 'authenticated'],
+      ['GET /api/products', 'authenticated'],
+    ]);
+  });
+
+  it('should validate each route with these DTOs of its path, query and body', () => {
+    expect(ctx.routeDtos()).toEqual([
+      ['POST /api/auth/login', 'AuthLoginRequestDto'],
+      ['GET /api/auth/me'],
+      ['POST /api/auth/register', 'AuthRegisterRequestDto'],
+      ['GET /api/health'],
+      ['GET /api/health/ready'],
+      ['GET /api/orders', 'OrderGetManyQueryDto'],
+      ['POST /api/orders', 'OrderPlaceRequestDto'],
+      ['GET /api/orders/:orderId', 'OrderIdParamDto'],
+      ['GET /api/products', 'CatalogProductListQueryDto'],
+    ]);
+  });
 
   describe('Health', () => {
     healthE2E.handleLiveness();

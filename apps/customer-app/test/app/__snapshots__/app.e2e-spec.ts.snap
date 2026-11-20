@@ -160,7 +160,6 @@ exports[`App Auth POST /api/auth/register should create a customer who logs in a
         "status": "active",
       },
     ],
-    "ledger_entry": [],
   },
   "ledger_record_queue": [
     {
@@ -224,31 +223,6 @@ exports[`App Auth POST /api/auth/register should refuse a malformed email with 4
             "field": "email",
             "messages": [
               "email must be an email",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Auth POST /api/auth/register should refuse a password shorter than 12 with 400 from validation and store nothing 1`] = `
-{
-  "db": {
-    "customer": [],
-  },
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "password",
-            "messages": [
-              "password must be longer than or equal to 12 characters",
             ],
           },
         ],
@@ -349,19 +323,6 @@ exports[`App Catalog GET /api/products should list every active product by id, w
       "page": 1,
       "pageCount": 1,
       "total": 3,
-    },
-  },
-}
-`;
-
-exports[`App Catalog GET /api/products should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
     },
   },
 }
@@ -468,19 +429,6 @@ exports[`App Order GET /api/orders should list only the orders of the caller, ne
 }
 `;
 
-exports[`App Order GET /api/orders should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Order GET /api/orders/:orderId should answer an unknown order with the same 404 1`] = `
 {
   "response": {
@@ -544,19 +492,6 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
           },
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Order GET /api/orders/:orderId should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
     },
   },
 }
@@ -771,19 +706,6 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
 }
 `;
 
-exports[`App Order POST /api/orders should refuse a caller without a token 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "UNAUTHORIZED",
-      "details": null,
-      "message": "Unauthorized",
-      "statusCode": 401,
-    },
-  },
-}
-`;
-
 exports[`App Order POST /api/orders should refuse a deleted product with 422 and write nothing 1`] = `
 {
   "db": {
@@ -820,6 +742,29 @@ exports[`App Order POST /api/orders should refuse a draft product with 422 and w
 }
 `;
 
+exports[`App Order POST /api/orders should refuse a key still in flight with 409 and write nothing 1`] = `
+{
+  "db": {
+    "idempotency_key": [
+      {
+        "response_body": null,
+        "scope": "customer:101",
+        "status": "in_flight",
+      },
+    ],
+    "order": [],
+  },
+  "response": {
+    "body": {
+      "code": "IDEMPOTENT_REQUEST_IN_FLIGHT",
+      "details": null,
+      "message": "Idempotency-Key e2e-order-in-flight-key is still being processed, retry shortly",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
 exports[`App Order POST /api/orders should refuse a placement without a key with 400 1`] = `
 {
   "db": {
@@ -849,50 +794,6 @@ exports[`App Order POST /api/orders should refuse an archived product with 422 a
       },
       "message": "Product 105 was not found",
       "statusCode": 422,
-    },
-  },
-}
-`;
-
-exports[`App Order POST /api/orders should refuse an empty list with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "productIds",
-            "messages": [
-              "productIds must contain at least 1 elements",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
-    },
-  },
-}
-`;
-
-exports[`App Order POST /api/orders should refuse an id that is not a number with 400 from validation 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "VALIDATION_FAILED",
-      "details": {
-        "fields": [
-          {
-            "field": "productIds",
-            "messages": [
-              "each value in productIds must be a positive integer",
-            ],
-          },
-        ],
-      },
-      "message": "The request is not valid",
-      "statusCode": 400,
     },
   },
 }

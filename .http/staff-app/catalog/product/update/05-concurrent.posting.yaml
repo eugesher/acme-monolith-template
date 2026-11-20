@@ -1,4 +1,4 @@
-name: 06-concurrent
+name: 05-concurrent
 description: |-
   e2e: Catalog › Product › PATCH /api/catalog/products/:productId › should apply every one of concurrent updates without If-Match
 

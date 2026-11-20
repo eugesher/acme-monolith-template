@@ -1,0 +1,24 @@
+name: 05-without-roles
+description: |-
+  e2e: Access › User › POST /api/access/users › should create a user without roles for an empty list
+
+  Expect: 201 Created, a user row and no row in staff_user_roles
+  User: admin@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/access/users
+body:
+  content: |-
+    {
+      "email": "no-role@example.com",
+      "password": "no-role-password-please-change",
+      "roleIds": []
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin
