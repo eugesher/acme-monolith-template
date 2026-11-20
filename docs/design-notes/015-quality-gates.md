@@ -130,7 +130,9 @@ lines; a blank line starts a new run, so a barrel can keep its folders apart.
 Groups are separated by one blank line. Static fields and plain instance fields stand together
 without one, the `readonly` ones included. A decorated field of a DTO or an entity spans several
 lines, so decorated fields and the members of a getter or method group are separated by one. The
-rule tells the two kinds of field apart by the decorator, not by the number of lines.
+rule tells the two kinds of field apart by the decorator, not by the number of lines. The order
+inside a group is free; the methods of a domain model take the order their use case calls them in
+(see `038-domain-models.md`).
 
 **Module keys** (`modules.mjs`, `sort-objects`) go `module`, `global`, `imports`, `exports`,
 `controllers`, `providers`: what the module takes and shows comes before how it is built. The rule

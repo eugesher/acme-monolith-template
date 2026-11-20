@@ -234,3 +234,12 @@ behind `version`, `ProductCoreArchiveModel._status` behind `status`,
 because `TagRenameModel` reads it through `get name()`, and a subclass cannot turn a field of its
 base into an accessor. A field without a getter keeps the plain name, as `name` and `status` of
 `ProductAggregate` and `body` and `resolved` of `NoteAggregate`.
+
+**The methods of a model go in the order the use case calls them.** The lint of class members (see
+`015-quality-gates.md`) fixes the groups and leaves the order inside a group free, so inside a group
+a model reads as its use case: `ProductPublishModel` goes `publish`, `toLedgerPayload`,
+`toLoggerPayload`, and `UserStaffUserCandidateModel` goes `assertEmail`, `toInsertPayload`,
+`assertRoles`, `createUserRoles`, `toRegistered`, as the registration writes the user before it
+checks the roles. An aggregate goes the same way for the answers it shares: the write service calls
+`assertExpectedVersion` of `ProductAggregate` before `toUpdatePayload`, and the use case calls
+`toSnapshot` last.
