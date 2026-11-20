@@ -1,4 +1,3 @@
-import { OrderNotFoundException } from '../../../domain';
 import { OrderGetTagsUseCase } from '../order-get-tags.use-case';
 import type { IOrderGetTagsRepositoryPort, IOrderTagPort } from '../../../outbound';
 
@@ -24,10 +23,13 @@ describe('OrderGetTagsUseCase', () => {
       expect(view).toEqual({ tags: [{ id: '302', name: 'vip' }] });
     });
 
-    it('throws OrderNotFoundException and reads no tags for an unknown order', async () => {
+    it('refuses an unknown order with ORDER_NOT_FOUND and reads no tags', async () => {
       repository.findExisting.mockResolvedValue(null);
 
-      await expect(useCase.execute({ orderId: '999' })).rejects.toThrow(OrderNotFoundException);
+      await expect(useCase.execute({ orderId: '999' })).rejects.toMatchObject({
+        code: 'ORDER_NOT_FOUND',
+        message: 'Order 999 was not found',
+      });
       expect(tag.find).not.toHaveBeenCalled();
     });
   });

@@ -1,4 +1,3 @@
-import { ProductNotFoundException, ProductTagNotFoundException } from '../../../domain';
 import {
   ProductTagReplaceOutcomeEnum,
   type IProductReplaceTagsRepositoryPort,
@@ -55,28 +54,30 @@ describe('ProductReplaceTagsUseCase', () => {
       expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
     });
 
-    it('throws ProductNotFoundException and replaces nothing for an unknown product', async () => {
+    it('refuses an unknown product with PRODUCT_NOT_FOUND and replaces nothing', async () => {
       repository.lockById.mockResolvedValue(null);
 
-      await expect(useCase.execute({ productId: '999', tagIds: ['300'] })).rejects.toThrow(
-        ProductNotFoundException,
-      );
+      await expect(useCase.execute({ productId: '999', tagIds: ['300'] })).rejects.toMatchObject({
+        code: 'PRODUCT_NOT_FOUND',
+        message: 'Product 999 was not found',
+      });
       expect(tag.replace).not.toHaveBeenCalled();
     });
 
-    it('throws ProductTagNotFoundException with the missing tags, so the transaction rolls back', async () => {
+    it('refuses missing tags with PRODUCT_TAG_NOT_FOUND and their ids, so the transaction rolls back', async () => {
       tag.replace.mockResolvedValue({
         outcome: ProductTagReplaceOutcomeEnum.TAG_NOT_FOUND,
         tags: [],
         missingTagIds: ['999'],
       });
 
-      const error: unknown = await useCase
-        .execute({ productId: '100', tagIds: ['300', '999'] })
-        .catch((caught: unknown) => caught);
+      const replacing = useCase.execute({ productId: '100', tagIds: ['300', '999'] });
 
-      expect(error).toBeInstanceOf(ProductTagNotFoundException);
-      expect(error).toMatchObject({ details: { missingTagIds: ['999'] } });
+      await expect(replacing).rejects.toMatchObject({
+        code: 'PRODUCT_TAG_NOT_FOUND',
+        message: 'Some of the tags do not exist',
+        details: { missingTagIds: ['999'] },
+      });
       expect(calls).not.toContain('commit');
     });
   });

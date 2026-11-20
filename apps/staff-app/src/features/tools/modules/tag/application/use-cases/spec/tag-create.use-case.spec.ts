@@ -1,6 +1,5 @@
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { TagNameInvalidException, TagNameTakenException } from '../../../domain';
 import { TagCreateInsertOutcomeEnum, type ITagCreateRepositoryPort } from '../../../outbound';
 import { TagCreateUseCase } from '../tag-create.use-case';
 
@@ -44,15 +43,21 @@ describe('TagCreateUseCase', () => {
       expect(logger.info).toHaveBeenCalledWith({ id: '303', name: 'heavy' }, 'Tag created');
     });
 
-    it('throws TagNameInvalidException and stores nothing for an empty name', async () => {
-      await expect(useCase.execute({ name: ' ' })).rejects.toThrow(TagNameInvalidException);
+    it('refuses an empty name with TAG_NAME_INVALID and stores nothing', async () => {
+      await expect(useCase.execute({ name: ' ' })).rejects.toMatchObject({
+        code: 'TAG_NAME_INVALID',
+        message: 'Tag.name must be a non-empty string of at most 64 characters',
+      });
       expect(repository.insert).not.toHaveBeenCalled();
     });
 
-    it('turns a duplicate key into TagNameTakenException', async () => {
+    it('turns a duplicate key into TAG_NAME_TAKEN', async () => {
       repository.insert.mockResolvedValue({ outcome: TagCreateInsertOutcomeEnum.DUPLICATE });
 
-      await expect(useCase.execute({ name: 'fragile' })).rejects.toThrow(TagNameTakenException);
+      await expect(useCase.execute({ name: 'fragile' })).rejects.toMatchObject({
+        code: 'TAG_NAME_TAKEN',
+        message: 'A tag named fragile already exists',
+      });
       expect(repository.findInserted).not.toHaveBeenCalled();
     });
 

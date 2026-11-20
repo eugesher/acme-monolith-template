@@ -1,6 +1,6 @@
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { TagNameInvalidException, TagNameTakenException, TagRenameModel } from '../../../domain';
+import { TagRenameModel } from '../../../domain';
 import { TagRenameUpdateOutcomeEnum, type ITagRenameRepositoryPort } from '../../../outbound';
 import { TagRenameUseCase } from '../tag-rename.use-case';
 import type { TagAccessService } from '../../services/tag-access.service';
@@ -79,19 +79,21 @@ describe('TagRenameUseCase', () => {
       expect(view.name).toBe('fragile');
     });
 
-    it('throws TagNameInvalidException and writes nothing for an empty name', async () => {
-      await expect(useCase.execute({ tagId: '300', name: ' ' })).rejects.toThrow(
-        TagNameInvalidException,
-      );
+    it('refuses an empty name with TAG_NAME_INVALID and writes nothing', async () => {
+      await expect(useCase.execute({ tagId: '300', name: ' ' })).rejects.toMatchObject({
+        code: 'TAG_NAME_INVALID',
+        message: 'Tag.name must be a non-empty string of at most 64 characters',
+      });
       expect(repository.update).not.toHaveBeenCalled();
     });
 
-    it('turns a duplicate key into TagNameTakenException', async () => {
+    it('turns a duplicate key into TAG_NAME_TAKEN', async () => {
       repository.update.mockResolvedValue(TagRenameUpdateOutcomeEnum.DUPLICATE);
 
-      await expect(useCase.execute({ tagId: '300', name: 'promo' })).rejects.toThrow(
-        TagNameTakenException,
-      );
+      await expect(useCase.execute({ tagId: '300', name: 'promo' })).rejects.toMatchObject({
+        code: 'TAG_NAME_TAKEN',
+        message: 'A tag named promo already exists',
+      });
     });
 
     it('rethrows any other error of the update', async () => {

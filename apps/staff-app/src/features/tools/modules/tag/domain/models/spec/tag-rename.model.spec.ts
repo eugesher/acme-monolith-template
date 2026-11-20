@@ -1,4 +1,3 @@
-import { TagNameInvalidException } from '../../exceptions/tag-name-invalid.exception';
 import { TagRenameModel } from '../tag-rename.model';
 
 describe('TagRenameModel', () => {
@@ -21,7 +20,12 @@ describe('TagRenameModel', () => {
     });
 
     it('keeps the old name when the new one is invalid', () => {
-      expect(() => tag.rename(' ')).toThrow(TagNameInvalidException);
+      expect(() => tag.rename(' ')).toThrow(
+        expect.objectContaining({
+          code: 'TAG_NAME_INVALID',
+          message: 'Tag.name must be a non-empty string of at most 64 characters',
+        }) as Error,
+      );
       expect(tag.name).toBe('fragile');
     });
   });

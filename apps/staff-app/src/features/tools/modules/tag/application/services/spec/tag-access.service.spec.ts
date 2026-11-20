@@ -1,4 +1,4 @@
-import { TagNotFoundException, TagRenameModel } from '../../../domain';
+import { TagRenameModel } from '../../../domain';
 import { TagAccessService } from '../tag-access.service';
 import type { ITagAccessRepositoryPort } from '../../../outbound';
 
@@ -25,12 +25,15 @@ describe('TagAccessService', () => {
       expect(tag.name).toBe('fragile');
     });
 
-    it('throws TagNotFoundException for an unknown tag', async () => {
+    it('refuses an unknown tag with TAG_NOT_FOUND', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.load({ tagId: '999' }, TagRenameModel.reconstitute)).rejects.toThrow(
-        TagNotFoundException,
-      );
+      await expect(
+        service.load({ tagId: '999' }, TagRenameModel.reconstitute),
+      ).rejects.toMatchObject({
+        code: 'TAG_NOT_FOUND',
+        message: 'Tag 999 was not found',
+      });
     });
   });
 });

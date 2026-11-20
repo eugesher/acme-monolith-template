@@ -73,6 +73,9 @@ describe('AuthJwtGuard', () => {
     const allowed = guard.canActivate(context);
 
     await expect(allowed).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(allowed).rejects.toMatchObject({
+      response: { statusCode: 401, message: 'Unauthorized' },
+    });
     expect(verifyAsync).not.toHaveBeenCalled();
   });
 
@@ -82,6 +85,9 @@ describe('AuthJwtGuard', () => {
     const allowed = guard.canActivate(context);
 
     await expect(allowed).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(allowed).rejects.toMatchObject({
+      response: { statusCode: 401, message: 'Unauthorized' },
+    });
     expect(validator.handleValidate).not.toHaveBeenCalled();
   });
 
@@ -91,6 +97,9 @@ describe('AuthJwtGuard', () => {
     const allowed = guard.canActivate(context);
 
     await expect(allowed).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(allowed).rejects.toMatchObject({
+      response: { statusCode: 401, message: 'Unauthorized' },
+    });
     expect(request.user).toBeUndefined();
   });
 });
