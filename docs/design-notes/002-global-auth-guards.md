@@ -13,25 +13,25 @@ the bearer token and hands the subject to `AUTH_USER_VALIDATOR_PORT`. Each app b
 its global `AuthGlobalModule`, which has the layers of a feature (see `024-code-placement.md`):
 every facade method calls a use case, and the use case reaches the data through an outbound port.
 
-| App           | The user and its permission codes                                                                                                               | Ports bound                |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| staff-app     | `AuthGlobalValidateSubjectUseCase` over `AUTH_GLOBAL_SUBJECT_PORT`, which `AuthGlobalSubjectCoreAdapter` implements with `STAFF_AUTH_CORE_PORT` | `AUTH_USER_VALIDATOR_PORT` |
-| processor-app | the same, file for file                                                                                                                         | `AUTH_USER_VALIDATOR_PORT` |
-| customer-app  | `AuthGlobalValidateSubjectUseCase` and its repository                                                                                           | `AUTH_USER_VALIDATOR_PORT` |
+| App          | The user and its permission codes                                                                                                                   | Ports bound                |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| staff-app    | `AuthGlobalValidateSubjectUseCase` over `AUTH_GLOBAL_SUBJECT_PORT`, which `AuthGlobalSubjectCommonAdapter` implements with `STAFF_AUTH_COMMON_PORT` | `AUTH_USER_VALIDATOR_PORT` |
+| customer-app | `AuthGlobalValidateSubjectUseCase` and its repository                                                                                               | `AUTH_USER_VALIDATOR_PORT` |
 
-The staff subject lives in the core module `core/modules/src/staff-auth`: two apps ask for it, and
-staff-app asks twice, from the guard and from `GET /auth/me`. One query reads the user, its roles
-and the codes of their permissions; `AuthGlobalSubjectCoreAdapter` keeps the id, the email and the
-codes, so the roles never reach `request.user` and the use case answers what its port answers. The
-customer check has one caller, so it lives in customer-app; its repository selects the id and the
-email, and a global module has no domain to rebuild them in.
+The staff subject lives in the common module `apps/staff-app/src/common/modules/staff-auth`: two
+modules of staff-app ask for it, the global module for the guard and the `auth` feature for
+`GET /auth/me` (see `024-code-placement.md`). One query reads the user, its roles and the codes of
+their permissions; `AuthGlobalSubjectCommonAdapter` keeps the id, the email and the codes, so the
+roles never reach `request.user` and the use case answers what its port answers. The customer check
+has one caller, so it lives in customer-app; its repository selects the id and the email, and a
+global module has no domain to rebuild them in.
 
 The global module also imports the lib modules, so mounting `AuthGlobalModule` in `AppModule` is the
 whole wiring.
 
 **Global classes carry the `AuthGlobal` prefix.** The folder stays `app/global/auth`, paired with
 the lib contract below, but the `auth` feature owns the plain names: `AuthModule`, and
-`AuthIdentityCoreAdapter` for the core adapter of its own. The prefix keeps the two apart in
+`AuthIdentityCommonAdapter` for the common adapter of its own. The prefix keeps the two apart in
 imports, in stack traces and in DI errors.
 
 **A global module pairs with the lib contract of its own name.** `app/global/auth` may import
@@ -41,15 +41,15 @@ without a new policy.
 
 ## Two lib modules
 
-| Module                 | Guards                | Needs                               | Imported by                            |
-| ---------------------- | --------------------- | ----------------------------------- | -------------------------------------- |
-| `AuthJwtModule`        | `AuthJwtGuard`        | `AUTH_USER_VALIDATOR_PORT`          | staff-app, processor-app, customer-app |
-| `AuthPermissionModule` | `AuthPermissionGuard` | `permissionCodes` on `request.user` | staff-app, processor-app               |
+| Module                 | Guards                | Needs                               | Imported by             |
+| ---------------------- | --------------------- | ----------------------------------- | ----------------------- |
+| `AuthJwtModule`        | `AuthJwtGuard`        | `AUTH_USER_VALIDATOR_PORT`          | staff-app, customer-app |
+| `AuthPermissionModule` | `AuthPermissionGuard` | `permissionCodes` on `request.user` | staff-app               |
 
 **Who the user is and what the user may do come in one answer.** `AUTH_USER_VALIDATOR_PORT.validate`
-answers `{ id, email, permissionCodes? }`. A staff app fills `permissionCodes`; customer-app leaves
-it out and imports `AuthJwtModule` alone. There is no roles guard and no `@Roles`: routes are gated
-by permissions only, and a role is a named set of them.
+answers `{ id, email, permissionCodes? }`. staff-app fills `permissionCodes`; customer-app leaves it
+out and imports `AuthJwtModule` alone. There is no roles guard and no `@Roles`: routes are gated by
+permissions only, and a role is a named set of them.
 
 **Two static modules, not a flag.** `AuthJwtModule.forRoot({ claims: true })` would hide the choice
 in an argument that no lint can read. An import of `AuthPermissionModule` is visible, and the lint
@@ -69,7 +69,7 @@ Each guard is one `APP_GUARD` provider, and Nest runs global guards in registrat
 
 **Authentication must come first.** The permissions guard reads `request.user`. Ahead of the JWT
 guard they would see an anonymous request on every gated route and answer 403 where 401 is meant.
-The `AuthGlobalModule` of a staff app imports `AuthJwtModule` before `AuthPermissionModule`, and the
+The `AuthGlobalModule` of staff-app imports `AuthJwtModule` before `AuthPermissionModule`, and the
 spec of the permission module checks that a gated route without a token answers 401.
 
 **Deny by default.** A route without decorators needs a token. `@Public()` is the only way out, and
@@ -83,27 +83,27 @@ the verified payload holds `sub`, `aud`, `iat` and `exp`. Roles and permissions 
 token, so there is no stale copy of them to trust or to refresh.
 
 **Claims in the token are not trusted.** The guard reads only `sub` from the verified payload and
-asks the validator for the user: id, email and, in a staff app, permission codes. The user comes
-from the database on every request, so a disabled account or a revoked permission stops working on
-the next call, not at token expiry. The cost is one read per request.
+asks the validator for the user: id, email and, in staff-app, permission codes. The user comes from
+the database on every request, so a disabled account or a revoked permission stops working on the
+next call, not at token expiry. The cost is one read per request.
 
 **One read per request, gated or not.** The staff validator reads the user with its permission codes
 in one query, so the permissions guard reads nothing. An ungated request pays for the codes too; the
 price is a join, and a gated request saves its second read.
 
 **One secret and one audience per app.** The guard verifies with `JWT_SECRET` of the app, the secret
-its `auth` feature signs the access token with. staff-app and processor-app serve the same staff and
-share the secret, so the token staff-app signs works in both; processor-app has no login of its own.
-customer-app has its own secret, so its tokens fail the signature check in the staff apps.
+its `auth` feature signs the access token with. staff-app alone serves the staff: processor-app has
+no routes for people, so it has no guards and no `JWT_SECRET` (see `023-processor-app.md`).
+customer-app has its own secret, so its tokens fail the signature check in staff-app.
 
 **The audience is code, not configuration.** `customer.id` and `staff_user.id` both count from 1, so
-a secret shared by mistake would let customer 5 in as staff user 5. Each app passes
+a secret shared by mistake would let customer 5 in as staff user 5. Each API app passes
 `AuthAudienceEnum` of `libs/kernel` to `AuthJwtModule.forRoot()`, and staff-app and customer-app to
-`CredentialsLibModule.register()`: `staff` in staff-app and processor-app, `customer` in
-customer-app. The token carries it as `aud`, and the guard accepts only the audience of its app and
-the algorithm of `AuthTokenAlgorithmEnum` of `libs/kernel`, `HS256`, which the credentials lib and
-the e2e contexts sign with too. An env variable could repeat the mistake of the secret; a constant
-in the module import cannot. The auth e2e of staff-app and of customer-app sends a token signed with
-the secret of the app for a subject of the app but the other audience and expects 401;
+`CredentialsLibModule.register()`: `staff` in staff-app, `customer` in customer-app. The token
+carries it as `aud`, and the guard accepts only the audience of its app and the algorithm of
+`AuthTokenAlgorithmEnum` of `libs/kernel`, `HS256`, which the credentials lib and the e2e contexts
+sign with too. An env variable could repeat the mistake of the secret; a constant in the module
+import cannot. The auth e2e of staff-app and of customer-app sends a token signed with the secret of
+the app for a subject of the app but the other audience and expects 401;
 `libs/auth/src/modules/spec/auth-jwt.module.spec.ts` checks another secret, another audience, no
 audience and `HS512`.

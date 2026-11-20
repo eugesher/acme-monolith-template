@@ -1,8 +1,8 @@
 # 023 — Processor app
 
 `apps/processor-app` runs the background work of the template: the queue processors and the
-schedules, and serves the staff the failed jobs of its queues. staff-app and customer-app only
-enqueue. All three apps share one database and one Redis.
+schedules. staff-app and customer-app enqueue, and staff-app serves the staff the failed jobs (see
+`041-failed-jobs.md`). All three apps share one database and one Redis.
 
 | Processor       | Entered by                                       | What it does                                                                      |
 | --------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
@@ -12,69 +12,43 @@ enqueue. All three apps share one database and one Redis.
 
 ## Why a third app
 
-**Background work scales and fails apart from HTTP.** A processor inside an HTTP app shares the CPU
-of the requests, and a schedule inside it runs once per replica: three replicas of staff-app would
-purge three times on every tick. processor-app is its own deployable, so the HTTP apps scale with
-traffic and processor-app with the queue.
+**Background work scales and fails apart from HTTP.** A processor inside an HTTP app shares the
+event loop of the requests, a job that runs the process out of memory takes the API down with it,
+and a schedule inside it runs once per replica: three replicas of staff-app would purge three times
+on every tick. processor-app is a process type of its own, so the HTTP apps scale with traffic and
+processor-app with the queue.
 
 **No HTTP app owns this work.** The queues are written by several apps, and a processor of one HTTP
 app would serve the others through a shared Redis anyway; a third app says so.
+
+**People reach the API apps, not processor-app.** The failed jobs are routes for the staff, so they
+live in staff-app, which already signs the staff in and checks their permissions (see
+`041-failed-jobs.md`). processor-app answers only the probes of the orchestrator: it has no guards,
+no `JWT_SECRET` and no staff entities.
 
 ## Shape
 
 The app has the folders of an HTTP app and uses fewer of them:
 
-| Folder                | What it holds                                                                               |
-| --------------------- | ------------------------------------------------------------------------------------------- |
-| `src/main.ts`         | the same bootstrap as the other apps; it listens for the health probes and the queue routes |
-| `src/app/setup`       | config and schedule; processor-app is the only app with `ScheduleSetupModule`               |
-| `src/app/global/auth` | `AuthGlobalModule` over the core module `staff-auth`, as in staff-app                       |
-| `src/common/shared`   | the registrations of the `ledger-record` and `product-stock-post-subtract` queues           |
-| `src/features/health` | `GET /health` and `GET /health/ready` for the orchestrator                                  |
-| `src/features/queue`  | the failed jobs of the queues for the staff                                                 |
-| `src/processors`      | the three processors                                                                        |
+| Folder                | What it holds                                                                     |
+| --------------------- | --------------------------------------------------------------------------------- |
+| `src/main.ts`         | the same bootstrap as the other apps; it listens for the health probes            |
+| `src/app/setup`       | config and schedule; processor-app is the only app with `ScheduleSetupModule`     |
+| `src/common/shared`   | the registrations of the `ledger-record` and `product-stock-post-subtract` queues |
+| `src/features/health` | `GET /health` and `GET /health/ready` for the orchestrator                        |
+| `src/processors`      | the three processors                                                              |
 
-**HTTP serves the probes and the queues.** `AuthGlobalModule` reaches the staff through the core
-module `staff-auth` (see `017-credentials-lib.md`). processor-app has no login: it shares
-`JWT_SECRET` and the `staff` audience with staff-app, so the token staff-app signs works here, and
-it lists the staff identity entities on its connection for the core module. The health routes carry
-`@Public()`. `APP_PIPE` and `APP_FILTER` are the ones of staff-app.
-
-| Route                                              | Permission     | What it does                            |
-| -------------------------------------------------- | -------------- | --------------------------------------- |
-| `GET /queues`                                      | `queue:read`   | every queue with the counts of its jobs |
-| `GET /queues/:queueName/jobs/failed`               | `queue:read`   | a page of the failed jobs, newest first |
-| `POST /queues/:queueName/jobs/failed/:jobId/retry` | `queue:retry`  | returns the job to the queue            |
-| `DELETE /queues/:queueName/jobs/failed/:jobId`     | `queue:delete` | removes the job                         |
-
-**The counts are read field by field.** `getJobCounts()` of Bull answers the paused jobs too, but
-its type does not declare them, so the adapter takes the five counts it declares and
-`getPausedCount()` for the sixth; every count is a number.
-
-**A failed job answers what the staff acts on, not the job of Bull.** `QueueRegistryQueueAdapter`
-maps each job to the view of its port: the id as a string, the name, the `data`, `attempts` and
-`attemptsMade`, the `failedReason` and the `stacktrace`, and the instants `createdAt`, `processedAt`
-and `failedAt` as ISO strings in UTC, `null` when Bull has none. The options, the progress and the
-return value of Bull stay in the adapter, so an upgrade of Bull does not change the response.
-
-An unknown queue or job answers 404, a job that is not failed 409. A retried job keeps its
-`attemptsMade`, so its next failure sends it straight back to the failed set: a retry is one more
-attempt, not a new round. The ledger deduplicates on the operation key, so retrying a ledger record
-that did append writes nothing.
-
-**Both actions log the staff user.** A retry logs `Failed job returned to the queue` at `info` with
-the queue, the job id and `staffUserId`. A delete logs `Failed job deleted` at `warn` with the same
-fields and the `data` of the job: a deleted ledger record never reaches the ledger, and the log is
-the only place it can be restored from.
+**HTTP serves the probes.** The health routes are the only ones, and no guard runs, so they carry no
+`@Public()`. `APP_PIPE`, `APP_FILTER`, `HttpSecurityModule` and `ThrottlerSetupModule` are those of
+the other apps, so every app has the same HTTP edge (see `037-http-edge.md`).
 
 **The config holds what the processors read**: the database, Redis, `IDEMPOTENCY_KEY_TTL_HOURS`,
 `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES`, `ENQUEUE_RETRY_ATTEMPTS` of the core modules it mounts, the
-logger and tracing, and `JWT_SECRET` to check the staff token. No cache TTL.
+logger and tracing, and the HTTP edge. No cache TTL and no `JWT_SECRET`.
 
 **The entity list holds `IdempotencyKey`, `LedgerEntry`, `Product` and `ProductStock`**, the tables
 of the purge, the ledger append and the stock check, with `Order`, `OrderProduct` and `Customer`,
-which the relations of `ProductStock` need on the connection, and the staff identity entities the
-guards read.
+which the relations of `ProductStock` need on the connection.
 
 ## The product-stock processor
 
@@ -97,7 +71,7 @@ comes after it waits (see `021-pessimistic-locking.md`).
 `@OnQueueFailed`, and `ProductStockPostSubtractReportFailureUseCase` logs it with the product ids
 through the same `JobFailureHelper.report` (see `008-queue-processor.md`): at `warn` while attempts
 are left, at `error` after the last one. A sold-out product the check did not archive then shows in
-the logs, not only among the failed jobs of `/queues`.
+the logs, not only among the failed jobs (see `041-failed-jobs.md`).
 
 ## Running
 

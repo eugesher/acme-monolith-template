@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 
 import { ORM_PORT, type IHostedRepository, type IOrmPort } from '@acme-libs/contracts/database';
-import { StaffRole, StaffRolePermission } from '@acme-core/entities';
+import { StaffRole, StaffRolePermission } from '@acme-staff/common/entities';
 
 import { RolePersistenceStaffRoleBuilder } from '../builders/role-persistence-staff-role.builder';
 

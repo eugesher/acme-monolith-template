@@ -81,14 +81,20 @@ the `acme:catalog:*` keys from Redis.
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
 `libs/testing/src/e2e/e2e.context.ts`, which holds only what all five contexts use: `init()`
 compiles the `AppModule` it is given with `@nestjs/testing`, starts it with
-`AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, builds a
-`JwtService` with `JWT_SECRET` from the config and the audience of the app and spies on the root
-logger; `close()` and `takeRootWarnings()` round it off. The class is not abstract: a context passes
-its `AppModule`, its `AppNameEnum` and its `AuthAudienceEnum` to the constructor, calls
-`super.init()` and adds its own. It signs one access token for each seeded account the cases use:
-admin, editor and viewer in staff-app, ann, bob and carol in customer-app, admin and viewer in
-processor-app. Everything the cases read is a getter that throws before `init()`. The contexts of
-staff-app and customer-app also hold the Redis client, through `@acme-libs/testing`.
+`AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, and spies on the
+root logger; `close()` and `takeRootWarnings()` round it off. The class is not abstract: a context
+passes its `AppModule` and its `AppNameEnum` to the constructor, calls `super.init()` and adds its
+own.
+
+**A context of an app with auth signs tokens.** `AuthE2EContext` of
+`libs/testing/src/e2e/auth-e2e.context.ts` extends `E2EContext` with the `AuthAudienceEnum` of the
+app and, after `super.init()`, a `JwtService` with `JWT_SECRET` from the config and that audience.
+The contexts of staff-app, customer-app and both system suites extend it and sign one access token
+for each seeded account the cases use: admin, editor and viewer in staff-app, ann, bob and carol in
+customer-app. processor-app has no auth and no `JWT_SECRET`, so its context extends `E2EContext` and
+signs nothing. A subclass rather than an optional audience keeps both classes free of a branch.
+Everything the cases read is a getter that throws before `init()`. The contexts of staff-app and
+customer-app also hold the Redis client, through `@acme-libs/testing`.
 
 **A catalog case clears its own keys, not the database.** The Bull queue of the ledger records lives
 in the same Redis, so `FLUSHDB` would drop its jobs and counters. `hooks()` deletes the
@@ -100,14 +106,22 @@ contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of 
 queue and empties the queue, as `takeRootWarnings()` takes the warnings. A case that enqueues takes
 the jobs, so the next case starts from an empty queue.
 
+**staff-app fails a job by hand.** No processor runs in staff-app, so the `/queues` cases (see
+`041-failed-jobs.md`) get a failed job from `failLedgerRecord(record)`: it adds the record with
+`attempts: 1`, takes it with `getNextJob()` of Bull and calls `moveToFailed(error)`, the steps a
+processor takes, so the job carries the instants and the stack trace the routes answer. The failure
+takes the token of the queue and so releases the lock `getNextJob()` set; with `ignoreLock` the lock
+would outlive the failure, and the retry and the delete of the job would fail. The context throws if
+the next job is not the one it added. That a returned record reaches the ledger is a seam of two
+apps, so it is a case of the system suite of staff-app.
+
 **processor-app waits for the queue and the schedules.** Its cases add jobs to the queue themselves
 and read the ledger. `waitForLedgerRecordQueue()` polls `getJobCounts()` every 100 ms until no job
 is waiting, active or delayed, and throws after 100 polls; the jobs run in the e2e process, so a
 drained queue means the rows are written. `fireSchedule(name)` fires a schedule through
 `SchedulerRegistry` without waiting for it, and `waitFor(description, settled)` polls until the
 outcome shows. A failing job is a record whose `subjectType` is longer than its column, enqueued
-with `attempts: 1`; the `/queues` cases retry and delete such jobs over HTTP with the tokens of the
-seeded staff users.
+with `attempts: 1`.
 
 The Jest files outside the apps live in `jest/`:
 
@@ -187,7 +201,9 @@ Redis. It has the layout of `apps/<app>/test`: the entry `app/app-system.e2e-spe
 `context/app-e2e.context.ts` and the classes of `features/`. An app suite reads the waiting job and
 stops there, a processor suite adds the job by hand, so neither proves that what a producer writes
 is what the processor reads. A system suite covers that seam and nothing else: one case per producer
-of a queue, checked like an app case, with the result of the job in place of the job.
+of a queue, checked like an app case, with the result of the job in place of the job. A route that
+returns a failed job to the queue is a producer too: the suite of staff-app lets processor-app fail
+a record, fixes it, retries it through `/queues` and waits for its ledger entry.
 
 **A job is awaited by its result.** `pollUntil(read, isDone)` waits first and reads after, 30
 attempts 500 ms apart, and answers the last read, so a job that never lands fails on the snapshot. A
@@ -195,15 +211,17 @@ chain of jobs is awaited by its last row: the order case waits for the two ledge
 correlation id, `OrderPlaced` and `ProductArchived` of the sold-out product.
 
 **The apps share one environment.** Jest loads the `.env.test` of the API app, and processor-app
-adds the variables only it has from its own file. The two differ in `PORT` and `JWT_SECRET`, and no
-system case calls processor-app over HTTP, so the context creates its Nest application and calls
-`init()` without `listen`: its processors and schedules run, and it opens no port that would take
-the `PORT` of the API app.
+adds the variables only it has from its own file. The two differ in `PORT`, and no system case calls
+processor-app over HTTP, so the context creates its Nest application and calls `init()` without
+`listen`: its processors and schedules run, and it opens no port that would take the `PORT` of the
+API app.
 
 **`test/system` is not plain node.** It compiles project code, so it has its own `tsconfig.json`
 over the root one and the lint category `repo:system`: it sees its own files, the `AppModule` of
-every app, the libs `kernel`, `toolkit`, `domain` and `testing`, and the packages `@nestjs/common`,
-`ioredis` and `supertest`. `test/infra` keeps running under plain node.
+every app, the contracts of core, the libs `kernel`, `toolkit`, `domain` and `testing`, and the
+packages `@nestjs/bull`, `@nestjs/common`, `bull`, `ioredis` and `supertest`. Bull and the contracts
+of core let a case put a failing job into a queue, which no route of an app writes. `test/infra`
+keeps running under plain node.
 
 ## Lint
 

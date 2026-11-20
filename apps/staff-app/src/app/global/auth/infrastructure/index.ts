@@ -1,1 +1,1 @@
-export * from './core-adapters/auth-global-subject-core.adapter';
+export * from './common-adapters/auth-global-subject-common.adapter';

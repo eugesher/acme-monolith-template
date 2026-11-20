@@ -6,10 +6,6 @@ import {
   OrderProduct,
   Product,
   ProductStock,
-  StaffRole,
-  StaffRolePermission,
-  StaffUser,
-  StaffUserRole,
 } from '@acme-core/entities';
 
 export const entities = [
@@ -20,8 +16,4 @@ export const entities = [
   OrderProduct,
   Product,
   ProductStock,
-  StaffRole,
-  StaffRolePermission,
-  StaffUser,
-  StaffUserRole,
 ];

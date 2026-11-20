@@ -65,7 +65,7 @@ describe('app entities (@acme-<app>/common/entities)', () => {
     'class-validator',
     '@acme-libs/toolkit',
     '@acme-libs/domain',
-    '@acme-core/contracts/staff-auth',
+    '@acme-core/contracts/ledger',
   ])(
     'an app entity may NOT import %s — a table carries no framework or module code',
     async (source) => {

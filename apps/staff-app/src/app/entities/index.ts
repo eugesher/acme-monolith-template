@@ -6,11 +6,13 @@ import {
   OrderProduct,
   Product,
   ProductStock,
+} from '@acme-core/entities';
+import {
   StaffRole,
   StaffRolePermission,
   StaffUser,
   StaffUserRole,
-} from '@acme-core/entities';
+} from '@acme-staff/common/entities';
 import { Note, NoteRevision, SubjectTag, Tag } from '@acme-staff/common/entities';
 
 export const entities = [

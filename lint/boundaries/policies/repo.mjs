@@ -25,8 +25,9 @@ export const repo = [
   from('repo:system', [
     to('repo:system'),
     to('acme-app:app:module'),
+    to('acme-core:contracts'),
     baseLibs('testing'),
-    packages('@nestjs/common', 'ioredis', 'supertest'),
+    packages('@nestjs/bull', '@nestjs/common', 'bull', 'ioredis', 'supertest'),
   ]),
   from('repo:test', [to('repo:test'), packages('dotenv', 'fs', 'joi', 'path', 'typeorm')]),
 ];

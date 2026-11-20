@@ -4,7 +4,8 @@ import request from 'supertest';
 import { DataSource } from 'typeorm';
 
 import { SnakeNamingStrategy } from '@acme-libs/database';
-import * as entities from '@acme-core/entities';
+import * as coreEntities from '@acme-core/entities';
+import * as staffEntities from '@acme-staff/common/entities';
 
 import { AppE2EContext } from '../context/app-e2e.context';
 import {
@@ -13,6 +14,7 @@ import {
   CatalogE2E,
   HealthE2E,
   LedgerE2E,
+  QueueE2E,
   SalesE2E,
   ToolsE2E,
   WarehouseE2E,
@@ -27,6 +29,7 @@ describe('App', () => {
   const accessE2E = AccessE2E.of(ctx);
   const authE2E = AuthE2E.of(ctx);
   const ledgerE2E = LedgerE2E.of(ctx);
+  const queueE2E = QueueE2E.of(ctx);
   const toolsE2E = ToolsE2E.of(ctx);
   const salesE2E = SalesE2E.of(ctx);
   const warehouseE2E = WarehouseE2E.of(ctx);
@@ -53,7 +56,7 @@ describe('App', () => {
       username: config.getOrThrow<string>('DATABASE_USER'),
       password: config.getOrThrow<string>('DATABASE_PASSWORD'),
       database: config.getOrThrow<string>('DATABASE_NAME'),
-      entities: Object.values(entities),
+      entities: [...Object.values(coreEntities), ...Object.values(staffEntities)],
       namingStrategy: new SnakeNamingStrategy(),
     });
 
@@ -92,6 +95,13 @@ describe('App', () => {
   describe('Ledger', () => {
     ledgerE2E.handleList();
     ledgerE2E.handleEnqueue();
+  });
+
+  describe('Queue', () => {
+    queueE2E.handleList();
+    queueE2E.handleListFailedJobs();
+    queueE2E.handleRetryFailedJob();
+    queueE2E.handleDeleteFailedJob();
   });
 
   describe('Tools', () => {

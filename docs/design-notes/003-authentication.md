@@ -1,10 +1,10 @@
 # 003 — Authentication
 
 Login and token signing live in an `auth` feature of staff-app and of customer-app, which also read
-the current user there. processor-app has no login: it takes the token of staff-app (see
-`023-processor-app.md`). `auth` also names the lib, its contract and the global module, so the
-classes of the global module carry the `AuthGlobal` prefix (see `002-global-auth-guards.md`) and the
-feature keeps the plain `Auth` prefix.
+the current user there. processor-app has no routes for people, so it neither signs nor checks a
+token (see `023-processor-app.md`). `auth` also names the lib, its contract and the global module,
+so the classes of the global module carry the `AuthGlobal` prefix (see `002-global-auth-guards.md`)
+and the feature keeps the plain `Auth` prefix.
 
 | App          | Feature                               |
 | ------------ | ------------------------------------- |
@@ -23,8 +23,7 @@ feature keeps the plain `Auth` prefix.
 
 **Each app logs its users in inside the feature.** No other module logs anyone in, so
 `AuthLoginUseCase` of each app reads the user, checks the password and signs the token itself (see
-`024-code-placement.md`). The staff log in only to staff-app, and processor-app takes that token, so
-one login serves both staff apps.
+`024-code-placement.md`).
 
 **An unknown email costs as much as a wrong password.** Each login use case checks the password
 before it looks at whether the user was found, and passes `passwordHash: null` for an unknown email;
@@ -39,8 +38,8 @@ guessing run does not leave a list of addresses in the logs. `AuthEmailTakenExce
 
 **A route that only echoes the guard has no use case.** `handleMe` of customer-app copies
 `@CurrentUser()` into the response DTO: `AuthJwtGuard` has already re-read the user. In staff-app
-`AuthMeUseCase` asks the core module `staff-auth` through `AUTH_IDENTITY_PORT` and
-`infrastructure/core-adapters/auth-identity-core.adapter.ts`.
+`AuthMeUseCase` asks the common module `staff-auth` through `AUTH_IDENTITY_PORT` and
+`infrastructure/common-adapters/auth-identity-common.adapter.ts`.
 
 ## A unique index instead of a lookup
 
@@ -71,13 +70,12 @@ module provides `HttpExceptionFilter` so that Nest can inject it into the featur
 
 ## One token per audience
 
-Each app verifies with its `JWT_SECRET` and its audience: `staff` for staff-app and processor-app,
-which share the secret, and `customer` for customer-app, which has its own. staff-app and
-customer-app sign with the same pair; processor-app signs nothing. A token of customer-app is
-refused by the staff apps with 401, and the other way round, even if the secrets were the same (see
-`002-global-auth-guards.md`). Login carries `@Public()`; without it the global JWT guard would
-answer 401 before the controller runs. The token carries only `sub`, `aud`, `iat` and `exp`, and its
-lifetime is `JWT_EXPIRES_IN`. Signing lives in `libs/credentials` (see `017-credentials-lib.md`).
+Each API app signs and verifies with its own `JWT_SECRET` and its audience: `staff` for staff-app,
+`customer` for customer-app. A token of customer-app is refused by staff-app with 401, and the other
+way round, even if the secrets were the same (see `002-global-auth-guards.md`). Login carries
+`@Public()`; without it the global JWT guard would answer 401 before the controller runs. The token
+carries only `sub`, `aud`, `iat` and `exp`, and its lifetime is `JWT_EXPIRES_IN`. Signing lives in
+`libs/credentials` (see `017-credentials-lib.md`).
 
 **A disabled account stops at once, a token of an active one only at expiry.** The guard re-reads
 the user on every request (see `002-global-auth-guards.md`), so a disabled account or a changed role

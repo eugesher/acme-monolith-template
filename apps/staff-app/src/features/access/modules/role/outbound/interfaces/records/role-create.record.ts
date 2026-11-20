@@ -1,4 +1,4 @@
-import type { StaffRole } from '@acme-core/entities';
+import type { StaffRole } from '@acme-staff/common/entities';
 
 import type { RoleCreateStaffRoleInsertOutcomeEnum } from '../../enums/role-create-staff-role-insert-outcome.enum';
 

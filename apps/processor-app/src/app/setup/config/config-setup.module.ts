@@ -16,7 +16,6 @@ export class ConfigSetupModule {
         ...ConfigSchema.DATABASE,
         ...ConfigSchema.REDIS,
         ...ConfigSchema.QUEUE,
-        ...ConfigSchema.AUTH,
         ...ConfigSchema.HTTP,
         ...ConfigSchema.OBSERVABILITY,
         IDEMPOTENCY_KEY_TTL_HOURS: Joi.number().integer().min(1).required(),

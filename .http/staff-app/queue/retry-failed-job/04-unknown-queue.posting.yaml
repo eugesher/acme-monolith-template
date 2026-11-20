@@ -1,0 +1,14 @@
+name: 04-unknown-queue
+description: |-
+  e2e: Queue › POST /api/queues/:queueName/jobs/failed/:jobId/retry › should refuse an unknown queue with 404 QUEUE_NOT_FOUND
+
+  Expect: 404 Not Found, code QUEUE_NOT_FOUND
+  User: admin@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/queues/unknown/jobs/failed/1/retry
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_admin

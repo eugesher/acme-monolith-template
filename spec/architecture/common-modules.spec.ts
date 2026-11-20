@@ -475,33 +475,33 @@ describe('common modules (common/modules/<module>)', () => {
     it.each([
       ['staff-app', 'auth'],
       ['customer-app', 'auth'],
-      ['processor-app', 'queue'],
+      ['processor-app', 'health'],
     ])('%s MAY import the port of any core module in its core adapters', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/infrastructure/core-adapters/__fixture__.ts`,
-        code: 'import { STAFF_AUTH_CORE_PORT } from "@acme-core/contracts/staff-auth";',
+        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/ledger";',
       }).toPassArchitectureLint();
     });
 
     it.each([
       ['staff-app', 'auth'],
       ['customer-app', 'auth'],
-      ['processor-app', 'queue'],
+      ['processor-app', 'health'],
     ])('%s MAY import any core entity in its persistence', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/infrastructure/persistence/__fixture__.ts`,
-        code: 'import { Customer, StaffUser } from "@acme-core/entities";',
+        code: 'import { Customer, Product } from "@acme-core/entities";',
       }).toPassArchitectureLint();
     });
 
     it.each([
       ['staff-app', 'auth'],
       ['customer-app', 'auth'],
-      ['processor-app', 'queue'],
+      ['processor-app', 'health'],
     ])('%s MAY mount any core module', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/${feature}.module.ts`,
-        code: 'import { StaffAuthCoreModule } from "@acme-core/modules/staff-auth";',
+        code: 'import { LedgerCoreModule } from "@acme-core/modules/ledger";',
       }).toPassArchitectureLint();
     });
   });

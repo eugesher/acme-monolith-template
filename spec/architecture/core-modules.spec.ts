@@ -90,7 +90,7 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['@acme-core/contracts/staff-auth', '@acme-core/modules/staff-auth'])(
+    it.each(['@acme-staff/contracts/staff-auth', '@acme-staff/common/modules'])(
       'ledger may NOT reach %s — the journal records facts, it never asks who the user is',
       async (alias) => {
         await expect({
