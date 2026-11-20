@@ -1,16 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
+import type { OnApplicationBootstrap } from '@nestjs/common';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
+import { IDEMPOTENCY_PURGE_QUEUE } from '@acme-processor/contracts/idempotency';
 
-import { IdempotencyPurgeUseCase } from '../../application';
+import { IdempotencyPurgeScheduleUseCase, IdempotencyPurgeUseCase } from '../../application';
 
-@Injectable()
-export class IdempotencyPurgeProcessor {
-  constructor(private readonly purge: IdempotencyPurgeUseCase) {}
+@Processor(IDEMPOTENCY_PURGE_QUEUE)
+export class IdempotencyPurgeProcessor extends WorkerHost implements OnApplicationBootstrap {
+  constructor(
+    private readonly schedule: IdempotencyPurgeScheduleUseCase,
+    private readonly purge: IdempotencyPurgeUseCase,
+  ) {
+    super();
+  }
 
-  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'idempotency-purge' })
-  public async handleTick(): Promise<void> {
+  public async onApplicationBootstrap(): Promise<void> {
+    await CorrelationContextHelper.run(undefined, () => this.schedule.execute());
+  }
+
+  public async process(): Promise<void> {
     await CorrelationContextHelper.run(undefined, () => this.purge.execute());
   }
 }

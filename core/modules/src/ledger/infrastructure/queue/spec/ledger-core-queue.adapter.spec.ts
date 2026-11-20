@@ -1,4 +1,4 @@
-import type { Queue } from 'bull';
+import type { Queue } from 'bullmq';
 
 import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
 
@@ -20,7 +20,7 @@ describe('LedgerCoreQueueAdapter', () => {
   });
 
   describe('add', () => {
-    it('adds only the fields of the record as one job under the operation key', async () => {
+    it('adds only the fields of the record as one job deduplicated by the operation key', async () => {
       const record = {
         operationKey: 'item-opened:7',
         subjectType: 'item',
@@ -36,6 +36,7 @@ describe('LedgerCoreQueueAdapter', () => {
 
       expect(add).toHaveBeenCalledTimes(1);
       expect(add).toHaveBeenCalledWith(
+        'ledger-record',
         {
           operationKey: 'item-opened:7',
           subjectType: 'item',
@@ -45,7 +46,7 @@ describe('LedgerCoreQueueAdapter', () => {
           occurredAt: '2026-01-05T08:00:00.000Z',
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
         },
-        { jobId: 'item-opened:7' },
+        { deduplication: { id: 'item-opened:7' } },
       );
     });
 
@@ -68,7 +69,7 @@ describe('LedgerCoreQueueAdapter', () => {
       await expect(adding).rejects.toThrow('redis is down');
     });
 
-    it('gives up on an add that hangs, as Bull does while Redis is down', async () => {
+    it('gives up on an add that hangs, as BullMQ does while Redis is down', async () => {
       jest.useFakeTimers();
       add.mockReturnValue(new Promise(() => undefined));
 

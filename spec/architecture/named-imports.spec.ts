@@ -2,9 +2,8 @@ import '../support/lint';
 
 describe('modules allowed by name', () => {
   describe.each([
-    'bull',
-    '@nestjs/bull',
-    '@nestjs/schedule',
+    'bullmq',
+    '@nestjs/bullmq',
     '@nestjs/common',
     '@acme-libs/auth',
     '@acme-libs/kernel',

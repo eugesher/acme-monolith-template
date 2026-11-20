@@ -119,6 +119,7 @@ export class QueueE2E {
 
       it('should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED', async () => {
         const job = await this.ctx.ledgerRecordQueue.add(
+          'ledger-record',
           {
             operationKey: 'e2e-queue:3',
             subjectType: 'product',
@@ -197,7 +198,7 @@ export class QueueE2E {
           .expect(HttpStatus.NO_CONTENT);
 
         expect({
-          job: await this.ctx.ledgerRecordQueue.getJob(job.id),
+          state: await job.getState(),
           failed: await this.ctx.ledgerRecordQueue.getFailedCount(),
         }).toMatchSnapshot();
       });

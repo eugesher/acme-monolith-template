@@ -115,13 +115,6 @@ describe('unused edges', () => {
         'boundaries/dependencies',
       );
     });
-
-    it('the app module may NOT import ScheduleModule: the schedule setup module configures it', async () => {
-      await expect({
-        file: 'apps/__unused-fixture__/src/app/app.module.ts',
-        code: 'import { ScheduleModule } from "@nestjs/schedule";',
-      }).toBreakRule('boundaries/dependencies');
-    });
   });
 
   describe('global modules', () => {
@@ -180,9 +173,9 @@ describe('unused edges', () => {
         '../../../common/shared/concurrency',
       ],
       [
-        'feature persistence may NOT reach Bull: jobs are enqueued from infrastructure/queue',
+        'feature persistence may NOT reach BullMQ: jobs are enqueued from infrastructure/queue',
         'apps/__unused-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
-        '@nestjs/bull',
+        '@nestjs/bullmq',
       ],
       [
         'feature presentation may NOT reach the observability lib: the middleware of the app sets the correlation id',

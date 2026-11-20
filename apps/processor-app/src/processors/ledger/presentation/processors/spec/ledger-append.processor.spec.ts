@@ -1,4 +1,4 @@
-import type { Job } from 'bull';
+import type { Job } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
@@ -30,9 +30,9 @@ describe('LedgerAppendProcessor', () => {
     );
   });
 
-  describe('handleRecord', () => {
+  describe('process', () => {
     it('appends the record inside the correlation context of the producer', async () => {
-      await processor.handleRecord({
+      await processor.process({
         data: {
           operationKey: 'product-created:12',
           subjectType: 'product',
@@ -55,10 +55,10 @@ describe('LedgerAppendProcessor', () => {
       expect(correlationIds).toEqual(['c0ffee00-0000-4000-8000-000000000001']);
     });
 
-    it('passes a failing append through, so Bull retries the job', async () => {
+    it('passes a failing append through, so BullMQ retries the job', async () => {
       append.execute.mockRejectedValue(new Error('deadlock'));
 
-      const handling = processor.handleRecord({
+      const handling = processor.process({
         data: {
           operationKey: 'product-created:12',
           subjectType: 'product',
@@ -126,6 +126,12 @@ describe('LedgerAppendProcessor', () => {
         attempts: 1,
         error: new Error('deadlock'),
       });
+    });
+
+    it('reports nothing for a failure without a job', async () => {
+      await processor.handleFailed(undefined, new Error('stalled'));
+
+      expect(reportFailure.execute).not.toHaveBeenCalled();
     });
   });
 });

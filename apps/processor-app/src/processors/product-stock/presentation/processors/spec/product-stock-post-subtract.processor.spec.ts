@@ -1,4 +1,4 @@
-import type { Job } from 'bull';
+import type { Job } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
@@ -35,9 +35,9 @@ describe('ProductStockPostSubtractProcessor', () => {
     );
   });
 
-  describe('handleRecord', () => {
+  describe('process', () => {
     it('checks the products of the job under the correlation id of the subtraction', async () => {
-      await processor.handleRecord({
+      await processor.process({
         data: { productIds: ['100', '106'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
       } as Job<IProductStockPostSubtractPayload>);
 
@@ -45,10 +45,10 @@ describe('ProductStockPostSubtractProcessor', () => {
       expect(correlationIds).toEqual(['c0ffee00-0000-4000-8000-000000000001']);
     });
 
-    it('passes a failing check through, so Bull retries the job', async () => {
+    it('passes a failing check through, so BullMQ retries the job', async () => {
       postSubtract.execute.mockRejectedValue(new Error('deadlock'));
 
-      const handling = processor.handleRecord({
+      const handling = processor.process({
         data: { productIds: ['100'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
       } as Job<IProductStockPostSubtractPayload>);
 
@@ -95,6 +95,12 @@ describe('ProductStockPostSubtractProcessor', () => {
         attempts: 1,
         error: new Error('deadlock'),
       });
+    });
+
+    it('reports nothing for a failure without a job', async () => {
+      await processor.handleFailed(undefined, new Error('stalled'));
+
+      expect(reportFailure.execute).not.toHaveBeenCalled();
     });
   });
 });

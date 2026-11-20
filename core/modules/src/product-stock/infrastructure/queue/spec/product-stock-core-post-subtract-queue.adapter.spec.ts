@@ -1,4 +1,4 @@
-import type { Queue } from 'bull';
+import type { Queue } from 'bullmq';
 
 import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
@@ -27,7 +27,7 @@ describe('ProductStockCorePostSubtractQueueAdapter', () => {
         timeoutMs: 500,
       });
 
-      expect(add).toHaveBeenCalledWith({
+      expect(add).toHaveBeenCalledWith('product-stock-post-subtract', {
         productIds: ['100', '106'],
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
       });
@@ -45,7 +45,7 @@ describe('ProductStockCorePostSubtractQueueAdapter', () => {
       await expect(enqueueing).rejects.toThrow('redis is down');
     });
 
-    it('gives up on an add that hangs, as Bull does while Redis is down', async () => {
+    it('gives up on an add that hangs, as BullMQ does while Redis is down', async () => {
       jest.useFakeTimers();
       add.mockReturnValue(new Promise(() => undefined));
 

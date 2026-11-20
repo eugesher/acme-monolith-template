@@ -26,7 +26,7 @@ Eight e2e cases have no request:
 - the schema check of staff-app compares the migrated database with the entities;
 - the ledger case of staff-app enqueues one record twice through `LEDGER_CORE_PORT` inside the app;
 - the `queue` cases of staff-app that page, retry and delete a failed job, and the one that retries
-  a delayed job: the e2e makes the job through Bull, and no route of an app makes one;
+  a delayed job: the e2e makes the job through BullMQ, and no route of an app makes one;
 - the auth limit of each app sends logins from one address until the limit is spent and one more
   from another address; `auth/login/02-wrong-password` sent more than `THROTTLE_AUTH_LIMIT` times
   within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.
@@ -78,8 +78,7 @@ the fixtures, and a second run gets another answer: for example, a second create
 hits the taken email. Run `yarn test:e2e:infra:reseed` to start over.
 
 The e2e deletes the `acme:catalog:*` keys of Redis before every catalog case of customer-app and
-leaves the keys of the Bull queue alone. When a description checks cache keys, delete those keys
-first.
+leaves the keys of the queues alone. When a description checks cache keys, delete those keys first.
 
 ## Tokens
 

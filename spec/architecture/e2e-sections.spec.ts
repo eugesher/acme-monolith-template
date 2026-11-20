@@ -8,15 +8,19 @@ describe('e2e sections', () => {
     }).toPassArchitectureLint();
   });
 
-  it.each(['@nestjs/bull', '@nestjs/common', '@nestjs/config', 'ioredis', 'supertest', 'typeorm'])(
-    'the e2e code MAY import %s',
-    async (source) => {
-      await expect({
-        file: 'apps/customer-app/test/context/__fixture__.ts',
-        code: `import { x } from "${source}";`,
-      }).toPassArchitectureLint();
-    },
-  );
+  it.each([
+    '@nestjs/bullmq',
+    '@nestjs/common',
+    '@nestjs/config',
+    'ioredis',
+    'supertest',
+    'typeorm',
+  ])('the e2e code MAY import %s', async (source) => {
+    await expect({
+      file: 'apps/customer-app/test/context/__fixture__.ts',
+      code: `import { x } from "${source}";`,
+    }).toPassArchitectureLint();
+  });
 
   it.each(['argon2', '@nestjs/core', '@nestjs/typeorm', '@nestjs/testing', 'nestjs-pino'])(
     'the e2e code may NOT import %s',

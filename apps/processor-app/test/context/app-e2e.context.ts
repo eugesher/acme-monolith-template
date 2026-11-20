@@ -1,6 +1,5 @@
-import { getQueueToken } from '@nestjs/bull';
-import { SchedulerRegistry } from '@nestjs/schedule';
-import type { Queue } from 'bull';
+import { getQueueToken } from '@nestjs/bullmq';
+import type { Queue } from 'bullmq';
 
 import { AppNameEnum } from '@acme-libs/kernel';
 import { E2EContext } from '@acme-libs/testing';
@@ -13,11 +12,13 @@ import {
   type IProductStockPostSubtractPayload,
 } from '@acme-core/contracts/product-stock';
 import { AppModule } from '@acme-processor/app/app.module';
+import { IDEMPOTENCY_PURGE_QUEUE } from '@acme-processor/contracts/idempotency';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {
   ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
   postSubtractQueue: Queue<IProductStockPostSubtractPayload>;
+  purgeQueue: Queue;
 }
 
 export class AppE2EContext extends E2EContext {
@@ -27,6 +28,10 @@ export class AppE2EContext extends E2EContext {
 
   public get postSubtractQueue(): Queue<IProductStockPostSubtractPayload> {
     return this.started.postSubtractQueue;
+  }
+
+  public get purgeQueue(): Queue {
+    return this.started.purgeQueue;
   }
 
   private static readonly POLL_INTERVAL_MS = 100;
@@ -55,14 +60,9 @@ export class AppE2EContext extends E2EContext {
     const postSubtractQueue = this.moduleFixture.get<Queue<IProductStockPostSubtractPayload>>(
       getQueueToken(PRODUCT_STOCK_POST_SUBTRACT_QUEUE),
     );
+    const purgeQueue = this.moduleFixture.get<Queue>(getQueueToken(IDEMPOTENCY_PURGE_QUEUE));
 
-    this.state = { ledgerRecordQueue, postSubtractQueue };
-  }
-
-  public fireSchedule(name: string): void {
-    const job = this.moduleFixture.get(SchedulerRegistry).getCronJob(name);
-
-    void job.fireOnTick();
+    this.state = { ledgerRecordQueue, postSubtractQueue, purgeQueue };
   }
 
   public async waitFor(description: string, settled: () => Promise<boolean>): Promise<void> {

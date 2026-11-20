@@ -7,10 +7,10 @@ export class ProductStockE2E {
     return new ProductStockE2E(ctx);
   }
 
-  public handleRecord(): void {
+  public process(): void {
     describe('queue product-stock-post-subtract', () => {
       it('should archive a published product without stock and record the archive in the ledger under the correlation id', async () => {
-        await this.ctx.postSubtractQueue.add({
+        await this.ctx.postSubtractQueue.add('product-stock-post-subtract', {
           productIds: ['106'],
           correlationId: 'e2e00000-0000-4000-8000-000000000004',
         });
@@ -32,7 +32,7 @@ export class ProductStockE2E {
       });
 
       it('should leave a published product with stock and a draft without stock as they are', async () => {
-        await this.ctx.postSubtractQueue.add({
+        await this.ctx.postSubtractQueue.add('product-stock-post-subtract', {
           productIds: ['100', '102'],
           correlationId: 'e2e00000-0000-4000-8000-000000000005',
         });

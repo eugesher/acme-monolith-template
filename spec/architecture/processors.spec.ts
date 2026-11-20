@@ -1,7 +1,7 @@
 import '../support/lint';
 import { Scaffold } from '../support/scaffold';
 
-describe('processors (processors/<module>) — modules entered by queues and schedules', () => {
+describe('processors (processors/<module>) — modules entered by queues', () => {
   let scaffold: Scaffold;
 
   beforeAll(() => {
@@ -251,6 +251,20 @@ describe('processors (processors/<module>) — modules entered by queues and sch
       }).toPassArchitectureLint();
     });
 
+    it('a processor MAY take OnApplicationBootstrap — the start of the app is one of its entries', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        code: 'import type { OnApplicationBootstrap } from "@nestjs/common";',
+      }).toPassArchitectureLint();
+    });
+
+    it('the application of a processor may NOT take OnApplicationBootstrap — entries live in presentation', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/application/__fixture__.ts',
+        code: 'import type { OnApplicationBootstrap } from "@nestjs/common";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
     it('a processor may NOT be an HTTP controller', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
@@ -258,17 +272,17 @@ describe('processors (processors/<module>) — modules entered by queues and sch
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('a processor MAY process a queue with Processor, Process, OnQueueFailed and the Job type', async () => {
+    it('a processor MAY process a queue with Processor, WorkerHost, OnWorkerEvent and the Job type', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
-        code: 'import { OnQueueFailed, Process, Processor } from "@nestjs/bull";\nimport type { Job } from "bull";',
+        code: 'import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";\nimport type { Job } from "bullmq";',
       }).toPassArchitectureLint();
     });
 
     it.each([
-      'import { InjectQueue } from "@nestjs/bull";',
-      'import { BullModule, Processor } from "@nestjs/bull";',
-      'import type { Queue } from "bull";',
+      'import { InjectQueue } from "@nestjs/bullmq";',
+      'import { BullModule, Processor } from "@nestjs/bullmq";',
+      'import type { Queue } from "bullmq";',
     ])(
       'a processor may NOT take the queue itself (%s) — queues are registered in common/shared',
       async (code) => {
@@ -288,18 +302,23 @@ describe('processors (processors/<module>) — modules entered by queues and sch
     ])('%s may NOT process a queue — only processors do', async (file) => {
       await expect({
         file,
-        code: 'import { Processor } from "@nestjs/bull";',
+        code: 'import { Processor } from "@nestjs/bullmq";',
       }).toBreakRule('boundaries/dependencies');
     });
 
+    it('a processor infrastructure/queue MAY take InjectQueue and the Queue type, to manage the jobs of its queue', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
+        code: 'import { InjectQueue } from "@nestjs/bullmq";\nimport type { Queue } from "bullmq";',
+      }).toPassArchitectureLint();
+    });
+
     it.each([
-      'import { InjectQueue } from "@nestjs/bull";',
-      'import { BullModule } from "@nestjs/bull";',
-      'import { Processor } from "@nestjs/bull";',
-      'import type { Queue } from "bull";',
-      'import type { Job } from "bull";',
+      'import { BullModule } from "@nestjs/bullmq";',
+      'import { Processor } from "@nestjs/bullmq";',
+      'import type { Job } from "bullmq";',
     ])(
-      'a processor infrastructure/queue may NOT take Bull (%s) — processors do not enqueue',
+      'a processor infrastructure/queue may NOT take more of BullMQ (%s) — it manages jobs, it does not process them',
       async (code) => {
         await expect({
           file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
@@ -316,8 +335,8 @@ describe('processors (processors/<module>) — modules entered by queues and sch
     });
 
     it.each([
-      'import { BullModule } from "@nestjs/bull";',
-      'import { InjectQueue } from "@nestjs/bull";',
+      'import { BullModule } from "@nestjs/bullmq";',
+      'import { InjectQueue } from "@nestjs/bullmq";',
     ])(
       'common/shared may NOT take Bull itself (%s) — it registers queues with the queue lib',
       async (code) => {
@@ -341,71 +360,7 @@ describe('processors (processors/<module>) — modules entered by queues and sch
     ])('%s may NOT take Bull itself — the queue lib connects it to Redis', async (file) => {
       await expect({
         file,
-        code: 'import { BullModule } from "@nestjs/bull";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it('a processor MAY schedule with Cron and CronExpression', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/processors/purge/presentation/__fixture__.ts',
-        code: 'import { Cron, CronExpression } from "@nestjs/schedule";',
-      }).toPassArchitectureLint();
-    });
-
-    it.each([
-      'import { SchedulerRegistry } from "@nestjs/schedule";',
-      'import { Cron, ScheduleModule } from "@nestjs/schedule";',
-    ])(
-      'a processor may NOT take the scheduler itself (%s) — the app sets up ScheduleModule',
-      async (code) => {
-        await expect({
-          file: 'apps/__processors-fixture__/src/processors/purge/presentation/__fixture__.ts',
-          code,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
-
-    it.each([
-      'apps/__processors-fixture__/src/processors/purge/application/__fixture__.ts',
-      'apps/__processors-fixture__/src/processors/purge/infrastructure/__fixture__.ts',
-      'apps/__processors-fixture__/src/processors/purge/__fixture__.ts',
-      'apps/__processors-fixture__/src/features/product/presentation/__fixture__.ts',
-      'apps/__processors-fixture__/src/common/modules/idempotency/application/__fixture__.ts',
-    ])('%s may NOT schedule — only processors do', async (file) => {
-      await expect({
-        file,
-        code: 'import { Cron } from "@nestjs/schedule";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it('the e2e code MAY take SchedulerRegistry to fire a schedule by its name', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/test/context/__fixture__.ts',
-        code: 'import { SchedulerRegistry } from "@nestjs/schedule";',
-      }).toPassArchitectureLint();
-    });
-
-    it.each([
-      'import { Cron } from "@nestjs/schedule";',
-      'import { ScheduleModule } from "@nestjs/schedule";',
-    ])('the e2e code may NOT take more than SchedulerRegistry (%s)', async (code) => {
-      await expect({
-        file: 'apps/__processors-fixture__/test/context/__fixture__.ts',
-        code,
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it('the app MAY set up ScheduleModule', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/app/setup/schedule/__fixture__.ts',
-        code: 'import { ScheduleModule } from "@nestjs/schedule";',
-      }).toPassArchitectureLint();
-    });
-
-    it('the app may NOT schedule a job itself — schedules belong to processors', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/app/setup/schedule/__fixture__.ts',
-        code: 'import { Cron } from "@nestjs/schedule";',
+        code: 'import { BullModule } from "@nestjs/bullmq";',
       }).toBreakRule('boundaries/dependencies');
     });
 

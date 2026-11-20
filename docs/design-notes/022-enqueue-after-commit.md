@@ -25,12 +25,12 @@ there (`ProductStockAddUseCase`, `OrderPlaceUseCase`).
 
 ## Deadline and retries
 
-**An enqueue has a deadline.** While Redis is down, Bull keeps the command in the offline queue of
-its client and `add` never settles. The adapter races `add` against the `timeoutMs` of the command
-through `DeadlineHelper.race` (`libs/toolkit/src/resilience/deadline.helper.ts`), which rejects with
-the message of the adapter when the deadline passes and clears its timer either way; the caller
-reads the timeout from `REDIS_COMMAND_TIMEOUT_MS`. The health probes of `libs/health` race their
-checks the same way.
+**An enqueue has a deadline.** A queue of BullMQ keeps the defaults of ioredis for the producer, so
+while Redis is down the command waits in the offline queue of its client and `add` never settles.
+The adapter races `add` against the `timeoutMs` of the command through `DeadlineHelper.race`
+(`libs/toolkit/src/resilience/deadline.helper.ts`), which rejects with the message of the adapter
+when the deadline passes and clears its timer either way; the caller reads the timeout from
+`REDIS_COMMAND_TIMEOUT_MS`. The health probes of `libs/health` race their checks the same way.
 
 **The write stays committed.** The caller retries the enqueue through `ReplayRetryHelper`
 (`libs/toolkit/src/resilience/replay-retry.helper.ts`) `ENQUEUE_RETRY_ATTEMPTS` times, and then logs
@@ -41,11 +41,13 @@ the job in the processor are the constant of `BullSetupModule`. The race does no
 timed-out command stays in the offline queue of the client and may still reach Redis once it is
 back, so the log says the record may be absent, and a processor must tolerate a duplicate job.
 
-**A ledger job is named by its operation key.** `LedgerCoreQueueAdapter` adds the job with
-`jobId: operationKey`, and Bull adds no job under an id it already holds, so the retries of one
-record leave one job in the queue. The id is free again once the job is recorded, because
-`removeOnComplete` drops it, while a job that ran out of attempts keeps its id in the failed set: it
-is replayed through `/queues` (see `041-failed-jobs.md`), not enqueued again. The post-subtract
+**A ledger job is deduplicated by its operation key.** `LedgerCoreQueueAdapter` adds the job with
+`deduplication: { id: operationKey }`, and BullMQ adds no job while one with that id waits, runs or
+waits to retry, so the retries of one record leave one job in the queue. The key is not the id of
+the job: BullMQ refuses a custom id with a colon, and an operation key has one or two. The
+deduplication ends when the job completes or runs out of attempts; a later enqueue of the same key
+adds a new job, and the ledger writes nothing for it (see `004-append-only-journal.md`). A job that
+ran out of attempts is replayed through `/queues` (see `041-failed-jobs.md`). The post-subtract
 queue has no such key, and its processor writes nothing on a replay.
 
 **The ledger is a core module with a facade.** `LedgerCoreModule` (`core/modules/src/ledger`)
@@ -76,7 +78,7 @@ processor e2e does (see `014-e2e-suites.md`).
 type, in core or in the lib that writes it. A core module or a lib that writes to a queue registers
 it itself with `BullSetupModule.registerQueue` of `libs/queue`, so every module that mounts it
 brings the queue with it. A processor registers the queues it reads in the `common/shared` of its
-app (`apps/processor-app/src/common/shared/ledger`). Bull applies the job options of the producer,
+app (`apps/processor-app/src/common/shared/ledger`). BullMQ applies the job options of the producer,
 so `registerQueue` takes the name alone and every registration gets the job options of
 `BullSetupModule.forRoot()`.
 

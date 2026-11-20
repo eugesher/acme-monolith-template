@@ -380,14 +380,14 @@ describe('core modules', () => {
     it('a queue adapter MAY take InjectQueue, the Queue type and the queue contract', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { InjectQueue } from "@nestjs/bull";\nimport type { Queue } from "bull";\nimport { X_QUEUE } from "../../../../../contracts/src/__ledger-fixture__";',
+        code: 'import { InjectQueue } from "@nestjs/bullmq";\nimport type { Queue } from "bullmq";\nimport { X_QUEUE } from "../../../../../contracts/src/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
     it('a queue adapter may NOT register a queue', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { BullModule } from "@nestjs/bull";',
+        code: 'import { BullModule } from "@nestjs/bullmq";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -427,8 +427,8 @@ describe('core modules', () => {
     });
 
     it.each([
-      'import { BullModule } from "@nestjs/bull";',
-      'import { Processor } from "@nestjs/bull";',
+      'import { BullModule } from "@nestjs/bullmq";',
+      'import { Processor } from "@nestjs/bullmq";',
     ])(
       'the module root may NOT take Bull itself (%s) — it registers queues with the queue lib',
       async (code) => {
@@ -444,7 +444,7 @@ describe('core modules', () => {
       async (layer) => {
         await expect({
           file: `core/modules/src/__ledger-fixture__/${layer}/__fixture__.ts`,
-          code: 'import { InjectQueue } from "@nestjs/bull";',
+          code: 'import { InjectQueue } from "@nestjs/bullmq";',
         }).toBreakRule('boundaries/dependencies');
       },
     );

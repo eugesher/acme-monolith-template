@@ -8,7 +8,6 @@ import { libLayers } from './lib-layers.mjs';
 import { moduleAreas } from './module-areas.mjs';
 import { queue } from './queue.mjs';
 import { repo } from './repo.mjs';
-import { scheduler } from './scheduler.mjs';
 
 export const policies = [
   ...acmeApp,
@@ -17,9 +16,8 @@ export const policies = [
   ...acmeCore,
   ...acmeLibs,
   ...repo,
-  httpSurface,
+  ...httpSurface,
   customerClaims,
-  ...scheduler,
   ...queue,
   ...libLayers,
 ];

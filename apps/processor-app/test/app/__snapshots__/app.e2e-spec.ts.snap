@@ -55,7 +55,7 @@ exports[`App Health GET /api/health/ready should report readiness of the databas
 }
 `;
 
-exports[`App Idempotency schedule idempotency-purge should purge the in-flight keys older than the in-flight TTL and keep the rest 1`] = `
+exports[`App Idempotency queue idempotency-purge should purge the in-flight keys older than the in-flight TTL and keep the rest 1`] = `
 {
   "db": {
     "idempotency_key": [
@@ -72,7 +72,7 @@ exports[`App Idempotency schedule idempotency-purge should purge the in-flight k
 }
 `;
 
-exports[`App Idempotency schedule idempotency-purge should purge the keys older than the TTL and keep the fresh ones 1`] = `
+exports[`App Idempotency queue idempotency-purge should purge the keys older than the TTL and keep the fresh ones 1`] = `
 {
   "db": {
     "idempotency_key": [

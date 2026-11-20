@@ -1600,7 +1600,7 @@ exports[`App Ledger GET /api/ledger should refuse a malformed page with 400 from
 exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should delete a failed job 1`] = `
 {
   "failed": 0,
-  "job": null,
+  "state": "unknown",
 }
 `;
 
@@ -1640,10 +1640,10 @@ exports[`App Queue GET /api/queues should list the queues with their job counts 
           "completed": 0,
           "delayed": 0,
           "failed": 0,
-          "paused": 0,
           "waiting": 0,
         },
         "name": "ledger-record",
+        "paused": false,
       },
       {
         "jobCounts": {
@@ -1651,10 +1651,10 @@ exports[`App Queue GET /api/queues should list the queues with their job counts 
           "completed": 0,
           "delayed": 0,
           "failed": 0,
-          "paused": 0,
           "waiting": 0,
         },
         "name": "product-stock-post-subtract",
+        "paused": false,
       },
     ],
   },
@@ -1696,7 +1696,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
           "failedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "failedReason": "The e2e case failed the record",
           "id": StringMatching /\\^\\\\d\\+\\$/,
-          "name": "__default__",
+          "name": "ledger-record",
           "processedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "stacktrace": [
             Any<String>,

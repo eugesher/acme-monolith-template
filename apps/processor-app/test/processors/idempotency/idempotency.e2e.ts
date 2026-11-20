@@ -7,8 +7,20 @@ export class IdempotencyE2E {
     return new IdempotencyE2E(ctx);
   }
 
-  public handleTick(): void {
-    describe('schedule idempotency-purge', () => {
+  public onApplicationBootstrap(): void {
+    describe('start of the app', () => {
+      it('should register one job scheduler of the purge every five minutes', async () => {
+        const schedulers = await this.ctx.purgeQueue.getJobSchedulers();
+
+        expect(schedulers.map(({ key, pattern }) => ({ key, pattern }))).toEqual([
+          { key: 'idempotency-purge', pattern: '*/5 * * * *' },
+        ]);
+      });
+    });
+  }
+
+  public process(): void {
+    describe('queue idempotency-purge', () => {
       it('should purge the keys older than the TTL and keep the fresh ones', async () => {
         await this.ctx.dataSource.query(
           `INSERT INTO idempotency_key (scope, idempotency_key, request_fingerprint, status, response_body, created_at)
@@ -16,7 +28,7 @@ export class IdempotencyE2E {
                   ('customer:101', 'e2e-purge-fresh', REPEAT('b', 64), 'completed', NULL, CURRENT_TIMESTAMP)`,
         );
 
-        this.ctx.fireSchedule('idempotency-purge');
+        await this.ctx.purgeQueue.add('idempotency-purge', {});
 
         await this.ctx.waitFor('the expired key to be purged', async () => {
           const [{ expired }] = await this.ctx.dataSource.query(
@@ -45,7 +57,7 @@ export class IdempotencyE2E {
                   ('customer:101', 'e2e-stuck-fresh', REPEAT('e', 64), 'in_flight', NULL, CURRENT_TIMESTAMP)`,
         );
 
-        this.ctx.fireSchedule('idempotency-purge');
+        await this.ctx.purgeQueue.add('idempotency-purge', {});
 
         await this.ctx.waitFor('the stuck in-flight key to be purged', async () => {
           const [{ stuck }] = await this.ctx.dataSource.query(

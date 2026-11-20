@@ -50,13 +50,13 @@ a test that turned them on.
 
 ## Mocks
 
-| Collaborator                                                                       | Mock                                                                                     |
-| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| a port, or any interface                                                           | `jest.Mocked<IProductLedgerPort>`: an object with a `jest.fn()` per method, passed as is |
-| a class of the template (a service, a use case)                                    | `jest.Mocked<Pick<ProductWriteService, 'write'>>`, passed with one `as unknown as`       |
-| a port of an inner use case built by a presentation or shell spec                  | `jest.Mocked<ConstructorParameters<typeof CatalogProductListUseCase>[0]>`                |
-| the logger                                                                         | `makePinoLoggerMock()` of `libs/testing`, passed as is                                   |
-| a driver or a framework object (Redis, a Bull queue, a span, an execution context) | a partial fake with a cast                                                               |
+| Collaborator                                                                         | Mock                                                                                     |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| a port, or any interface                                                             | `jest.Mocked<IProductLedgerPort>`: an object with a `jest.fn()` per method, passed as is |
+| a class of the template (a service, a use case)                                      | `jest.Mocked<Pick<ProductWriteService, 'write'>>`, passed with one `as unknown as`       |
+| a port of an inner use case built by a presentation or shell spec                    | `jest.Mocked<ConstructorParameters<typeof CatalogProductListUseCase>[0]>`                |
+| the logger                                                                           | `makePinoLoggerMock()` of `libs/testing`, passed as is                                   |
+| a driver or a framework object (Redis, a BullMQ queue, a span, an execution context) | a partial fake with a cast                                                               |
 
 **A mock is configured through its typed member**: `repository.findById.mockResolvedValue(record)`.
 The type of the port checks the fixture there, so a view that lost a field or an enum value written
@@ -71,7 +71,7 @@ A presentation or shell spec that builds a real use case may not import the `out
 module, so it takes the type of the port from the constructor of the use case.
 
 **A fake of a driver stays partial.** Its shape belongs to the library, and the e2e suites check it
-against the real Redis, MySQL and Bull; a full mock of `Redis` would repeat its typings and still
+against the real Redis, MySQL and BullMQ; a full mock of `Redis` would repeat its typings and still
 not prove the runtime.
 
 **An assertion reads the member where it lives**:

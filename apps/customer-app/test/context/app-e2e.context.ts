@@ -1,5 +1,5 @@
-import { getQueueToken } from '@nestjs/bull';
-import type { Queue } from 'bull';
+import { getQueueToken } from '@nestjs/bullmq';
+import type { Queue } from 'bullmq';
 import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
@@ -71,7 +71,7 @@ export class AppE2EContext extends AuthE2EContext {
     );
     const jobs = await queue.getWaiting();
 
-    await queue.empty();
+    await queue.drain();
 
     return jobs.map((job) => job.data);
   }
@@ -82,7 +82,7 @@ export class AppE2EContext extends AuthE2EContext {
     );
     const jobs = await queue.getWaiting();
 
-    await queue.empty();
+    await queue.drain();
 
     return jobs.map((job) => job.data);
   }

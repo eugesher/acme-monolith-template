@@ -72,9 +72,14 @@ Features and processors are built by one function, `areaPolicies`, over the same
 and a repository, `ledger` neither. The entries stay, so a processor that grows a layer follows the
 same rules a feature does.
 
-`infrastructure/queue` of a processor may inject a queue to manage its jobs. It takes `InjectQueue`
-and the `Queue` type and nothing else of Bull, under the same rule as a feature queue adapter in
+`infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
+processor upserts its job scheduler (see `009-scheduled-processor.md`). It takes `InjectQueue` and
+the `Queue` type and nothing else of BullMQ, under the same rule as a feature queue adapter in
 `queue.mjs`.
+
+**The start of the app is an entry of a processor.** `http-surface.mjs` lets the presentation of a
+processor take `OnApplicationBootstrap` from `@nestjs/common` next to the DI names, in a rule of its
+own; every other layer of a processor, a core module or a common module takes the DI names only.
 
 The module root of a feature or a processor may reach a shared barrel, as the module root of a
 common module may (a positive case of the common modules spec).
@@ -98,9 +103,9 @@ A core module announces what it wrote after the commit (see `026-transaction-por
 edges exist for it:
 
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
-  `InjectQueue` and the `Queue` type and nothing else of Bull (`queue.mjs`) and its own contracts.
+  `InjectQueue` and the `Queue` type and nothing else of BullMQ (`queue.mjs`) and its own contracts.
 - **The module root registers the queues it writes to** with `BullSetupModule.registerQueue` of
-  `libs/queue` and takes nothing of Bull itself. A core module is mounted by features of several
+  `libs/queue` and takes nothing of BullMQ itself. A core module is mounted by features of several
   apps, so the queue comes with it rather than with the `common/shared` of each app.
 - **Core infrastructure may take `@acme-libs/contracts/cache`**, to drop the keys a write makes
   stale; the application still may not, so caching stays an adapter behind a port.

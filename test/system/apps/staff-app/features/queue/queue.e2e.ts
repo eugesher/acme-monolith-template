@@ -14,6 +14,7 @@ export class QueueE2E {
     describe('POST /api/queues/:queueName/jobs/failed/:jobId/retry', () => {
       it('should return a failed record to the queue and append it once its cause is gone', async () => {
         const job = await this.ctx.ledgerRecordQueue.add(
+          'ledger-record',
           {
             operationKey: 'e2e-system-queue:1',
             subjectType: 'p'.repeat(65),
@@ -30,7 +31,7 @@ export class QueueE2E {
           () => job.isFailed(),
           (failed) => failed,
         );
-        await job.update({ ...job.data, subjectType: 'product' });
+        await job.updateData({ ...job.data, subjectType: 'product' });
 
         await request(this.ctx.app.getHttpServer())
           .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)

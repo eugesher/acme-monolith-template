@@ -5,28 +5,29 @@ export const queue = [
     from: { file: { categories: 'acme-app:processors:presentation' } },
     disallow: [
       {
-        ...packages('@nestjs/bull'),
-        dependency: { specifiers: ['!{OnQueueFailed,Process,Processor}'] },
+        ...packages('@nestjs/bullmq'),
+        dependency: { specifiers: ['!{OnWorkerEvent,Processor,WorkerHost}'] },
       },
-      { ...packages('bull'), dependency: { specifiers: ['!Job'] } },
+      { ...packages('bullmq'), dependency: { specifiers: ['!Job'] } },
     ],
     message:
-      'a processor only takes Processor, Process and OnQueueFailed from @nestjs/bull and the Job type from bull; queues are registered in common/shared',
+      'a processor only takes Processor, WorkerHost and OnWorkerEvent from @nestjs/bullmq and the Job type from bullmq; queues are registered in common/shared',
   },
   {
     from: {
       file: {
         categories: [
           'acme-app:features:infrastructure:queue',
+          'acme-app:processors:infrastructure:queue',
           'acme-core:modules:infrastructure:queue',
         ],
       },
     },
     disallow: [
-      { ...packages('@nestjs/bull'), dependency: { specifiers: ['!InjectQueue'] } },
-      { ...packages('bull'), dependency: { specifiers: ['!Queue'] } },
+      { ...packages('@nestjs/bullmq'), dependency: { specifiers: ['!InjectQueue'] } },
+      { ...packages('bullmq'), dependency: { specifiers: ['!Queue'] } },
     ],
     message:
-      'a queue adapter only takes InjectQueue from @nestjs/bull and the Queue type from bull; queues are registered in common/shared',
+      'a queue adapter only takes InjectQueue from @nestjs/bullmq and the Queue type from bullmq; queues are registered in common/shared',
   },
 ];

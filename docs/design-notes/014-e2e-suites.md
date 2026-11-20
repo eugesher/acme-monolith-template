@@ -44,8 +44,9 @@ apps/<app>/test/
   processors/<processor>/<processor>.e2e.ts
 ```
 
-`processors/` exists in processor-app only: a processor class has one public method per entry,
-`handleRecord()` for a queue and `handleTick()` for a schedule.
+`processors/` exists in processor-app only: a processor class has one public method per entry of the
+processor, named after it: `process()` for the jobs of its queue, and `onApplicationBootstrap()` for
+what the idempotency processor does at the start of the app.
 
 **`app.e2e-spec.ts` is the only Jest entry.** The app boots once, in `beforeAll`. The entry holds
 one `describe` per feature and calls the methods of the feature class inside it:
@@ -96,32 +97,37 @@ signs nothing. A subclass rather than an optional audience keeps both classes fr
 Everything the cases read is a getter that throws before `init()`. The contexts of staff-app and
 customer-app also hold the Redis client, through `@acme-libs/testing`.
 
-**A catalog case clears its own keys, not the database.** The Bull queue of the ledger records lives
-in the same Redis, so `FLUSHDB` would drop its jobs and counters. `hooks()` deletes the
-`acme:catalog:*` keys before each case, and the cases list those keys only: a timer of Bull writes
-its own keys at any moment.
+**A catalog case clears its own keys, not the database.** The queues live in the same Redis, under
+`acme:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters. `hooks()`
+deletes the `acme:catalog:*` keys before each case, and the cases list those keys only: BullMQ
+writes its own keys at any moment.
 
 **staff-app and customer-app read the job, not the ledger.** Neither processes the queue, so their
 contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-record`
-queue and empties the queue, as `takeRootWarnings()` takes the warnings. A case that enqueues takes
+queue and drains the queue, as `takeRootWarnings()` takes the warnings. A case that enqueues takes
 the jobs, so the next case starts from an empty queue.
 
 **staff-app fails a job by hand.** No processor runs in staff-app, so the `/queues` cases (see
 `041-failed-jobs.md`) get a failed job from `failLedgerRecord(record)`: it adds the record with
-`attempts: 1`, takes it with `getNextJob()` of Bull and calls `moveToFailed(error)`, the steps a
-processor takes, so the job carries the instants and the stack trace the routes answer. The failure
-takes the token of the queue and so releases the lock `getNextJob()` set; with `ignoreLock` the lock
-would outlive the failure, and the retry and the delete of the job would fail. The context throws if
-the next job is not the one it added. That a returned record reaches the ledger is a seam of two
-apps, so it is a case of the system suite of staff-app.
+`attempts: 1` and processes it by hand, as BullMQ documents it: a `Worker` without a processor, on
+the connection and the prefix of the queue, takes the job with `getNextJob(token)` and fails it with
+`moveToFailed(error, token)`. The context opens that worker in `init()` and closes it in `close()`:
+a job the worker returns talks to Redis through the connection of the worker, so a case that reads
+or removes the job after the failure needs the worker still open. These are the steps a processor
+takes, so the job carries the instants and the stack trace the routes answer, and the failure under
+the same token releases the lock that `getNextJob` set; a lock left behind would make the retry and
+the delete of the job fail. The context throws if the next job is not the one it added. That a
+returned record reaches the ledger is a seam of two apps, so it is a case of the system suite of
+staff-app.
 
-**processor-app waits for the queue and the schedules.** Its cases add jobs to the queue themselves
-and read the ledger. `waitForLedgerRecordQueue()` polls `getJobCounts()` every 100 ms until no job
-is waiting, active or delayed, and throws after 100 polls; the jobs run in the e2e process, so a
-drained queue means the rows are written. `fireSchedule(name)` fires a schedule through
-`SchedulerRegistry` without waiting for it, and `waitFor(description, settled)` polls until the
-outcome shows. A failing job is a record whose `subjectType` is longer than its column, enqueued
-with `attempts: 1`.
+**processor-app waits for its queues.** Its cases add jobs to the queues themselves and read the
+tables. `waitForLedgerRecordQueue()` polls `getJobCounts()` every 100 ms until no job is waiting,
+active or delayed, and throws after 100 polls; the jobs run in the e2e process, so a drained queue
+means the rows are written. A purge case adds a job to the `idempotency-purge` queue, as the job
+scheduler does every five minutes, and `waitFor(description, settled)` polls the rows until the
+outcome shows; the start case reads the schedulers of that queue (see `009-scheduled-processor.md`).
+A failing job is a record whose `subjectType` is longer than its column, enqueued with
+`attempts: 1`.
 
 The Jest files outside the apps live in `jest/`:
 
@@ -213,25 +219,25 @@ correlation id, `OrderPlaced` and `ProductArchived` of the sold-out product.
 **The apps share one environment.** Jest loads the `.env.test` of the API app, and processor-app
 adds the variables only it has from its own file. The two differ in `PORT`, and no system case calls
 processor-app over HTTP, so the context creates its Nest application and calls `init()` without
-`listen`: its processors and schedules run, and it opens no port that would take the `PORT` of the
-API app.
+`listen`: its processors run and its schedule is registered, and it opens no port that would take
+the `PORT` of the API app.
 
 **`test/system` is not plain node.** It compiles project code, so it has its own `tsconfig.json`
 over the root one and the lint category `repo:system`: it sees its own files, the `AppModule` of
 every app, the contracts of core, the libs `kernel`, `toolkit`, `domain` and `testing`, and the
-packages `@nestjs/bull`, `@nestjs/common`, `bull`, `ioredis` and `supertest`. Bull and the contracts
-of core let a case put a failing job into a queue, which no route of an app writes. `test/infra`
-keeps running under plain node.
+packages `@nestjs/bullmq`, `@nestjs/common`, `bullmq`, `ioredis` and `supertest`. BullMQ and the
+contracts of core let a case put a failing job into a queue, which no route of an app writes.
+`test/infra` keeps running under plain node.
 
 ## Lint
 
 `apps/*/test/**` is the category `acme-app:test`. It sees its own app's tests, its `AppModule`, its
 contracts, the contracts of core, `@acme-core/entities`, the libs `kernel`, `toolkit`, `domain`,
-`database`, `observability` and `testing`, and the packages `@nestjs/bull`, `@nestjs/common`,
-`@nestjs/config`, `@nestjs/schedule`, `bull`, `ioredis`, `supertest` and `typeorm`.
-`@nestjs/testing` and `nestjs-pino` stay in the testing lib. The observability lib opens a
-correlation context for a case that calls a port directly, outside a request, as `LedgerE2E` does
-for the core ledger. `spec/architecture/e2e-sections.spec.ts` checks these edges.
+`database`, `observability` and `testing`, and the packages `@nestjs/bullmq`, `@nestjs/common`,
+`@nestjs/config`, `bullmq`, `ioredis`, `supertest` and `typeorm`. `@nestjs/testing` and
+`nestjs-pino` stay in the testing lib. The observability lib opens a correlation context for a case
+that calls a port directly, outside a request, as `LedgerE2E` does for the core ledger.
+`spec/architecture/e2e-sections.spec.ts` checks these edges.
 
 The e2e code turns off `no-unsafe-argument`, `no-unsafe-assignment` and `no-unsafe-member-access`
 (`lint/configs/e2e.mjs`): a response body and a query result are untyped by nature, and the snapshot

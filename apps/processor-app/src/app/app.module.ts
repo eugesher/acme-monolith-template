@@ -17,7 +17,7 @@ import { HealthModule } from '@acme-processor/features';
 import { IdempotencyModule, LedgerModule, ProductStockModule } from '@acme-processor/processors';
 
 import { entities } from './entities';
-import { ConfigSetupModule, ScheduleSetupModule } from './setup';
+import { ConfigSetupModule } from './setup';
 
 @Module({
   imports: [
@@ -26,7 +26,6 @@ import { ConfigSetupModule, ScheduleSetupModule } from './setup';
     TracerSetupModule.forRoot(),
     LocalStorageSetupModule.forRoot(),
     OrmModule.forRoot(entities),
-    ScheduleSetupModule,
     BullSetupModule.forRoot(),
     CacheLibModule,
     HttpSecurityModule.forRoot(),
