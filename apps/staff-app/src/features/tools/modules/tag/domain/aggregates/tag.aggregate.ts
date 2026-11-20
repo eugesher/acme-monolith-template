@@ -1,6 +1,6 @@
 import { Entity } from '@acme-libs/domain';
 
-import { TagNameInvalidException } from '../exceptions/tag-name-invalid.exception';
+import { TagNameInvalidException } from '../errors';
 import type { ITagSnapshot } from '../interfaces';
 
 export abstract class TagAggregate extends Entity {

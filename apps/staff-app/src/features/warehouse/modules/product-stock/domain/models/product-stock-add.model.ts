@@ -1,6 +1,6 @@
 import { Entity } from '@acme-libs/domain';
 
-import { ProductQuantityInvalidException } from '../exceptions/product-quantity-invalid.exception';
+import { ProductQuantityInvalidException } from '../errors';
 import type {
   IProductStockAddLedgerPayload,
   IProductStockAddLedgerPayloadBuild,

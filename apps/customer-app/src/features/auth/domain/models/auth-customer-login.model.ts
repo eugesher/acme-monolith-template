@@ -1,6 +1,6 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
-import { AuthUserInactiveException } from '../exceptions/auth-user-inactive.exception';
+import { AuthUserInactiveException } from '../errors';
 import type {
   IAuthCustomerLoginLoggerPayload,
   IAuthCustomerLoginReconstitute,

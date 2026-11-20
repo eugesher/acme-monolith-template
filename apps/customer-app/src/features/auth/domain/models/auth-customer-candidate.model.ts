@@ -1,8 +1,7 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 import { EmailValue } from '@acme-core/domain';
 
-import { AuthEmailInvalidException } from '../exceptions/auth-email-invalid.exception';
-import { AuthPasswordTooWeakException } from '../exceptions/auth-password-too-weak.exception';
+import { AuthEmailInvalidException, AuthPasswordTooWeakException } from '../errors';
 import type {
   IAuthCustomerCandidateCreate,
   IAuthCustomerCandidateInsertPayload,

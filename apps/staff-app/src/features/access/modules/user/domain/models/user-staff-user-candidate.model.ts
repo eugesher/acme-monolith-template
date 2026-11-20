@@ -1,9 +1,11 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 import { EmailValue } from '@acme-core/domain';
 
-import { UserEmailInvalidException } from '../exceptions/user-email-invalid.exception';
-import { UserPasswordTooWeakException } from '../exceptions/user-password-too-weak.exception';
-import { UserRoleNotFoundException } from '../exceptions/user-role-not-found.exception';
+import {
+  UserEmailInvalidException,
+  UserPasswordTooWeakException,
+  UserRoleNotFoundException,
+} from '../errors';
 import type {
   IUserStaffUserCandidateCreate,
   IUserStaffUserCandidateInsertPayload,

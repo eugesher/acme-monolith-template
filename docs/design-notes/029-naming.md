@@ -46,6 +46,17 @@ reach the use case unseen.
 so the enum takes the word `Exception`, not `Error`. `IdentityExceptionCodeEnum` in `libs/kernel`
 serves the identity exceptions of several apps the same way.
 
+**The folder of the exceptions takes the word of the API.** A domain keeps its exceptions and their
+codes in `domain/errors`: `exceptions/` holds the classes and their `base/`, `codes/` the enum, and
+`errors/index.ts` exports both. The client gets an error body with an error code (see
+`039-api-surface.md`), so the folder says `errors`, while the files keep the word of the code they
+hold, `Exception`. The identity domains have no `codes/`, since their codes are
+`IdentityExceptionCodeEnum`. From outside the folder an import goes through its barrel, as it does
+for `interfaces/`: `lint/syntax/barrel-bypass.selectors.mjs` refuses a path into `codes/` or
+`exceptions/` of `errors/` and into any subfolder of `interfaces/`. A folder of interfaces without
+subfolders, as in `libs/auth`, has no barrel, so a file path to it stays, and so does a path into
+`libs/http/src/errors`, which holds the error body of the HTTP lib, not the exceptions of a domain.
+
 **A queue adapter is named by where it sends.** The adapter is transport to a target, so a target
 with a compound name keeps it whole: `ProductStockCorePostSubtractQueueAdapter` sends to the
 post-subtract queue.

@@ -19,7 +19,7 @@ and the feature keeps the plain `Auth` prefix.
 | application    | `application/use-cases/auth-login.use-case.ts`                                                                                    |
 | outbound       | `outbound/ports/auth-login-repository.port.ts`                                                                                    |
 | infrastructure | `infrastructure/persistence/repositories/auth-login.repository.ts`, `infrastructure/lib-adapters/auth-credentials-lib.adapter.ts` |
-| domain         | `domain/models/`, `domain/exceptions/base/auth-base.exception.ts`                                                                 |
+| domain         | `domain/models/`, `domain/errors/exceptions/base/auth-base.exception.ts`                                                          |
 
 **Each app logs its users in inside the feature.** No other module logs anyone in, so
 `AuthLoginUseCase` of each app reads the user, checks the password and signs the token itself (see

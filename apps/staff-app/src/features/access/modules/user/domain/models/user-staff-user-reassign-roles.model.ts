@@ -1,4 +1,4 @@
-import { UserRoleNotFoundException } from '../exceptions/user-role-not-found.exception';
+import { UserRoleNotFoundException } from '../errors';
 import type {
   IUserStaffUserReassignRolesCreate,
   IUserStaffUserReassignRolesLoggerPayload,

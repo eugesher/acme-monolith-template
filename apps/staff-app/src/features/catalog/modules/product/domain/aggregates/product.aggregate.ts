@@ -2,10 +2,12 @@ import { VersionedEntity } from '@acme-libs/domain';
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
-import { ProductNameInvalidException } from '../exceptions/product-name-invalid.exception';
-import { ProductSkuInvalidException } from '../exceptions/product-sku-invalid.exception';
-import { ProductVersionInvalidException } from '../exceptions/product-version-invalid.exception';
-import { ProductVersionMismatchException } from '../exceptions/product-version-mismatch.exception';
+import {
+  ProductNameInvalidException,
+  ProductSkuInvalidException,
+  ProductVersionInvalidException,
+  ProductVersionMismatchException,
+} from '../errors';
 import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
 
 export abstract class ProductAggregate extends VersionedEntity {

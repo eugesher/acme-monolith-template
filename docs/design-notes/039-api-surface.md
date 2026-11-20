@@ -10,7 +10,7 @@ OpenAPI document lists.
 | ids               | `@IsEntityId` in `libs/http/src/validation/decorators/is-entity-id.decorator.ts`                     |
 | headers           | `libs/http/src/concurrency`, `libs/http/src/idempotency`                                             |
 | error body        | `ErrorResponseDto` and `HttpExceptionFilter` in `libs/http`                                          |
-| error codes       | `<Context>ExceptionCodeEnum` in `domain/enums`, the `STATUS` of the filter of the module             |
+| error codes       | `<Context>ExceptionCodeEnum` in `domain/errors/codes`, the `STATUS` of the filter of the module      |
 | errors in OpenAPI | `@ApiErrorResponses` in `libs/http`, `ApiReference.setup` in `libs/openapi`                          |
 
 ## Methods
