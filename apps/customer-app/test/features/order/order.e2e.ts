@@ -1,6 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
+import { BodyFingerprintHelper } from '@acme-libs/toolkit';
+
 import type { AppE2EContext } from '../../context/app-e2e.context';
 
 export class OrderE2E {
@@ -303,6 +305,77 @@ export class OrderE2E {
           refused: { body: refused?.body },
           db: { product_stock: { quantity: Number(quantity) } },
         }).toMatchSnapshot();
+      });
+
+      it('should refuse a key still in flight with 409 and write nothing', async () => {
+        const fingerprint = BodyFingerprintHelper.compute({ productIds: ['100'] });
+        const [{ lastId }] = await this.ctx.dataSource.query(
+          'SELECT MAX(id) AS lastId FROM `order`',
+        );
+
+        await this.ctx.dataSource.query(
+          "INSERT INTO idempotency_key (scope, idempotency_key, request_fingerprint, status, response_body, created_at) VALUES ('customer:101', 'e2e-order-in-flight-key', ?, 'in_flight', NULL, CURRENT_TIMESTAMP)",
+          [fingerprint],
+        );
+
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .post('/api/orders')
+            .set('Idempotency-Key', 'e2e-order-in-flight-key')
+            .auth(this.ctx.annToken, { type: 'bearer' })
+            .send({ productIds: ['100'] })
+            .expect(HttpStatus.CONFLICT);
+
+          expect({
+            response: { body: response.body },
+            db: {
+              order: await this.ctx.dataSource.query('SELECT id FROM `order` WHERE id > ?', [
+                lastId,
+              ]),
+              idempotency_key: await this.ctx.dataSource.query(
+                'SELECT scope, status, response_body FROM idempotency_key WHERE idempotency_key = ?',
+                ['e2e-order-in-flight-key'],
+              ),
+            },
+          }).toMatchSnapshot();
+        } finally {
+          await this.ctx.dataSource.query(
+            "DELETE FROM idempotency_key WHERE idempotency_key = 'e2e-order-in-flight-key'",
+          );
+        }
+      });
+
+      it('should place one order for simultaneous requests under one key and replay or refuse the others', async () => {
+        const [{ lastId }] = await this.ctx.dataSource.query(
+          'SELECT MAX(id) AS lastId FROM `order`',
+        );
+
+        const responses = await Promise.all(
+          [1, 2, 3].map(() =>
+            request(this.ctx.app.getHttpServer())
+              .post('/api/orders')
+              .set('Idempotency-Key', 'e2e-order-same-key-race')
+              .auth(this.ctx.carolToken, { type: 'bearer' })
+              .send({ productIds: ['100'] }),
+          ),
+        );
+
+        await this.ctx.takeLedgerRecords();
+        await this.ctx.takePostSubtractJobs();
+
+        const created = responses.filter((response) => response.status < 300);
+        const refused = responses.filter((response) => response.status >= 300);
+        const orders = await this.ctx.dataSource.query('SELECT id FROM `order` WHERE id > ?', [
+          lastId,
+        ]);
+
+        expect(orders).toEqual([{ id: created[0].body.id }]);
+        expect(created.map((response): unknown => response.body)).toEqual(
+          expect.arrayOf(created[0].body),
+        );
+        expect(refused.map((response): unknown => [response.status, response.body.code])).toEqual(
+          expect.arrayOf([HttpStatus.CONFLICT, 'IDEMPOTENT_REQUEST_IN_FLIGHT']),
+        );
       });
     });
   }

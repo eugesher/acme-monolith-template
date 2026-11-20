@@ -2709,6 +2709,29 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
 }
 `;
 
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a key still in flight with 409 and add nothing 1`] = `
+{
+  "db": {
+    "idempotency_key": [
+      {
+        "response_body": null,
+        "scope": "staff:2",
+        "status": "in_flight",
+      },
+    ],
+    "product_stock": [],
+  },
+  "response": {
+    "body": {
+      "code": "IDEMPOTENT_REQUEST_IN_FLIGHT",
+      "details": null,
+      "message": "Idempotency-Key e2e-restock-in-flight-key is still being processed, retry shortly",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
 exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a restock without a key with 400 1`] = `
 {
   "response": {

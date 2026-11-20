@@ -48,6 +48,9 @@ is already in the scope.
 and key before the caller does any work. Of two simultaneous requests with the same scope and key,
 exactly one insert succeeds; the repository answers `DUPLICATE` to the other (see
 `003-authentication.md`). A "have I seen this key?" read before the write would let both through.
+The e2e suite of customer-app sends three orders under one key at once and expects one order, every
+other answer a replay of it or `in-flight`; a read before the write fails it, while the sequential
+replay still passes.
 
 **The module fingerprints the body.** The caller passes the logical body, never a hash.
 `BodyFingerprintHelper` hashes it canonically: object keys are sorted at every depth and array order
@@ -67,7 +70,8 @@ it.
 answer a `replay` first, refuse `in-flight` and `mismatch` next, each with an early exit, and do the
 work last, through a private `write` that runs it in a transaction and releases the key when it
 throws. The work completes the key inside the same transaction, so a stored answer never outlives a
-rolled-back write.
+rolled-back write. The e2e suites of both callers insert a row in flight under the fingerprint of
+the body, from `BodyFingerprintHelper`, and expect the 409 and no write.
 
 **A key that vanished is in flight.** If the insert hits a duplicate but the row is gone when the
 module reads it, the holder has just released it. The answer is `in-flight`: the client retries and

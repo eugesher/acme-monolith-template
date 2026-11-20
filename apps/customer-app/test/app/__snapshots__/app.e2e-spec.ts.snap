@@ -743,6 +743,29 @@ exports[`App Order POST /api/orders should refuse a draft product with 422 and w
 }
 `;
 
+exports[`App Order POST /api/orders should refuse a key still in flight with 409 and write nothing 1`] = `
+{
+  "db": {
+    "idempotency_key": [
+      {
+        "response_body": null,
+        "scope": "customer:101",
+        "status": "in_flight",
+      },
+    ],
+    "order": [],
+  },
+  "response": {
+    "body": {
+      "code": "IDEMPOTENT_REQUEST_IN_FLIGHT",
+      "details": null,
+      "message": "Idempotency-Key e2e-order-in-flight-key is still being processed, retry shortly",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
 exports[`App Order POST /api/orders should refuse a placement without a key with 400 1`] = `
 {
   "db": {

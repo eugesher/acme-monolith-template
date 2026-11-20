@@ -1,6 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
+import { BodyFingerprintHelper } from '@acme-libs/toolkit';
+
 import type { AppE2EContext } from '../../../context/app-e2e.context';
 
 export class ProductStockE2E {
@@ -175,6 +177,45 @@ export class ProductStockE2E {
           .expect(HttpStatus.BAD_REQUEST);
 
         expect({ response: { body: response.body } }).toMatchSnapshot();
+      });
+
+      it('should refuse a key still in flight with 409 and add nothing', async () => {
+        const fingerprint = BodyFingerprintHelper.compute({ productId: '100', quantity: 5 });
+        const [{ lastId }] = await this.ctx.dataSource.query(
+          'SELECT MAX(id) AS lastId FROM product_stock',
+        );
+
+        await this.ctx.dataSource.query(
+          "INSERT INTO idempotency_key (scope, idempotency_key, request_fingerprint, status, response_body, created_at) VALUES ('staff:2', 'e2e-restock-in-flight-key', ?, 'in_flight', NULL, CURRENT_TIMESTAMP)",
+          [fingerprint],
+        );
+
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .post('/api/warehouse/product-stock/100/add')
+            .set('Idempotency-Key', 'e2e-restock-in-flight-key')
+            .auth(this.ctx.editorToken, { type: 'bearer' })
+            .send({ quantity: 5 })
+            .expect(HttpStatus.CONFLICT);
+
+          expect({
+            response: { body: response.body },
+            db: {
+              product_stock: await this.ctx.dataSource.query(
+                'SELECT id FROM product_stock WHERE id > ?',
+                [lastId],
+              ),
+              idempotency_key: await this.ctx.dataSource.query(
+                'SELECT scope, status, response_body FROM idempotency_key WHERE idempotency_key = ?',
+                ['e2e-restock-in-flight-key'],
+              ),
+            },
+          }).toMatchSnapshot();
+        } finally {
+          await this.ctx.dataSource.query(
+            "DELETE FROM idempotency_key WHERE idempotency_key = 'e2e-restock-in-flight-key'",
+          );
+        }
       });
     });
   }
