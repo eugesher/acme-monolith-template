@@ -74,19 +74,21 @@ export class LedgerE2E {
           { attempts: 1 },
         );
 
-        await this.ctx.waitFor('the record to fail', () => job.isFailed());
+        try {
+          await this.ctx.waitFor('the record to fail', () => job.isFailed());
 
-        expect({
-          db: {
-            ledger_entry: await this.ctx.dataSource.query(
-              'SELECT * FROM ledger_entry WHERE operation_key = ?',
-              ['e2e-record:3'],
-            ),
-          },
-          failed: (await this.ctx.ledgerRecordQueue.getFailed()).map((failed) => failed.data),
-        }).toMatchSnapshot();
-
-        await job.remove();
+          expect({
+            db: {
+              ledger_entry: await this.ctx.dataSource.query(
+                'SELECT * FROM ledger_entry WHERE operation_key = ?',
+                ['e2e-record:3'],
+              ),
+            },
+            failed: (await this.ctx.ledgerRecordQueue.getFailed()).map((failed) => failed.data),
+          }).toMatchSnapshot();
+        } finally {
+          await job.remove();
+        }
       });
     });
   }

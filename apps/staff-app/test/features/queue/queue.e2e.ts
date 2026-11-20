@@ -36,31 +36,37 @@ export class QueueE2E {
           correlationId: 'e2e00000-0000-4000-8000-000000000009',
         });
 
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/queues/ledger-record/jobs/failed')
-          .query({ page: 1, limit: 10 })
-          .auth(this.ctx.viewerToken, { type: 'bearer' })
-          .expect(HttpStatus.OK);
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .get('/api/queues/ledger-record/jobs/failed')
+            .query({ page: 1, limit: 10 })
+            .auth(this.ctx.viewerToken, { type: 'bearer' })
+            .expect(HttpStatus.OK);
 
-        expect({ response: { body: response.body } }).toMatchSnapshot({
-          response: {
-            body: {
-              data: [
-                {
-                  id: expect.stringMatching(/^\d+$/),
-                  createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-                  processedAt: expect.stringMatching(
-                    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                  ),
-                  failedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-                  stacktrace: [expect.any(String)],
-                },
-              ],
+          expect({ response: { body: response.body } }).toMatchSnapshot({
+            response: {
+              body: {
+                data: [
+                  {
+                    id: expect.stringMatching(/^\d+$/),
+                    createdAt: expect.stringMatching(
+                      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                    ),
+                    processedAt: expect.stringMatching(
+                      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                    ),
+                    failedAt: expect.stringMatching(
+                      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                    ),
+                    stacktrace: [expect.any(String)],
+                  },
+                ],
+              },
             },
-          },
-        });
-
-        await job.remove();
+          });
+        } finally {
+          await job.remove();
+        }
       });
 
       it('should refuse an unknown queue with 404 QUEUE_NOT_FOUND', async () => {
@@ -114,22 +120,24 @@ export class QueueE2E {
           { delay: 60000 },
         );
 
-        const response = await request(this.ctx.app.getHttpServer())
-          .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
-          .auth(this.ctx.adminToken, { type: 'bearer' })
-          .expect(HttpStatus.CONFLICT);
+        try {
+          const response = await request(this.ctx.app.getHttpServer())
+            .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
+            .auth(this.ctx.adminToken, { type: 'bearer' })
+            .expect(HttpStatus.CONFLICT);
 
-        await job.remove();
-
-        expect({ response: { body: response.body } }).toMatchSnapshot({
-          response: {
-            body: {
-              message: expect.stringMatching(
-                /^Job \S+ of queue ledger-record is delayed, not failed$/,
-              ),
+          expect({ response: { body: response.body } }).toMatchSnapshot({
+            response: {
+              body: {
+                message: expect.stringMatching(
+                  /^Job \S+ of queue ledger-record is delayed, not failed$/,
+                ),
+              },
             },
-          },
-        });
+          });
+        } finally {
+          await job.remove();
+        }
       });
 
       it('should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND', async () => {

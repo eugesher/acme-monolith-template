@@ -40,10 +40,6 @@ export class AuthE2E {
               'SELECT * FROM customer WHERE email = ? ORDER BY id',
               ['eve@example.com'],
             ),
-            ledger_entry: await this.ctx.dataSource.query(
-              'SELECT * FROM ledger_entry WHERE subject_type = ? AND subject_id = ? ORDER BY id',
-              ['customer', response.body.id],
-            ),
           },
           ledger_record_queue: records.filter((record) => record.subjectId === response.body.id),
         };

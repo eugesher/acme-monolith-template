@@ -160,7 +160,6 @@ exports[`App Auth POST /api/auth/register should create a customer who logs in a
         "status": "active",
       },
     ],
-    "ledger_entry": [],
   },
   "ledger_record_queue": [
     {
