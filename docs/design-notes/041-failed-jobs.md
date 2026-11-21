@@ -14,9 +14,9 @@ two apps meet in one Redis.
 
 **A queue is read, not processed.** The feature registers `ledger-record` and
 `product-stock-post-subtract` through the `common/shared` of staff-app with
-`BullSetupModule.registerQueue` (see `032-queue-lib.md`), and `QueueRegistryQueueAdapter` injects
-them. A BullMQ queue without a worker reads and moves jobs and runs none, so staff-app takes no job
-from processor-app.
+`BullSetupModule.registerQueue` (see `032-queue-lib.md`), and `QueueRegistryAdapter` injects them. A
+BullMQ queue without a worker reads and moves jobs and runs none, so staff-app takes no job from
+processor-app.
 
 **A pause belongs to the queue, not to a job.** BullMQ keeps the jobs of a paused queue waiting and
 marks the queue, so each queue answers `paused` from `isPaused()` and the counts of five states from
@@ -24,8 +24,8 @@ marks the queue, so each queue answers `paused` from `isPaused()` and the counts
 prioritizes jobs nor builds flows, so the states `prioritized` and `waiting-children` stay out of
 the answer.
 
-**A failed job answers what the staff acts on, not the job of BullMQ.** `QueueRegistryQueueAdapter`
-maps each job to the view of its port: the id as a string, the name, the `data`, `attempts` and
+**A failed job answers what the staff acts on, not the job of BullMQ.** `QueueRegistryAdapter` maps
+each job to the view of its port: the id as a string, the name, the `data`, `attempts` and
 `attemptsMade`, the `failedReason` and the `stacktrace`, and the instants `createdAt`, `processedAt`
 and `failedAt` as ISO strings in UTC, `null` when BullMQ has none. The options, the progress and the
 return value of BullMQ stay in the adapter, so an upgrade of BullMQ does not change the response.

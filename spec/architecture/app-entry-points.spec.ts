@@ -265,7 +265,7 @@ describe('app entry points', () => {
 
   it.each([
     'apps/processor-app/src/processors/ledger/presentation/processors/ledger-append.processor.ts',
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
+    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
     'apps/processor-app/src/common/shared/ledger/ledger-queue.module.ts',
     'apps/staff-app/test/context/app-e2e.context.ts',
     'apps/customer-app/test/context/app-e2e.context.ts',
@@ -277,7 +277,7 @@ describe('app entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
+    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
     'apps/staff-app/src/common/shared/product-stock-post-subtract/queues/product-stock-post-subtract-queue.module.ts',
   ])('%s MAY import the queue contract of the core product stock', async (file) => {
     await expect({

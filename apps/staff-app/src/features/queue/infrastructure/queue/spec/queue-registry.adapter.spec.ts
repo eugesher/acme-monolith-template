@@ -1,13 +1,13 @@
 import type { Queue } from 'bullmq';
 
-import { QueueRegistryQueueAdapter } from '../queue-registry-queue.adapter';
+import { QueueRegistryAdapter } from '../queue-registry.adapter';
 
-describe('QueueRegistryQueueAdapter', () => {
+describe('QueueRegistryAdapter', () => {
   let ledgerQueue: jest.Mocked<
     Pick<Queue, 'name' | 'getJobCounts' | 'isPaused' | 'getFailed' | 'getFailedCount' | 'getJob'>
   >;
   let stockQueue: jest.Mocked<Pick<Queue, 'name' | 'getJobCounts' | 'isPaused'>>;
-  let adapter: QueueRegistryQueueAdapter;
+  let adapter: QueueRegistryAdapter;
 
   beforeEach(() => {
     ledgerQueue = {
@@ -23,7 +23,7 @@ describe('QueueRegistryQueueAdapter', () => {
       getJobCounts: jest.fn(),
       isPaused: jest.fn(),
     };
-    adapter = new QueueRegistryQueueAdapter(
+    adapter = new QueueRegistryAdapter(
       ledgerQueue as unknown as Queue,
       stockQueue as unknown as Queue,
     );

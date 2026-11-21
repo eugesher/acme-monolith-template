@@ -17,10 +17,10 @@ import {
 } from '../../outbound';
 
 @Injectable()
-export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
+export class QueueRegistryAdapter implements IQueueRegistryPort {
   public static readonly provider: ClassProvider<IQueueRegistryPort> = {
     provide: QUEUE_REGISTRY_PORT,
-    useClass: QueueRegistryQueueAdapter,
+    useClass: QueueRegistryAdapter,
   };
 
   private readonly queues: Map<string, Queue>;
@@ -70,7 +70,7 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
       queue.getFailed(offset, offset + limit - 1),
       queue.getFailedCount(),
     ]);
-    const failedJobs = jobs.map((job) => QueueRegistryQueueAdapter.toFailedJob(job));
+    const failedJobs = jobs.map((job) => QueueRegistryAdapter.toFailedJob(job));
 
     return [failedJobs, total];
   }
@@ -105,8 +105,8 @@ export class QueueRegistryQueueAdapter implements IQueueRegistryPort {
     const { processedOn, finishedOn } = job;
     const data: unknown = job.data;
     const createdAt = new Date(timestamp).toISOString();
-    const processedAt = QueueRegistryQueueAdapter.toInstant(processedOn);
-    const failedAt = QueueRegistryQueueAdapter.toInstant(finishedOn);
+    const processedAt = QueueRegistryAdapter.toInstant(processedOn);
+    const failedAt = QueueRegistryAdapter.toInstant(finishedOn);
 
     return {
       id: String(id),

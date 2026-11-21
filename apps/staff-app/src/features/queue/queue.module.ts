@@ -10,7 +10,7 @@ import {
   QueueListUseCase,
   QueueRetryFailedJobUseCase,
 } from './application';
-import { QueueRegistryQueueAdapter } from './infrastructure';
+import { QueueRegistryAdapter } from './infrastructure';
 import { QueueController } from './presentation';
 
 @Module({
@@ -23,7 +23,7 @@ import { QueueController } from './presentation';
     QueueRetryFailedJobUseCase,
     QueueDeleteFailedJobUseCase,
     QueueFailedJobService,
-    QueueRegistryQueueAdapter.provider,
+    QueueRegistryAdapter.provider,
   ],
 })
 export class QueueModule {}
