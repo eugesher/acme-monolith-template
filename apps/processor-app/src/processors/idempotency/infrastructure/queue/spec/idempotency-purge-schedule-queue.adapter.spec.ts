@@ -1,6 +1,7 @@
 import type { Queue } from 'bullmq';
 
 import { IdempotencyPurgeScheduleQueueAdapter } from '../idempotency-purge-schedule-queue.adapter';
+import type { IIdempotencyPurgePayload } from '../../../outbound';
 
 describe('IdempotencyPurgeScheduleQueueAdapter', () => {
   let queue: jest.Mocked<Pick<Queue, 'upsertJobScheduler'>>;
@@ -9,7 +10,9 @@ describe('IdempotencyPurgeScheduleQueueAdapter', () => {
   beforeEach(() => {
     queue = { upsertJobScheduler: jest.fn() };
     queue.upsertJobScheduler.mockResolvedValue({} as never);
-    adapter = new IdempotencyPurgeScheduleQueueAdapter(queue as unknown as Queue);
+    adapter = new IdempotencyPurgeScheduleQueueAdapter(
+      queue as unknown as Queue<IIdempotencyPurgePayload>,
+    );
   });
 
   describe('register', () => {

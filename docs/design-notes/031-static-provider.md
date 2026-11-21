@@ -24,10 +24,9 @@ providers: [OrderGetManyRepository.provider, OrderIdempotencyCoreAdapter.provide
 ```
 
 **Every class of `infrastructure/` that implements a port carries the field**: repositories, core,
-common and lib adapters, queue and cache adapters, and the adapters of `libs/cache`,
-`libs/credentials` and `libs/health`. It is `public static readonly`, so no code can rebind the
-class for the whole process, and it comes first in the class, before the private constants and the
-constructor.
+common and lib adapters, cache adapters, and the adapters of `libs/cache`, `libs/credentials` and
+`libs/health`. It is `public static readonly`, so no code can rebind the class for the whole
+process, and it comes first in the class, before the private constants and the constructor.
 
 **The type argument checks the binding.** `ClassProvider<IOrderIdempotencyPort>` makes the compiler
 check that `useClass` implements the port. A bare `{ provide, useClass }` in the module is a
@@ -46,6 +45,12 @@ lands on the object that `useClass` holds.
 
 ## Where the scheme stops
 
+- **Queue adapters** are bound by a module next to them, `<context>-<target>-queue.module.ts` in
+  `infrastructure/queue`. The module registers the queue the adapter injects, from `core/queues` or
+  with `BullSetupModule.registerQueue` for a queue of the module alone, binds the adapter as
+  `{ provide, useClass } satisfies ClassProvider<IPort>` and exports the port. The module root
+  imports that module and lists no binding, so registering the queue and implementing the port
+  cannot drift apart, and the module is the one place that shows which class answers the port.
 - **Facades** in `shell/` stay `{ provide: <MODULE>_<LAYER>_PORT, useClass: <Facade> }`. A facade is
   the public entry of a module, not an implementation of one of its outbound ports, and the module
   exports the port it binds: the literal next to `exports` shows at a glance which class answers the

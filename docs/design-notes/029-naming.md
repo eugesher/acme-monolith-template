@@ -2,24 +2,26 @@
 
 A name says who or where; the action lives in the method or in the port.
 
-| Element                            | Name                                                                                    | Example                                                    |
-| ---------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| port of a core or lib module       | `I<Module><Layer>Port`, `<MODULE>_<LAYER>_PORT`, `<module>-<layer>.port.ts`             | `IIdempotencyCorePort`, `IDEMPOTENCY_CORE_PORT`            |
-| facade of that module              | `<Module><Layer>Facade`, `<module>-<layer>.facade.ts`                                   | `IdempotencyCoreFacade`                                    |
-| facade method                      | `handle<Action>`                                                                        | `handleClaim`, `handleSignAccessToken`                     |
-| use case held by a facade          | `<action>`, without the context                                                         | `claim: IdempotencyCoreClaimUseCase`                       |
-| domain exception codes             | `<Context>ExceptionCodeEnum`, `<context>-exception-code.enum.ts`                        | `OrderExceptionCodeEnum`                                   |
-| queue adapter                      | `<Context><Target>QueueAdapter`, `<context>-<target>-queue.adapter.ts`                  | `ProductStockCorePostSubtractQueueAdapter`                 |
-| transaction port of a module       | `I<Module>TransactionPort`, `<MODULE>_TRANSACTION_PORT`, `<module>-transaction.port.ts` | `IRoleTransactionPort`, `ROLE_TRANSACTION_PORT`            |
-| transaction adapter                | `<Module>TransactionAdapter`, `persistence/transaction/<module>-transaction.adapter.ts` | `RoleTransactionAdapter`                                   |
-| outcome of a repository write      | `<Port><Subject><Method>OutcomeEnum`, `<port>-<subject>-<method>-outcome.enum.ts`       | `RoleCreateStaffRoleInsertOutcomeEnum`                     |
-| commands of a service              | `I<Context><Service><Method>Command`, one file `<context>-<service>.command.ts`         | `IProductAccessLoadCommand` in `product-access.command.ts` |
-| token of a config value            | `<MODULE>_<PROPERTY>_TOKEN`, `<module>-<property>.token.ts`                             | `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`                         |
-| binding of an infrastructure class | `public static readonly provider: ClassProvider<I…Port>`                                | `OrderIdempotencyCoreAdapter.provider`                     |
-| provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                       | `ProductConfigOccRetryAttemptsProvider`                    |
-| type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                  | `replay-retry.options.ts`, `utility.type.ts`               |
-| params of a helper method          | `I<Subject><Action>`, `interfaces/params/<subject>-<action>.interface.ts`               | `IPageWindowClamp`, `IPageBuild`                           |
-| snapshot of a helper method        | `I<Subject>`, `interfaces/snapshots/<subject>.interface.ts`                             | `IPageWindow`, `IPage`                                     |
+| Element                            | Name                                                                                                | Example                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| port of a core or lib module       | `I<Module><Layer>Port`, `<MODULE>_<LAYER>_PORT`, `<module>-<layer>.port.ts`                         | `IIdempotencyCorePort`, `IDEMPOTENCY_CORE_PORT`            |
+| facade of that module              | `<Module><Layer>Facade`, `<module>-<layer>.facade.ts`                                               | `IdempotencyCoreFacade`                                    |
+| facade method                      | `handle<Action>`                                                                                    | `handleClaim`, `handleSignAccessToken`                     |
+| use case held by a facade          | `<action>`, without the context                                                                     | `claim: IdempotencyCoreClaimUseCase`                       |
+| domain exception codes             | `<Context>ExceptionCodeEnum`, `<context>-exception-code.enum.ts`                                    | `OrderExceptionCodeEnum`                                   |
+| queue adapter                      | `<Context><Target>QueueAdapter`, `<context>-<target>-queue.adapter.ts`                              | `ProductStockCorePostSubtractQueueAdapter`                 |
+| module of a queue adapter          | `<Context><Target>QueueModule`, `<context>-<target>-queue.module.ts`, next to the adapter           | `ProductStockCorePostSubtractQueueModule`                  |
+| queue of one module                | `<MODULE>_<TARGET>_QUEUE`, `I<Module><Target>Payload`, `outbound/queues/<module>-<target>.queue.ts` | `IDEMPOTENCY_PURGE_QUEUE`, `IIdempotencyPurgePayload`      |
+| transaction port of a module       | `I<Module>TransactionPort`, `<MODULE>_TRANSACTION_PORT`, `<module>-transaction.port.ts`             | `IRoleTransactionPort`, `ROLE_TRANSACTION_PORT`            |
+| transaction adapter                | `<Module>TransactionAdapter`, `persistence/transaction/<module>-transaction.adapter.ts`             | `RoleTransactionAdapter`                                   |
+| outcome of a repository write      | `<Port><Subject><Method>OutcomeEnum`, `<port>-<subject>-<method>-outcome.enum.ts`                   | `RoleCreateStaffRoleInsertOutcomeEnum`                     |
+| commands of a service              | `I<Context><Service><Method>Command`, one file `<context>-<service>.command.ts`                     | `IProductAccessLoadCommand` in `product-access.command.ts` |
+| token of a config value            | `<MODULE>_<PROPERTY>_TOKEN`, `<module>-<property>.token.ts`                                         | `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`                         |
+| binding of an infrastructure class | `public static readonly provider: ClassProvider<I…Port>`                                            | `OrderIdempotencyCoreAdapter.provider`                     |
+| provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                                   | `ProductConfigOccRetryAttemptsProvider`                    |
+| type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                              | `replay-retry.options.ts`, `utility.type.ts`               |
+| params of a helper method          | `I<Subject><Action>`, `interfaces/params/<subject>-<action>.interface.ts`                           | `IPageWindowClamp`, `IPageBuild`                           |
+| snapshot of a helper method        | `I<Subject>`, `interfaces/snapshots/<subject>.interface.ts`                                         | `IPageWindow`, `IPage`                                     |
 
 **A module with one port names it after the module.** The port, its token and its facade carry the
 name of the module and its layer (`Core`, `Lib`, `Common`) and nothing else, so a consumer finds the

@@ -30,14 +30,12 @@ no `JWT_SECRET` and no staff entities.
 
 The app has the folders of an HTTP app and uses fewer of them:
 
-| Folder                | What it holds                                                                                     |
-| --------------------- | ------------------------------------------------------------------------------------------------- |
-| `src/main.ts`         | the same bootstrap as the other apps; it listens for the health probes                            |
-| `src/app/setup`       | config                                                                                            |
-| `src/common/shared`   | the registration of the `idempotency-purge` queue; `ledger-record` comes from `@acme-core/queues` |
-| `src/contracts`       | `IDEMPOTENCY_PURGE_QUEUE`, the queue only processor-app writes and reads                          |
-| `src/features/health` | `GET /health` and `GET /health/ready` for the orchestrator                                        |
-| `src/processors`      | the three processors                                                                              |
+| Folder                | What it holds                                                          |
+| --------------------- | ---------------------------------------------------------------------- |
+| `src/main.ts`         | the same bootstrap as the other apps; it listens for the health probes |
+| `src/app/setup`       | config                                                                 |
+| `src/features/health` | `GET /health` and `GET /health/ready` for the orchestrator             |
+| `src/processors`      | the three processors                                                   |
 
 **HTTP serves the probes.** The health routes are the only ones, and no guard runs, so they carry no
 `@Public()`. `APP_PIPE`, `APP_FILTER`, `HttpSecurityModule` and `ThrottlerSetupModule` are those of

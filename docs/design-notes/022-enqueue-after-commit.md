@@ -75,12 +75,13 @@ processor e2e does (see `014-e2e-suites.md`).
 ## Where the queue is declared
 
 **A queue written by several apps keeps its contract outside the apps**: the name and the payload
-type, in core or in the lib that writes it. Its registration lives in `core/queues`, and a core
-module that writes to it mounts that registration in its shell, so every module that mounts the core
-module brings the queue with it; the processor and the failed jobs of staff-app mount the same one.
-A queue only one app writes and reads is registered in the `common/shared` of the app
-(`apps/processor-app/src/common/shared/idempotency`). BullMQ applies the job options of the
-producer, so `registerQueue` takes the name alone and every registration gets the job options of
+type, in core or in the lib that writes it. Its registration lives in `core/queues`, and the module
+of the core queue adapter mounts it next to the binding of the adapter
+(`ProductStockCorePostSubtractQueueModule`), so every module that mounts the core module brings the
+queue with it; the processor and the failed jobs of staff-app mount the same registration. A queue
+of one module keeps its name in the `outbound/queues` of the module and is registered by the module
+of its adapter (see `009-scheduled-processor.md`). BullMQ applies the job options of the producer,
+so `registerQueue` takes the name alone and every registration gets the job options of
 `BullSetupModule.forRoot()`.
 
 The lint edges for a core queue adapter are in `lint/boundaries/policies/acme-core.mjs` and

@@ -23,10 +23,6 @@ describe('app entry points', () => {
       '@acme-customer/features/*',
       '@acme-processor/app',
       '@acme-processor/app/*',
-      '@acme-processor/common',
-      '@acme-processor/common/*',
-      '@acme-processor/contracts',
-      '@acme-processor/contracts/*',
       '@acme-processor/features',
       '@acme-processor/features/*',
       '@acme-processor/processors',
@@ -49,7 +45,6 @@ describe('app entry points', () => {
     '@acme-customer/app/app.module',
     '@acme-customer/features',
     '@acme-processor/app/app.module',
-    '@acme-processor/common/shared',
     '@acme-processor/features',
     '@acme-processor/processors',
   ])('%s resolves', (source) => {
@@ -69,14 +64,6 @@ describe('app entry points', () => {
       '@acme-staff/app/setup/config/config-setup.module',
     ],
     ['apps/staff-app/src/features/product/__fixture__.ts', '@acme-staff/common/modules/tag'],
-    [
-      'apps/processor-app/src/processors/ledger/__fixture__.ts',
-      '@acme-processor/common/shared/idempotency',
-    ],
-    [
-      'apps/processor-app/src/processors/ledger/__fixture__.ts',
-      '@acme-processor/common/shared/idempotency/queues/idempotency-purge-queue.module',
-    ],
   ])('%s may NOT reach a deep path through an alias: %s', async (file, source) => {
     await expect({
       file,
@@ -287,7 +274,7 @@ describe('app entry points', () => {
 
   it.each([
     'apps/processor-app/src/processors/ledger/ledger.module.ts',
-    'apps/staff-app/src/features/queue/queue.module.ts',
+    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
   ])('%s MAY register the ledger record queue through the core queues', async (file) => {
     await expect({
       file,
@@ -325,7 +312,6 @@ describe('app entry points', () => {
       'apps/staff-app/src/features/health/infrastructure/core-adapters/__fixture__.ts',
       '@acme-core/modules/idempotency',
     ],
-    ['apps/staff-app/src/features/queue/infrastructure/queue/__fixture__.ts', '@acme-core/queues'],
   ])('%s may NOT import %s', async (file, source) => {
     await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
       'boundaries/dependencies',

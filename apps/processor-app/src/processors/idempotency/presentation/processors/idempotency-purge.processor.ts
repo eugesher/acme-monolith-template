@@ -2,9 +2,9 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import type { OnApplicationBootstrap } from '@nestjs/common';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import { IDEMPOTENCY_PURGE_QUEUE } from '@acme-processor/contracts/idempotency';
 
 import { IdempotencyPurgeScheduleUseCase, IdempotencyPurgeUseCase } from '../../application';
+import { IDEMPOTENCY_PURGE_QUEUE } from '../../outbound';
 
 @Processor(IDEMPOTENCY_PURGE_QUEUE)
 export class IdempotencyPurgeProcessor extends WorkerHost implements OnApplicationBootstrap {

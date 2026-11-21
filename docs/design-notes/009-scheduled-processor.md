@@ -6,15 +6,15 @@ but nothing else deletes them, so the delete lives here with a repository of its
 `024-code-placement.md`). It is a processor: a job of the `idempotency-purge` queue enters it, and a
 job scheduler of BullMQ adds that job every five minutes.
 
-| Layer                        | What it holds                                                                                                                                        |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `presentation/processors`    | `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                 |
-| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                         |
-| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                       |
-| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN` |
-| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`                                                                                                               |
-| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                         |
-| `infrastructure/config`      | `IdempotencyConfigKeyTtlHoursProvider`, `IdempotencyConfigInFlightTtlMinutesProvider`                                                                |
+| Layer                        | What it holds                                                                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `presentation/processors`    | `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                                            |
+| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                                                    |
+| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                                                  |
+| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN`, `IDEMPOTENCY_PURGE_QUEUE` |
+| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`, `IdempotencyPurgeScheduleQueueModule`                                                                                                   |
+| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                                                    |
+| `infrastructure/config`      | `IdempotencyConfigKeyTtlHoursProvider`, `IdempotencyConfigInFlightTtlMinutesProvider`                                                                                           |
 
 The processor owns both TTLs: its `infrastructure/config` binds `IDEMPOTENCY_KEY_TTL_HOURS` and
 `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` to their tokens (see `030-config-values.md`). The core module
@@ -77,11 +77,16 @@ application.
 
 ## Wiring
 
-The queue name `IDEMPOTENCY_PURGE_QUEUE` lives in `apps/processor-app/src/contracts/idempotency`:
-the registration of the queue in `common/shared/idempotency`, the processor and the queue adapter
-all read it, and an app contract is what those layers share. processor-app mounts
-`IdempotencyModule` through `@acme-processor/processors`, and the module imports
-`IdempotencyPurgeQueueModule`.
+The queue name `IDEMPOTENCY_PURGE_QUEUE` and the type of its job data, `IIdempotencyPurgePayload`,
+live in `outbound/queues/idempotency-purge.queue.ts`: no other module writes or reads the queue. The
+job carries no data, so the type is `Record<string, never>` and an add with any field does not
+compile. `IdempotencyPurgeScheduleQueueModule` registers the queue, binds
+`IdempotencyPurgeScheduleQueueAdapter` to `IDEMPOTENCY_PURGE_SCHEDULE_PORT` and exports the port,
+and `IdempotencyModule` imports it. The processor takes the name from `outbound` for
+`@Processor(IDEMPOTENCY_PURGE_QUEUE)`: lint lets the presentation of a processor take only a
+`*_QUEUE` name from its outbound, not a port (see `016-lint-allowlists.md`). The e2e context reaches
+the queue by the literal `'idempotency-purge'`, the name BullMQ sees. processor-app mounts
+`IdempotencyModule` through `@acme-processor/processors`.
 
 **The start of the app is an entry.** `IdempotencyPurgeProcessor` implements
 `OnApplicationBootstrap`, so lint lets the presentation of a processor take that name from

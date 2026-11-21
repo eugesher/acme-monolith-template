@@ -3,21 +3,26 @@
 All three apps connect BullMQ the same way, so the connection lives in a lib:
 `libs/queue/src/bull/bull-setup.module.ts`.
 
-| Method                          | Called by                                       | What it returns                                                         |
-| ------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------- |
-| `BullSetupModule.forRoot()`     | `AppModule` of each app                         | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
-| `BullSetupModule.registerQueue` | `core/queues`, `common/shared` of processor-app | `BullModule.registerQueue({ name })`                                    |
+| Method                          | Called by                                    | What it returns                                                         |
+| ------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------- |
+| `BullSetupModule.forRoot()`     | `AppModule` of each app                      | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
+| `BullSetupModule.registerQueue` | `core/queues`, the module of a queue adapter | `BullModule.registerQueue({ name })`                                    |
 
 ```ts
 export const LedgerQueueModule = BullSetupModule.registerQueue(LEDGER_RECORD_QUEUE);
 ```
 
-**A queue that several modules use is registered once, in `core/queues`.** `LedgerQueueModule` of
-`@acme-core/queues` serves the producers through `LedgerCoreModule`, the ledger processor of
-processor-app and the failed jobs of staff-app (see `041-failed-jobs.md`), and
-`ProductStockPostSubtractQueueModule` serves `ProductStockCoreModule`, the processor and the failed
-jobs the same way, so no module keeps a copy. A queue one app writes and reads stays in the
-`common/shared` of that app, as `idempotency-purge` of processor-app does.
+**A queue is registered by the module of the adapter that injects it.** Each queue adapter of
+`infrastructure/queue` has a module next to it that registers its queue and exports its port (see
+`031-static-provider.md`): `LedgerCoreQueueModule`, `ProductStockCorePostSubtractQueueModule`,
+`QueueRegistryModule` and `IdempotencyPurgeScheduleQueueModule`.
+
+**A queue that several modules use is registered once, in `core/queues`.** `LedgerQueueModule` and
+`ProductStockPostSubtractQueueModule` of `@acme-core/queues` serve the core queue adapters, the
+failed jobs of staff-app (see `041-failed-jobs.md`) and the ledger processor, which has no adapter
+and mounts the registration in its module root. A queue of one module is registered by the module of
+its adapter with `BullSetupModule.registerQueue`, and its name lives in the `outbound/queues` of
+that module, as `idempotency-purge` of processor-app does (see `009-scheduled-processor.md`).
 
 **A setup class, not a module.** `BullSetupModule` has no `@Module`: it is a class of static methods
 that return the modules of `@nestjs/bullmq`, and the options are built in the private static
@@ -53,11 +58,11 @@ worker takes the connection and the prefix of its queue.
 
 ## Who sees the lib
 
-| Importer                  | Uses            |
-| ------------------------- | --------------- |
-| `app.module.ts`           | `forRoot()`     |
-| `core/queues`             | `registerQueue` |
-| `common/shared` of an app | `registerQueue` |
+| Importer                      | Uses            |
+| ----------------------------- | --------------- |
+| `app.module.ts`               | `forRoot()`     |
+| `core/queues`                 | `registerQueue` |
+| the module of a queue adapter | `registerQueue` |
 
 No other layer imports `libs/queue`, and none of the importers above imports `@nestjs/bullmq`: the
 package is left to the lib, to the queue adapters of `infrastructure/queue` and to the presentation
