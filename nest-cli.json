@@ -217,6 +217,15 @@
         "tsConfigPath": "core/modules/tsconfig.lib.json"
       }
     },
+    "core-queues": {
+      "type": "library",
+      "root": "core/queues",
+      "entryFile": "index",
+      "sourceRoot": "core/queues/src",
+      "compilerOptions": {
+        "tsConfigPath": "core/queues/tsconfig.lib.json"
+      }
+    },
     "credentials": {
       "type": "library",
       "root": "libs/credentials",

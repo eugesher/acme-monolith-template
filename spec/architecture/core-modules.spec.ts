@@ -391,11 +391,18 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('the module root MAY register the queues it writes to with the queue lib', async () => {
+    it('the module root MAY register the queues it writes to through the core queues', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { BullSetupModule } from "@acme-libs/queue";\nimport { X_QUEUE } from "../../../../contracts/src/__ledger-fixture__";',
+        code: 'import { LedgerQueueModule } from "@acme-core/queues";',
       }).toPassArchitectureLint();
+    });
+
+    it('the module root may NOT register a queue with the queue lib itself', async () => {
+      await expect({
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
+      }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module root MAY mount the core ledger', async () => {

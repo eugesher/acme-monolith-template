@@ -11,7 +11,7 @@ export const queue = [
       { ...packages('bullmq'), dependency: { specifiers: ['!Job'] } },
     ],
     message:
-      'a processor only takes Processor, WorkerHost and OnWorkerEvent from @nestjs/bullmq and the Job type from bullmq; queues are registered in common/shared',
+      'a processor only takes Processor, WorkerHost and OnWorkerEvent from @nestjs/bullmq and the Job type from bullmq; queues are registered in common/shared and core/queues',
   },
   {
     from: {
@@ -28,6 +28,6 @@ export const queue = [
       { ...packages('bullmq'), dependency: { specifiers: ['!Queue'] } },
     ],
     message:
-      'a queue adapter only takes InjectQueue from @nestjs/bullmq and the Queue type from bullmq; queues are registered in common/shared',
+      'a queue adapter only takes InjectQueue from @nestjs/bullmq and the Queue type from bullmq; queues are registered in common/shared and core/queues',
   },
 ];

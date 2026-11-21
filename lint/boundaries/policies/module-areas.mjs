@@ -98,6 +98,7 @@ const areaPolicies = (area, sharedFacing) => {
       to('acme-app:common:shared:index', own('app')),
       to('acme-app:common:modules:index', own('app')),
       to('acme-core:modules:index'),
+      to('acme-core:queues'),
       ...sharedFacing.module,
     ]),
   ];

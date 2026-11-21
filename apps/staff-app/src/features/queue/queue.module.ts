@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { HttpExceptionFilter } from '@acme-libs/http';
-import { LedgerQueueModule, ProductStockPostSubtractQueueModule } from '@acme-staff/common/shared';
+import { LedgerQueueModule, ProductStockPostSubtractQueueModule } from '@acme-core/queues';
 
 import {
   QueueDeleteFailedJobUseCase,

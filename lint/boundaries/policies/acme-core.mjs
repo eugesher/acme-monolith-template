@@ -73,10 +73,12 @@ export const acmeCore = [
     layer('shell'),
     ownContracts,
     to('acme-core:modules:index'),
-    baseLibs('queue'),
+    to('acme-core:queues'),
+    baseLibs(),
   ]),
   from('acme-core:modules:index', [layer('shell')]),
   from('acme-core:contracts', [ownContracts, baseLibs()]),
   from('acme-core:domain', [coreDomain, baseLibs()]),
   from('acme-core:entities', [to('acme-core:entities'), libs('kernel'), packages('typeorm')]),
+  from('acme-core:queues', [to('acme-core:queues'), to('acme-core:contracts'), libs('queue')]),
 ];

@@ -284,7 +284,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       'import { BullModule, Processor } from "@nestjs/bullmq";',
       'import type { Queue } from "bullmq";',
     ])(
-      'a processor may NOT take the queue itself (%s) — queues are registered in common/shared',
+      'a processor may NOT take the queue itself (%s) — queues are registered in common/shared and core/queues',
       async (code) => {
         await expect({
           file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',

@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { BullSetupModule } from '@acme-libs/queue';
-import {
-  PRODUCT_STOCK_CORE_PORT,
-  PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
-} from '@acme-core/contracts/product-stock';
+import { ProductStockPostSubtractQueueModule } from '@acme-core/queues';
+import { PRODUCT_STOCK_CORE_PORT } from '@acme-core/contracts/product-stock';
 
 import { ProductStockCoreLockUseCase, ProductStockCoreMoveUseCase } from '../application';
 import {
@@ -18,7 +15,7 @@ import {
 import { ProductStockCoreFacade } from './product-stock-core.facade';
 
 @Module({
-  imports: [BullSetupModule.registerQueue(PRODUCT_STOCK_POST_SUBTRACT_QUEUE)],
+  imports: [ProductStockPostSubtractQueueModule],
   exports: [PRODUCT_STOCK_CORE_PORT],
   providers: [
     { provide: PRODUCT_STOCK_CORE_PORT, useClass: ProductStockCoreFacade },
