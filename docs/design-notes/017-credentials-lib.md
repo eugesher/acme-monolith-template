@@ -49,20 +49,19 @@ signs `HS256` tokens with that `aud`.
 Modules that read the same table keep models of their own, narrowed to what each uses (see
 `024-code-placement.md`). Example: `UserStaffUserCandidateModel`
 (`apps/staff-app/src/features/access/modules/user/domain/models`), `AuthStaffUserLoginModel`
-(`apps/staff-app/src/features/auth/domain/models`) and `StaffAuthCommonSubjectModel`
-(`apps/staff-app/src/common/modules/staff-auth/domain/models`) all map `staff_user`.
+(`apps/staff-app/src/features/auth/domain/models`) and `AuthCommonSubjectModel`
+(`apps/staff-app/src/common/modules/auth/domain/models`) all map `staff_user`.
 
 ## A common module for the staff subject
 
 staff-app checks the subject of every request in its guard and answers it at `GET /auth/me`, so the
-check lives in the common module `apps/staff-app/src/common/modules/staff-auth` behind
-`STAFF_AUTH_COMMON_PORT` (`apps/staff-app/src/contracts/staff-auth`): `handleFindSubject` for both.
-The `auth` feature reaches it through `AuthIdentityCommonAdapter`, the global module through
-`AuthGlobalSubjectCommonAdapter`. No other app asks for the staff: processor-app has no routes for
-people (see `023-processor-app.md`), so the module and the staff entities stay in staff-app (see
-`024-code-placement.md`). Only staff-app signs the staff in: its `auth` feature checks the password
-and signs the token behind `AuthCredentialsLibAdapter`. No common or core module reaches the
-credentials.
+check lives in the common module `apps/staff-app/src/common/modules/auth` behind `AUTH_COMMON_PORT`
+(`apps/staff-app/src/contracts/auth`): `handleFindSubject` for both. The `auth` feature reaches it
+through `AuthIdentityCommonAdapter`, the global module through `AuthGlobalSubjectCommonAdapter`. No
+other app asks for the staff: processor-app has no routes for people (see `023-processor-app.md`),
+so the module and the staff entities stay in staff-app (see `024-code-placement.md`). Only staff-app
+signs the staff in: its `auth` feature checks the password and signs the token behind
+`AuthCredentialsLibAdapter`. No common or core module reaches the credentials.
 
 ## Table naming
 

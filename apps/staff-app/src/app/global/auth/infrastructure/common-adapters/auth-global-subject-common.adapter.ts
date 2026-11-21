@@ -1,9 +1,6 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import {
-  STAFF_AUTH_COMMON_PORT,
-  type IStaffAuthCommonPort,
-} from '@acme-staff/contracts/staff-auth';
+import { AUTH_COMMON_PORT, type IAuthCommonPort } from '@acme-staff/contracts/auth';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import {
@@ -21,15 +18,15 @@ export class AuthGlobalSubjectCommonAdapter implements IAuthGlobalSubjectPort {
   };
 
   constructor(
-    @Inject(STAFF_AUTH_COMMON_PORT)
-    private readonly staffAuthCore: IStaffAuthCommonPort,
+    @Inject(AUTH_COMMON_PORT)
+    private readonly authCommon: IAuthCommonPort,
   ) {}
 
   public async findSubject(
     command: IAuthGlobalSubjectFindSubjectCommand,
   ): Promise<Nullable<IAuthGlobalSubjectView>> {
     const { userId } = command;
-    const subject = await this.staffAuthCore.handleFindSubject({ userId });
+    const subject = await this.authCommon.handleFindSubject({ userId });
 
     if (!subject) {
       return null;

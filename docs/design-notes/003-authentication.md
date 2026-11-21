@@ -38,7 +38,7 @@ guessing run does not leave a list of addresses in the logs. `AuthEmailTakenExce
 
 **A route that only echoes the guard has no use case.** `handleMe` of customer-app copies
 `@CurrentUser()` into the response DTO: `AuthJwtGuard` has already re-read the user. In staff-app
-`AuthMeUseCase` asks the common module `staff-auth` through `AUTH_IDENTITY_PORT` and
+`AuthMeUseCase` asks the common module `auth` through `AUTH_IDENTITY_PORT` and
 `infrastructure/common-adapters/auth-identity-common.adapter.ts`.
 
 ## A unique index instead of a lookup
