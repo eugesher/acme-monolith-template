@@ -1,13 +1,7 @@
 import '../support/lint';
 
 describe('modules allowed by name', () => {
-  describe.each([
-    'bullmq',
-    '@nestjs/bullmq',
-    '@nestjs/common',
-    '@acme-libs/auth',
-    '@acme-libs/kernel',
-  ])('%s', (source) => {
+  describe.each(['bullmq', '@nestjs/bullmq', '@nestjs/common'])('%s', (source) => {
     it.each([
       ['a namespace import', `import * as x from "${source}";`],
       ['a default import', `import x from "${source}";`],

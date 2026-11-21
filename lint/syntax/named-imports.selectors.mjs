@@ -1,5 +1,4 @@
-const namedOnly =
-  '/^(bullmq|@nestjs\\x2Fbullmq|@nestjs\\x2Fcommon|@acme-libs\\x2Fauth|@acme-libs\\x2Fkernel)$/';
+const namedOnly = '/^(bullmq|@nestjs\\x2Fbullmq|@nestjs\\x2Fcommon)$/';
 
 const message = 'a policy allows this module by name, so it is imported only by named specifiers';
 
