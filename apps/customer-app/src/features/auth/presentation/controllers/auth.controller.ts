@@ -30,12 +30,14 @@ export class AuthController {
   @AuthThrottle()
   @ApiOperation({ summary: 'Sign up as a customer; log in afterwards for a token' })
   @ApiCreatedResponse({ type: AuthRegisterResponseDto })
-  @ApiErrorResponses(
-    AuthHttpExceptionFilter.STATUS,
-    IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
-    IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK,
-    IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
-  )
+  @ApiErrorResponses({
+    statuses: AuthHttpExceptionFilter.STATUS,
+    codes: [
+      IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
+      IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK,
+      IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
+    ],
+  })
   public async handleRegister(
     @Body() body: AuthRegisterRequestDto,
   ): Promise<AuthRegisterResponseDto> {
@@ -50,11 +52,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Exchange credentials for an access token' })
   @ApiOkResponse({ type: AuthAccessTokenResponseDto })
-  @ApiErrorResponses(
-    AuthHttpExceptionFilter.STATUS,
-    IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
-    IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
-  )
+  @ApiErrorResponses({
+    statuses: AuthHttpExceptionFilter.STATUS,
+    codes: [
+      IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
+      IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
+    ],
+  })
   public async handleLogin(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
     const { email, password } = body;
 

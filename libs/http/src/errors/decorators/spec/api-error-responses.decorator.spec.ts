@@ -6,16 +6,14 @@ import { ApiErrorResponses } from '../api-error-responses.decorator';
 describe('ApiErrorResponses', () => {
   it('documents one error response per status of the given codes', () => {
     class ItemController {
-      @ApiErrorResponses(
-        {
+      @ApiErrorResponses({
+        statuses: {
           ITEM_NOT_FOUND: HttpStatus.NOT_FOUND,
           ITEM_ARCHIVED: HttpStatus.CONFLICT,
           ITEM_NAME_TAKEN: HttpStatus.CONFLICT,
         },
-        'ITEM_NAME_TAKEN',
-        'ITEM_NOT_FOUND',
-        'ITEM_ARCHIVED',
-      )
+        codes: ['ITEM_NAME_TAKEN', 'ITEM_NOT_FOUND', 'ITEM_ARCHIVED'],
+      })
       public handleRename(this: void): string {
         return 'renamed';
       }
@@ -38,7 +36,10 @@ describe('ApiErrorResponses', () => {
 
   it('names VALIDATION_FAILED first among the codes of 400', () => {
     class ItemController {
-      @ApiErrorResponses({ ITEM_NAME_INVALID: HttpStatus.BAD_REQUEST }, 'ITEM_NAME_INVALID')
+      @ApiErrorResponses({
+        statuses: { ITEM_NAME_INVALID: HttpStatus.BAD_REQUEST },
+        codes: ['ITEM_NAME_INVALID'],
+      })
       public handleCreate(this: void): string {
         return 'created';
       }

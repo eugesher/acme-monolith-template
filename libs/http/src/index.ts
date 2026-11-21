@@ -2,6 +2,7 @@ export * from './concurrency/decorators/api-if-match-header.decorator';
 export * from './concurrency/decorators/if-match.decorator';
 
 export * from './errors/decorators/api-error-responses.decorator';
+export * from './errors/decorators/api-error-responses.options';
 export * from './errors/error.response.dto';
 
 export * from './filters/domain-http-exception.filter';

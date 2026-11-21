@@ -40,7 +40,10 @@ export class RoleController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Create a role with its permissions' })
   @ApiCreatedResponse({ type: RoleResponseDto })
-  @ApiErrorResponses(RoleHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN)
+  @ApiErrorResponses({
+    statuses: RoleHttpExceptionFilter.STATUS,
+    codes: [IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN],
+  })
   public async handleCreate(@Body() body: RoleCreateRequestDto): Promise<RoleResponseDto> {
     const { name, permissionCodes } = body;
 
@@ -51,7 +54,10 @@ export class RoleController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Reassign the permission set of a role' })
   @ApiOkResponse({ type: RoleResponseDto })
-  @ApiErrorResponses(RoleHttpExceptionFilter.STATUS, IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND)
+  @ApiErrorResponses({
+    statuses: RoleHttpExceptionFilter.STATUS,
+    codes: [IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND],
+  })
   public async handleReassignPermissions(
     @Param() params: RoleIdParamDto,
     @Body() body: RolePermissionsReassignRequestDto,

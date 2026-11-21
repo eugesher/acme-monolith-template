@@ -28,13 +28,15 @@ export class UserController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Create a principal' })
   @ApiCreatedResponse({ type: UserResponseDto })
-  @ApiErrorResponses(
-    UserHttpExceptionFilter.STATUS,
-    IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
-    IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK,
-    IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
-    IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
-  )
+  @ApiErrorResponses({
+    statuses: UserHttpExceptionFilter.STATUS,
+    codes: [
+      IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
+      IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK,
+      IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
+      IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
+    ],
+  })
   public async handleRegister(@Body() body: UserRegisterRequestDto): Promise<UserResponseDto> {
     const { email, password, roleIds } = body;
 
@@ -45,11 +47,13 @@ export class UserController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'Reassign the roles of a principal' })
   @ApiOkResponse({ type: UserRolesResponseDto })
-  @ApiErrorResponses(
-    UserHttpExceptionFilter.STATUS,
-    IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND,
-    IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
-  )
+  @ApiErrorResponses({
+    statuses: UserHttpExceptionFilter.STATUS,
+    codes: [
+      IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND,
+      IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
+    ],
+  })
   public async handleReassignRoles(
     @Param() params: UserIdParamDto,
     @Body() body: UserRolesReassignRequestDto,

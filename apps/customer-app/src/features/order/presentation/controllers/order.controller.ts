@@ -30,14 +30,16 @@ export class OrderController {
   @ApiIdempotencyKeyHeader()
   @ApiOperation({ summary: 'Place an order for active products in stock (idempotent)' })
   @ApiCreatedResponse({ type: OrderResponseDto })
-  @ApiErrorResponses(
-    OrderHttpExceptionFilter.STATUS,
-    OrderExceptionCodeEnum.ORDER_EMPTY,
-    OrderExceptionCodeEnum.ORDER_PRODUCT_NOT_FOUND,
-    OrderExceptionCodeEnum.ORDER_STOCK_INSUFFICIENT,
-    OrderExceptionCodeEnum.ORDER_IDEMPOTENT_REQUEST_IN_FLIGHT,
-    OrderExceptionCodeEnum.ORDER_IDEMPOTENCY_KEY_REUSED,
-  )
+  @ApiErrorResponses({
+    statuses: OrderHttpExceptionFilter.STATUS,
+    codes: [
+      OrderExceptionCodeEnum.ORDER_EMPTY,
+      OrderExceptionCodeEnum.ORDER_PRODUCT_NOT_FOUND,
+      OrderExceptionCodeEnum.ORDER_STOCK_INSUFFICIENT,
+      OrderExceptionCodeEnum.ORDER_IDEMPOTENT_REQUEST_IN_FLIGHT,
+      OrderExceptionCodeEnum.ORDER_IDEMPOTENCY_KEY_REUSED,
+    ],
+  })
   public async handlePlace(
     @CurrentUser() user: IAuthCurrentUserView,
     @Body() body: OrderPlaceRequestDto,
@@ -65,7 +67,10 @@ export class OrderController {
   @Get(':orderId')
   @ApiOperation({ summary: 'Read one order of the caller with its products' })
   @ApiOkResponse({ type: OrderResponseDto })
-  @ApiErrorResponses(OrderHttpExceptionFilter.STATUS, OrderExceptionCodeEnum.ORDER_NOT_FOUND)
+  @ApiErrorResponses({
+    statuses: OrderHttpExceptionFilter.STATUS,
+    codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
+  })
   public async handleGetOne(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: OrderIdParamDto,
