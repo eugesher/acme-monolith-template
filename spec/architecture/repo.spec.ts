@@ -20,6 +20,7 @@ describe('repo', () => {
       'apps/__system-fixture__/src/features/index.ts',
       'core/contracts/src/__ledger-fixture__/index.ts',
       'core/modules/src/__product-fixture__/index.ts',
+      'apps/__cwd-fixture__/src/main.ts',
     ]);
   });
 
@@ -243,7 +244,7 @@ describe('repo', () => {
   describe('working directory', () => {
     it.each([
       ['migrations', 'config/data-source.ts'],
-      ['apps/staff-app', 'src/main.ts'],
+      ['apps/__cwd-fixture__', 'src/main.ts'],
     ])(
       'linting from %s, as an editor does from the nearest package, classifies %s from the repo root',
       (cwd, file) => {
