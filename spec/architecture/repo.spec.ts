@@ -15,6 +15,11 @@ describe('repo', () => {
       'scripts/node/support/script-args.ts',
       'test/infra/seed/support/seed-rows.ts',
       'test/system/apps/staff-app/context/__context-fixture__.ts',
+      'apps/__system-fixture__/src/app/app.module.ts',
+      'apps/__other-system-fixture__/src/app/app.module.ts',
+      'apps/__system-fixture__/src/features/index.ts',
+      'core/contracts/src/__ledger-fixture__/index.ts',
+      'core/modules/src/__product-fixture__/index.ts',
     ]);
   });
 
@@ -92,7 +97,7 @@ describe('repo', () => {
     it('a system test MAY mount the app modules and its own context', async () => {
       await expect({
         file: 'test/system/apps/staff-app/app/__fixture__.ts',
-        code: 'import { x } from "@acme-staff/app/app.module";\nimport { y } from "@acme-processor/app/app.module";\nimport { z } from "../context/__context-fixture__";',
+        code: 'import { x } from "../../../../../apps/__system-fixture__/src/app/app.module";\nimport { y } from "../../../../../apps/__other-system-fixture__/src/app/app.module";\nimport { z } from "../context/__context-fixture__";',
       }).toPassArchitectureLint();
     });
 
@@ -109,7 +114,7 @@ describe('repo', () => {
     it('a system test MAY read the contracts of core, to name a queue and its job', async () => {
       await expect({
         file: 'test/system/apps/staff-app/context/__fixture__.ts',
-        code: 'import { x } from "@acme-core/contracts/ledger";',
+        code: 'import { x } from "@acme-core/contracts/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
@@ -130,9 +135,12 @@ describe('repo', () => {
       },
     );
 
-    it.each(['@acme-staff/features', '@acme-core/modules/product'])(
+    it.each([
+      ['the features of an app', '../../../../../apps/__system-fixture__/src/features'],
+      ['a core module', '@acme-core/modules/__product-fixture__'],
+    ])(
       'a system test may NOT reach %s — it enters an app through its AppModule',
-      async (source) => {
+      async (_, source) => {
         await expect({
           file: 'test/system/apps/staff-app/app/__fixture__.ts',
           code: `import { x } from "${source}";`,
@@ -143,7 +151,7 @@ describe('repo', () => {
     it('a seed script may NOT reach the app modules', async () => {
       await expect({
         file: 'test/infra/seed/__fixture__.ts',
-        code: 'import { x } from "@acme-staff/app/app.module";',
+        code: 'import { x } from "../../../apps/__system-fixture__/src/app/app.module";',
       }).toBreakRule('boundaries/dependencies');
     });
   });

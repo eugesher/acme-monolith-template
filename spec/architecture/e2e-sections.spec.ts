@@ -1,6 +1,22 @@
 import '../support/lint';
+import { Scaffold } from '../support/scaffold';
 
 describe('e2e sections', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'core/contracts/src/__ledger-fixture__/index.ts',
+      'core/entities/src/index.ts',
+      'apps/__e2e-fixture__/test/features/index.ts',
+      'apps/__e2e-fixture__/test/context/app-e2e.context.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
   it('an e2e section follows the spec rules and MAY pass an awaited call to another call', async () => {
     await expect({
       file: 'apps/staff-app/test/features/__fixture__.e2e.ts',
@@ -46,15 +62,12 @@ describe('e2e sections', () => {
     }).toPassArchitectureLint();
   });
 
-  it.each(['@acme-core/contracts/ledger', '@acme-core/contracts/product-stock'])(
-    'the e2e context MAY read the queue contract %s',
-    async (source) => {
-      await expect({
-        file: 'apps/processor-app/test/context/__fixture__.ts',
-        code: `import { x } from "${source}";`,
-      }).toPassArchitectureLint();
-    },
-  );
+  it('the e2e context MAY read a queue contract of core', async () => {
+    await expect({
+      file: 'apps/processor-app/test/context/__fixture__.ts',
+      code: 'import { x } from "@acme-core/contracts/__ledger-fixture__";',
+    }).toPassArchitectureLint();
+  });
 
   it('an e2e spec MAY read the entities of core', async () => {
     await expect({
@@ -65,7 +78,7 @@ describe('e2e sections', () => {
 
   it('an e2e spec MAY mount the e2e sections and the context of its app', async () => {
     await expect({
-      file: 'apps/staff-app/test/app/__fixture__.e2e-spec.ts',
+      file: 'apps/__e2e-fixture__/test/app/__fixture__.e2e-spec.ts',
       code: 'import { AuthE2E } from "../features";import { AppE2EContext } from "../context/app-e2e.context";',
     }).toPassArchitectureLint();
   });
@@ -79,8 +92,8 @@ describe('e2e sections', () => {
 
   it('an e2e spec may NOT mount the e2e sections of another app', async () => {
     await expect({
-      file: 'apps/customer-app/test/app/__fixture__.e2e-spec.ts',
-      code: 'import { AuthE2E } from "../../../staff-app/test/features";',
+      file: 'apps/__other-e2e-fixture__/test/app/__fixture__.e2e-spec.ts',
+      code: 'import { AuthE2E } from "../../../__e2e-fixture__/test/features";',
     }).toBreakRule('boundaries/dependencies');
   });
 });

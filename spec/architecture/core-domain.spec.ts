@@ -1,6 +1,22 @@
 import '../support/lint';
+import { Scaffold } from '../support/scaffold';
 
 describe('core domain (@acme-core/domain)', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'core/domain/src/index.ts',
+      'core/domain/src/__fixture__/fixture.value.ts',
+      'core/entities/src/index.ts',
+      'core/modules/src/__product-fixture__/index.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
   it('@acme-core/domain resolves', () => {
     expect('@acme-core/domain').toResolve();
   });
@@ -8,7 +24,7 @@ describe('core domain (@acme-core/domain)', () => {
   it('a domain layer may NOT reach a deep path into the core domain', async () => {
     await expect({
       file: 'apps/staff-app/src/features/product/domain/__fixture__.ts',
-      code: 'import { EmailValue } from "@acme-core/domain/email/email.value";',
+      code: 'import { EmailValue } from "@acme-core/domain/__fixture__/fixture.value";',
     }).toBreakRule('no-restricted-imports');
   });
 
@@ -54,7 +70,7 @@ describe('core domain (@acme-core/domain)', () => {
 
   it.each([
     'import { Product } from "@acme-core/entities";',
-    'import { ProductCoreModule } from "@acme-core/modules/product";',
+    'import { ProductCoreModule } from "@acme-core/modules/__product-fixture__";',
     'import { Injectable } from "@nestjs/common";',
   ])('the core domain may NOT take %s', async (code) => {
     await expect({

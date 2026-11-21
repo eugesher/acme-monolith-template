@@ -39,6 +39,13 @@ so a spec that scaffolds `libs/kernel/src/index.ts` leaves a real `libs/kernel` 
 Scaffolded apps and modules are named `__<topic>-fixture__` so they never collide with real code.
 Libs keep their real names: the lint rules capture the lib name, and the edges are per lib.
 
+**No fixture imports the code of an app or a core module.** An import that a case needs goes to a
+scaffolded `__<topic>-fixture__` app or module, by a relative path or by a wildcard alias of core
+(`@acme-core/contracts/__ledger-fixture__`); the roots of the core packages are scaffolded like the
+libs. An app or a module of the template can be removed or renamed and the specs stay green. One
+case reads a real app alias: `no-restricted-imports` matches the text `@acme-*/common/entities/**`,
+which only an alias of an app can produce.
+
 **A killed run leaves no scaffold behind.** A scaffold may write outside `__*-fixture__`, such as
 `libs/config/src/env/__fixture__.ts`, where `.gitignore` does not hide it. A scaffold records every
 path in the gitignored `.scaffold-manifest` before it writes it and strikes the path out in

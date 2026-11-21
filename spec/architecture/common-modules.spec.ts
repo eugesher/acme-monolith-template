@@ -472,7 +472,7 @@ describe('common modules (common/modules/<module>)', () => {
     ])('%s MAY import the port of any core module in its core adapters', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/infrastructure/core-adapters/__fixture__.ts`,
-        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/ledger";',
+        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
@@ -494,7 +494,7 @@ describe('common modules (common/modules/<module>)', () => {
     ])('%s MAY mount any core module', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/${feature}.module.ts`,
-        code: 'import { LedgerCoreModule } from "@acme-core/modules/ledger";',
+        code: 'import { LedgerCoreModule } from "@acme-core/modules/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
   });

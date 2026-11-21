@@ -1,6 +1,23 @@
 import '../support/lint';
+import { Scaffold } from '../support/scaffold';
 
 describe('core queues (@acme-core/queues)', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'core/queues/src/index.ts',
+      'core/queues/src/__fixture__/fixture-queue.module.ts',
+      'core/contracts/src/__ledger-fixture__/index.ts',
+      'core/entities/src/index.ts',
+      'core/modules/src/__ledger-fixture__/index.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
   it('@acme-core/queues resolves', () => {
     expect('@acme-core/queues').toResolve();
   });
@@ -8,7 +25,7 @@ describe('core queues (@acme-core/queues)', () => {
   it('a queue adapter module may NOT reach a deep path into the core queues', async () => {
     await expect({
       file: 'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
-      code: 'import { LedgerQueueModule } from "@acme-core/queues/ledger/ledger-queue.module";',
+      code: 'import { LedgerQueueModule } from "@acme-core/queues/__fixture__/fixture-queue.module";',
     }).toBreakRule('no-restricted-imports');
   });
 
@@ -43,7 +60,7 @@ describe('core queues (@acme-core/queues)', () => {
 
   it.each([
     'import { BullSetupModule } from "@acme-libs/queue";',
-    'import { LEDGER_RECORD_QUEUE } from "@acme-core/contracts/ledger";',
+    'import { LEDGER_RECORD_QUEUE } from "@acme-core/contracts/__ledger-fixture__";',
   ])('the core queues MAY take %s', async (code) => {
     await expect({
       file: 'core/queues/src/ledger/__fixture__.ts',
@@ -53,7 +70,7 @@ describe('core queues (@acme-core/queues)', () => {
 
   it.each([
     'import { LedgerEntry } from "@acme-core/entities";',
-    'import { LedgerCoreModule } from "@acme-core/modules/ledger";',
+    'import { LedgerCoreModule } from "@acme-core/modules/__ledger-fixture__";',
     'import { BullModule } from "@nestjs/bullmq";',
   ])('the core queues may NOT take %s', async (code) => {
     await expect({

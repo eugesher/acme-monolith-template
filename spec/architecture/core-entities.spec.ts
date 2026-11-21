@@ -1,6 +1,20 @@
 import '../support/lint';
+import { Scaffold } from '../support/scaffold';
 
 describe('core entities (@acme-core/entities)', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'core/entities/src/index.ts',
+      'core/entities/src/__fixture__/fixture.entity.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
   it('@acme-core/entities resolves', () => {
     expect('@acme-core/entities').toResolve();
   });
@@ -8,7 +22,7 @@ describe('core entities (@acme-core/entities)', () => {
   it('a repository may NOT reach a deep path into the entities', async () => {
     await expect({
       file: 'apps/staff-app/src/features/product/infrastructure/persistence/repositories/__fixture__.ts',
-      code: 'import { Product } from "@acme-core/entities/product/product.entity";',
+      code: 'import { Product } from "@acme-core/entities/__fixture__/fixture.entity";',
     }).toBreakRule('no-restricted-imports');
   });
 
