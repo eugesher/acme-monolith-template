@@ -125,43 +125,19 @@ describe('libs by layer', () => {
   });
 
   it.each([
-    ['staff-app', 'import { CurrentUser, RequiresPermission } from "@acme-libs/auth";'],
-    ['staff-app', 'import { PermissionCodeEnum } from "@acme-libs/kernel";'],
-    ['customer-app', 'import { CurrentUser, Public } from "@acme-libs/auth";'],
-    ['customer-app', 'import type { IAuthCurrentUserView } from "@acme-libs/contracts/auth";'],
-  ])('%s presentation MAY take %s', async (app, code) => {
+    'import { CurrentUser, Public, RequiresPermission } from "@acme-libs/auth";',
+    'import { PermissionCodeEnum } from "@acme-libs/kernel";',
+    'import type { IAuthCurrentUserView } from "@acme-libs/contracts/auth";',
+  ])('presentation MAY take %s', async (code) => {
     await expect({
-      file: `apps/${app}/src/features/auth/presentation/controllers/__fixture__.ts`,
+      file: 'apps/__layers-fixture__/src/features/auth/presentation/controllers/__fixture__.ts',
       code,
     }).toPassArchitectureLint();
   });
 
-  it.each([
-    'import { CurrentUser, RequiresPermission } from "@acme-libs/auth";',
-    'import { PermissionCodeEnum } from "@acme-libs/kernel";',
-    'import { IdempotencyStatusEnum } from "@acme-libs/kernel";',
-  ])(
-    'customer-app presentation may NOT take %s — a customer holds no roles or permissions',
-    async (code) => {
-      await expect({
-        file: 'apps/customer-app/src/features/auth/presentation/controllers/__fixture__.ts',
-        code,
-      }).toBreakRule('boundaries/dependencies');
-    },
-  );
-
-  it.each([
-    [
-      'apps/customer-app/src/app/global/auth/shell/__fixture__.ts',
-      'import { AuthJwtModule, AuthPermissionModule } from "@acme-libs/auth";',
-    ],
-  ])('%s may NOT wire the claim guards: %s', async (file, code) => {
-    await expect({ file, code }).toBreakRule('boundaries/dependencies');
-  });
-
-  it('the staff-app global auth module MAY wire the claim guards', async () => {
+  it('the global auth module MAY wire the claim guards', async () => {
     await expect({
-      file: 'apps/staff-app/src/app/global/auth/shell/__fixture__.ts',
+      file: 'apps/__layers-fixture__/src/app/global/auth/shell/__fixture__.ts',
       code: 'import { AuthJwtModule, AuthPermissionModule } from "@acme-libs/auth";\nimport { AUTH_USER_VALIDATOR_PORT } from "@acme-libs/contracts/auth";',
     }).toPassArchitectureLint();
   });

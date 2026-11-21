@@ -52,10 +52,11 @@ out and imports `AuthJwtModule` alone. There is no roles guard and no `@Roles`: 
 permissions only, and a role is a named set of them.
 
 **Two static modules, not a flag.** `AuthJwtModule.forRoot({ claims: true })` would hide the choice
-in an argument that no lint can read. An import of `AuthPermissionModule` is visible, and the lint
-policy `customer-claims.mjs` refuses it in customer-app, together with `@RequiresPermission` and
-`PermissionCodeEnum`. Without the permission module the decorators would be silently ignored, so a
-route of customer-app cannot even name them.
+in an argument that no lint can read. An import of `AuthPermissionModule` in the global auth module
+of an app is visible. Without the permission module `@RequiresPermission` is silently ignored, so
+`spec/auth-permission-module.spec.ts` fails an app that imports the decorator in `src/` while no
+file of its `src/` imports `AuthPermissionModule`. The spec walks every folder of `apps/` and, like
+the lint, names no app.
 
 ## Order
 

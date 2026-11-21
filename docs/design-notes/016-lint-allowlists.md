@@ -18,6 +18,11 @@ lives with the rule that covers the importer:
 **An edge used only by specs counts as used.** A lib module spec imports `@nestjs/core`, and a
 common-module spec imports the kernel; both are code the lint checks.
 
+**No rule names an app.** A category matches `apps/*` and captures the folder as `app`, a policy
+compares it with `own('app')`, and the import groups of `imports.mjs` match any `@acme-<app>` alias
+but the libs and the core. An app may take any name, and a new app gets the same rules without an
+edit of the lint.
+
 ## Why an edge without a use stays
 
 ### `policies/selectors.mjs` — the base libs
@@ -183,17 +188,17 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
 
 ### Policies that name exports
 
-A policy that refuses or allows a name of a lib or a package, such as `customer-claims.mjs` with
-`AuthJwtModule` and `CurrentUser` or `http-surface.mjs` with the DI names of `@nestjs/common`,
-matches the specifier of the import, not the file behind it. A renamed export would leave the policy
-guarding a name nobody imports, and its negative case would stay green as long as its fixture used
-the old name too. `spec/architecture/policy-specifiers.spec.ts` reads the resolved policies of the
-boundaries rule and checks with the TypeScript checker that every specifier named for a lib or a
-package is an export of it. The checker reads the declarations, so a type such as `ClassProvider`
-counts as an export, as it does for the import it guards.
+A policy that refuses or allows a name of a lib or a package, such as `http-surface.mjs` with the DI
+names of `@nestjs/common` or `queue.mjs` with the names of `@nestjs/bullmq`, matches the specifier
+of the import, not the file behind it. A renamed export would leave the policy guarding a name
+nobody imports, and its negative case would stay green as long as its fixture used the old name too.
+`spec/architecture/policy-specifiers.spec.ts` reads the resolved policies of the boundaries rule and
+checks with the TypeScript checker that every specifier named for a lib or a package is an export of
+it. The checker reads the declarations, so a type such as `ClassProvider` counts as an export, as it
+does for the import it guards.
 
-A policy that names exports is an allowlist of names: `customer-claims.mjs` lists what customer-app
-takes from `@acme-libs/auth` and `@acme-libs/kernel`, so a new name is a decision. A namespace,
+A policy that names exports is an allowlist of names: `http-surface.mjs` lists what core and common
+modules and processors take from `@nestjs/common`, so a new name is a decision. A namespace,
 default, side-effect, star or dynamic import has no specifier for a policy to read, so
 `lint/syntax/named-imports.selectors.mjs` refuses those forms for every module a policy lists by
 name.
