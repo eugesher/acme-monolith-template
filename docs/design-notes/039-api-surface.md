@@ -70,7 +70,8 @@ never absent, like every field of a response that may be missing.
 
 **A domain exception carries its code.** It answers a `code` of its module and may add `details`,
 which `DomainException` of `libs/domain` carries for every module. The exception filter of the
-module maps the code to a status (see `003-authentication.md`).
+module extends `DomainHttpExceptionFilter` of `libs/http` and declares the status of each code in
+its `STATUS`; the base answers the body (see `003-authentication.md`).
 
 **A shared mechanism answers one code in every module.** A refused `Idempotency-Key` is
 `IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENT_REQUEST_IN_FLIGHT`, a stale `If-Match` is `VERSION_MISMATCH`

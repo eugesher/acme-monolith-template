@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { CredentialsLibModule } from '@acme-libs/credentials';
-import { HttpExceptionFilter } from '@acme-libs/http';
 import { AuthAudienceEnum } from '@acme-libs/kernel';
 import { AuthCommonModule } from '@acme-staff/common/modules';
 
@@ -17,7 +16,6 @@ import { AuthController } from './presentation';
   imports: [CredentialsLibModule.register(AuthAudienceEnum.STAFF), AuthCommonModule],
   controllers: [AuthController],
   providers: [
-    HttpExceptionFilter,
     AuthLoginUseCase,
     AuthMeUseCase,
     AuthLoginRepository.provider,

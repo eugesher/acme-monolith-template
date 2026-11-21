@@ -510,7 +510,7 @@ describe('features', () => {
     it('the errors folder of the HTTP lib MAY be reached by a file path', async () => {
       await expect({
         file: 'libs/http/src/__fixture__.ts',
-        code: 'export * from "./errors/helpers/domain-http-exception.helper";',
+        code: 'export * from "./errors/decorators/api-error-responses.decorator";',
       }).toPassArchitectureLint();
     });
 

@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
-
 import {
   QueueDeleteFailedJobUseCase,
   QueueFailedJobService,
@@ -16,7 +14,6 @@ import { QueueController } from './presentation';
   imports: [QueueRegistryModule],
   controllers: [QueueController],
   providers: [
-    HttpExceptionFilter,
     QueueListUseCase,
     QueueListFailedJobsUseCase,
     QueueRetryFailedJobUseCase,

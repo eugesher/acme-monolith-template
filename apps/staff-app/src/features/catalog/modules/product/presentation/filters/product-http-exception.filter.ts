@@ -1,11 +1,11 @@
-import { Catch, HttpStatus, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
+import { Catch, HttpStatus } from '@nestjs/common';
 
-import { DomainHttpExceptionHelper, HttpExceptionFilter } from '@acme-libs/http';
+import { DomainHttpExceptionFilter } from '@acme-libs/http';
 
 import { ProductBaseException, ProductExceptionCodeEnum } from '../../domain';
 
 @Catch(ProductBaseException)
-export class ProductHttpExceptionFilter implements ExceptionFilter<ProductBaseException> {
+export class ProductHttpExceptionFilter extends DomainHttpExceptionFilter<ProductBaseException> {
   public static readonly STATUS: Record<ProductBaseException['code'], HttpStatus> = {
     [ProductExceptionCodeEnum.PRODUCT_SKU_INVALID]: HttpStatus.BAD_REQUEST,
     [ProductExceptionCodeEnum.PRODUCT_NAME_INVALID]: HttpStatus.BAD_REQUEST,
@@ -18,12 +18,5 @@ export class ProductHttpExceptionFilter implements ExceptionFilter<ProductBaseEx
     [ProductExceptionCodeEnum.PRODUCT_VERSION_INVALID]: HttpStatus.INTERNAL_SERVER_ERROR,
   };
 
-  constructor(private readonly httpExceptionFilter: HttpExceptionFilter) {}
-
-  public catch(exception: ProductBaseException, host: ArgumentsHost): void {
-    const statusCode = ProductHttpExceptionFilter.STATUS[exception.code];
-    const error = DomainHttpExceptionHelper.toHttpException(exception, statusCode);
-
-    this.httpExceptionFilter.catch(error, host);
-  }
+  protected override readonly status = ProductHttpExceptionFilter.STATUS;
 }

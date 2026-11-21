@@ -1,6 +1,7 @@
 import { HttpException, type ArgumentsHost } from '@nestjs/common';
 
-import type { HttpExceptionFilter } from '@acme-libs/http';
+import { HttpExceptionFilter } from '@acme-libs/http';
+import { makePinoLoggerMock } from '@acme-libs/testing';
 
 import {
   OrderEmptyException,
@@ -13,12 +14,20 @@ import {
 import { OrderHttpExceptionFilter } from '../order-http-exception.filter';
 
 describe('OrderHttpExceptionFilter', () => {
-  let httpExceptionFilter: { catch: jest.Mock<void, [HttpException, ArgumentsHost]> };
+  let baseCatch: jest.SpyInstance<void, [HttpException, ArgumentsHost]>;
   let filter: OrderHttpExceptionFilter;
 
   beforeEach(() => {
-    httpExceptionFilter = { catch: jest.fn() as jest.Mock<void, [HttpException, ArgumentsHost]> };
-    filter = new OrderHttpExceptionFilter(httpExceptionFilter as unknown as HttpExceptionFilter);
+    baseCatch = jest
+      .spyOn(HttpExceptionFilter.prototype, 'catch')
+      .mockImplementation(() => undefined) as unknown as jest.SpyInstance<
+      void,
+      [HttpException, ArgumentsHost]
+    >;
+    filter = new OrderHttpExceptionFilter(
+      {} as ConstructorParameters<typeof OrderHttpExceptionFilter>[0],
+      makePinoLoggerMock(),
+    );
   });
 
   it('hands the HttpException over together with the same host', () => {
@@ -26,8 +35,8 @@ describe('OrderHttpExceptionFilter', () => {
 
     filter.catch(new OrderNotFoundException('600'), host);
 
-    expect(httpExceptionFilter.catch).toHaveBeenCalledTimes(1);
-    expect(httpExceptionFilter.catch).toHaveBeenCalledWith(expect.any(HttpException), host);
+    expect(baseCatch).toHaveBeenCalledTimes(1);
+    expect(baseCatch).toHaveBeenCalledWith(expect.any(HttpException), host);
   });
 
   it.each([
@@ -54,7 +63,7 @@ describe('OrderHttpExceptionFilter', () => {
     (code, status, exception) => {
       filter.catch(exception, {} as ArgumentsHost);
 
-      const [error] = httpExceptionFilter.catch.mock.calls[0];
+      const [error] = baseCatch.mock.calls[0];
 
       expect(error.getStatus()).toBe(status);
       expect(error.getResponse()).toMatchObject({
@@ -71,7 +80,7 @@ describe('OrderHttpExceptionFilter', () => {
       {} as ArgumentsHost,
     );
 
-    const [error] = httpExceptionFilter.catch.mock.calls[0];
+    const [error] = baseCatch.mock.calls[0];
 
     expect(error.getResponse()).toEqual({
       statusCode: 409,

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 import { ProductCoreModule } from '@acme-core/modules/product';
 import { TagCommonModule } from '@acme-staff/common/modules';
@@ -36,7 +35,6 @@ import { ProductController } from './presentation';
   imports: [LedgerCoreModule, TagCommonModule, ProductCoreModule],
   controllers: [ProductController],
   providers: [
-    HttpExceptionFilter,
     ProductCreateUseCase,
     ProductGetManyUseCase,
     ProductGetOneUseCase,

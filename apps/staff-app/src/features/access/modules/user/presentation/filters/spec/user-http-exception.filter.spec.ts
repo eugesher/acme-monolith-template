@@ -1,6 +1,7 @@
 import { HttpException, type ArgumentsHost } from '@nestjs/common';
 
-import type { HttpExceptionFilter } from '@acme-libs/http';
+import { HttpExceptionFilter } from '@acme-libs/http';
+import { makePinoLoggerMock } from '@acme-libs/testing';
 
 import {
   UserEmailInvalidException,
@@ -12,12 +13,20 @@ import {
 import { UserHttpExceptionFilter } from '../user-http-exception.filter';
 
 describe('UserHttpExceptionFilter', () => {
-  let httpExceptionFilter: { catch: jest.Mock<void, [HttpException, ArgumentsHost]> };
+  let baseCatch: jest.SpyInstance<void, [HttpException, ArgumentsHost]>;
   let filter: UserHttpExceptionFilter;
 
   beforeEach(() => {
-    httpExceptionFilter = { catch: jest.fn() as jest.Mock<void, [HttpException, ArgumentsHost]> };
-    filter = new UserHttpExceptionFilter(httpExceptionFilter as unknown as HttpExceptionFilter);
+    baseCatch = jest
+      .spyOn(HttpExceptionFilter.prototype, 'catch')
+      .mockImplementation(() => undefined) as unknown as jest.SpyInstance<
+      void,
+      [HttpException, ArgumentsHost]
+    >;
+    filter = new UserHttpExceptionFilter(
+      {} as ConstructorParameters<typeof UserHttpExceptionFilter>[0],
+      makePinoLoggerMock(),
+    );
   });
 
   it('hands the HttpException over together with the same host', () => {
@@ -25,8 +34,8 @@ describe('UserHttpExceptionFilter', () => {
 
     filter.catch(new UserRoleNotFoundException('1'), host);
 
-    expect(httpExceptionFilter.catch).toHaveBeenCalledTimes(1);
-    expect(httpExceptionFilter.catch).toHaveBeenCalledWith(expect.any(HttpException), host);
+    expect(baseCatch).toHaveBeenCalledTimes(1);
+    expect(baseCatch).toHaveBeenCalledWith(expect.any(HttpException), host);
   });
 
   it.each([
@@ -40,7 +49,7 @@ describe('UserHttpExceptionFilter', () => {
     (code, status, exception) => {
       filter.catch(exception, {} as ArgumentsHost);
 
-      const [error] = httpExceptionFilter.catch.mock.calls[0];
+      const [error] = baseCatch.mock.calls[0];
 
       expect(error.getStatus()).toBe(status);
       expect(error.getResponse()).toEqual({ statusCode: status, message: 'domain message', code });

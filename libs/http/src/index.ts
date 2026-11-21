@@ -3,8 +3,8 @@ export * from './concurrency/decorators/if-match.decorator';
 
 export * from './errors/decorators/api-error-responses.decorator';
 export * from './errors/error.response.dto';
-export * from './errors/helpers/domain-http-exception.helper';
 
+export * from './filters/domain-http-exception.filter';
 export * from './filters/http-exception.filter';
 
 export * from './idempotency/decorators/api-idempotency-key-header.decorator';
