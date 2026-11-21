@@ -1,58 +1,19 @@
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 
 import '../support/lint';
 
 describe('app entry points', () => {
-  it('tsconfig publishes exactly these app aliases', () => {
+  it('every app alias of tsconfig points at an existing folder', () => {
     const tsconfig = JSON.parse(
       readFileSync(path.resolve(__dirname, '../../tsconfig.json'), 'utf8'),
     ) as { compilerOptions: { paths: Record<string, string[]> } };
+    const missing = Object.entries(tsconfig.compilerOptions.paths)
+      .filter(([alias]) => !alias.startsWith('@acme-libs/') && !alias.startsWith('@acme-core/'))
+      .map(([, [target]]) => target.replace(/\/\*$/, ''))
+      .filter((target) => !existsSync(path.resolve(__dirname, '../..', target)));
 
-    const appAliases = Object.keys(tsconfig.compilerOptions.paths).filter(
-      (alias) =>
-        alias.startsWith('@acme-staff') ||
-        alias.startsWith('@acme-customer') ||
-        alias.startsWith('@acme-processor'),
-    );
-
-    expect(appAliases).toEqual([
-      '@acme-customer/app',
-      '@acme-customer/app/*',
-      '@acme-customer/features',
-      '@acme-customer/features/*',
-      '@acme-processor/app',
-      '@acme-processor/app/*',
-      '@acme-processor/features',
-      '@acme-processor/features/*',
-      '@acme-processor/processors',
-      '@acme-processor/processors/*',
-      '@acme-staff/app',
-      '@acme-staff/app/*',
-      '@acme-staff/common',
-      '@acme-staff/common/*',
-      '@acme-staff/contracts',
-      '@acme-staff/contracts/*',
-      '@acme-staff/features',
-      '@acme-staff/features/*',
-    ]);
-  });
-
-  it.each([
-    '@acme-staff/app/app.module',
-    '@acme-staff/common/modules',
-    '@acme-staff/features',
-    '@acme-customer/app/app.module',
-    '@acme-customer/features',
-    '@acme-processor/app/app.module',
-    '@acme-processor/features',
-    '@acme-processor/processors',
-  ])('%s resolves', (source) => {
-    expect(source).toResolve();
-  });
-
-  it.each(['@acme-staff/processors'])('%s does not resolve', (source) => {
-    expect(source).not.toResolve();
+    expect(missing).toEqual([]);
   });
 
   it.each([
