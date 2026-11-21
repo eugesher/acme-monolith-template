@@ -89,9 +89,7 @@ the queue by the literal `'idempotency-purge'`, the name BullMQ sees. processor-
 `IdempotencyModule` through `@acme-processor/processors`.
 
 **The start of the app is an entry.** `IdempotencyPurgeProcessor` implements
-`OnApplicationBootstrap`, so lint lets the presentation of a processor take that name from
-`@nestjs/common` next to the DI names (see `016-lint-allowlists.md`). No layer imports
-`@nestjs/schedule`.
+`OnApplicationBootstrap`. No layer imports `@nestjs/schedule`.
 
 The e2e suite adds a job to the queue itself and reads the rows, and it checks that the start left
 exactly one scheduler with the pattern (see `014-e2e-suites.md`).

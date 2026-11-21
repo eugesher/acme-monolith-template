@@ -34,10 +34,10 @@ the lib contract below, but the `auth` feature owns the plain names: `AuthModule
 `AuthIdentityCommonAdapter` for the common adapter of its own. The prefix keeps the two apart in
 imports, in stack traces and in DI errors.
 
-**A global module pairs with the lib contract of its own name.** `app/global/auth` may import
-`libs/contracts/src/auth`, and only that contract. The lint expresses it as one selector,
-`{ lib: '{{ from.file.captured.module }}' }`, so a future `app/global/<name>` gets the same rule
-without a new policy.
+**A global module implements a lib contract.** `app/global/auth` binds `AUTH_USER_VALIDATOR_PORT` of
+`libs/contracts/src/auth` in its module root and implements it in its facade. The shell and the
+common-adapters of a global module may import the contract of any lib, whatever the name of the
+module, so a future `app/global/<name>` implements the port it needs without a new policy.
 
 ## Two lib modules
 

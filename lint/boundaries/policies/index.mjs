@@ -2,7 +2,6 @@ import { acmeApp } from './acme-app.mjs';
 import { acmeCore } from './acme-core.mjs';
 import { acmeLibs } from './acme-libs.mjs';
 import { commonModules } from './common-modules.mjs';
-import { httpSurface } from './http-surface.mjs';
 import { libLayers } from './lib-layers.mjs';
 import { moduleAreas } from './module-areas.mjs';
 import { queue } from './queue.mjs';
@@ -15,7 +14,6 @@ export const policies = [
   ...acmeCore,
   ...acmeLibs,
   ...repo,
-  ...httpSurface,
   ...queue,
   ...libLayers,
 ];

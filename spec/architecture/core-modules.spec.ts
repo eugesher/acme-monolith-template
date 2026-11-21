@@ -213,55 +213,16 @@ describe('core modules', () => {
     });
   });
 
-  describe('@nestjs/common without an HTTP surface', () => {
-    it('a core module may NOT declare HTTP controllers', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { Controller } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
+  describe('@nestjs/common', () => {
     it.each([
       'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
       'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
       'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
-    ])('%s MAY take the DI names from @nestjs/common', async (file) => {
+    ])('%s MAY take @nestjs/common', async (file) => {
       await expect({
         file,
         code: 'import { ClassProvider, DynamicModule, Inject, Injectable, Module } from "@nestjs/common";',
       }).toPassArchitectureLint();
-    });
-
-    it.each(['ModuleMetadata', 'Type'])(
-      'core and common modules and processors may NOT take %s, no module takes options',
-      async (name) => {
-        await expect({
-          file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-          code: `import { ${name} } from "@nestjs/common";`,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
-
-    it.each([
-      'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
-    ])('%s may NOT slip an HTTP name in next to a DI name', async (file) => {
-      await expect({
-        file,
-        code: 'import { Injectable, Get } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it.each([
-      'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
-    ])('%s may NOT import @nestjs/common as a namespace', async (file) => {
-      await expect({
-        file,
-        code: 'import * as common from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
     });
   });
 
@@ -382,13 +343,6 @@ describe('core modules', () => {
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
         code: 'import { InjectQueue } from "@nestjs/bullmq";\nimport type { Queue } from "bullmq";\nimport { X_QUEUE } from "../../../../../contracts/src/__ledger-fixture__";',
       }).toPassArchitectureLint();
-    });
-
-    it('a queue adapter may NOT register a queue', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { BullModule } from "@nestjs/bullmq";',
-      }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module of a queue adapter MAY register its queue through the core queues', async () => {

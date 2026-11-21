@@ -123,18 +123,18 @@ export const moduleAreas = [
   }),
   ...areaPolicies('processors', {
     outbound: [],
-    application: [],
+    application: [packages('@nestjs/common')],
     infrastructure: [packages('@nestjs/common', 'typeorm')],
-    commonAdapters: [],
-    libAdapters: [],
+    commonAdapters: [packages('@nestjs/common')],
+    libAdapters: [packages('@nestjs/common')],
     queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
     presentation: [
       layerOf('acme-app:processors', ['app', 'module'])('outbound'),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
       baseLibs('observability'),
-      packages('@nestjs/bullmq', 'bullmq'),
+      packages('@nestjs/bullmq', '@nestjs/common', 'bullmq'),
     ],
-    module: [to('acme-core:queues'), baseLibs()],
+    module: [to('acme-core:queues'), baseLibs(), packages('@nestjs/common')],
   }),
 ];

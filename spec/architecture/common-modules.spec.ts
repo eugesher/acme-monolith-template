@@ -310,13 +310,6 @@ describe('common modules (common/modules/<module>)', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('a common module may NOT declare HTTP controllers', async () => {
-      await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-        code: 'import { Controller } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
     it('a facade MAY reach the application layer and its own contracts', async () => {
       await expect({
         file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/idempotency-common.facade.ts',

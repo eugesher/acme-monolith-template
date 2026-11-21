@@ -12,8 +12,6 @@ import {
   to,
 } from './selectors.mjs';
 
-const namesakeLibContracts = to('acme-libs:contracts', { lib: '{{ from.file.captured.module }}' });
-
 const appIndexes = [
   to('acme-app:app:global:index', own('app')),
   to('acme-app:features:index', own('app')),
@@ -78,7 +76,7 @@ export const acmeApp = [
     to('acme-app:common:modules:index', own('app')),
     to('acme-core:modules:index'),
     baseLibs('auth'),
-    namesakeLibContracts,
+    to('acme-libs:contracts'),
     packages('@nestjs/common'),
   ]),
   from('acme-app:app:global:infrastructure', [
@@ -106,7 +104,7 @@ export const acmeApp = [
     to('acme-app:app:global:outbound', own('app', 'module')),
     to('acme-app:contracts', own('app')),
     baseLibs(),
-    namesakeLibContracts,
+    to('acme-libs:contracts'),
     packages('@nestjs/common'),
   ]),
   from('acme-app:contracts', [appContracts, baseLibs()]),

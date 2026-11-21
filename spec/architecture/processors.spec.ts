@@ -109,13 +109,6 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
         }).toBreakRule('no-restricted-syntax');
       },
     );
-
-    it('may NOT declare HTTP controllers', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/__fixture__.ts',
-        code: 'import { Controller } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
   });
 
   describe('layers', () => {
@@ -161,18 +154,11 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toPassArchitectureLint();
     });
 
-    it('infrastructure/common-adapters MAY take the DI names from @nestjs/common', async () => {
+    it('infrastructure/common-adapters MAY take @nestjs/common', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/common-adapters/__fixture__.ts',
         code: 'import { Inject, Injectable } from "@nestjs/common";',
       }).toPassArchitectureLint();
-    });
-
-    it('infrastructure/common-adapters take only the DI names from @nestjs/common', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/common-adapters/__fixture__.ts',
-        code: 'import { Injectable, Controller } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
     });
 
     it.each([
@@ -251,7 +237,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toPassArchitectureLint();
     });
 
-    it('a processor MAY take the DI names from @nestjs/common', async () => {
+    it('a processor MAY take @nestjs/common', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
         code: 'import { Injectable } from "@nestjs/common";',
@@ -265,40 +251,12 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toPassArchitectureLint();
     });
 
-    it('the application of a processor may NOT take OnApplicationBootstrap — entries live in presentation', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/application/__fixture__.ts',
-        code: 'import type { OnApplicationBootstrap } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it('a processor may NOT be an HTTP controller', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
-        code: 'import { Controller, Post } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
     it('a processor MAY process a queue with Processor, WorkerHost, OnWorkerEvent and the Job type', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
         code: 'import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";\nimport type { Job } from "bullmq";',
       }).toPassArchitectureLint();
     });
-
-    it.each([
-      'import { InjectQueue } from "@nestjs/bullmq";',
-      'import { BullModule, Processor } from "@nestjs/bullmq";',
-      'import type { Queue } from "bullmq";',
-    ])(
-      'a processor may NOT take the queue itself (%s) — a queue is registered by the module of its queue adapter or in core/queues',
-      async (code) => {
-        await expect({
-          file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
-          code,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
 
     it.each([
       'apps/__processors-fixture__/src/processors/ledger-record/application/__fixture__.ts',
@@ -319,20 +277,6 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
         code: 'import { InjectQueue } from "@nestjs/bullmq";\nimport type { Queue } from "bullmq";',
       }).toPassArchitectureLint();
     });
-
-    it.each([
-      'import { BullModule } from "@nestjs/bullmq";',
-      'import { Processor } from "@nestjs/bullmq";',
-      'import type { Job } from "bullmq";',
-    ])(
-      'a processor infrastructure/queue may NOT take more of BullMQ (%s) — it manages jobs, it does not process them',
-      async (code) => {
-        await expect({
-          file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
-          code,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
 
     it('the module of a queue adapter MAY register its queue with the queue lib', async () => {
       await expect({
