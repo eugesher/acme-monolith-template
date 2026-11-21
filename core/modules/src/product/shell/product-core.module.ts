@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Module, type ClassProvider } from '@nestjs/common';
 
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
-import { PRODUCT_CORE_PORT } from '@acme-core/contracts/product';
+import { PRODUCT_CORE_PORT, type IProductCorePort } from '@acme-core/contracts/product';
 
 import { ProductCoreArchiveUseCase } from '../application';
 import {
@@ -16,7 +16,10 @@ import { ProductCoreFacade } from './product-core.facade';
   imports: [LedgerCoreModule],
   exports: [PRODUCT_CORE_PORT],
   providers: [
-    { provide: PRODUCT_CORE_PORT, useClass: ProductCoreFacade },
+    {
+      provide: PRODUCT_CORE_PORT,
+      useClass: ProductCoreFacade,
+    } satisfies ClassProvider<IProductCorePort>,
     ProductCoreArchiveUseCase,
     ProductCoreArchiveRepository.provider,
     ProductCoreCatalogCacheAdapter.provider,

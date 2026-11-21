@@ -1,6 +1,6 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, type ClassProvider } from '@nestjs/common';
 
-import { CACHE_LIB_PORT } from '@acme-libs/contracts/cache';
+import { CACHE_LIB_PORT, type ICacheLibPort } from '@acme-libs/contracts/cache';
 
 import {
   CacheLibDelByPrefixUseCase,
@@ -18,7 +18,7 @@ import { CacheLibFacade } from './cache-lib.facade';
 @Module({
   exports: [CACHE_LIB_PORT],
   providers: [
-    { provide: CACHE_LIB_PORT, useClass: CacheLibFacade },
+    { provide: CACHE_LIB_PORT, useClass: CacheLibFacade } satisfies ClassProvider<ICacheLibPort>,
     CacheLibGetUseCase,
     CacheLibDelByPrefixUseCase,
     CacheLibWrapUseCase,

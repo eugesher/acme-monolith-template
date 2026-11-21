@@ -54,7 +54,10 @@ lands on the object that `useClass` holds.
 - **Facades** in `shell/` stay `{ provide: <MODULE>_<LAYER>_PORT, useClass: <Facade> }`. A facade is
   the public entry of a module, not an implementation of one of its outbound ports, and the module
   exports the port it binds: the literal next to `exports` shows at a glance which class answers the
-  exported port. The binding is typed by the facade alone, which `implements` the port.
+  exported port. `implements` checks that the facade answers its port, not that the token is the
+  token of that port, so the literal is
+  `{ provide, useClass } satisfies ClassProvider<I<Module><Layer>Port>`: a facade bound under the
+  token of another port does not compile, as `ClassProvider<IPort>` makes `.provider` checked.
 - **The facades of `libs/database` and `libs/local-storage`** (`OrmFacade`,
   `LocalStorageTransactionalFacade`) are bound under the contract tokens `ORM_PORT` and
   `TRANSACTION_PORT` by `OrmModule` and `LocalStorageTransactionalModule` of their libs, next to the

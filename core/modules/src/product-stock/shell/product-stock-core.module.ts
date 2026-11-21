@@ -1,6 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, type ClassProvider } from '@nestjs/common';
 
-import { PRODUCT_STOCK_CORE_PORT } from '@acme-core/contracts/product-stock';
+import {
+  PRODUCT_STOCK_CORE_PORT,
+  type IProductStockCorePort,
+} from '@acme-core/contracts/product-stock';
 
 import { ProductStockCoreLockUseCase, ProductStockCoreMoveUseCase } from '../application';
 import {
@@ -17,7 +20,10 @@ import { ProductStockCoreFacade } from './product-stock-core.facade';
   imports: [ProductStockCorePostSubtractQueueModule],
   exports: [PRODUCT_STOCK_CORE_PORT],
   providers: [
-    { provide: PRODUCT_STOCK_CORE_PORT, useClass: ProductStockCoreFacade },
+    {
+      provide: PRODUCT_STOCK_CORE_PORT,
+      useClass: ProductStockCoreFacade,
+    } satisfies ClassProvider<IProductStockCorePort>,
     ProductStockCoreLockUseCase,
     ProductStockCoreMoveUseCase,
     ProductStockCoreLockRepository.provider,
