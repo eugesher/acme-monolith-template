@@ -1,7 +1,6 @@
 export * from './codes/order-exception-code.enum';
 
 export * from './exceptions/base/order-base.exception';
-
 export * from './exceptions/order-empty.exception';
 export * from './exceptions/order-idempotency-key-reused.exception';
 export * from './exceptions/order-idempotent-request-in-flight.exception';
