@@ -1,4 +1,4 @@
-# nestjs-monolith-template
+# Acme Monolith Template
 
 Three NestJS apps over one MySQL and one Redis: `staff-app` (port 3001), `customer-app` (port 3000)
 and `processor-app` (port 3002).

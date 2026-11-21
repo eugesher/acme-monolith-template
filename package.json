@@ -1,5 +1,5 @@
 {
-  "name": "nestjs-monolith-template",
+  "name": "acme-monolith-template",
   "private": true,
   "license": "MIT",
   "engines": {
