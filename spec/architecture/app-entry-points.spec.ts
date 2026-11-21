@@ -278,7 +278,7 @@ describe('app entry points', () => {
 
   it.each([
     'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry-queue.adapter.ts',
-    'apps/processor-app/src/common/shared/product-stock-post-subtract/queues/product-stock-post-subtract-queue.module.ts',
+    'apps/staff-app/src/common/shared/product-stock-post-subtract/queues/product-stock-post-subtract-queue.module.ts',
   ])('%s MAY import the queue contract of the core product stock', async (file) => {
     await expect({
       file,
