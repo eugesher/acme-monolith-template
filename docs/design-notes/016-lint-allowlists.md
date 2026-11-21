@@ -23,6 +23,12 @@ compares it with `own('app')`, and the import groups of `imports.mjs` match any 
 but the libs and the core. An app may take any name, and a new app gets the same rules without an
 edit of the lint.
 
+**Every file of `apps`, `core` and `libs` has a category.** `boundaries/no-unknown-files` runs on
+those three folders only, so a folder outside the layout of an app, such as `apps/<app>/src/utils/`,
+fails lint, while a new top-level folder of the repository, such as `tools/`, does not. The code of
+the three folders still may not import a file outside every category
+(`boundaries/no-unknown-dependencies`).
+
 ## Why an edge without a use stays
 
 ### `policies/selectors.mjs` — the base libs

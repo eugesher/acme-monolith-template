@@ -294,11 +294,21 @@ describe('repo', () => {
   });
 
   describe('unknown files', () => {
-    it('a file matching NO pattern fails lint', async () => {
+    it.each([
+      'apps/__repo-fixture__/src/__fixture__.ts',
+      'core/__repo-fixture__/src/__fixture__.ts',
+      'libs/__repo-fixture__/__fixture__.ts',
+    ])('%s matches NO pattern and fails lint', async (file) => {
+      await expect({ file, code: 'export const orphan = 1;' }).toBreakRule(
+        'boundaries/no-unknown-files',
+      );
+    });
+
+    it('a file of a new top-level folder MAY match no pattern — only apps, core and libs need one', async () => {
       await expect({
-        file: 'apps/__repo-fixture__/src/__fixture__.ts',
-        code: 'export const orphan = 1;',
-      }).toBreakRule('boundaries/no-unknown-files');
+        file: 'tools/__fixture__.ts',
+        code: 'export const tool = 1;',
+      }).toPassArchitectureLint();
     });
 
     it('an import of a file outside every pattern fails lint', async () => {
