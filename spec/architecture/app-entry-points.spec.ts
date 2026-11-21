@@ -72,7 +72,7 @@ describe('app entry points', () => {
     ['apps/staff-app/src/features/product/__fixture__.ts', '@acme-staff/common/modules/tag'],
     [
       'apps/processor-app/src/processors/ledger/__fixture__.ts',
-      '@acme-processor/common/shared/product-stock-post-subtract',
+      '@acme-processor/common/shared/idempotency',
     ],
     [
       'apps/processor-app/src/processors/ledger/__fixture__.ts',
