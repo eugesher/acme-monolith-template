@@ -74,6 +74,13 @@ case names the step that failed in `cache.error`: `read` or `write` of `cache.wr
 because `startActiveSpan` makes it the active one while the work runs. The tracer must start before
 ioredis is loaded, so `main.ts` imports `@acme-libs/observability/tracer` first.
 
+**The query cache of TypeORM is off.** A read is cached through the port of its module, so the
+options of the data source in `libs/database/src/orm/shell/orm.module.ts` set no `cache`. TypeORM
+loads ioredis for `cache: { type: 'ioredis' }` as an optional peer of `^5.0.4`, and the template
+installs ioredis 6 for `libs/cache`, the throttler storage and BullMQ. `.yarnrc.yml` discards the
+warning of Yarn about that range (`YN0060`), so nothing says it when the cache is turned on: check
+the peer range of TypeORM first.
+
 ## Invalidation after the write
 
 Every writer drops the entry once its write has returned. The catalog is written in staff-app, so
