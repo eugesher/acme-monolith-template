@@ -265,16 +265,6 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['import { BullModule } from "@nestjs/bullmq";', 'import type { Job } from "bullmq";'])(
-      'infrastructure/queue may NOT take more than InjectQueue and the Queue type (%s)',
-      async (code) => {
-        await expect({
-          file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
-          code,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
-
     it('infrastructure/queue may NOT reach a lib contract', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',

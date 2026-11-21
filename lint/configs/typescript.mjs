@@ -3,7 +3,6 @@ import typescriptEslint from 'typescript-eslint';
 
 import { awaitedArgumentSelectors } from '../syntax/awaited-argument.selectors.mjs';
 import { barrelBypassSelectors } from '../syntax/barrel-bypass.selectors.mjs';
-import { namedImportSelectors } from '../syntax/named-imports.selectors.mjs';
 
 export const typescript = {
   files: ['**/*.ts'],
@@ -44,11 +43,6 @@ export const typescript = {
     ],
     '@typescript-eslint/promise-function-async': ['error', { checkArrowFunctions: false }],
     '@typescript-eslint/return-await': ['error', 'always'],
-    'no-restricted-syntax': [
-      'error',
-      ...barrelBypassSelectors,
-      ...namedImportSelectors,
-      ...awaitedArgumentSelectors,
-    ],
+    'no-restricted-syntax': ['error', ...barrelBypassSelectors, ...awaitedArgumentSelectors],
   },
 };

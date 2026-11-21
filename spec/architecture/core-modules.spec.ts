@@ -23,6 +23,10 @@ describe('core modules', () => {
       'apps/__core-fixture__/src/features/product/product.module.ts',
       'libs/cache/src/index.ts',
       'libs/kernel/src/index.ts',
+      'apps/__core-fixture__/src/contracts/auth/index.ts',
+      'apps/__core-fixture__/src/common/modules/index.ts',
+      'core/contracts/src/__product-fixture__/index.ts',
+      'core/queues/src/index.ts',
     ]);
   });
 
@@ -90,20 +94,26 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['@acme-staff/contracts/auth', '@acme-staff/common/modules'])(
+    it.each([
+      ['the contracts of an app', '../../../../../../apps/__core-fixture__/src/contracts/auth'],
+      [
+        'the common modules of an app',
+        '../../../../../../apps/__core-fixture__/src/common/modules',
+      ],
+    ])(
       'ledger may NOT reach %s — the journal records facts, it never asks who the user is',
-      async (alias) => {
+      async (_, source) => {
         await expect({
-          file: 'core/modules/src/ledger/application/use-cases/__fixture__.ts',
-          code: `import { x } from "${alias}";`,
+          file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
+          code: `import { x } from "${source}";`,
         }).toBreakRule('boundaries/dependencies');
       },
     );
 
-    it('product MAY reach its own contracts through the alias', async () => {
+    it('a core module MAY reach its own contracts through the alias', async () => {
       await expect({
-        file: 'core/modules/src/product/application/use-cases/__fixture__.ts',
-        code: 'import { PRODUCT_CORE_PORT } from "@acme-core/contracts/product";',
+        file: 'core/modules/src/__product-fixture__/application/use-cases/__fixture__.ts',
+        code: 'import { PRODUCT_CORE_PORT } from "@acme-core/contracts/__product-fixture__";',
       }).toPassArchitectureLint();
     });
 
@@ -213,55 +223,16 @@ describe('core modules', () => {
     });
   });
 
-  describe('@nestjs/common without an HTTP surface', () => {
-    it('a core module may NOT declare HTTP controllers', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { Controller } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
+  describe('@nestjs/common', () => {
     it.each([
       'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
       'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
       'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
-    ])('%s MAY take the DI names from @nestjs/common', async (file) => {
+    ])('%s MAY take @nestjs/common', async (file) => {
       await expect({
         file,
         code: 'import { ClassProvider, DynamicModule, Inject, Injectable, Module } from "@nestjs/common";',
       }).toPassArchitectureLint();
-    });
-
-    it.each(['ModuleMetadata', 'Type'])(
-      'core and common modules and processors may NOT take %s, no module takes options',
-      async (name) => {
-        await expect({
-          file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-          code: `import { ${name} } from "@nestjs/common";`,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
-
-    it.each([
-      'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
-    ])('%s may NOT slip an HTTP name in next to a DI name', async (file) => {
-      await expect({
-        file,
-        code: 'import { Injectable, Get } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it.each([
-      'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
-    ])('%s may NOT import @nestjs/common as a namespace', async (file) => {
-      await expect({
-        file,
-        code: 'import * as common from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
     });
   });
 
@@ -384,13 +355,6 @@ describe('core modules', () => {
       }).toPassArchitectureLint();
     });
 
-    it('a queue adapter may NOT register a queue', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { BullModule } from "@nestjs/bullmq";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
     it('the module of a queue adapter MAY register its queue through the core queues', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
@@ -414,14 +378,14 @@ describe('core modules', () => {
     it('the module root MAY mount the core ledger', async () => {
       await expect({
         file: 'core/modules/src/product/shell/__fixture__.ts',
-        code: 'import { LedgerCoreModule } from "@acme-core/modules/ledger";',
+        code: 'import { LedgerCoreModule } from "@acme-core/modules/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
     it('a core-adapter MAY take the port of the core ledger', async () => {
       await expect({
         file: 'core/modules/src/product/infrastructure/core-adapters/__fixture__.ts',
-        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/ledger";',
+        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 

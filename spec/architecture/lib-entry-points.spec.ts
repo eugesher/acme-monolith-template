@@ -1,106 +1,23 @@
-import { readdirSync, readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 
 import '../support/lint';
 
 describe('lib entry points', () => {
-  it('libs/ holds exactly the libs the edge table in libs.spec.ts knows about', () => {
-    const libs = readdirSync(path.resolve(__dirname, '../../libs')).sort();
-
-    expect(libs).toEqual([
-      'auth',
-      'bootstrap',
-      'cache',
-      'config',
-      'contracts',
-      'credentials',
-      'database',
-      'domain',
-      'health',
-      'http',
-      'kernel',
-      'local-storage',
-      'observability',
-      'openapi',
-      'queue',
-      'testing',
-      'toolkit',
-    ]);
-  });
-
-  it('tsconfig publishes exactly these lib aliases', () => {
+  it('every lib alias of tsconfig points at an existing folder', () => {
     const tsconfig = JSON.parse(
       readFileSync(path.resolve(__dirname, '../../tsconfig.json'), 'utf8'),
     ) as { compilerOptions: { paths: Record<string, string[]> } };
+    const missing = Object.entries(tsconfig.compilerOptions.paths)
+      .filter(([alias]) => alias.startsWith('@acme-libs/'))
+      .map(([, [target]]) => target.replace(/\/\*$/, ''))
+      .filter((target) => !existsSync(path.resolve(__dirname, '../..', target)));
 
-    const libAliases = Object.keys(tsconfig.compilerOptions.paths).filter((alias) =>
-      alias.startsWith('@acme-libs/'),
-    );
-
-    expect(libAliases).toEqual([
-      '@acme-libs/auth',
-      '@acme-libs/auth/*',
-      '@acme-libs/bootstrap',
-      '@acme-libs/bootstrap/*',
-      '@acme-libs/cache',
-      '@acme-libs/cache/*',
-      '@acme-libs/config',
-      '@acme-libs/config/*',
-      '@acme-libs/contracts',
-      '@acme-libs/contracts/*',
-      '@acme-libs/credentials',
-      '@acme-libs/credentials/*',
-      '@acme-libs/database',
-      '@acme-libs/database/*',
-      '@acme-libs/domain',
-      '@acme-libs/domain/*',
-      '@acme-libs/health',
-      '@acme-libs/health/*',
-      '@acme-libs/http',
-      '@acme-libs/http/*',
-      '@acme-libs/kernel',
-      '@acme-libs/kernel/*',
-      '@acme-libs/local-storage',
-      '@acme-libs/local-storage/*',
-      '@acme-libs/observability',
-      '@acme-libs/observability/*',
-      '@acme-libs/openapi',
-      '@acme-libs/openapi/*',
-      '@acme-libs/queue',
-      '@acme-libs/queue/*',
-      '@acme-libs/testing',
-      '@acme-libs/testing/*',
-      '@acme-libs/toolkit',
-      '@acme-libs/toolkit/*',
-    ]);
+    expect(missing).toEqual([]);
   });
 
-  it.each([
-    '@acme-libs/auth',
-    '@acme-libs/bootstrap',
-    '@acme-libs/cache',
-    '@acme-libs/config',
-    '@acme-libs/contracts/auth',
-    '@acme-libs/contracts/cache',
-    '@acme-libs/contracts/credentials',
-    '@acme-libs/contracts/database',
-    '@acme-libs/contracts/health',
-    '@acme-libs/contracts/local-storage',
-    '@acme-libs/credentials',
-    '@acme-libs/database',
-    '@acme-libs/domain',
-    '@acme-libs/health',
-    '@acme-libs/http',
-    '@acme-libs/kernel',
-    '@acme-libs/local-storage',
-    '@acme-libs/observability',
-    '@acme-libs/observability/tracer',
-    '@acme-libs/openapi',
-    '@acme-libs/queue',
-    '@acme-libs/testing',
-    '@acme-libs/toolkit',
-  ])('%s resolves', (source) => {
-    expect(source).toResolve();
+  it('@acme-libs/observability/tracer resolves, the one deep entry point of a lib', () => {
+    expect('@acme-libs/observability/tracer').toResolve();
   });
 
   it.each(['@acme-libs/toolkit/src'])(

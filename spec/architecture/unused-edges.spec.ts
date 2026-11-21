@@ -125,7 +125,7 @@ describe('unused edges', () => {
         '../../../../../../../libs/observability/src',
       ],
       [
-        'global infrastructure may NOT reach the contracts of its namesake lib: a core-adapter implements the lib port',
+        'global infrastructure may NOT reach the contracts of a lib: a core-adapter implements the lib port',
         'apps/__unused-fixture__/src/app/global/auth/infrastructure/__fixture__.ts',
         '../../../../../../../libs/contracts/src/auth',
       ],

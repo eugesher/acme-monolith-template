@@ -269,34 +269,29 @@ describe('global modules (app/global) — modules without controllers', () => {
 
   it.each([
     [
-      'apps/__global-fixture__/src/app/global/auth/shell/__fixture__.ts',
-      '../../../../../../../libs/contracts/src',
+      'apps/__global-fixture__/src/app/global/session/shell/__fixture__.ts',
+      '../../../../../../../libs/contracts/src/auth',
     ],
     [
-      'apps/__global-fixture__/src/app/global/auth/infrastructure/common-adapters/__fixture__.ts',
-      '../../../../../../../../libs/contracts/src',
+      'apps/__global-fixture__/src/app/global/session/shell/__fixture__.ts',
+      '../../../../../../../libs/contracts/src/cache',
     ],
-  ])('%s MAY reach the lib contracts of its own name', async (file, contracts) => {
-    await expect({ file, code: `import { x } from "${contracts}/auth";` }).toPassArchitectureLint();
-  });
+    [
+      'apps/__global-fixture__/src/app/global/session/infrastructure/common-adapters/__fixture__.ts',
+      '../../../../../../../../libs/contracts/src/auth',
+    ],
+  ])(
+    '%s MAY reach the lib contract %s, whatever the name of the module',
+    async (file, contracts) => {
+      await expect({ file, code: `import { x } from "${contracts}";` }).toPassArchitectureLint();
+    },
+  );
 
-  it.each([
-    [
-      'apps/__global-fixture__/src/app/global/auth/shell/__fixture__.ts',
-      '../../../../../../../libs/contracts/src',
-    ],
-    [
-      'apps/__global-fixture__/src/app/global/auth/infrastructure/common-adapters/__fixture__.ts',
-      '../../../../../../../../libs/contracts/src',
-    ],
-    [
-      'apps/__global-fixture__/src/app/global/auth/infrastructure/persistence/__fixture__.ts',
-      '../../../../../../../../libs/contracts/src',
-    ],
-  ])('%s may NOT reach lib contracts of another name', async (file, contracts) => {
-    await expect({ file, code: `import { x } from "${contracts}/cache";` }).toBreakRule(
-      'boundaries/dependencies',
-    );
+  it('global persistence may NOT reach the cache contracts', async () => {
+    await expect({
+      file: 'apps/__global-fixture__/src/app/global/auth/infrastructure/persistence/__fixture__.ts',
+      code: 'import { x } from "../../../../../../../../libs/contracts/src/cache";',
+    }).toBreakRule('boundaries/dependencies');
   });
 
   it.each([

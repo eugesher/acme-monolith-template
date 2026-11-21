@@ -18,6 +18,17 @@ lives with the rule that covers the importer:
 **An edge used only by specs counts as used.** A lib module spec imports `@nestjs/core`, and a
 common-module spec imports the kernel; both are code the lint checks.
 
+**No rule names an app.** A category matches `apps/*` and captures the folder as `app`, a policy
+compares it with `own('app')`, and the import groups of `imports.mjs` match any `@acme-<app>` alias
+but the libs and the core. An app may take any name, and a new app gets the same rules without an
+edit of the lint.
+
+**Every file of `apps`, `core` and `libs` has a category.** `boundaries/no-unknown-files` runs on
+those three folders only, so a folder outside the layout of an app, such as `apps/<app>/src/utils/`,
+fails lint, while a new top-level folder of the repository, such as `tools/`, does not. The code of
+the three folders still may not import a file outside every category
+(`boundaries/no-unknown-dependencies`).
+
 ## Why an edge without a use stays
 
 ### `policies/selectors.mjs` — the base libs
@@ -73,17 +84,12 @@ and a repository, `ledger` neither. The entries stay, so a processor that grows 
 same rules a feature does.
 
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
-processor upserts its job scheduler (see `009-scheduled-processor.md`). It takes `InjectQueue` and
-the `Queue` type and nothing else of BullMQ, under the same rule as a feature queue adapter in
-`queue.mjs`. The module next to the adapter takes `libs/queue` or `@acme-core/queues` to register
-the queue, in features and processors alike. The presentation of a processor takes the name of its
-queue from its own `outbound` for `@Processor`, and `queue.mjs` keeps it to `*_QUEUE` names, so a
-port still reaches the processor only through a use case. The module root of a processor without a
-queue adapter, as the ledger, mounts its registration from `@acme-core/queues`.
-
-**The start of the app is an entry of a processor.** `http-surface.mjs` lets the presentation of a
-processor take `OnApplicationBootstrap` from `@nestjs/common` next to the DI names, in a rule of its
-own; every other layer of a processor, a core module or a common module takes the DI names only.
+processor upserts its job scheduler (see `009-scheduled-processor.md`). The module next to the
+adapter takes `libs/queue` or `@acme-core/queues` to register the queue, in features and processors
+alike. The presentation of a processor takes the name of its queue from its own `outbound` for
+`@Processor`, and `queue.mjs` keeps it to `*_QUEUE` names, so a port still reaches the processor
+only through a use case. The module root of a processor without a queue adapter, as the ledger,
+mounts its registration from `@acme-core/queues`.
 
 The module root of a feature or a processor may reach a shared barrel, as the module root of a
 common module may (a positive case of the common modules spec).
@@ -107,7 +113,7 @@ A core module announces what it wrote after the commit (see `026-transaction-por
 edges exist for it:
 
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
-  `InjectQueue` and the `Queue` type and nothing else of BullMQ (`queue.mjs`) and its own contracts.
+  `@nestjs/bullmq`, `bullmq` and its own contracts.
 - **The module of a queue adapter registers its queue** from `@acme-core/queues`, and the module
   root mounts that module and takes neither `@acme-core/queues`, `libs/queue` nor BullMQ itself. A
   core module is mounted by features of several apps, so the queue comes with it rather than with
@@ -181,22 +187,16 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   port of its module's outbound with the port of a common module, which is named after that module,
   not after the global module, so the namesake rule of `appContracts` would refuse it.
 
-### Policies that name exports
+### No policy names an export
 
-A policy that refuses or allows a name of a lib or a package, such as `customer-claims.mjs` with
-`AuthJwtModule` and `CurrentUser` or `http-surface.mjs` with the DI names of `@nestjs/common`,
-matches the specifier of the import, not the file behind it. A renamed export would leave the policy
-guarding a name nobody imports, and its negative case would stay green as long as its fixture used
-the old name too. `spec/architecture/policy-specifiers.spec.ts` reads the resolved policies of the
-boundaries rule and checks with the TypeScript checker that every specifier named for a lib or a
-package is an export of it. The checker reads the declarations, so a type such as `ClassProvider`
-counts as an export, as it does for the import it guards.
+A policy allows a layer other layers, libs and packages, never a list of the names they export.
+Which decorator or type a layer takes from a package it may import is the choice of the code: a core
+service may implement `OnModuleInit`, a processor may throw `UnrecoverableError`, a queue adapter
+may pass `JobsOptions`. A list of names would turn each of them into an edit of the lint.
 
-A policy that names exports is an allowlist of names: `customer-claims.mjs` lists what customer-app
-takes from `@acme-libs/auth` and `@acme-libs/kernel`, so a new name is a decision. A namespace,
-default, side-effect, star or dynamic import has no specifier for a policy to read, so
-`lint/syntax/named-imports.selectors.mjs` refuses those forms for every module a policy lists by
-name.
+One policy still names imports: `queue.mjs` keeps the presentation of a processor to the `*_QUEUE`
+names of its own `outbound`, so that a port reaches it only through a use case. The specifier is a
+pattern of the naming of `029-naming.md`, not a list of exports.
 
 ### The layers of a lib
 

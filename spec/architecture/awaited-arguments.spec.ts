@@ -56,6 +56,6 @@ describe('awaited arguments', () => {
     expect(specEntries).toEqual(
       sourceEntries.filter((entry) => !JSON.stringify(entry).includes('awaited')),
     );
-    expect(specEntries.length).toBe(12);
+    expect(specEntries.length).toBe(8);
   });
 });

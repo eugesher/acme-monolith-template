@@ -66,9 +66,3 @@ lands on the object that `useClass` holds.
   entities.
 - **Global enhancers** (`APP_PIPE`, `APP_FILTER`, `APP_GUARD`) are bound by the app module and the
   auth lib, under tokens of Nest.
-
-## Lint
-
-Core modules, common modules and processors take only DI names from `@nestjs/common`
-(`policies/http-surface.mjs`). `ClassProvider` is one of them, next to `DynamicModule`, `Inject`,
-`Injectable` and `Module`; it brings no HTTP surface.

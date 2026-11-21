@@ -34,10 +34,10 @@ the lib contract below, but the `auth` feature owns the plain names: `AuthModule
 `AuthIdentityCommonAdapter` for the common adapter of its own. The prefix keeps the two apart in
 imports, in stack traces and in DI errors.
 
-**A global module pairs with the lib contract of its own name.** `app/global/auth` may import
-`libs/contracts/src/auth`, and only that contract. The lint expresses it as one selector,
-`{ lib: '{{ from.file.captured.module }}' }`, so a future `app/global/<name>` gets the same rule
-without a new policy.
+**A global module implements a lib contract.** `app/global/auth` binds `AUTH_USER_VALIDATOR_PORT` of
+`libs/contracts/src/auth` in its module root and implements it in its facade. The shell and the
+common-adapters of a global module may import the contract of any lib, whatever the name of the
+module, so a future `app/global/<name>` implements the port it needs without a new policy.
 
 ## Two lib modules
 
@@ -52,10 +52,11 @@ out and imports `AuthJwtModule` alone. There is no roles guard and no `@Roles`: 
 permissions only, and a role is a named set of them.
 
 **Two static modules, not a flag.** `AuthJwtModule.forRoot({ claims: true })` would hide the choice
-in an argument that no lint can read. An import of `AuthPermissionModule` is visible, and the lint
-policy `customer-claims.mjs` refuses it in customer-app, together with `@RequiresPermission` and
-`PermissionCodeEnum`. Without the permission module the decorators would be silently ignored, so a
-route of customer-app cannot even name them.
+in an argument that no lint can read. An import of `AuthPermissionModule` in the global auth module
+of an app is visible. Without the permission module `@RequiresPermission` is silently ignored, so
+`spec/auth-permission-module.spec.ts` fails an app that imports the decorator in `src/` while no
+file of its `src/` imports `AuthPermissionModule`. The spec walks every folder of `apps/` and, like
+the lint, names no app.
 
 ## Order
 

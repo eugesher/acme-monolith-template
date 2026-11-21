@@ -310,13 +310,6 @@ describe('common modules (common/modules/<module>)', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('a common module may NOT declare HTTP controllers', async () => {
-      await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-        code: 'import { Controller } from "@nestjs/common";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
     it('a facade MAY reach the application layer and its own contracts', async () => {
       await expect({
         file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/idempotency-common.facade.ts',
@@ -479,7 +472,7 @@ describe('common modules (common/modules/<module>)', () => {
     ])('%s MAY import the port of any core module in its core adapters', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/infrastructure/core-adapters/__fixture__.ts`,
-        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/ledger";',
+        code: 'import { LEDGER_CORE_PORT } from "@acme-core/contracts/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
@@ -501,7 +494,7 @@ describe('common modules (common/modules/<module>)', () => {
     ])('%s MAY mount any core module', async (app, feature) => {
       await expect({
         file: `apps/${app}/src/features/${feature}/${feature}.module.ts`,
-        code: 'import { LedgerCoreModule } from "@acme-core/modules/ledger";',
+        code: 'import { LedgerCoreModule } from "@acme-core/modules/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
   });

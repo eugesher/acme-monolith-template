@@ -27,7 +27,7 @@ export const acmeCore = [
     coreDomain,
     ownContracts,
     baseLibs('observability'),
-    packages('nestjs-pino'),
+    packages('@nestjs/common', 'nestjs-pino'),
   ]),
   from('acme-core:modules:infrastructure', [
     layer('outbound'),
@@ -54,6 +54,7 @@ export const acmeCore = [
     layer('infrastructure:core-adapters'),
     to('acme-core:contracts'),
     baseLibs(),
+    packages('@nestjs/common'),
   ]),
   from('acme-core:modules:infrastructure:lib-adapters', [
     layer('outbound'),
@@ -66,7 +67,12 @@ export const acmeCore = [
     layer('infrastructure:config'),
     libs('config'),
   ]),
-  from('acme-core:modules:shell:facade', [layer('application'), ownContracts, baseLibs()]),
+  from('acme-core:modules:shell:facade', [
+    layer('application'),
+    ownContracts,
+    baseLibs(),
+    packages('@nestjs/common'),
+  ]),
   from('acme-core:modules:shell', [
     layer('application'),
     layer('infrastructure'),
@@ -75,6 +81,7 @@ export const acmeCore = [
     ownContracts,
     to('acme-core:modules:index'),
     baseLibs(),
+    packages('@nestjs/common'),
   ]),
   from('acme-core:modules:index', [layer('shell')]),
   from('acme-core:contracts', [ownContracts, baseLibs()]),

@@ -84,8 +84,8 @@ of its adapter (see `009-scheduled-processor.md`). BullMQ applies the job option
 so `registerQueue` takes the name alone and every registration gets the job options of
 `BullSetupModule.forRoot()`.
 
-The lint edges for a core queue adapter are in `lint/boundaries/policies/acme-core.mjs` and
-`queue.mjs` (see `016-lint-allowlists.md`).
+The lint edges for a core queue adapter are in `lint/boundaries/policies/acme-core.mjs` (see
+`016-lint-allowlists.md`).
 
 ## The processor
 
