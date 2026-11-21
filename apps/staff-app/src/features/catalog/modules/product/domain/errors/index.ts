@@ -1,7 +1,6 @@
 export * from './codes/product-exception-code.enum';
 
 export * from './exceptions/base/product-base.exception';
-
 export * from './exceptions/product-already-archived.exception';
 export * from './exceptions/product-name-invalid.exception';
 export * from './exceptions/product-not-found.exception';

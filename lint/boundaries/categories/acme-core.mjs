@@ -29,4 +29,5 @@ export const acmeCore = [
   ['acme-core:contracts', 'core/contracts/src/*/**', ['module']],
   ['acme-core:domain', 'core/domain/src/**', []],
   ['acme-core:entities', 'core/entities/src/**', []],
+  ['acme-core:queues', 'core/queues/src/**', []],
 ];

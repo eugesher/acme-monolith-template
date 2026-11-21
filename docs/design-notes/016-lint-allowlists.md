@@ -27,7 +27,7 @@ vocabulary, the toolkit is the technique of every layer and the domain lib holds
 domain models and exceptions (`Entity`, `VersionedEntity`, `ValueObject`, `DomainException`), so
 each layer gets all three whether or not one of its files imports them. The names after them are
 what the layer adds: `baseLibs('observability')` for an application layer,
-`baseLibs('ledger', 'queue')` for the module root of a core module.
+`baseLibs('auth', 'credentials', 'health', 'http')` for the module root of a feature.
 
 `main.ts` and the core entities are the exceptions: they list their libs one by one.
 
@@ -75,7 +75,11 @@ same rules a feature does.
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
 processor upserts its job scheduler (see `009-scheduled-processor.md`). It takes `InjectQueue` and
 the `Queue` type and nothing else of BullMQ, under the same rule as a feature queue adapter in
-`queue.mjs`.
+`queue.mjs`. The module next to the adapter takes `libs/queue` or `@acme-core/queues` to register
+the queue, in features and processors alike. The presentation of a processor takes the name of its
+queue from its own `outbound` for `@Processor`, and `queue.mjs` keeps it to `*_QUEUE` names, so a
+port still reaches the processor only through a use case. The module root of a processor without a
+queue adapter, as the ledger, mounts its registration from `@acme-core/queues`.
 
 **The start of the app is an entry of a processor.** `http-surface.mjs` lets the presentation of a
 processor take `OnApplicationBootstrap` from `@nestjs/common` next to the DI names, in a rule of its
@@ -104,9 +108,10 @@ edges exist for it:
 
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
   `InjectQueue` and the `Queue` type and nothing else of BullMQ (`queue.mjs`) and its own contracts.
-- **The module root registers the queues it writes to** with `BullSetupModule.registerQueue` of
-  `libs/queue` and takes nothing of BullMQ itself. A core module is mounted by features of several
-  apps, so the queue comes with it rather than with the `common/shared` of each app.
+- **The module of a queue adapter registers its queue** from `@acme-core/queues`, and the module
+  root mounts that module and takes neither `@acme-core/queues`, `libs/queue` nor BullMQ itself. A
+  core module is mounted by features of several apps, so the queue comes with it rather than with
+  each app.
 - **Core infrastructure may take `@acme-libs/contracts/cache`**, to drop the keys a write makes
   stale; the application still may not, so caching stays an adapter behind a port.
 
@@ -143,7 +148,7 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `LEDGER_CORE_PORT` from `@acme-core/contracts/ledger`. The ledger reads the correlation id of the
   context itself, so no adapter needs the observability lib. What reads the queue takes the same
   contracts, as it takes those of any core module: the presentation of a processor, the queue
-  registry of staff-app in `infrastructure/queue`, `common/shared`, the e2e code and `test/system`.
+  registry of staff-app in `infrastructure/queue`, `core/queues`, the e2e code and `test/system`.
 - **A processor and a global module read tables.** Their infrastructure may import `typeorm`,
   `@acme-libs/contracts/database` and `@nestjs/common`, as feature infrastructure does.
 - **No module touches `@nestjs-cls`.** A repository injects `ORM_PORT` of

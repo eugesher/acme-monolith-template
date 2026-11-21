@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtModule, type JwtSignOptions } from '@nestjs/jwt';
-import type { DynamicModule } from '@nestjs/common';
+import type { ClassProvider, DynamicModule } from '@nestjs/common';
 
 import { AuthTokenAlgorithmEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
-import { CREDENTIALS_LIB_PORT } from '@acme-libs/contracts/credentials';
+import { CREDENTIALS_LIB_PORT, type ICredentialsLibPort } from '@acme-libs/contracts/credentials';
 
 import {
   CredentialsLibHashPasswordUseCase,
@@ -35,7 +35,10 @@ export class CredentialsLibModule {
       ],
       exports: [CREDENTIALS_LIB_PORT],
       providers: [
-        { provide: CREDENTIALS_LIB_PORT, useClass: CredentialsLibFacade },
+        {
+          provide: CREDENTIALS_LIB_PORT,
+          useClass: CredentialsLibFacade,
+        } satisfies ClassProvider<ICredentialsLibPort>,
         CredentialsLibSignAccessTokenUseCase,
         CredentialsLibHashPasswordUseCase,
         CredentialsLibVerifyPasswordUseCase,

@@ -70,7 +70,8 @@ never absent, like every field of a response that may be missing.
 
 **A domain exception carries its code.** It answers a `code` of its module and may add `details`,
 which `DomainException` of `libs/domain` carries for every module. The exception filter of the
-module maps the code to a status (see `003-authentication.md`).
+module extends `DomainHttpExceptionFilter` of `libs/http` and declares the status of each code in
+its `STATUS`; the base answers the body (see `003-authentication.md`).
 
 **A shared mechanism answers one code in every module.** A refused `Idempotency-Key` is
 `IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENT_REQUEST_IN_FLIGHT`, a stale `If-Match` is `VERSION_MISMATCH`
@@ -101,7 +102,7 @@ No request carries that version, so the filter answers 500, not 400.
 
 **Every status a route refuses with has a response.** `ApiReference.setup` declares
 `ErrorResponseDto` the `default` response of every operation.
-`@ApiErrorResponses(<Filter>.STATUS, ...codes)` of `libs/http` adds a response for each status of
-the codes the route refuses with, its codes in the description, and a 400 names `VALIDATION_FAILED`
-before them. The statuses come from the public `STATUS` of the filter that answers them, so the
-document cannot drift from the answer.
+`@ApiErrorResponses({ statuses: <Filter>.STATUS, codes: [...] })` of `libs/http` adds a response for
+each status of the codes the route refuses with, its codes in the description, and a 400 names
+`VALIDATION_FAILED` before them. The statuses come from the public `STATUS` of the filter that
+answers them, so the document cannot drift from the answer.

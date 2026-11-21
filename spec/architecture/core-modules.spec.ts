@@ -90,7 +90,7 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['@acme-staff/contracts/staff-auth', '@acme-staff/common/modules'])(
+    it.each(['@acme-staff/contracts/auth', '@acme-staff/common/modules'])(
       'ledger may NOT reach %s — the journal records facts, it never asks who the user is',
       async (alias) => {
         await expect({
@@ -391,12 +391,25 @@ describe('core modules', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('the module root MAY register the queues it writes to with the queue lib', async () => {
+    it('the module of a queue adapter MAY register its queue through the core queues', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { BullSetupModule } from "@acme-libs/queue";\nimport { X_QUEUE } from "../../../../contracts/src/__ledger-fixture__";',
+        file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
+        code: 'import { LedgerQueueModule } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
+
+    it.each([
+      'import { LedgerQueueModule } from "@acme-core/queues";',
+      'import { BullSetupModule } from "@acme-libs/queue";',
+    ])(
+      'the module root may NOT register a queue itself (%s) — it mounts the module of its queue adapter',
+      async (code) => {
+        await expect({
+          file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+          code,
+        }).toBreakRule('boundaries/dependencies');
+      },
+    );
 
     it('the module root MAY mount the core ledger', async () => {
       await expect({

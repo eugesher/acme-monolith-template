@@ -12,7 +12,6 @@ import {
   type IProductStockPostSubtractPayload,
 } from '@acme-core/contracts/product-stock';
 import { AppModule } from '@acme-processor/app/app.module';
-import { IDEMPOTENCY_PURGE_QUEUE } from '@acme-processor/contracts/idempotency';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {
@@ -60,7 +59,7 @@ export class AppE2EContext extends E2EContext {
     const postSubtractQueue = this.moduleFixture.get<Queue<IProductStockPostSubtractPayload>>(
       getQueueToken(PRODUCT_STOCK_POST_SUBTRACT_QUEUE),
     );
-    const purgeQueue = this.moduleFixture.get<Queue>(getQueueToken(IDEMPOTENCY_PURGE_QUEUE));
+    const purgeQueue = this.moduleFixture.get<Queue>(getQueueToken('idempotency-purge'));
 
     this.state = { ledgerRecordQueue, postSubtractQueue, purgeQueue };
   }

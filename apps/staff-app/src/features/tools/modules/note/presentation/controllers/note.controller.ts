@@ -63,11 +63,10 @@ export class NoteController {
   @Post()
   @ApiOperation({ summary: 'Attach a back-office note to any subject' })
   @ApiCreatedResponse({ type: NoteResponseDto })
-  @ApiErrorResponses(
-    NoteHttpExceptionFilter.STATUS,
-    NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID,
-    NoteExceptionCodeEnum.NOTE_BODY_INVALID,
-  )
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID, NoteExceptionCodeEnum.NOTE_BODY_INVALID],
+  })
   public async handleCreate(
     @Body() request: NoteCreateRequestDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -81,7 +80,10 @@ export class NoteController {
   @Get()
   @ApiOperation({ summary: 'Browse your notes, newest first, optionally of one subject' })
   @ApiOkResponse({ type: NotePageResponseDto })
-  @ApiErrorResponses(NoteHttpExceptionFilter.STATUS, NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID)
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID],
+  })
   public async handleGetMany(
     @Query() query: NoteGetManyQueryDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -95,7 +97,10 @@ export class NoteController {
   @Get(':noteId')
   @ApiOperation({ summary: 'Read one of your notes' })
   @ApiOkResponse({ type: NoteResponseDto })
-  @ApiErrorResponses(NoteHttpExceptionFilter.STATUS, NoteExceptionCodeEnum.NOTE_NOT_FOUND)
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
+  })
   public async handleGetOne(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -112,14 +117,16 @@ export class NoteController {
     summary: 'Rewrite the body of one of your notes and record the revision with it',
   })
   @ApiOkResponse({ type: NoteResponseDto })
-  @ApiErrorResponses(
-    NoteHttpExceptionFilter.STATUS,
-    NoteExceptionCodeEnum.NOTE_BODY_INVALID,
-    NoteExceptionCodeEnum.NOTE_NOT_FOUND,
-    NoteExceptionCodeEnum.NOTE_RESOLVED,
-    NoteExceptionCodeEnum.NOTE_VERSION_CONFLICT,
-    NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
-  )
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [
+      NoteExceptionCodeEnum.NOTE_BODY_INVALID,
+      NoteExceptionCodeEnum.NOTE_NOT_FOUND,
+      NoteExceptionCodeEnum.NOTE_RESOLVED,
+      NoteExceptionCodeEnum.NOTE_VERSION_CONFLICT,
+      NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
+    ],
+  })
   public async handleEdit(
     @Param() params: NoteIdParamDto,
     @Body() request: NoteEditRequestDto,
@@ -138,13 +145,15 @@ export class NoteController {
   @ApiIfMatchHeader()
   @ApiOperation({ summary: 'Resolve one of your notes for good; it can no longer be edited' })
   @ApiOkResponse({ type: NoteResponseDto })
-  @ApiErrorResponses(
-    NoteHttpExceptionFilter.STATUS,
-    NoteExceptionCodeEnum.NOTE_NOT_FOUND,
-    NoteExceptionCodeEnum.NOTE_RESOLVED,
-    NoteExceptionCodeEnum.NOTE_VERSION_CONFLICT,
-    NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
-  )
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [
+      NoteExceptionCodeEnum.NOTE_NOT_FOUND,
+      NoteExceptionCodeEnum.NOTE_RESOLVED,
+      NoteExceptionCodeEnum.NOTE_VERSION_CONFLICT,
+      NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
+    ],
+  })
   public async handleResolve(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -159,7 +168,10 @@ export class NoteController {
   @Get(':noteId/revisions')
   @ApiOperation({ summary: 'Read the edit history of one of your notes, newest first' })
   @ApiOkResponse({ type: NoteRevisionPageResponseDto })
-  @ApiErrorResponses(NoteHttpExceptionFilter.STATUS, NoteExceptionCodeEnum.NOTE_NOT_FOUND)
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
+  })
   public async handleGetRevisions(
     @Param() params: NoteIdParamDto,
     @Query() query: NoteGetRevisionsQueryDto,
@@ -176,7 +188,10 @@ export class NoteController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete one of your notes' })
   @ApiNoContentResponse()
-  @ApiErrorResponses(NoteHttpExceptionFilter.STATUS, NoteExceptionCodeEnum.NOTE_NOT_FOUND)
+  @ApiErrorResponses({
+    statuses: NoteHttpExceptionFilter.STATUS,
+    codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
+  })
   public async handleDelete(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,

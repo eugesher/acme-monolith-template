@@ -8,7 +8,7 @@ deadline and retries.
 | hook in a use case | `core/modules/src/product-stock/application/use-cases/product-stock-core-move.use-case.ts`                         |
 | queue adapter      | `core/modules/src/product-stock/infrastructure/queue/product-stock-core-post-subtract-queue.adapter.ts`            |
 | queue contract     | `core/contracts/src/product-stock/queues/product-stock-post-subtract.queue.ts`                                     |
-| queue registration | `core/modules/src/product-stock/shell/product-stock-core.module.ts`                                                |
+| queue registration | `core/queues/src/product-stock-post-subtract/product-stock-post-subtract-queue.module.ts`                          |
 | the processor      | `apps/processor-app/src/processors/product-stock/presentation/processors/product-stock-post-subtract.processor.ts` |
 | from a feature     | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts`  |
 
@@ -75,10 +75,12 @@ processor e2e does (see `014-e2e-suites.md`).
 ## Where the queue is declared
 
 **A queue written by several apps keeps its contract outside the apps**: the name and the payload
-type, in core or in the lib that writes it. A core module or a lib that writes to a queue registers
-it itself with `BullSetupModule.registerQueue` of `libs/queue`, so every module that mounts it
-brings the queue with it. A processor registers the queues it reads in the `common/shared` of its
-app (`apps/processor-app/src/common/shared/ledger`). BullMQ applies the job options of the producer,
+type, in core or in the lib that writes it. Its registration lives in `core/queues`, and the module
+of the core queue adapter mounts it next to the binding of the adapter
+(`ProductStockCorePostSubtractQueueModule`), so every module that mounts the core module brings the
+queue with it; the processor and the failed jobs of staff-app mount the same registration. A queue
+of one module keeps its name in the `outbound/queues` of the module and is registered by the module
+of its adapter (see `009-scheduled-processor.md`). BullMQ applies the job options of the producer,
 so `registerQueue` takes the name alone and every registration gets the job options of
 `BullSetupModule.forRoot()`.
 

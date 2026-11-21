@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
 import { IdempotencyCoreModule } from '@acme-core/modules/idempotency';
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 import { ProductStockCoreModule } from '@acme-core/modules/product-stock';
@@ -31,7 +30,6 @@ import { OrderController } from './presentation';
     OrderLedgerCoreAdapter.provider,
     OrderProductStockCoreAdapter.provider,
     OrderTransactionAdapter.provider,
-    HttpExceptionFilter,
   ],
 })
 export class OrderModule {}

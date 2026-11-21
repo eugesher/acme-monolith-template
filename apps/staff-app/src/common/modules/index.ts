@@ -1,2 +1,2 @@
-export * from './staff-auth';
+export * from './auth';
 export * from './tag';

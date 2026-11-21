@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
-
 import {
   TagAccessService,
   TagCreateUseCase,
@@ -21,7 +19,6 @@ import { TagController } from './presentation';
 @Module({
   controllers: [TagController],
   providers: [
-    HttpExceptionFilter,
     TagCreateUseCase,
     TagDeleteUseCase,
     TagGetManyUseCase,

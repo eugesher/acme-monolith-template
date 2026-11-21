@@ -27,13 +27,15 @@ export class ProductStockController {
   @ApiIdempotencyKeyHeader()
   @ApiOperation({ summary: 'Add units to the stock of a product (idempotent)' })
   @ApiOkResponse({ type: ProductStockResponseDto })
-  @ApiErrorResponses(
-    ProductStockHttpExceptionFilter.STATUS,
-    ProductStockExceptionCodeEnum.PRODUCT_QUANTITY_INVALID,
-    ProductStockExceptionCodeEnum.PRODUCT_NOT_FOUND,
-    ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT,
-    ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENCY_KEY_REUSED,
-  )
+  @ApiErrorResponses({
+    statuses: ProductStockHttpExceptionFilter.STATUS,
+    codes: [
+      ProductStockExceptionCodeEnum.PRODUCT_QUANTITY_INVALID,
+      ProductStockExceptionCodeEnum.PRODUCT_NOT_FOUND,
+      ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT,
+      ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENCY_KEY_REUSED,
+    ],
+  })
   public async handleAdd(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: ProductStockProductIdParamDto,

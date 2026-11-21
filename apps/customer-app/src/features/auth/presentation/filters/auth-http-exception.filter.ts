@@ -1,12 +1,12 @@
-import { Catch, HttpStatus, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
+import { Catch, HttpStatus } from '@nestjs/common';
 
-import { DomainHttpExceptionHelper, HttpExceptionFilter } from '@acme-libs/http';
+import { DomainHttpExceptionFilter } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 
 import { AuthBaseException } from '../../domain';
 
 @Catch(AuthBaseException)
-export class AuthHttpExceptionFilter implements ExceptionFilter<AuthBaseException> {
+export class AuthHttpExceptionFilter extends DomainHttpExceptionFilter<AuthBaseException> {
   public static readonly STATUS: Record<AuthBaseException['code'], HttpStatus> = {
     [IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID]: HttpStatus.BAD_REQUEST,
     [IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK]: HttpStatus.BAD_REQUEST,
@@ -15,12 +15,5 @@ export class AuthHttpExceptionFilter implements ExceptionFilter<AuthBaseExceptio
     [IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN]: HttpStatus.CONFLICT,
   };
 
-  constructor(private readonly httpExceptionFilter: HttpExceptionFilter) {}
-
-  public catch(exception: AuthBaseException, host: ArgumentsHost): void {
-    const statusCode = AuthHttpExceptionFilter.STATUS[exception.code];
-    const error = DomainHttpExceptionHelper.toHttpException(exception, statusCode);
-
-    this.httpExceptionFilter.catch(error, host);
-  }
+  protected override readonly status = AuthHttpExceptionFilter.STATUS;
 }

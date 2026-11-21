@@ -1,5 +1,3 @@
-export const LEDGER_RECORD_QUEUE = 'ledger-record';
-
 export interface ILedgerRecordProcessorPayload {
   operationKey: string;
   subjectType: string;
@@ -9,3 +7,5 @@ export interface ILedgerRecordProcessorPayload {
   occurredAt: string;
   correlationId: string;
 }
+
+export const LEDGER_RECORD_QUEUE = 'ledger-record';

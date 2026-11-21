@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 
 import { DeadlineHelper } from '@acme-libs/toolkit';
@@ -8,19 +8,13 @@ import {
   type IProductStockPostSubtractPayload,
 } from '@acme-core/contracts/product-stock';
 
-import {
-  PRODUCT_STOCK_CORE_POST_SUBTRACT_PORT,
-  type IProductStockCorePostSubtractEnqueueCommand,
-  type IProductStockCorePostSubtractPort,
+import type {
+  IProductStockCorePostSubtractEnqueueCommand,
+  IProductStockCorePostSubtractPort,
 } from '../../outbound';
 
 @Injectable()
 export class ProductStockCorePostSubtractQueueAdapter implements IProductStockCorePostSubtractPort {
-  public static readonly provider: ClassProvider<IProductStockCorePostSubtractPort> = {
-    provide: PRODUCT_STOCK_CORE_POST_SUBTRACT_PORT,
-    useClass: ProductStockCorePostSubtractQueueAdapter,
-  };
-
   constructor(
     @InjectQueue(PRODUCT_STOCK_POST_SUBTRACT_QUEUE)
     private readonly queue: Queue<IProductStockPostSubtractPayload>,

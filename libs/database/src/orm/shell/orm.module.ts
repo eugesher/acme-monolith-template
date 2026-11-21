@@ -1,10 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
-import type { DynamicModule } from '@nestjs/common';
+import type { ClassProvider, DynamicModule } from '@nestjs/common';
 
 import { TlsHelper } from '@acme-libs/config';
 import { LocalStorageTransactionalModule } from '@acme-libs/local-storage';
-import { ORM_PORT } from '@acme-libs/contracts/database';
+import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import { SnakeNamingStrategy } from '../../naming/snake-naming.strategy';
 import { OrmGetRepositoryUseCase } from '../application';
@@ -19,7 +19,7 @@ export class OrmModule {
       imports: [OrmModule.forRootAsync(entities), LocalStorageTransactionalModule.forRoot()],
       exports: [ORM_PORT],
       providers: [
-        { provide: ORM_PORT, useClass: OrmFacade },
+        { provide: ORM_PORT, useClass: OrmFacade } satisfies ClassProvider<IOrmPort>,
         OrmGetRepositoryUseCase,
         OrmHostAdapter.provider,
       ],

@@ -18,7 +18,7 @@ stays in core; a method of it that one app calls moves into that app, and the re
 | core `idempotency`   | `handleClaim`, `handleComplete`, `handleRelease`      | staff `product-stock`, customer `order`                                                  |
 | core `product`       | `handleArchive`                                       | staff `product`, the processor `product-stock`                                           |
 | core `product-stock` | `handleLock`, `handleMove`                            | staff `product-stock`, customer `order`, `handleLock` also the processor `product-stock` |
-| common `staff-auth`  | `handleFindSubject`                                   | `app/global/auth` of staff-app, staff `auth`                                             |
+| common `auth`        | `handleFindSubject`                                   | `app/global/auth` of staff-app, staff `auth`                                             |
 | common `tag`         | `handleFind`, `handleReplace`, `handleFindSubjectIds` | staff `product`, staff `order`                                                           |
 
 Everything else sits with its only caller, for example:
@@ -54,7 +54,7 @@ a value object such as `EmailValue` carries one rule that every module applies t
 `core/domain` holds it once and each module refuses in its own words (see `038-domain-models.md`).
 
 **The names say where a symbol lives.** A symbol of a common module carries `Common`
-(`StaffAuthCommonModule`, `TAG_COMMON_PORT`), a symbol of a core module carries `Core`
+(`AuthCommonModule`, `TAG_COMMON_PORT`), a symbol of a core module carries `Core`
 (`LedgerCoreModule`, `LEDGER_CORE_PORT`), and a feature symbol carries neither. A feature and a
 common or core module may share a name, and the infix keeps them apart.
 

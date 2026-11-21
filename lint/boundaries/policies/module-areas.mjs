@@ -77,9 +77,11 @@ const areaPolicies = (area, sharedFacing) => {
     fromSpec(`${prefix}:infrastructure:queue`),
     from(`${prefix}:infrastructure:queue`, [
       layer('outbound'),
+      layer('infrastructure:queue'),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
-      baseLibs(),
+      to('acme-core:queues'),
+      baseLibs('queue'),
       ...sharedFacing.queue,
     ]),
     fromSpec(`${prefix}:infrastructure:config`),
@@ -127,11 +129,12 @@ export const moduleAreas = [
     libAdapters: [],
     queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
     presentation: [
+      layerOf('acme-app:processors', ['app', 'module'])('outbound'),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
       baseLibs('observability'),
       packages('@nestjs/bullmq', 'bullmq'),
     ],
-    module: [baseLibs()],
+    module: [to('acme-core:queues'), baseLibs()],
   }),
 ];

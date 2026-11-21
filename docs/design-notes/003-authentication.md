@@ -38,7 +38,7 @@ guessing run does not leave a list of addresses in the logs. `AuthEmailTakenExce
 
 **A route that only echoes the guard has no use case.** `handleMe` of customer-app copies
 `@CurrentUser()` into the response DTO: `AuthJwtGuard` has already re-read the user. In staff-app
-`AuthMeUseCase` asks the common module `staff-auth` through `AUTH_IDENTITY_PORT` and
+`AuthMeUseCase` asks the common module `auth` through `AUTH_IDENTITY_PORT` and
 `infrastructure/common-adapters/auth-identity-common.adapter.ts`.
 
 ## A unique index instead of a lookup
@@ -59,14 +59,15 @@ instead of passing for a taken name. A use case throws its own exception for the
 (`AuthEmailTakenException`, `TagNameTakenException`) or takes another branch (see
 `004-append-only-journal.md` and `006-idempotency-keys.md`).
 
-## The feature filter delegates
+## The feature filter maps, the shared filter answers
 
-`AuthHttpExceptionFilter` looks up the status of the code of `AuthBaseException` in its public
-`STATUS`, turns the exception into an `HttpException` with
-`DomainHttpExceptionHelper.toHttpException(exception, statusCode)` of `libs/http` and hands it to
-the shared `HttpExceptionFilter`, which answers the body of every error (see `039-api-surface.md`).
-Logging, and masking of `password` and `email` in the logged request, stay in one place. The feature
-module provides `HttpExceptionFilter` so that Nest can inject it into the feature filter.
+`AuthHttpExceptionFilter` is `@Catch(AuthBaseException)` over `DomainHttpExceptionFilter` of
+`libs/http` and holds only its public `STATUS`, the status of each code of `AuthBaseException`. The
+base turns the exception into an `HttpException` of that status and hands it to `super.catch` of
+`HttpExceptionFilter`, which answers the body of every error (see `039-api-surface.md`). Logging,
+and masking of `password` and `email` in the logged request, stay in one place. The filter inherits
+the constructor of `HttpExceptionFilter`, whose `HttpAdapterHost` and logger are global, so the
+feature module provides nothing for it.
 
 ## One token per audience
 

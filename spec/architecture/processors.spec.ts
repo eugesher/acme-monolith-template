@@ -237,11 +237,18 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('a processor may NOT reach its outbound — ports belong to the application', async () => {
+    it('a processor may NOT take a port from its outbound — ports belong to the application', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
-        code: 'import { x } from "../outbound";',
+        code: 'import { X_PORT } from "../outbound";',
       }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('a processor MAY take the name of its queue from its outbound', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        code: 'import { X_QUEUE } from "../outbound";',
+      }).toPassArchitectureLint();
     });
 
     it('a processor MAY take the DI names from @nestjs/common', async () => {
@@ -284,7 +291,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       'import { BullModule, Processor } from "@nestjs/bullmq";',
       'import type { Queue } from "bullmq";',
     ])(
-      'a processor may NOT take the queue itself (%s) — queues are registered in common/shared',
+      'a processor may NOT take the queue itself (%s) — a queue is registered by the module of its queue adapter or in core/queues',
       async (code) => {
         await expect({
           file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
@@ -327,11 +334,18 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       },
     );
 
-    it('common/shared MAY register a queue with the queue lib', async () => {
+    it('the module of a queue adapter MAY register its queue with the queue lib', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";\nimport { X_QUEUE } from "../../outbound";',
+      }).toPassArchitectureLint();
+    });
+
+    it('common/shared may NOT register a queue — the module of its queue adapter does', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/common/shared/ledger-record/queues/__fixture__.ts',
-        code: 'import { BullSetupModule } from "@acme-libs/queue";\nimport { x } from "../../../../contracts/ledger-record";',
-      }).toPassArchitectureLint();
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
+      }).toBreakRule('boundaries/dependencies');
     });
 
     it.each([

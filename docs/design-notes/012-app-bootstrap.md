@@ -129,7 +129,10 @@ caught error under `err` when it is not an `HttpException`. `RequestBodyHelper` 
 before validation and may hold fields no DTO declares. The client finds the correlation id in the
 `x-correlation-id` header of every response, not in the body. Nest maps a 4xx error of the body
 parser to an `HttpException` before any filter runs. A feature filter on a controller catches the
-domain exceptions of that feature first and hands the response to `HttpExceptionFilter`.
+domain exceptions of that feature first: it extends `DomainHttpExceptionFilter` of `libs/http`,
+which maps the code to the status of the `STATUS` of the filter and answers through `super.catch` of
+`HttpExceptionFilter`. A domain exception whose code has no status, or an error that is not one,
+reaches `super.catch` as it is and answers 500.
 
 **One CLS context carries the correlation id, the transaction and the logs.**
 `LocalStorageSetupModule` of `libs/local-storage` is the root `ClsModule` of the app. Its middleware

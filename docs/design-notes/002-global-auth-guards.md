@@ -13,18 +13,18 @@ the bearer token and hands the subject to `AUTH_USER_VALIDATOR_PORT`. Each app b
 its global `AuthGlobalModule`, which has the layers of a feature (see `024-code-placement.md`):
 every facade method calls a use case, and the use case reaches the data through an outbound port.
 
-| App          | The user and its permission codes                                                                                                                   | Ports bound                |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| staff-app    | `AuthGlobalValidateSubjectUseCase` over `AUTH_GLOBAL_SUBJECT_PORT`, which `AuthGlobalSubjectCommonAdapter` implements with `STAFF_AUTH_COMMON_PORT` | `AUTH_USER_VALIDATOR_PORT` |
-| customer-app | `AuthGlobalValidateSubjectUseCase` and its repository                                                                                               | `AUTH_USER_VALIDATOR_PORT` |
+| App          | The user and its permission codes                                                                                                             | Ports bound                |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| staff-app    | `AuthGlobalValidateSubjectUseCase` over `AUTH_GLOBAL_SUBJECT_PORT`, which `AuthGlobalSubjectCommonAdapter` implements with `AUTH_COMMON_PORT` | `AUTH_USER_VALIDATOR_PORT` |
+| customer-app | `AuthGlobalValidateSubjectUseCase` and its repository                                                                                         | `AUTH_USER_VALIDATOR_PORT` |
 
-The staff subject lives in the common module `apps/staff-app/src/common/modules/staff-auth`: two
-modules of staff-app ask for it, the global module for the guard and the `auth` feature for
-`GET /auth/me` (see `024-code-placement.md`). One query reads the user, its roles and the codes of
-their permissions; `AuthGlobalSubjectCommonAdapter` keeps the id, the email and the codes, so the
-roles never reach `request.user` and the use case answers what its port answers. The customer check
-has one caller, so it lives in customer-app; its repository selects the id and the email, and a
-global module has no domain to rebuild them in.
+The staff subject lives in the common module `apps/staff-app/src/common/modules/auth`: two modules
+of staff-app ask for it, the global module for the guard and the `auth` feature for `GET /auth/me`
+(see `024-code-placement.md`). One query reads the user, its roles and the codes of their
+permissions; `AuthGlobalSubjectCommonAdapter` keeps the id, the email and the codes, so the roles
+never reach `request.user` and the use case answers what its port answers. The customer check has
+one caller, so it lives in customer-app; its repository selects the id and the email, and a global
+module has no domain to rebuild them in.
 
 The global module also imports the lib modules, so mounting `AuthGlobalModule` in `AppModule` is the
 whole wiring.

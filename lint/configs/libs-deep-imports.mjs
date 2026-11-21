@@ -33,6 +33,10 @@ export const libsDeepImports = {
             message: 'outside specs the entities are imported by their root, @acme-core/entities',
           },
           {
+            group: ['@acme-core/queues/**'],
+            message: 'outside specs the core queues are imported by their root, @acme-core/queues',
+          },
+          {
             group: ['@acme-*/common/entities/**'],
             message:
               'outside specs the entities of an app are imported by their root, @acme-<app>/common/entities',

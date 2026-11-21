@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@acme-libs/http';
-
 import {
   NoteAccessService,
   NoteCreateUseCase,
@@ -29,7 +27,6 @@ import { NoteController } from './presentation';
 @Module({
   controllers: [NoteController],
   providers: [
-    HttpExceptionFilter,
     NoteCreateUseCase,
     NoteGetManyUseCase,
     NoteGetOneUseCase,

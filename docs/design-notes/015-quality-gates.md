@@ -117,7 +117,12 @@ after all the value imports of its block. Names are sorted alphabetically, case 
 `sort-named-imports` puts the `type` specifiers of one import after its values.
 
 **Exports** (`exports.mjs`, `sort-exports`) of a barrel are sorted alphabetically within each run of
-lines; a blank line starts a new run, so a barrel can keep its folders apart.
+lines; a blank line starts a new run. A barrel groups its lines by the first folder of the path,
+`persistence/repositories/*` and `persistence/transaction/*` in one run, one blank line between the
+runs. A barrel that lists the modules of an area, `features`, `processors`, `common/modules`,
+`common/shared`, `features/<group>/modules` and the barrels of the e2e suites, has one folder per
+line and no blank line, so lint keeps the whole list in order. Lint sorts a run; the grouping is the
+convention.
 
 **Class members** (`classes.mjs`, `sort-classes`) go by kind and accessibility, not by name
 (`type: 'unsorted'`):
