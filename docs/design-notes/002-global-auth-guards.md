@@ -117,7 +117,7 @@ tokens fail the signature check in staff-app.
 
 **The audience is code, not configuration.** `customer.id` and `staff_user.id` both count from 1, so
 a secret shared by mistake would let customer 5 in as staff user 5. Each API app passes
-`AuthAudienceEnum` of `libs/kernel` once, to `CredentialsModule.forRoot()` in its `AppModule`:
+`AuthAudienceEnum` of `libs/kernel` once, to `CredentialsModule.forRoot()` in its `AppSetupModule`:
 `staff` in staff-app, `customer` in customer-app. The token carries it as `aud`, and the lib accepts
 only the audience of its app and the algorithm of `AuthTokenAlgorithmEnum` of `libs/kernel`,
 `HS256`, which it and the e2e contexts sign with too. An env variable could repeat the mistake of

@@ -265,22 +265,19 @@ describe('libs', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the app lib MAY import the Nest packages the setup of an app takes its options from', async () => {
+  it('the app lib MAY import the Nest packages the setup of an app takes its options and global providers from', async () => {
     await expect({
       file: 'libs/app/src/setup/__fixture__.ts',
-      code: 'import type { DynamicModule } from "@nestjs/common";\nimport type { TypeOrmModuleOptions } from "@nestjs/typeorm";',
+      code: 'import type { DynamicModule } from "@nestjs/common";\nimport { APP_FILTER, APP_PIPE } from "@nestjs/core";\nimport type { TypeOrmModuleOptions } from "@nestjs/typeorm";',
     }).toPassArchitectureLint();
   });
 
-  it.each(['@nestjs/core', '@nestjs/config', 'typeorm'])(
-    'the app lib may NOT import %s',
-    async (source) => {
-      await expect({
-        file: 'libs/app/src/setup/__fixture__.ts',
-        code: `import { x } from "${source}";`,
-      }).toBreakRule('boundaries/dependencies');
-    },
-  );
+  it.each(['@nestjs/config', 'typeorm'])('the app lib may NOT import %s', async (source) => {
+    await expect({
+      file: 'libs/app/src/setup/__fixture__.ts',
+      code: `import { x } from "${source}";`,
+    }).toBreakRule('boundaries/dependencies');
+  });
 
   it('the toolkit lib MAY import crypto (BodyFingerprintHelper)', async () => {
     await expect({

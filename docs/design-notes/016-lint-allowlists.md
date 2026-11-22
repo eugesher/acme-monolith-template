@@ -157,7 +157,7 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   of a feature may take `@acme-libs/contracts/credentials`: the `auth` features of staff-app and of
   customer-app, and the `user` feature of staff-app for the hash of a new password. So may the
   `infrastructure/lib-adapters` of a global module, which verify the bearer token for the guard.
-  Only `AppModule` may mount `@acme-libs/credentials`, once for the app (see
+  Only `app/setup/app-setup.module.ts` may mount `@acme-libs/credentials`, once for the app (see
   `017-credentials-lib.md`): a feature that mounted it too would build a second module with its own
   `JwtModule` and password hasher. No core or common module signs anyone in, so none may.
 - **A lib port is reached through a lib adapter.** A feature or a global module declares a port of
@@ -192,6 +192,12 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import `@nestjs/typeorm`;
   `TypeOrmModule.forFeature` would add repository tokens that nothing injects. `libs/app` takes
   `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to `OrmModule`.
+- **One file sets an app up.** `app/setup/app-setup.module.ts` is the category `acme-app:app:setup`:
+  it may import `@acme-libs/app`, `@acme-libs/credentials`, the base libs, the files of its own
+  `app/` and `@nestjs/common`. `AppModule` reaches only that file, the indexes of the features,
+  processors and global modules and `@nestjs/common`, and the rest of `app/` reaches neither lib.
+  `libs/app` takes the libs it mounts, `cache`, `database`, `http`, `local-storage`, `observability`
+  and `queue`, and `@nestjs/core` for `APP_PIPE` and `APP_FILTER` (see `012-app-bootstrap.md`).
 - **A module root binds no token.** An adapter carries its binding in a static `provider` (see
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global

@@ -8,7 +8,7 @@ The connection of an app and the repositories its modules read through live in `
 | `repository/` | `HostedRepository`            | the repository a module gets: six TypeORM methods and two inserts |
 | `naming/`     | `SnakeNamingStrategy`         | snake_case names of tables and columns, for the app and its e2e   |
 
-`AppModule` hands `OrmModule.forRoot` the entities of `app/entities` and nothing else (see
+`AppSetupModule` hands `OrmModule.forRoot` the entities of `app/entities` and nothing else (see
 `012-app-bootstrap.md`).
 
 ## `orm/`

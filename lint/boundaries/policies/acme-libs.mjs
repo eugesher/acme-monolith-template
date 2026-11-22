@@ -40,7 +40,7 @@ export const acmeLibs = [
   ),
   fromLib('app', [
     libs('cache', 'database', 'http', 'local-storage', 'observability', 'queue'),
-    packages('@nestjs/common', '@nestjs/typeorm'),
+    packages('@nestjs/common', '@nestjs/core', '@nestjs/typeorm'),
   ]),
   fromLib('bootstrap', [
     libs('observability', 'openapi'),

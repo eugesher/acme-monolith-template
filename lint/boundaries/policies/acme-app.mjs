@@ -25,10 +25,14 @@ export const acmeApp = [
     packages('@nestjs/common', '@nestjs/core'),
   ]),
   from('acme-app:app:module', [
-    to('acme-app:app', own('app')),
+    to('acme-app:app:setup', own('app')),
     ...appIndexes,
-    baseLibs('cache', 'credentials', 'database', 'http', 'local-storage', 'observability', 'queue'),
-    packages('@nestjs/common', '@nestjs/core'),
+    packages('@nestjs/common'),
+  ]),
+  from('acme-app:app:setup', [
+    to('acme-app:app', own('app')),
+    baseLibs('app', 'credentials'),
+    packages('@nestjs/common'),
   ]),
   from('acme-app:app', [
     to('acme-app:app', own('app')),

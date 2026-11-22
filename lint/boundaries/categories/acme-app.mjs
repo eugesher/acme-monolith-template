@@ -23,6 +23,7 @@ export const acmeApp = [
   ['acme-app:global:infrastructure', 'apps/*/src/global/*/infrastructure/**', ['app', 'module']],
   ['acme-app:global:shell', 'apps/*/src/global/*/shell/**', ['app', 'module']],
   ['acme-app:app:module', 'apps/*/src/app/app.module.ts', ['app']],
+  ['acme-app:app:setup', 'apps/*/src/app/setup/app-setup.module.ts', ['app']],
   ['acme-app:app', 'apps/*/src/app/**', ['app']],
   ['acme-app:common:modules:domain', 'apps/*/src/common/modules/*/domain/**', ['app', 'module']],
   [

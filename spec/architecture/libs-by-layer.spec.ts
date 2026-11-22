@@ -201,11 +201,11 @@ describe('libs by layer', () => {
     }).toPassArchitectureLint();
   });
 
-  it('the AppModule MAY reach the database lib', async () => {
+  it('the AppModule may NOT reach the database lib, the app lib mounts it', async () => {
     await expect({
       file: 'apps/__layers-fixture__/src/app/app.module.ts',
       code: 'import { x } from "../../../../libs/database/src";',
-    }).toPassArchitectureLint();
+    }).toBreakRule('boundaries/dependencies');
   });
 
   it.each([
@@ -349,7 +349,7 @@ describe('libs by layer', () => {
     },
   );
 
-  it('the app outside the AppModule may NOT reach the cache lib, the AppModule mounts it', async () => {
+  it('the app may NOT reach the cache lib, the app lib mounts it', async () => {
     await expect({
       file: 'apps/__layers-fixture__/src/app/setup/config/__fixture__.ts',
       code: 'import { x } from "../../../../../../libs/cache/src";',
@@ -357,8 +357,12 @@ describe('libs by layer', () => {
   });
 
   it.each([
-    ['apps/__layers-fixture__/src/app/app.module.ts', '../../../../libs', 'cache'],
-    ['apps/__layers-fixture__/src/app/app.module.ts', '../../../../libs', 'credentials'],
+    ['apps/__layers-fixture__/src/app/setup/app-setup.module.ts', '../../../../../libs', 'app'],
+    [
+      'apps/__layers-fixture__/src/app/setup/app-setup.module.ts',
+      '../../../../../libs',
+      'credentials',
+    ],
     [
       'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
       '../../../../../../libs',

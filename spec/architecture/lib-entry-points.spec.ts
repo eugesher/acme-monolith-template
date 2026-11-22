@@ -152,12 +152,22 @@ describe('lib entry points', () => {
     },
   );
 
-  it('the AppModule MAY import the database lib by its alias', async () => {
+  it('the app lib MAY import the database lib by its alias', async () => {
     await expect({
-      file: 'apps/staff-app/src/app/app.module.ts',
+      file: 'libs/app/src/setup/__fixture__.ts',
       code: 'import { OrmModule } from "@acme-libs/database";',
     }).toPassArchitectureLint();
   });
+
+  it.each(['@acme-libs/cache', '@acme-libs/database', '@acme-libs/http', '@acme-libs/queue'])(
+    'the AppModule may NOT import %s by its alias, the app lib mounts it',
+    async (source) => {
+      await expect({
+        file: 'apps/staff-app/src/app/app.module.ts',
+        code: `import { x } from "${source}";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
 
   it('application may NOT import the local-storage lib root, it takes the transaction port', async () => {
     await expect({
@@ -188,9 +198,9 @@ describe('lib entry points', () => {
       }).toBreakRule('boundaries/dependencies');
     },
   );
-  it('the app root MAY import the cache lib by its alias', async () => {
+  it('the app lib MAY import the cache lib by its alias', async () => {
     await expect({
-      file: 'apps/staff-app/src/app/app.module.ts',
+      file: 'libs/app/src/setup/__fixture__.ts',
       code: 'import { CacheModule } from "@acme-libs/cache";',
     }).toPassArchitectureLint();
   });
@@ -262,7 +272,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/app/app.module.ts',
+    'libs/app/src/setup/__fixture__.ts',
     'apps/staff-app/src/common/shared/auth/__fixture__.ts',
   ])('%s MAY import the http lib by its alias', async (file) => {
     await expect({

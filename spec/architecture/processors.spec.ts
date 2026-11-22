@@ -318,11 +318,11 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       },
     );
 
-    it('the app module MAY connect Bull to Redis with the queue lib', async () => {
+    it('the app module may NOT connect Bull to Redis itself, the app lib mounts the queue lib', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/app/app.module.ts',
         code: 'import { BullSetupModule } from "@acme-libs/queue";',
-      }).toPassArchitectureLint();
+      }).toBreakRule('boundaries/dependencies');
     });
 
     it.each([

@@ -24,7 +24,7 @@ library, so a caller that hands it a wider object cannot widen the token.
 that verifies with the secret, the audience and `HS256` of the app, and `null` for any other token,
 so no caller reads a claim the lib did not sign.
 
-**One module per app.** `AppModule` mounts `CredentialsModule.forRoot(audience)` once, and the
+**One module per app.** `AppSetupModule` mounts `CredentialsModule.forRoot(audience)` once, and the
 module is global: one `JwtModule` signs and verifies with one set of options, and one password
 hasher serves every module of the app. Nest 12 keys a dynamic module by the object its method
 returns, not by the arguments, so a lib mounted by each module that uses it would build a

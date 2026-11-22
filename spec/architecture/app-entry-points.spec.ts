@@ -11,6 +11,8 @@ describe('app entry points', () => {
     scaffold = Scaffold.create([
       'apps/__entry-fixture__/src/app/app.module.ts',
       'apps/__entry-fixture__/src/app/setup/config/config-setup.module.ts',
+      'apps/__entry-fixture__/src/app/setup/app-setup.module.ts',
+      'apps/__entry-fixture__/src/app/entities/index.ts',
       'apps/__entry-fixture__/src/features/index.ts',
       'apps/__entry-fixture__/src/features/health/shell/health.module.ts',
       'apps/__entry-fixture__/src/processors/index.ts',
@@ -104,18 +106,61 @@ describe('app entry points', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the AppModule MAY register global providers with tokens from @nestjs/core', async () => {
+  it('the AppModule may NOT import @nestjs/core, the app lib registers the global providers', async () => {
     await expect({
       file: 'apps/staff-app/src/app/app.module.ts',
       code: 'import { APP_FILTER, APP_PIPE } from "@nestjs/core";',
-    }).toPassArchitectureLint();
+    }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the app setup may NOT import @nestjs/core, only the AppModule registers global providers', async () => {
+  it('the app setup may NOT import @nestjs/core, the app lib registers the global providers', async () => {
     await expect({
       file: 'apps/staff-app/src/app/setup/config/__fixture__.ts',
       code: 'import { APP_PIPE } from "@nestjs/core";',
     }).toBreakRule('boundaries/dependencies');
+  });
+
+  it('the AppModule MAY mount the app setup module', async () => {
+    await expect({
+      file: 'apps/__entry-fixture__/src/app/app.module.ts',
+      code: 'import { AppSetupModule } from "./setup/app-setup.module";',
+    }).toPassArchitectureLint();
+  });
+
+  it('the app setup module MAY extend the app lib and mount the credentials lib, the config setup and the entities of its app', async () => {
+    await expect({
+      file: 'apps/__entry-fixture__/src/app/setup/app-setup.module.ts',
+      code: 'import type { DynamicModule } from "@nestjs/common";\nimport { AppSetupBaseModule } from "../../../../../libs/app/src";\nimport { CredentialsModule } from "../../../../../libs/credentials/src";\nimport { AppNameEnum } from "../../../../../libs/kernel/src";\nimport { entities } from "../entities";\nimport { ConfigSetupModule } from "./config/config-setup.module";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each(['cache', 'database', 'http', 'queue'])(
+    'the app setup module may NOT reach the %s lib: the app lib mounts it',
+    async (lib) => {
+      await expect({
+        file: 'apps/__entry-fixture__/src/app/setup/app-setup.module.ts',
+        code: `import { x } from "../../../../../libs/${lib}/src";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it.each([
+    [
+      'apps/__entry-fixture__/src/app/setup/config/__fixture__.ts',
+      '../../../../../../libs/app/src',
+    ],
+    [
+      'apps/__entry-fixture__/src/app/setup/config/__fixture__.ts',
+      '../../../../../../libs/credentials/src',
+    ],
+    [
+      'apps/__entry-fixture__/src/features/health/shell/__fixture__.ts',
+      '../../../../../../libs/app/src',
+    ],
+  ])('%s may NOT reach %s, only the app setup module does', async (file, source) => {
+    await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+      'boundaries/dependencies',
+    );
   });
 
   it('main may NOT reach past the AppModule into the app setup', async () => {

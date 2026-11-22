@@ -5,7 +5,7 @@ All three apps connect BullMQ the same way, so the connection lives in a lib:
 
 | Method                          | Called by                                    | What it returns                                                         |
 | ------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------- |
-| `BullSetupModule.forRoot()`     | `AppModule` of each app                      | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
+| `BullSetupModule.forRoot()`     | `AppSetupBaseModule` of `libs/app`           | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
 | `BullSetupModule.registerQueue` | `core/queues`, the module of a queue adapter | `BullModule.registerQueue({ name })`                                    |
 
 ```ts
