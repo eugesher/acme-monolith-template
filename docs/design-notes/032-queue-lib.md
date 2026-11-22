@@ -65,6 +65,6 @@ worker takes the connection and the prefix of its queue.
 | the module of a queue adapter | `registerQueue` |
 
 No other layer imports `libs/queue`, and none of the importers above imports `@nestjs/bullmq`: the
-package is left to the lib, to the queue adapters of `infrastructure/queue` and to the presentation
-of the processors. The lib itself sees `@nestjs/bullmq`, `@nestjs/common` and `@nestjs/config` (see
+package is left to the lib, to the queue adapters of `infrastructure/queue` and to the processors in
+`shell/`. The lib itself sees `@nestjs/bullmq`, `@nestjs/common` and `@nestjs/config` (see
 `016-lint-allowlists.md`).
