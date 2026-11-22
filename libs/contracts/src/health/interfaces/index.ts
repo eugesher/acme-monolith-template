@@ -1,1 +1,1 @@
-export * from './views/health-lib.view';
+export * from './views/health.view';

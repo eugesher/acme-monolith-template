@@ -89,10 +89,10 @@ that each one did. processor-app has no `features/` left. The lint treats the fi
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
 `libs/testing/src/e2e/e2e.context.ts`, which holds what the contexts share: `init()` compiles the
 `AppModule` it is given with `@nestjs/testing`, starts it with
-`AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, and spies on the
-root logger; `close()`, `takeRootWarnings()`, `mountedRoutes()` and `routeDtos()` round it off. The
-class is not abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor,
-calls `super.init()` and adds its own.
+`AppBootstrap.create(app, <app>).execute()` of `libs/app`, as `main.ts` does, and spies on the root
+logger; `close()`, `takeRootWarnings()`, `mountedRoutes()` and `routeDtos()` round it off. The class
+is not abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor, calls
+`super.init()` and adds its own.
 
 **A context of an app with auth signs tokens.** `AuthE2EContext` of
 `libs/testing/src/e2e/auth-e2e.context.ts` extends `E2EContext` with the `AuthAudienceEnum` of the
@@ -261,20 +261,21 @@ the `PORT` of the API app.
 
 **`test/system` is not plain node.** It compiles project code, so it has its own `tsconfig.json`
 over the root one and the lint category `repo:system`: it sees its own files, the `AppModule` of
-every app, the contracts of core, the libs `kernel`, `toolkit`, `domain` and `testing`, and the
-packages `@nestjs/bullmq`, `@nestjs/common`, `bullmq`, `ioredis` and `supertest`. BullMQ and the
-contracts of core let a case put a failing job into a queue, which no route of an app writes.
-`test/infra` keeps running under plain node.
+every app through its barrel `@acme-<app>/app`, the contracts of core, the libs `kernel`, `toolkit`,
+`domain` and `testing`, and the packages `@nestjs/bullmq`, `@nestjs/common`, `bullmq`, `ioredis` and
+`supertest`. BullMQ and the contracts of core let a case put a failing job into a queue, which no
+route of an app writes. `test/infra` keeps running under plain node.
 
 ## Lint
 
-`apps/*/test/**` is the category `acme-app:test`. It sees its own app's tests, its `AppModule`, its
-contracts, the contracts of core, `@acme-core/entities`, the libs `kernel`, `toolkit`, `domain`,
-`database`, `observability` and `testing`, and the packages `@nestjs/bullmq`, `@nestjs/common`,
-`@nestjs/config`, `bullmq`, `ioredis`, `supertest` and `typeorm`. `@nestjs/core`, `@nestjs/testing`
-and `nestjs-pino` stay in the testing lib. The observability lib opens a correlation context for a
-case that calls a port directly, outside a request, as `LedgerE2E` does for the core ledger.
-`spec/architecture/e2e-sections.spec.ts` checks these edges.
+`apps/*/test/**` is the category `acme-app:test`. It sees its own app's tests, its `AppModule`
+through `@acme-<app>/app`, its contracts, the contracts of core, `@acme-core/entities`, the libs
+`kernel`, `toolkit`, `domain`, `database`, `observability` and `testing`, and the packages
+`@nestjs/bullmq`, `@nestjs/common`, `@nestjs/config`, `bullmq`, `ioredis`, `supertest` and
+`typeorm`. `@nestjs/core`, `@nestjs/testing` and `nestjs-pino` stay in the testing lib. The
+observability lib opens a correlation context for a case that calls a port directly, outside a
+request, as `LedgerE2E` does for the core ledger. `spec/architecture/e2e-sections.spec.ts` checks
+these edges.
 
 The e2e code turns off `no-unsafe-argument`, `no-unsafe-assignment` and `no-unsafe-member-access`
 (`lint/configs/e2e.mjs`): a response body and a query result are untyped by nature, and the snapshot

@@ -42,5 +42,5 @@ rebuilds each record of the page and answers its snapshot (see `038-domain-model
 
 **Ids are strings and instants ISO strings** in every response (see `039-api-surface.md`).
 
-**The app lists the entities of the modules it mounts** in `app/entities` and hands them to
+**The app lists the entities of the modules it mounts** in `app/setup/entities` and hands them to
 `OrmModule.forRoot`, because a repository reads only an entity registered on the connection.

@@ -6,8 +6,8 @@ request limits (see `003-authentication.md` and `036-production-stack.md`).
 
 ## One module for the API routes
 
-`HttpSecurityModule` of `libs/http`, imported by the `AppModule` of all three apps, mounts two
-middlewares on every route of the prefix, in this order:
+`HttpSecurityModule` of `libs/http`, imported by `AppSetupBaseModule` of `libs/app` for all three
+apps, mounts two middlewares on every route of the prefix, in this order:
 
 | Middleware           | What it does                                                                      |
 | -------------------- | --------------------------------------------------------------------------------- |

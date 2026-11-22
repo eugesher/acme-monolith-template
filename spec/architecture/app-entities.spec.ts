@@ -25,7 +25,7 @@ describe('app entities (@acme-<app>/common/entities)', () => {
   });
 
   it.each([
-    ['apps/__entities-fixture__/src/app/entities/index.ts', '../../common/entities'],
+    ['apps/__entities-fixture__/src/app/setup/entities/index.ts', '../../../common/entities'],
     [
       'apps/__entities-fixture__/src/global/auth/infrastructure/persistence/repositories/__fixture__.ts',
       '../../../../../common/entities',

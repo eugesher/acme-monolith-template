@@ -3,7 +3,7 @@ import type { Queue } from 'bullmq';
 import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
-import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
+import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
 import {
   LEDGER_RECORD_QUEUE,
@@ -13,7 +13,7 @@ import {
   PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
   type IProductStockPostSubtractPayload,
 } from '@acme-core/contracts/product-stock';
-import { AppModule } from '@acme-customer/app/app.module';
+import { AppModule } from '@acme-customer/app';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {
@@ -57,7 +57,7 @@ export class AppE2EContext extends AuthE2EContext {
   public override async init(): Promise<void> {
     await super.init();
 
-    const redis = this.moduleFixture.get<Redis>(CACHE_LIB_REDIS_CLIENT_TOKEN);
+    const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
     const annToken = this.jwt.sign({ sub: '101' });
     const bobToken = this.jwt.sign({ sub: '102' });
     const carolToken = this.jwt.sign({ sub: '103' });

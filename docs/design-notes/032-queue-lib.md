@@ -5,7 +5,7 @@ All three apps connect BullMQ the same way, so the connection lives in a lib:
 
 | Method                          | Called by                                    | What it returns                                                         |
 | ------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------- |
-| `BullSetupModule.forRoot()`     | `AppModule` of each app                      | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
+| `BullSetupModule.forRoot()`     | `AppSetupBaseModule` of `libs/app`           | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
 | `BullSetupModule.registerQueue` | `core/queues`, the module of a queue adapter | `BullModule.registerQueue({ name })`                                    |
 
 ```ts
@@ -58,11 +58,11 @@ worker takes the connection and the prefix of its queue.
 
 ## Who sees the lib
 
-| Importer                      | Uses            |
-| ----------------------------- | --------------- |
-| `app.module.ts`               | `forRoot()`     |
-| `core/queues`                 | `registerQueue` |
-| the module of a queue adapter | `registerQueue` |
+| Importer                           | Uses            |
+| ---------------------------------- | --------------- |
+| `AppSetupBaseModule` of `libs/app` | `forRoot()`     |
+| `core/queues`                      | `registerQueue` |
+| the module of a queue adapter      | `registerQueue` |
 
 No other layer imports `libs/queue`, and none of the importers above imports `@nestjs/bullmq`: the
 package is left to the lib, to the queue adapters of `infrastructure/queue` and to the processors in

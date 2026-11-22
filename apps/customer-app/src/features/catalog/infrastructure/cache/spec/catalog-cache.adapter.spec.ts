@@ -1,9 +1,9 @@
-import type { ICacheLibPort } from '@acme-libs/contracts/cache';
+import type { ICachePort } from '@acme-libs/contracts/cache';
 
 import { CatalogCacheAdapter } from '../catalog-cache.adapter';
 
 describe('CatalogCacheAdapter', () => {
-  let cache: jest.Mocked<ICacheLibPort>;
+  let cache: jest.Mocked<ICachePort>;
   let adapter: CatalogCacheAdapter;
 
   beforeEach(() => {

@@ -20,15 +20,20 @@ const appIndexes = [
 
 export const acmeApp = [
   from('acme-app:main', [
-    to('acme-app:app:module', own('app')),
-    libs('bootstrap', 'kernel', 'observability'),
+    to('acme-app:app:index', own('app')),
+    libs('app', 'kernel', 'observability'),
     packages('@nestjs/common', '@nestjs/core'),
   ]),
+  from('acme-app:app:index', [to('acme-app:app:module', own('app'))]),
   from('acme-app:app:module', [
-    to('acme-app:app', own('app')),
+    to('acme-app:app:setup', own('app')),
     ...appIndexes,
-    baseLibs('cache', 'credentials', 'database', 'http', 'local-storage', 'observability', 'queue'),
-    packages('@nestjs/common', '@nestjs/core'),
+    packages('@nestjs/common'),
+  ]),
+  from('acme-app:app:setup', [
+    to('acme-app:app', own('app')),
+    baseLibs('app', 'credentials'),
+    packages('@nestjs/common'),
   ]),
   from('acme-app:app', [
     to('acme-app:app', own('app')),
@@ -74,7 +79,7 @@ export const acmeApp = [
     to('acme-app:common:modules:index', own('app')),
     to('acme-core:modules:index'),
     baseLibs('auth'),
-    to('acme-libs:contracts'),
+    libContracts('auth'),
     packages('@nestjs/common'),
   ]),
   from('acme-app:global:infrastructure', [
@@ -103,14 +108,13 @@ export const acmeApp = [
     to('acme-app:global:outbound', own('app', 'module')),
     to('acme-app:contracts', own('app')),
     baseLibs(),
-    to('acme-libs:contracts'),
     packages('@nestjs/common'),
   ]),
   from('acme-app:global:infrastructure:lib-adapters', [
     to('acme-app:global:infrastructure:lib-adapters', own('app', 'module')),
     to('acme-app:global:outbound', own('app', 'module')),
     baseLibs(),
-    to('acme-libs:contracts'),
+    libContracts('credentials'),
     packages('@nestjs/common'),
   ]),
   from('acme-app:contracts', [appContracts, baseLibs()]),
@@ -122,7 +126,7 @@ export const acmeApp = [
   ]),
   from('acme-app:test', [
     to('acme-app:test', own('app')),
-    to('acme-app:app:module', own('app')),
+    to('acme-app:app:index', own('app')),
     to('acme-app:contracts', own('app')),
     to('acme-core:contracts'),
     to('acme-core:entities'),

@@ -1,6 +1,6 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import { CREDENTIALS_LIB_PORT, type ICredentialsLibPort } from '@acme-libs/contracts/credentials';
+import { CREDENTIALS_PORT, type ICredentialsPort } from '@acme-libs/contracts/credentials';
 import type { Nullable } from '@acme-libs/toolkit';
 
 import { AUTH_GLOBAL_CREDENTIALS_PORT, type IAuthGlobalCredentialsPort } from '../../outbound';
@@ -13,8 +13,8 @@ export class AuthGlobalCredentialsLibAdapter implements IAuthGlobalCredentialsPo
   };
 
   constructor(
-    @Inject(CREDENTIALS_LIB_PORT)
-    private readonly credentials: ICredentialsLibPort,
+    @Inject(CREDENTIALS_PORT)
+    private readonly credentials: ICredentialsPort,
   ) {}
 
   public async verifyAccessToken(token: string): Promise<Nullable<string>> {

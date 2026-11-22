@@ -1,1 +1,1 @@
-export * from './commands/cache-lib-wrap.command';
+export * from './commands/cache-wrap.command';

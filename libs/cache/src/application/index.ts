@@ -1,3 +1,3 @@
-export * from './use-cases/cache-lib-del-by-prefix.use-case';
-export * from './use-cases/cache-lib-get.use-case';
-export * from './use-cases/cache-lib-wrap.use-case';
+export * from './use-cases/cache-del-by-prefix.use-case';
+export * from './use-cases/cache-get.use-case';
+export * from './use-cases/cache-wrap.use-case';

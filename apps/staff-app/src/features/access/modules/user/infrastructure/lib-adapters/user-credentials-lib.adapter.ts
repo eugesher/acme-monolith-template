@@ -1,6 +1,6 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import { CREDENTIALS_LIB_PORT, type ICredentialsLibPort } from '@acme-libs/contracts/credentials';
+import { CREDENTIALS_PORT, type ICredentialsPort } from '@acme-libs/contracts/credentials';
 
 import { USER_CREDENTIALS_PORT, type IUserCredentialsPort } from '../../outbound';
 
@@ -12,8 +12,8 @@ export class UserCredentialsLibAdapter implements IUserCredentialsPort {
   };
 
   constructor(
-    @Inject(CREDENTIALS_LIB_PORT)
-    private readonly credentials: ICredentialsLibPort,
+    @Inject(CREDENTIALS_PORT)
+    private readonly credentials: ICredentialsPort,
   ) {}
 
   public async hashPassword(password: string): Promise<string> {

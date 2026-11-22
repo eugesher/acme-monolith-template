@@ -1,4 +1,4 @@
-export * from './commands/credentials-lib-sign-access-token.command';
-export * from './commands/credentials-lib-verify-password.command';
+export * from './commands/credentials-sign-access-token.command';
+export * from './commands/credentials-verify-password.command';
 
-export * from './views/credentials-lib-verify-access-token.view';
+export * from './views/credentials-verify-access-token.view';

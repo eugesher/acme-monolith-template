@@ -4,23 +4,23 @@ import { LoggerModule, PinoLogger } from 'nestjs-pino';
 import { DataSource } from 'typeorm';
 
 import { AppNameEnum } from '@acme-libs/kernel';
-import { CACHE_LIB_PORT } from '@acme-libs/contracts/cache';
-import { HEALTH_LIB_PORT, type IHealthLibPort } from '@acme-libs/contracts/health';
+import { CACHE_PORT } from '@acme-libs/contracts/cache';
+import { HEALTH_PORT, type IHealthPort } from '@acme-libs/contracts/health';
 
 import { HealthLibModule } from '../health-lib.module';
 
 describe('HealthLibModule', () => {
   let context: INestApplicationContext;
-  let port: IHealthLibPort;
+  let port: IHealthPort;
 
   beforeEach(async () => {
     @Global()
     @Module({
-      exports: [DataSource, CACHE_LIB_PORT],
+      exports: [DataSource, CACHE_PORT],
       providers: [
         { provide: DataSource, useValue: { query: () => Promise.resolve([{ 1: '1' }]) } },
         {
-          provide: CACHE_LIB_PORT,
+          provide: CACHE_PORT,
           useValue: { handleGet: () => Promise.reject(new Error('down')) },
         },
       ],
@@ -37,7 +37,7 @@ describe('HealthLibModule', () => {
     class TestModule {}
 
     context = await NestFactory.createApplicationContext(TestModule, { logger: false });
-    port = context.get(HEALTH_LIB_PORT);
+    port = context.get(HEALTH_PORT);
   });
 
   afterEach(async () => {

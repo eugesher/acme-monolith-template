@@ -3,10 +3,10 @@ import '@acme-libs/observability/tracer';
 import { NestFactory } from '@nestjs/core';
 import type { NestApplicationOptions } from '@nestjs/common';
 
-import { AppBootstrap } from '@acme-libs/bootstrap';
+import { AppBootstrap } from '@acme-libs/app';
 import { AppNameEnum } from '@acme-libs/kernel';
 import { BootstrapLogger } from '@acme-libs/observability';
-import { AppModule } from '@acme-staff/app/app.module';
+import { AppModule } from '@acme-staff/app';
 
 void (async () => {
   const appName = AppNameEnum.STAFF_APP;

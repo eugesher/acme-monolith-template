@@ -58,7 +58,7 @@ describe('e2e sections', () => {
   it('the e2e context MAY use the testing lib', async () => {
     await expect({
       file: 'apps/customer-app/test/context/__fixture__.ts',
-      code: 'import { E2EContext } from "@acme-libs/testing";\nimport { CACHE_LIB_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
+      code: 'import { E2EContext } from "@acme-libs/testing";\nimport { CACHE_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
     }).toPassArchitectureLint();
   });
 

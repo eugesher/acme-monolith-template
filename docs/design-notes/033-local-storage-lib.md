@@ -8,8 +8,9 @@ so they live in one lib, `libs/local-storage`, in two parts:
 | `setup/`         | `LocalStorageSetupModule.forRoot()`         | the root `ClsModule`, the context of every request under its correlation id |
 | `transactional/` | `LocalStorageTransactionalModule.forRoot()` | the transactional plugin, global `TRANSACTION_PORT`                         |
 
-`AppModule` imports `LocalStorageSetupModule` before `OrmModule` of `libs/database`, and `OrmModule`
-imports `LocalStorageTransactionalModule` (see `012-app-bootstrap.md`).
+`AppSetupBaseModule` of `libs/app` imports `LocalStorageSetupModule` before `OrmModule` of
+`libs/database`, and `OrmModule` imports `LocalStorageTransactionalModule` (see
+`012-app-bootstrap.md`).
 
 ## `setup/`
 
@@ -57,7 +58,7 @@ import `libs/local-storage`.
 
 | Importer                                  | Uses                                                              |
 | ----------------------------------------- | ----------------------------------------------------------------- |
-| `app.module.ts`                           | `LocalStorageSetupModule.forRoot()`                               |
+| `AppSetupBaseModule` of `libs/app`        | `LocalStorageSetupModule.forRoot()`                               |
 | `OrmModule` of `libs/database`            | `LocalStorageTransactionalModule.forRoot()`                       |
 | `infrastructure` of the apps and the core | `TRANSACTION_PORT` from the contracts, in the transaction adapter |
 

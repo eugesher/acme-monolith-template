@@ -157,7 +157,7 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   of a feature may take `@acme-libs/contracts/credentials`: the `auth` features of staff-app and of
   customer-app, and the `user` feature of staff-app for the hash of a new password. So may the
   `infrastructure/lib-adapters` of a global module, which verify the bearer token for the guard.
-  Only `AppModule` may mount `@acme-libs/credentials`, once for the app (see
+  Only `app/setup/app-setup.module.ts` may mount `@acme-libs/credentials`, once for the app (see
   `017-credentials-lib.md`): a feature that mounted it too would build a second module with its own
   `JwtModule` and password hasher. No core or common module signs anyone in, so none may.
 - **A lib port is reached through a lib adapter.** A feature or a global module declares a port of
@@ -188,9 +188,20 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   so the rest of the toolkit sees only `crypto`, and the domain lib and the kernel see no package.
 - **The database contracts name TypeORM.** The ORM port returns a TypeORM `Repository`, so the
   contracts of `database` may import `typeorm`; the other contracts see only the base libs.
-- **No module registers entities.** The entities of an app are listed once in `app/entities` and
-  handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import `@nestjs/typeorm`;
-  `TypeOrmModule.forFeature` would add repository tokens that nothing injects.
+- **No module registers entities.** The entities of an app are listed once in `app/setup/entities`
+  and handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import
+  `@nestjs/typeorm`; `TypeOrmModule.forFeature` would add repository tokens that nothing injects.
+  `libs/app` takes `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to
+  `OrmModule`.
+- **One file sets an app up.** `app/setup/app-setup.module.ts` is the category `acme-app:app:setup`:
+  it may import `@acme-libs/app`, `@acme-libs/credentials`, the base libs, the files of its own
+  `app/` and `@nestjs/common`. `AppModule` reaches only that file, the indexes of the features,
+  processors and global modules and `@nestjs/common`, and the rest of `app/` reaches neither lib.
+  `libs/app` holds two parts behind one root, so `main.ts` and the app setup import `@acme-libs/app`
+  alike, and the `file` capture keeps an allowlist per part: `setup/` takes the libs it mounts,
+  `cache`, `database`, `http`, `local-storage`, `observability` and `queue`, and `@nestjs/core` for
+  `APP_PIPE` and `APP_FILTER`; `bootstrap/` takes `observability`, `openapi`, `@nestjs/config` and
+  `nestjs-pino` to start the app (see `012-app-bootstrap.md`).
 - **A module root binds no token.** An adapter carries its binding in a static `provider` (see
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
@@ -202,10 +213,12 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
 - **A global common-adapter reaches any contract of its app and its own outbound.** It implements a
   port of its module's outbound with the port of a common module, which is named after that module,
   not after the global module, so the namesake rule of `appContracts` would refuse it.
-- **A global lib-adapter reaches the contracts of the libs and its own outbound.** It implements a
+- **A global lib-adapter reaches the `credentials` contract and its own outbound.** It implements a
   port of its module's outbound with the port of a lib, as the lib-adapters of a feature do:
-  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_LIB_PORT`. The rest
-  of the global infrastructure may not take a lib contract other than that of `database`.
+  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_PORT`. The shell of
+  a global module takes the `auth` contract, its common-adapters take no lib contract, and the rest
+  of the global infrastructure takes only that of `database`. Each layer names the contracts it
+  uses, so a new lib contract reaches a global module only through a new policy.
 
 ### No policy names an export
 
@@ -245,4 +258,4 @@ may reach `naming` and `orm/application` may reach `repository`.
 and the logger mock of `observability/pino-logger.mock.ts`. Any `*.spec.ts` may import it, through a
 policy that matches the path, and so may the e2e code and `test/system`; no layer of production code
 lists it, so lint refuses it there. The lib reaches the `outbound` of the cache lib for the Redis
-token and the bootstrap lib for `AppBootstrap`, and nothing else of another lib.
+token and the app lib for `AppBootstrap`, and nothing else of another lib.

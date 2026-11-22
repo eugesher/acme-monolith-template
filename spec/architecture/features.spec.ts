@@ -346,14 +346,14 @@ describe('features', () => {
     it('infrastructure/lib-adapters MAY take the credentials port — a feature signs its users in', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/lib-adapters/__fixture__.ts',
-        code: 'import { Inject, Injectable } from "@nestjs/common";\nimport { CREDENTIALS_LIB_PORT } from "@acme-libs/contracts/credentials";',
+        code: 'import { Inject, Injectable } from "@nestjs/common";\nimport { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";',
       }).toPassArchitectureLint();
     });
 
     it('infrastructure/lib-adapters MAY take the health port', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/lib-adapters/__fixture__.ts',
-        code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
+        code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
       }).toPassArchitectureLint();
     });
 
@@ -362,7 +362,7 @@ describe('features', () => {
       async (layer) => {
         await expect({
           file: `apps/__features-fixture__/src/features/product/${layer}/__fixture__.ts`,
-          code: 'import { CREDENTIALS_LIB_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
+          code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_PORT } from "@acme-libs/contracts/health";',
         }).toBreakRule('boundaries/dependencies');
       },
     );
@@ -417,7 +417,7 @@ describe('features', () => {
       async (file) => {
         await expect({
           file: `apps/__features-fixture__/src/features/product/${file}`,
-          code: 'import { CredentialsLibModule } from "@acme-libs/credentials";',
+          code: 'import { CredentialsModule } from "@acme-libs/credentials";',
         }).toBreakRule('boundaries/dependencies');
       },
     );

@@ -7,7 +7,6 @@ describe('libs by layer', () => {
   beforeAll(() => {
     scaffold = Scaffold.create([
       'libs/auth/src/index.ts',
-      'libs/bootstrap/src/index.ts',
       'libs/cache/src/index.ts',
       'libs/config/src/index.ts',
       'libs/credentials/src/index.ts',
@@ -45,8 +44,8 @@ describe('libs by layer', () => {
     ['core/contracts/src/__ledger-fixture__/__fixture__.ts', '../../../../libs'],
   ])('%s may reach only the framework-free libs', async (file, libs) => {
     const others = [
+      'app',
       'auth',
-      'bootstrap',
       'cache',
       'config',
       'database',
@@ -70,10 +69,10 @@ describe('libs by layer', () => {
   });
 
   it('main may reach only the libs that run before or outside DI', async () => {
-    const allowed = ['bootstrap', 'kernel', 'observability'];
+    const allowed = ['app', 'kernel', 'observability'];
     const libs = [
+      'app',
       'auth',
-      'bootstrap',
       'cache',
       'config',
       'database',
@@ -201,11 +200,11 @@ describe('libs by layer', () => {
     }).toPassArchitectureLint();
   });
 
-  it('the AppModule MAY reach the database lib', async () => {
+  it('the AppModule may NOT reach the database lib, the app lib mounts it', async () => {
     await expect({
-      file: 'apps/__layers-fixture__/src/app/app.module.ts',
-      code: 'import { x } from "../../../../libs/database/src";',
-    }).toPassArchitectureLint();
+      file: 'apps/__layers-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../../../../libs/database/src";',
+    }).toBreakRule('boundaries/dependencies');
   });
 
   it.each([
@@ -349,7 +348,7 @@ describe('libs by layer', () => {
     },
   );
 
-  it('the app outside the AppModule may NOT reach the cache lib, the AppModule mounts it', async () => {
+  it('the app may NOT reach the cache lib, the app lib mounts it', async () => {
     await expect({
       file: 'apps/__layers-fixture__/src/app/setup/config/__fixture__.ts',
       code: 'import { x } from "../../../../../../libs/cache/src";',
@@ -357,8 +356,12 @@ describe('libs by layer', () => {
   });
 
   it.each([
-    ['apps/__layers-fixture__/src/app/app.module.ts', '../../../../libs', 'cache'],
-    ['apps/__layers-fixture__/src/app/app.module.ts', '../../../../libs', 'credentials'],
+    ['apps/__layers-fixture__/src/app/setup/app-setup.module.ts', '../../../../../libs', 'app'],
+    [
+      'apps/__layers-fixture__/src/app/setup/app-setup.module.ts',
+      '../../../../../libs',
+      'credentials',
+    ],
     [
       'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
       '../../../../../../libs',
@@ -458,7 +461,7 @@ describe('libs by layer', () => {
     }).toPassArchitectureLint();
   });
 
-  it('main may NOT read the config: the bootstrap lib reads the port and the prefix', async () => {
+  it('main may NOT read the config: AppBootstrap of the app lib reads the port and the prefix', async () => {
     await expect({
       file: 'apps/__layers-fixture__/src/main.ts',
       code: 'import { ConfigService } from "@nestjs/config";',

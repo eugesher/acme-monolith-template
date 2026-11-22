@@ -37,6 +37,15 @@
         "tsConfigPath": "apps/processor-app/tsconfig.app.json"
       }
     },
+    "app": {
+      "type": "library",
+      "root": "libs/app",
+      "entryFile": "index",
+      "sourceRoot": "libs/app/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/app/tsconfig.lib.json"
+      }
+    },
     "auth": {
       "type": "library",
       "root": "libs/auth",
@@ -44,15 +53,6 @@
       "sourceRoot": "libs/auth/src",
       "compilerOptions": {
         "tsConfigPath": "libs/auth/tsconfig.lib.json"
-      }
-    },
-    "bootstrap": {
-      "type": "library",
-      "root": "libs/bootstrap",
-      "entryFile": "index",
-      "sourceRoot": "libs/bootstrap/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/bootstrap/tsconfig.lib.json"
       }
     },
     "cache": {

@@ -6,8 +6,8 @@ describe('libs', () => {
 
   beforeAll(() => {
     scaffold = Scaffold.create([
+      'libs/app/src/index.ts',
       'libs/auth/src/index.ts',
-      'libs/bootstrap/src/index.ts',
       'libs/cache/src/index.ts',
       'libs/config/src/index.ts',
       'libs/credentials/src/index.ts',
@@ -63,7 +63,6 @@ describe('libs', () => {
     ['toolkit', []],
     ['domain', []],
     ['auth', ['kernel', 'toolkit', 'domain']],
-    ['bootstrap', ['kernel', 'toolkit', 'domain', 'observability', 'openapi']],
     ['cache', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
     ['config', ['kernel', 'toolkit', 'domain']],
     ['credentials', ['kernel', 'toolkit', 'domain']],
@@ -74,11 +73,11 @@ describe('libs', () => {
     ['observability', ['kernel', 'toolkit', 'domain', 'config']],
     ['openapi', ['kernel', 'toolkit', 'domain', 'http']],
     ['queue', ['kernel', 'toolkit', 'domain', 'config']],
-    ['testing', ['kernel', 'toolkit', 'domain', 'bootstrap']],
+    ['testing', ['kernel', 'toolkit', 'domain', 'app']],
   ])('%s may import only %j of the other libs', async (from, allowed) => {
     const libs = [
+      'app',
       'auth',
-      'bootstrap',
       'cache',
       'config',
       'credentials',
@@ -156,8 +155,8 @@ describe('libs', () => {
   });
 
   it.each([
+    ['app', []],
     ['auth', ['auth']],
-    ['bootstrap', []],
     ['cache', ['cache']],
     ['config', []],
     ['credentials', ['credentials']],
@@ -249,6 +248,56 @@ describe('libs', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
+  it.each([
+    ['setup', ['cache', 'database', 'http', 'local-storage', 'observability', 'queue']],
+    ['bootstrap', ['observability', 'openapi']],
+  ])('the %s of the app lib may import only %j of the other libs', async (part, allowed) => {
+    const libs = [
+      'auth',
+      'cache',
+      'config',
+      'credentials',
+      'database',
+      'health',
+      'http',
+      'local-storage',
+      'observability',
+      'openapi',
+      'queue',
+    ];
+
+    const reachable = libs.filter((lib) => allowed.includes(lib));
+    const unreachable = libs.filter((lib) => !allowed.includes(lib));
+
+    for (const to of reachable) {
+      await expect({
+        file: `libs/app/src/${part}/__fixture__.ts`,
+        code: `import { x } from "../../../${to}/src";`,
+      }).toPassArchitectureLint();
+    }
+
+    for (const to of unreachable) {
+      await expect({
+        file: `libs/app/src/${part}/__fixture__.ts`,
+        code: `import { x } from "../../../${to}/src";`,
+      }).toBreakRule('boundaries/dependencies');
+    }
+  });
+
+  it('the setup of the app lib MAY import the Nest packages the setup of an app takes its options and global providers from', async () => {
+    await expect({
+      file: 'libs/app/src/setup/__fixture__.ts',
+      code: 'import type { DynamicModule } from "@nestjs/common";\nimport { APP_FILTER, APP_PIPE } from "@nestjs/core";\nimport type { TypeOrmModuleOptions } from "@nestjs/typeorm";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each(['@nestjs/config', 'typeorm'])('the app lib may NOT import %s', async (source) => {
+    await expect({
+      file: 'libs/app/src/setup/__fixture__.ts',
+      code: `import { x } from "${source}";`,
+    }).toBreakRule('boundaries/dependencies');
+  });
+
   it('the toolkit lib MAY import crypto (BodyFingerprintHelper)', async () => {
     await expect({
       file: 'libs/toolkit/src/__fixture__.ts',
@@ -277,16 +326,16 @@ describe('libs', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the bootstrap lib MAY import the Nest packages that set up an app', async () => {
+  it('the bootstrap of the app lib MAY import the Nest packages that set up an app', async () => {
     await expect({
-      file: 'libs/bootstrap/src/app/__fixture__.ts',
+      file: 'libs/app/src/bootstrap/__fixture__.ts',
       code: 'import { INestApplication } from "@nestjs/common";\nimport { ConfigService } from "@nestjs/config";\nimport { Logger } from "nestjs-pino";',
     }).toPassArchitectureLint();
   });
 
-  it('the bootstrap lib may NOT import NestFactory: main.ts creates the app', async () => {
+  it('the bootstrap of the app lib may NOT import NestFactory: main.ts creates the app', async () => {
     await expect({
-      file: 'libs/bootstrap/src/app/__fixture__.ts',
+      file: 'libs/app/src/bootstrap/__fixture__.ts',
       code: 'import { NestFactory } from "@nestjs/core";',
     }).toBreakRule('boundaries/dependencies');
   });

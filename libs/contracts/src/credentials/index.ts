@@ -1,3 +1,3 @@
 export * from './interfaces';
 
-export * from './ports/credentials-lib.port';
+export * from './ports/credentials.port';

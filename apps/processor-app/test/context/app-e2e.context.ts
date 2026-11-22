@@ -11,7 +11,7 @@ import {
   PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
   type IProductStockPostSubtractPayload,
 } from '@acme-core/contracts/product-stock';
-import { AppModule } from '@acme-processor/app/app.module';
+import { AppModule } from '@acme-processor/app';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {

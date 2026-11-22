@@ -1,2 +1,2 @@
-export * from './commands/cache-lib-store.command';
-export * from './commands/cache-lib-tracer.command';
+export * from './commands/cache-store.command';
+export * from './commands/cache-tracer.command';

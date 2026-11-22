@@ -1,1 +1,1 @@
-export * from './shell/credentials-lib.module';
+export * from './shell/credentials.module';

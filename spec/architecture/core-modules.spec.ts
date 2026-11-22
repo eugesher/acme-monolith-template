@@ -278,21 +278,21 @@ describe('core modules', () => {
     it('application may NOT reach the credentials contract — the lib adapter talks to it', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
-        code: 'import { CREDENTIALS_LIB_PORT } from "@acme-libs/contracts/credentials";',
+        code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module root may NOT mount the credentials lib — no core module signs anyone in', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { CredentialsLibModule } from "@acme-libs/credentials";',
+        code: 'import { CredentialsModule } from "@acme-libs/credentials";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('a lib adapter may NOT take the credentials contract — no core module signs anyone in', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/lib-adapters/__fixture__.ts',
-        code: 'import { CREDENTIALS_LIB_PORT } from "@acme-libs/contracts/credentials";',
+        code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -337,14 +337,14 @@ describe('core modules', () => {
     it('application may NOT take the cache port, caching is an adapter behind a port', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
-        code: 'import { CACHE_LIB_PORT } from "@acme-libs/contracts/cache";',
+        code: 'import { CACHE_PORT } from "@acme-libs/contracts/cache";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('infrastructure MAY take the cache port to drop the keys a write makes stale', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/cache/__fixture__.ts',
-        code: 'import { CACHE_KEYS, CACHE_LIB_PORT } from "@acme-libs/contracts/cache";',
+        code: 'import { CACHE_KEYS, CACHE_PORT } from "@acme-libs/contracts/cache";',
       }).toPassArchitectureLint();
     });
 
