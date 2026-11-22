@@ -10,8 +10,8 @@ Its contract `core/contracts/src/idempotency` has one port:
 | ----------------------- | ----------------------- | ----------------------------------------- |
 | `IDEMPOTENCY_CORE_PORT` | `IdempotencyCoreFacade` | a feature that serves an idempotent write |
 
-Deleting the expired keys has one caller, the `idempotency` processor of processor-app, so it lives
-in the processor with a repository of its own (see `009-scheduled-processor.md` and
+Deleting the expired keys has one caller, the `idempotency-purge` processor of processor-app, so it
+lives in the processor with a repository of its own (see `009-scheduled-processor.md` and
 `024-code-placement.md`).
 
 A feature root mounts `IdempotencyCoreModule` from `@acme-core/modules/idempotency` and reaches a

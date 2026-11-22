@@ -155,7 +155,7 @@ describe('app entry points', () => {
   it('the AppModule MAY import the processors of its own app', async () => {
     await expect({
       file: 'apps/__entry-fixture__/src/app/app.module.ts',
-      code: 'import { LedgerModule } from "../processors";',
+      code: 'import { LedgerAppendModule } from "../processors";',
     }).toPassArchitectureLint();
   });
 
@@ -169,7 +169,7 @@ describe('app entry points', () => {
   ])('%s may NOT import the processors index by %s', async (file, source) => {
     await expect({
       file,
-      code: `import { LedgerModule } from "${source}";`,
+      code: `import { LedgerAppendModule } from "${source}";`,
     }).toBreakRule('boundaries/dependencies');
   });
 
@@ -220,7 +220,7 @@ describe('app entry points', () => {
   it.each([
     'apps/staff-app/src/features/health/health.module.ts',
     'apps/customer-app/src/features/health/health.module.ts',
-    'apps/processor-app/src/processors/idempotency/idempotency.module.ts',
+    'apps/processor-app/src/processors/idempotency-purge/idempotency-purge.module.ts',
   ])('%s MAY mount the idempotency core module by its alias', async (file) => {
     await expect({
       file,
@@ -236,7 +236,7 @@ describe('app entry points', () => {
   });
 
   it.each([
-    'apps/processor-app/src/processors/ledger/presentation/processors/ledger-append.processor.ts',
+    'apps/processor-app/src/processors/ledger-append/presentation/processors/ledger-append.processor.ts',
     'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
     'core/queues/src/ledger/ledger-queue.module.ts',
     'apps/staff-app/test/context/app-e2e.context.ts',
@@ -259,7 +259,7 @@ describe('app entry points', () => {
   });
 
   it.each([
-    'apps/processor-app/src/processors/ledger/ledger.module.ts',
+    'apps/processor-app/src/processors/ledger-append/ledger-append.module.ts',
     'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
   ])('%s MAY register the ledger record queue through the core queues', async (file) => {
     await expect({
@@ -281,7 +281,7 @@ describe('app entry points', () => {
   it.each([
     'apps/staff-app/src/features/health/infrastructure/core-adapters/__fixture__.ts',
     'apps/customer-app/src/features/health/infrastructure/core-adapters/__fixture__.ts',
-    'apps/processor-app/src/processors/idempotency/infrastructure/core-adapters/__fixture__.ts',
+    'apps/processor-app/src/processors/idempotency-purge/infrastructure/core-adapters/__fixture__.ts',
   ])('%s MAY import the idempotency core contracts by their alias', async (file) => {
     await expect({
       file,

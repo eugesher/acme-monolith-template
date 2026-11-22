@@ -33,7 +33,7 @@ describe('core queues (@acme-core/queues)', () => {
     'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
     'core/modules/src/ledger/infrastructure/queue/ledger-core-queue.module.ts',
     'core/modules/src/product-stock/infrastructure/queue/product-stock-core-post-subtract-queue.module.ts',
-    'apps/processor-app/src/processors/ledger/ledger.module.ts',
+    'apps/processor-app/src/processors/ledger-append/ledger-append.module.ts',
   ])('%s MAY register a queue of the core queues', async (file) => {
     await expect({
       file,
@@ -44,7 +44,7 @@ describe('core queues (@acme-core/queues)', () => {
   it.each([
     'apps/staff-app/src/features/queue/queue.module.ts',
     'apps/staff-app/src/features/queue/application/use-cases/__fixture__.ts',
-    'apps/processor-app/src/processors/ledger/presentation/processors/__fixture__.ts',
+    'apps/processor-app/src/processors/ledger-append/presentation/processors/__fixture__.ts',
     'apps/staff-app/src/common/shared/ledger/__fixture__.ts',
     'core/modules/src/ledger/shell/ledger-core.module.ts',
     'libs/queue/src/__fixture__.ts',

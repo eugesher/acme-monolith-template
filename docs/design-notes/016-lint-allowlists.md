@@ -79,9 +79,9 @@ Removing one of them turns its spec red.
 ### `module-areas.mjs` — processors share the layer model of features
 
 Features and processors are built by one function, `areaPolicies`, over the same list of layers
-(`categories/module-layers.mjs`). A processor uses fewer of them: `idempotency` has a domain helper
-and a repository, `ledger` neither. The entries stay, so a processor that grows a layer follows the
-same rules a feature does.
+(`categories/module-layers.mjs`). A processor uses fewer of them: `idempotency-purge` has a domain
+helper and a repository, `ledger-append` neither. The entries stay, so a processor that grows a
+layer follows the same rules a feature does.
 
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
 processor upserts its job scheduler (see `009-scheduled-processor.md`). The module next to the

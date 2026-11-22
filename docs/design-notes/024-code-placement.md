@@ -13,24 +13,24 @@ stays in core; a method of it that one app calls moves into that app, and the re
 
 ## What lives where
 
-| Module               | Methods                                               | Callers                                                                                  |
-| -------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| core `idempotency`   | `handleClaim`, `handleComplete`, `handleRelease`      | staff `product-stock`, customer `order`                                                  |
-| core `product`       | `handleArchive`                                       | staff `product`, the processor `product-stock`                                           |
-| core `product-stock` | `handleLock`, `handleMove`                            | staff `product-stock`, customer `order`, `handleLock` also the processor `product-stock` |
-| common `auth`        | `handleFindSubject`                                   | `global/auth` of staff-app, staff `auth`                                                 |
-| common `tag`         | `handleFind`, `handleReplace`, `handleFindSubjectIds` | staff `product`, staff `order`                                                           |
+| Module               | Methods                                               | Callers                                                                                                |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| core `idempotency`   | `handleClaim`, `handleComplete`, `handleRelease`      | staff `product-stock`, customer `order`                                                                |
+| core `product`       | `handleArchive`                                       | staff `product`, the processor `product-stock-post-subtract`                                           |
+| core `product-stock` | `handleLock`, `handleMove`                            | staff `product-stock`, customer `order`, `handleLock` also the processor `product-stock-post-subtract` |
+| common `auth`        | `handleFindSubject`                                   | `global/auth` of staff-app, staff `auth`                                                               |
+| common `tag`         | `handleFind`, `handleReplace`, `handleFindSubjectIds` | staff `product`, staff `order`                                                                         |
 
 Everything else sits with its only caller, for example:
 
-| Code                                                 | Lives in                                        |
-| ---------------------------------------------------- | ----------------------------------------------- |
-| the append to `ledger_entry`                         | `apps/processor-app/src/processors/ledger`      |
-| the read of `ledger_entry`                           | `apps/staff-app/src/features/ledger`            |
-| the delete of expired idempotency keys               | `apps/processor-app/src/processors/idempotency` |
-| the password check and the token of a customer login | `apps/customer-app/src/features/auth`           |
-| the password check and the token of a staff login    | `apps/staff-app/src/features/auth`              |
-| the create, list, rename and delete of tags          | `apps/staff-app/src/features/tools/modules/tag` |
+| Code                                                 | Lives in                                              |
+| ---------------------------------------------------- | ----------------------------------------------------- |
+| the append to `ledger_entry`                         | `apps/processor-app/src/processors/ledger-append`     |
+| the read of `ledger_entry`                           | `apps/staff-app/src/features/ledger`                  |
+| the delete of expired idempotency keys               | `apps/processor-app/src/processors/idempotency-purge` |
+| the password check and the token of a customer login | `apps/customer-app/src/features/auth`                 |
+| the password check and the token of a staff login    | `apps/staff-app/src/features/auth`                    |
+| the create, list, rename and delete of tags          | `apps/staff-app/src/features/tools/modules/tag`       |
 
 ## Why per method
 

@@ -1,14 +1,14 @@
 # 008 — Queue processor
 
-`apps/processor-app/src/processors/ledger` processes the `ledger-record` queue and appends each job
-to `ledger_entry` (see `004-append-only-journal.md`). It is a processor, not a feature: a job of the
-BullMQ queue `ledger-record` enters it, not an HTTP request, and it has no controller.
+`apps/processor-app/src/processors/ledger-append` processes the `ledger-record` queue and appends
+each job to `ledger_entry` (see `004-append-only-journal.md`). It is a processor, not a feature: a
+job of the BullMQ queue `ledger-record` enters it, not an HTTP request, and it has no controller.
 
 | Layer                        | What it holds                                                                                 |
 | ---------------------------- | --------------------------------------------------------------------------------------------- |
 | `presentation/processors`    | `LedgerAppendProcessor`: `process` for a job, `@OnWorkerEvent('failed')` for a failed attempt |
 | `application`                | `LedgerAppendUseCase`, `LedgerAppendReportFailureUseCase`                                     |
-| `domain`                     | `LedgerAppendEntryModel`, `LedgerInstantValue`                                                |
+| `domain`                     | `LedgerAppendEntryModel`, `LedgerAppendInstantValue`                                          |
 | `outbound`                   | `LEDGER_APPEND_REPOSITORY_PORT`                                                               |
 | `infrastructure/persistence` | `LedgerAppendRepository` over `ledger_entry`                                                  |
 

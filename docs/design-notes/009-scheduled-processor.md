@@ -1,20 +1,20 @@
 # 009 — Scheduled processor
 
-`apps/processor-app/src/processors/idempotency` deletes expired and stuck rows of `idempotency_key`
-on a schedule. The keys are written by the core idempotency module (see `006-idempotency-keys.md`),
-but nothing else deletes them, so the delete lives here with a repository of its own (see
-`024-code-placement.md`). It is a processor: a job of the `idempotency-purge` queue enters it, and a
-job scheduler of BullMQ adds that job every five minutes.
+`apps/processor-app/src/processors/idempotency-purge` deletes expired and stuck rows of
+`idempotency_key` on a schedule. The keys are written by the core idempotency module (see
+`006-idempotency-keys.md`), but nothing else deletes them, so the delete lives here with a
+repository of its own (see `024-code-placement.md`). It is a processor: a job of the
+`idempotency-purge` queue enters it, and a job scheduler of BullMQ adds that job every five minutes.
 
-| Layer                        | What it holds                                                                                                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `presentation/processors`    | `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                                            |
-| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                                                    |
-| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                                                  |
-| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN`, `IDEMPOTENCY_PURGE_QUEUE` |
-| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`, `IdempotencyPurgeScheduleQueueModule`                                                                                                   |
-| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                                                    |
-| `infrastructure/config`      | `IdempotencyConfigKeyTtlHoursProvider`, `IdempotencyConfigInFlightTtlMinutesProvider`                                                                                           |
+| Layer                        | What it holds                                                                                                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `presentation/processors`    | `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                                                                                |
+| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                                                                                        |
+| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                                                                                      |
+| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN`, `IDEMPOTENCY_PURGE_QUEUE` |
+| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`, `IdempotencyPurgeScheduleQueueModule`                                                                                                                                       |
+| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                                                                                        |
+| `infrastructure/config`      | `IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider`, `IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider`                                                                                               |
 
 The processor owns both TTLs: its `infrastructure/config` binds `IDEMPOTENCY_KEY_TTL_HOURS` and
 `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` to their tokens (see `030-config-values.md`). The core module
@@ -82,11 +82,11 @@ live in `outbound/queues/idempotency-purge.queue.ts`: no other module writes or 
 job carries no data, so the type is `Record<string, never>` and an add with any field does not
 compile. `IdempotencyPurgeScheduleQueueModule` registers the queue, binds
 `IdempotencyPurgeScheduleQueueAdapter` to `IDEMPOTENCY_PURGE_SCHEDULE_PORT` and exports the port,
-and `IdempotencyModule` imports it. The processor takes the name from `outbound` for
+and `IdempotencyPurgeModule` imports it. The processor takes the name from `outbound` for
 `@Processor(IDEMPOTENCY_PURGE_QUEUE)`: lint lets the presentation of a processor take only a
 `*_QUEUE` name from its outbound, not a port (see `016-lint-allowlists.md`). The e2e context reaches
 the queue by the literal `'idempotency-purge'`, the name BullMQ sees. processor-app mounts
-`IdempotencyModule` through `@acme-processor/processors`.
+`IdempotencyPurgeModule` through `@acme-processor/processors`.
 
 **The start of the app is an entry.** `IdempotencyPurgeProcessor` implements
 `OnApplicationBootstrap`. No layer imports `@nestjs/schedule`.
