@@ -7,7 +7,7 @@ import {
   ProductStockPostSubtractModule,
 } from '@acme-processor/processors';
 
-import { AppSetupModule } from './setup/app-setup.module';
+import { AppSetupModule } from '../setup/app-setup.module';
 
 @Module({
   imports: [

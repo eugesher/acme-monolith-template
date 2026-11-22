@@ -13,7 +13,7 @@ import {
 } from '@acme-staff/features';
 import { AuthGlobalModule } from '@acme-staff/global';
 
-import { AppSetupModule } from './setup/app-setup.module';
+import { AppSetupModule } from '../setup/app-setup.module';
 
 @Module({
   imports: [

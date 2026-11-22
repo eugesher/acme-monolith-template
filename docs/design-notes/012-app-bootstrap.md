@@ -101,24 +101,24 @@ features or processors of the app, and takes no argument and no provider.
 
 **The setup of every app comes from one lib.** `AppSetupModule` extends `AppSetupBaseModule` of
 `libs/app` and hands its `setup()` only what the app owns: its name, `ConfigSetupModule.forRoot()`,
-the entities of `app/entities` and the modules of its own. `setup()` returns a dynamic module of the
-class it is called on, `module: this`, so the graph and the DI errors name the `AppSetupModule` of
-the app. The modules come in this order:
+the entities of `app/setup/entities` and the modules of its own. `setup()` returns a dynamic module
+of the class it is called on, `module: this`, so the graph and the DI errors name the
+`AppSetupModule` of the app. The modules come in this order:
 
-| Piece                               | Where                                           | What it does                                                                                                                |
-| ----------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `ConfigSetupModule.forRoot()`       | `app/setup/config`                              | validates the environment of the app with Joi                                                                               |
-| `BullSetupModule.forRoot()`         | `libs/queue`                                    | the BullMQ connection to Redis, the prefix and the job options of every queue                                               |
-| `CacheModule.forRoot()`             | `libs/cache`                                    | global `CACHE_PORT`                                                                                                         |
-| `HttpSecurityModule.forRoot()`      | `libs/http`                                     | the security headers of `helmet` and CORS from `HTTP_CORS_ORIGINS` (see `037-http-edge.md`)                                 |
-| `LocalStorageSetupModule.forRoot()` | `libs/local-storage`                            | the CLS context of every request under its correlation id                                                                   |
-| `LoggerSetupModule.forRoot(<app>)`  | `libs/observability`                            | pino, HTTP request logs                                                                                                     |
-| `OrmModule.forRoot(entities)`       | `libs/database`, the entities of `app/entities` | the connection, the entities of the app, `ORM_PORT`, `TRANSACTION_PORT` (see `026-transaction-port.md`)                     |
-| `ThrottlerSetupModule.forRoot()`    | `libs/http`                                     | the global request limits over Redis and `trust proxy` (see `003-authentication.md`)                                        |
-| `TracerSetupModule.forRoot()`       | `libs/observability`                            | closes the tracer once the queues have closed                                                                               |
-| the modules of the app              | `app/setup/app-setup.module.ts`                 | `CredentialsModule.forRoot(<audience>)` in staff-app and customer-app (see `017-credentials-lib.md`); none in processor-app |
-| `APP_PIPE`                          | `StrictValidationPipe`                          | whitelist, forbid unknown properties, transform                                                                             |
-| `APP_FILTER`                        | `HttpExceptionFilter`                           | the error body and its log                                                                                                  |
+| Piece                               | Where                                                 | What it does                                                                                                                |
+| ----------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `ConfigSetupModule.forRoot()`       | `app/setup/config`                                    | validates the environment of the app with Joi                                                                               |
+| `BullSetupModule.forRoot()`         | `libs/queue`                                          | the BullMQ connection to Redis, the prefix and the job options of every queue                                               |
+| `CacheModule.forRoot()`             | `libs/cache`                                          | global `CACHE_PORT`                                                                                                         |
+| `HttpSecurityModule.forRoot()`      | `libs/http`                                           | the security headers of `helmet` and CORS from `HTTP_CORS_ORIGINS` (see `037-http-edge.md`)                                 |
+| `LocalStorageSetupModule.forRoot()` | `libs/local-storage`                                  | the CLS context of every request under its correlation id                                                                   |
+| `LoggerSetupModule.forRoot(<app>)`  | `libs/observability`                                  | pino, HTTP request logs                                                                                                     |
+| `OrmModule.forRoot(entities)`       | `libs/database`, the entities of `app/setup/entities` | the connection, the entities of the app, `ORM_PORT`, `TRANSACTION_PORT` (see `026-transaction-port.md`)                     |
+| `ThrottlerSetupModule.forRoot()`    | `libs/http`                                           | the global request limits over Redis and `trust proxy` (see `003-authentication.md`)                                        |
+| `TracerSetupModule.forRoot()`       | `libs/observability`                                  | closes the tracer once the queues have closed                                                                               |
+| the modules of the app              | `app/setup/app-setup.module.ts`                       | `CredentialsModule.forRoot(<audience>)` in staff-app and customer-app (see `017-credentials-lib.md`); none in processor-app |
+| `APP_PIPE`                          | `StrictValidationPipe`                                | whitelist, forbid unknown properties, transform                                                                             |
+| `APP_FILTER`                        | `HttpExceptionFilter`                                 | the error body and its log                                                                                                  |
 
 **The config comes first, the modules of the app last, the rest by name.** Nest mounts the
 middlewares of the global modules before the others whatever the order of the imports, and runs the
@@ -245,17 +245,19 @@ passes, including one line per module and route at start.
 
 ## Entry points
 
-`main.ts` and the e2e context import `AppModule` by `@acme-<app>/app/app.module`. The alias
-`@acme-<app>/app/*` maps the folder `app/`, which has no barrel, so the import names the file. The
-alias resolves any path under `app/`; lint decides which of them a file may import.
+`app/` has the shape of a module: `shell/app.module.ts` holds `AppModule`, `setup/` holds
+`AppSetupModule`, the config setup and the entities, and `app/index.ts` re-exports `AppModule` and
+nothing else. `main.ts` and the e2e context import it by `@acme-<app>/app`.
 
-Lint gives `app.module.ts` its own category, `acme-app:app:module`:
+Lint gives each its own category:
 
-- only `main.ts` and `test/` of the same app may import it, and the system suites of `test/system`,
-  which boot an API app next to processor-app (see `014-e2e-suites.md`);
-- `main.ts` sees nothing else of the app: not `setup/`, not `global/`;
-- it imports `app/setup/app-setup.module.ts`, the indexes of the features, processors and global
-  modules and `@nestjs/common`, and no lib: `libs/app` mounts them and binds `APP_PIPE` and
+- `acme-app:app:index`, the barrel: only `main.ts` and `test/` of the same app may import it, and
+  the system suites of `test/system`, which boot an API app next to processor-app (see
+  `014-e2e-suites.md`); it may reach only `shell/app.module.ts`;
+- `acme-app:app:module`, `shell/app.module.ts`: no one reaches it past the barrel, so `main.ts` sees
+  nothing else of the app, not `setup/`, not `global/`;
+- `AppModule` imports `app/setup/app-setup.module.ts`, the indexes of the features, processors and
+  global modules and `@nestjs/common`, and no lib: `libs/app` mounts them and binds `APP_PIPE` and
   `APP_FILTER`.
 
 `main.ts` may also import the `app`, `kernel` and `observability` libs, the last only for the

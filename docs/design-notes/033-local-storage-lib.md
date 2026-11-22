@@ -58,7 +58,7 @@ import `libs/local-storage`.
 
 | Importer                                  | Uses                                                              |
 | ----------------------------------------- | ----------------------------------------------------------------- |
-| `app.module.ts`                           | `LocalStorageSetupModule.forRoot()`                               |
+| `AppSetupBaseModule` of `libs/app`        | `LocalStorageSetupModule.forRoot()`                               |
 | `OrmModule` of `libs/database`            | `LocalStorageTransactionalModule.forRoot()`                       |
 | `infrastructure` of the apps and the core | `TRANSACTION_PORT` from the contracts, in the transaction adapter |
 

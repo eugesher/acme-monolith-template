@@ -4,8 +4,8 @@ import type { Redis } from 'ioredis';
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
-import { AppModule } from '@acme-customer/app/app.module';
-import { AppModule as ProcessorAppModule } from '@acme-processor/app/app.module';
+import { AppModule } from '@acme-customer/app';
+import { AppModule as ProcessorAppModule } from '@acme-processor/app';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {

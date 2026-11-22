@@ -20,10 +20,11 @@ const appIndexes = [
 
 export const acmeApp = [
   from('acme-app:main', [
-    to('acme-app:app:module', own('app')),
+    to('acme-app:app:index', own('app')),
     libs('app', 'kernel', 'observability'),
     packages('@nestjs/common', '@nestjs/core'),
   ]),
+  from('acme-app:app:index', [to('acme-app:app:module', own('app'))]),
   from('acme-app:app:module', [
     to('acme-app:app:setup', own('app')),
     ...appIndexes,
@@ -125,7 +126,7 @@ export const acmeApp = [
   ]),
   from('acme-app:test', [
     to('acme-app:test', own('app')),
-    to('acme-app:app:module', own('app')),
+    to('acme-app:app:index', own('app')),
     to('acme-app:contracts', own('app')),
     to('acme-core:contracts'),
     to('acme-core:entities'),

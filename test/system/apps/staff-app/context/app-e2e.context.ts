@@ -8,8 +8,8 @@ import {
   LEDGER_RECORD_QUEUE,
   type ILedgerRecordProcessorPayload,
 } from '@acme-core/contracts/ledger';
-import { AppModule as ProcessorAppModule } from '@acme-processor/app/app.module';
-import { AppModule } from '@acme-staff/app/app.module';
+import { AppModule as ProcessorAppModule } from '@acme-processor/app';
+import { AppModule } from '@acme-staff/app';
 import type { Maybe } from '@acme-libs/toolkit';
 
 interface IAppE2EState {

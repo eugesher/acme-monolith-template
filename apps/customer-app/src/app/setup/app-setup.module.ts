@@ -4,8 +4,8 @@ import { AppSetupBaseModule } from '@acme-libs/app';
 import { CredentialsModule } from '@acme-libs/credentials';
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 
-import { entities } from '../entities';
 import { ConfigSetupModule } from './config/config-setup.module';
+import { entities } from './entities';
 
 export class AppSetupModule extends AppSetupBaseModule {
   public static forRoot(): DynamicModule {

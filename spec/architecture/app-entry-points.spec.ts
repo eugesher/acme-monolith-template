@@ -9,17 +9,19 @@ describe('app entry points', () => {
 
   beforeAll(() => {
     scaffold = Scaffold.create([
-      'apps/__entry-fixture__/src/app/app.module.ts',
+      'apps/__entry-fixture__/src/app/index.ts',
+      'apps/__entry-fixture__/src/app/shell/app.module.ts',
       'apps/__entry-fixture__/src/app/setup/config/config-setup.module.ts',
       'apps/__entry-fixture__/src/app/setup/app-setup.module.ts',
-      'apps/__entry-fixture__/src/app/entities/index.ts',
+      'apps/__entry-fixture__/src/app/setup/entities/index.ts',
       'apps/__entry-fixture__/src/features/index.ts',
       'apps/__entry-fixture__/src/features/health/shell/health.module.ts',
       'apps/__entry-fixture__/src/processors/index.ts',
       'apps/__entry-fixture__/src/processors/ledger/shell/ledger.module.ts',
       'apps/__entry-fixture__/src/common/modules/index.ts',
       'apps/__entry-fixture__/src/common/modules/tag/index.ts',
-      'apps/__other-entry-fixture__/src/app/app.module.ts',
+      'apps/__other-entry-fixture__/src/app/index.ts',
+      'apps/__other-entry-fixture__/src/app/shell/app.module.ts',
       'apps/__other-entry-fixture__/src/features/index.ts',
       'core/contracts/src/__idempotency-fixture__/index.ts',
       'core/contracts/src/__ledger-fixture__/index.ts',
@@ -47,8 +49,16 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/__entry-fixture__/src/app/app.module.ts', '../features/health/shell/health.module'],
-    ['apps/__entry-fixture__/src/app/app.module.ts', '../processors/ledger/shell/ledger.module'],
+    [
+      'apps/__entry-fixture__/src/app/shell/app.module.ts',
+      '../../features/health/shell/health.module',
+    ],
+    [
+      'apps/__entry-fixture__/src/app/shell/app.module.ts',
+      '../../processors/ledger/shell/ledger.module',
+    ],
+    ['apps/__entry-fixture__/src/main.ts', './app/shell/app.module'],
+    ['apps/__entry-fixture__/test/context/__fixture__.ts', '../../src/app/shell/app.module'],
     [
       'apps/__entry-fixture__/src/features/product/shell/__fixture__.module.ts',
       '../../../app/setup/config/config-setup.module',
@@ -65,8 +75,8 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/__entry-fixture__/src/main.ts', './app/app.module'],
-    ['apps/__entry-fixture__/test/context/__fixture__.ts', '../../src/app/app.module'],
+    ['apps/__entry-fixture__/src/main.ts', './app'],
+    ['apps/__entry-fixture__/test/context/__fixture__.ts', '../../src/app'],
   ])('%s MAY import the AppModule of its own app by %s', async (file, source) => {
     await expect({
       file,
@@ -75,10 +85,10 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/__entry-fixture__/src/main.ts', '../../__other-entry-fixture__/src/app/app.module'],
+    ['apps/__entry-fixture__/src/main.ts', '../../__other-entry-fixture__/src/app'],
     [
       'apps/__entry-fixture__/test/context/__fixture__.ts',
-      '../../../__other-entry-fixture__/src/app/app.module',
+      '../../../__other-entry-fixture__/src/app',
     ],
   ])('%s may NOT import the AppModule of another app by %s', async (file, source) => {
     await expect({
@@ -88,17 +98,15 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../../app.module'],
-    ['apps/__entry-fixture__/src/global/auth/shell/__fixture__.ts', '../../../app/app.module'],
-    [
-      'apps/__entry-fixture__/src/features/product/shell/product.module.ts',
-      '../../../app/app.module',
-    ],
+    ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../..'],
+    ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../../shell/app.module'],
+    ['apps/__entry-fixture__/src/global/auth/shell/__fixture__.ts', '../../../app'],
+    ['apps/__entry-fixture__/src/features/product/shell/product.module.ts', '../../../app'],
     [
       'apps/__entry-fixture__/src/processors/idempotency/shell/__fixture__.module.ts',
-      '../../../app/app.module',
+      '../../../app',
     ],
-    ['apps/__entry-fixture__/src/common/shared/ledger/__fixture__.ts', '../../../app/app.module'],
+    ['apps/__entry-fixture__/src/common/shared/ledger/__fixture__.ts', '../../../app'],
   ])('%s may NOT import the AppModule, only main and the tests do', async (file, source) => {
     await expect({
       file,
@@ -108,7 +116,7 @@ describe('app entry points', () => {
 
   it('the AppModule may NOT import @nestjs/core, the app lib registers the global providers', async () => {
     await expect({
-      file: 'apps/staff-app/src/app/app.module.ts',
+      file: 'apps/staff-app/src/app/shell/app.module.ts',
       code: 'import { APP_FILTER, APP_PIPE } from "@nestjs/core";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -122,15 +130,32 @@ describe('app entry points', () => {
 
   it('the AppModule MAY mount the app setup module', async () => {
     await expect({
-      file: 'apps/__entry-fixture__/src/app/app.module.ts',
-      code: 'import { AppSetupModule } from "./setup/app-setup.module";',
+      file: 'apps/__entry-fixture__/src/app/shell/app.module.ts',
+      code: 'import { AppSetupModule } from "../setup/app-setup.module";',
     }).toPassArchitectureLint();
   });
+
+  it('the app barrel MAY re-export its AppModule', async () => {
+    await expect({
+      file: 'apps/__entry-fixture__/src/app/index.ts',
+      code: 'export * from "./shell/app.module";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each(['./setup/app-setup.module', './setup/entities', '../features'])(
+    'the app barrel may NOT re-export %s, only its AppModule',
+    async (source) => {
+      await expect({
+        file: 'apps/__entry-fixture__/src/app/index.ts',
+        code: `export * from "${source}";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
 
   it('the app setup module MAY extend the app lib and mount the credentials lib, the config setup and the entities of its app', async () => {
     await expect({
       file: 'apps/__entry-fixture__/src/app/setup/app-setup.module.ts',
-      code: 'import type { DynamicModule } from "@nestjs/common";\nimport { AppSetupBaseModule } from "../../../../../libs/app/src";\nimport { CredentialsModule } from "../../../../../libs/credentials/src";\nimport { AppNameEnum } from "../../../../../libs/kernel/src";\nimport { entities } from "../entities";\nimport { ConfigSetupModule } from "./config/config-setup.module";',
+      code: 'import type { DynamicModule } from "@nestjs/common";\nimport { AppSetupBaseModule } from "../../../../../libs/app/src";\nimport { CredentialsModule } from "../../../../../libs/credentials/src";\nimport { AppNameEnum } from "../../../../../libs/kernel/src";\nimport { entities } from "./entities";\nimport { ConfigSetupModule } from "./config/config-setup.module";',
     }).toPassArchitectureLint();
   });
 
@@ -184,7 +209,7 @@ describe('app entry points', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it.each([['apps/__entry-fixture__/src/app/app.module.ts', '../features']])(
+  it.each([['apps/__entry-fixture__/src/app/shell/app.module.ts', '../../features']])(
     '%s MAY import the features of its own app by %s',
     async (file, source) => {
       await expect({
@@ -196,8 +221,8 @@ describe('app entry points', () => {
 
   it.each([
     [
-      'apps/__entry-fixture__/src/app/app.module.ts',
-      '../../../__other-entry-fixture__/src/features',
+      'apps/__entry-fixture__/src/app/shell/app.module.ts',
+      '../../../../__other-entry-fixture__/src/features',
     ],
   ])('%s may NOT import the features of another app by %s', async (file, source) => {
     await expect({
@@ -208,15 +233,15 @@ describe('app entry points', () => {
 
   it('the AppModule MAY import the processors of its own app', async () => {
     await expect({
-      file: 'apps/__entry-fixture__/src/app/app.module.ts',
-      code: 'import { LedgerAppendModule } from "../processors";',
+      file: 'apps/__entry-fixture__/src/app/shell/app.module.ts',
+      code: 'import { LedgerAppendModule } from "../../processors";',
     }).toPassArchitectureLint();
   });
 
   it.each([
     [
-      'apps/__other-entry-fixture__/src/app/app.module.ts',
-      '../../../__entry-fixture__/src/processors',
+      'apps/__other-entry-fixture__/src/app/shell/app.module.ts',
+      '../../../../__entry-fixture__/src/processors',
     ],
     ['apps/__entry-fixture__/src/features/health/shell/health.module.ts', '../../../processors'],
     ['apps/__entry-fixture__/src/main.ts', './processors'],
@@ -365,8 +390,8 @@ describe('app entry points', () => {
       '../../../../../__entry-fixture__/src/common/modules',
     ],
     [
-      'apps/__other-entry-fixture__/src/app/app.module.ts',
-      '../../../__entry-fixture__/src/common/modules',
+      'apps/__other-entry-fixture__/src/app/shell/app.module.ts',
+      '../../../../__entry-fixture__/src/common/modules',
     ],
   ])('%s may NOT reach the common modules of another app by %s', async (file, source) => {
     await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(

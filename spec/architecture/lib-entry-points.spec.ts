@@ -163,7 +163,7 @@ describe('lib entry points', () => {
     'the AppModule may NOT import %s by its alias, the app lib mounts it',
     async (source) => {
       await expect({
-        file: 'apps/staff-app/src/app/app.module.ts',
+        file: 'apps/staff-app/src/app/shell/app.module.ts',
         code: `import { x } from "${source}";`,
       }).toBreakRule('boundaries/dependencies');
     },
@@ -262,7 +262,7 @@ describe('lib entry points', () => {
 
   it.each([
     'apps/staff-app/src/main.ts',
-    'apps/staff-app/src/app/app.module.ts',
+    'apps/staff-app/src/app/shell/app.module.ts',
     'apps/staff-app/src/features/product/shell/__fixture__.ts',
   ])('%s may NOT import the openapi lib, the document is built at startup only', async (file) => {
     await expect({

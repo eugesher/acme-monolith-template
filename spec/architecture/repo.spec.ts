@@ -15,8 +15,10 @@ describe('repo', () => {
       'scripts/node/support/script-args.ts',
       'test/infra/seed/support/seed-rows.ts',
       'test/system/apps/staff-app/context/__context-fixture__.ts',
-      'apps/__system-fixture__/src/app/app.module.ts',
-      'apps/__other-system-fixture__/src/app/app.module.ts',
+      'apps/__system-fixture__/src/app/index.ts',
+      'apps/__system-fixture__/src/app/shell/app.module.ts',
+      'apps/__other-system-fixture__/src/app/index.ts',
+      'apps/__other-system-fixture__/src/app/shell/app.module.ts',
       'apps/__system-fixture__/src/features/index.ts',
       'core/contracts/src/__ledger-fixture__/index.ts',
       'core/modules/src/__product-fixture__/index.ts',
@@ -98,8 +100,15 @@ describe('repo', () => {
     it('a system test MAY mount the app modules and its own context', async () => {
       await expect({
         file: 'test/system/apps/staff-app/app/__fixture__.ts',
-        code: 'import { x } from "../../../../../apps/__system-fixture__/src/app/app.module";\nimport { y } from "../../../../../apps/__other-system-fixture__/src/app/app.module";\nimport { z } from "../context/__context-fixture__";',
+        code: 'import { x } from "../../../../../apps/__system-fixture__/src/app";\nimport { y } from "../../../../../apps/__other-system-fixture__/src/app";\nimport { z } from "../context/__context-fixture__";',
       }).toPassArchitectureLint();
+    });
+
+    it('a system test may NOT reach past the app barrel into its shell', async () => {
+      await expect({
+        file: 'test/system/apps/staff-app/app/__fixture__.ts',
+        code: 'import { x } from "../../../../../apps/__system-fixture__/src/app/shell/app.module";',
+      }).toBreakRule('boundaries/dependencies');
     });
 
     it.each(['@nestjs/bullmq', '@nestjs/common', 'bullmq', 'ioredis', 'supertest'])(
@@ -152,7 +161,7 @@ describe('repo', () => {
     it('a seed script may NOT reach the app modules', async () => {
       await expect({
         file: 'test/infra/seed/__fixture__.ts',
-        code: 'import { x } from "../../../apps/__system-fixture__/src/app/app.module";',
+        code: 'import { x } from "../../../apps/__system-fixture__/src/app";',
       }).toBreakRule('boundaries/dependencies');
     });
   });

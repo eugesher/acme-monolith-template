@@ -35,7 +35,7 @@ raw SQL, the migration and the seed write `` `order` `` with backticks.
 
 **A relation registers its target.** A foreign key makes TypeORM require the target entity in the
 entity list of every app that maps the source (see `018-entity-ownership-lint.md`). Example:
-`apps/processor-app/src/app/entities/index.ts`.
+`apps/processor-app/src/app/setup/entities/index.ts`.
 
 **Every column of an entity is `public readonly`.** TypeORM fills an entity by assignment at run
 time, which `readonly` does not stop, and the code writes rows through literals in

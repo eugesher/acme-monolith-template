@@ -58,11 +58,11 @@ worker takes the connection and the prefix of its queue.
 
 ## Who sees the lib
 
-| Importer                      | Uses            |
-| ----------------------------- | --------------- |
-| `app.module.ts`               | `forRoot()`     |
-| `core/queues`                 | `registerQueue` |
-| the module of a queue adapter | `registerQueue` |
+| Importer                           | Uses            |
+| ---------------------------------- | --------------- |
+| `AppSetupBaseModule` of `libs/app` | `forRoot()`     |
+| `core/queues`                      | `registerQueue` |
+| the module of a queue adapter      | `registerQueue` |
 
 No other layer imports `libs/queue`, and none of the importers above imports `@nestjs/bullmq`: the
 package is left to the lib, to the queue adapters of `infrastructure/queue` and to the processors in

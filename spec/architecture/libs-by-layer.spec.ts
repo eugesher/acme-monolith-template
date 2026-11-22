@@ -202,8 +202,8 @@ describe('libs by layer', () => {
 
   it('the AppModule may NOT reach the database lib, the app lib mounts it', async () => {
     await expect({
-      file: 'apps/__layers-fixture__/src/app/app.module.ts',
-      code: 'import { x } from "../../../../libs/database/src";',
+      file: 'apps/__layers-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../../../../libs/database/src";',
     }).toBreakRule('boundaries/dependencies');
   });
 

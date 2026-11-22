@@ -188,10 +188,11 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   so the rest of the toolkit sees only `crypto`, and the domain lib and the kernel see no package.
 - **The database contracts name TypeORM.** The ORM port returns a TypeORM `Repository`, so the
   contracts of `database` may import `typeorm`; the other contracts see only the base libs.
-- **No module registers entities.** The entities of an app are listed once in `app/entities` and
-  handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import `@nestjs/typeorm`;
-  `TypeOrmModule.forFeature` would add repository tokens that nothing injects. `libs/app` takes
-  `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to `OrmModule`.
+- **No module registers entities.** The entities of an app are listed once in `app/setup/entities`
+  and handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import
+  `@nestjs/typeorm`; `TypeOrmModule.forFeature` would add repository tokens that nothing injects.
+  `libs/app` takes `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to
+  `OrmModule`.
 - **One file sets an app up.** `app/setup/app-setup.module.ts` is the category `acme-app:app:setup`:
   it may import `@acme-libs/app`, `@acme-libs/credentials`, the base libs, the files of its own
   `app/` and `@nestjs/common`. `AppModule` reaches only that file, the indexes of the features,

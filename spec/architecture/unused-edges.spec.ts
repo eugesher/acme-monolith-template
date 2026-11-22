@@ -32,62 +32,62 @@ describe('unused edges', () => {
     it.each([
       [
         'the app module may NOT reach a shared barrel: shared code is used by the modules it mounts',
-        'apps/__unused-fixture__/src/app/app.module.ts',
-        '../common/shared/concurrency',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../common/shared/concurrency',
       ],
       [
         'the app module may NOT reach the entities: the ORM setup module registers them',
-        'apps/__unused-fixture__/src/app/app.module.ts',
-        '../../../../core/entities/src',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../../../../core/entities/src',
       ],
       [
         'the app module may NOT reach the config lib: the config setup module binds it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
-        '../../../../libs/config/src',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../../../../libs/config/src',
       ],
       [
-        'a setup module may NOT reach the database lib: the app module mounts OrmModule',
+        'a setup module may NOT reach the database lib: the app lib mounts OrmModule',
         'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
         '../../../../../../libs/database/src',
       ],
       [
         'the app module may NOT reach the database contracts: the database and local-storage libs bind them',
-        'apps/__unused-fixture__/src/app/app.module.ts',
-        '../../../../libs/contracts/src/database',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../../../../libs/contracts/src/database',
       ],
       [
         'the app module may NOT import @nestjs-cls/transactional: the local-storage lib configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         '@nestjs-cls/transactional',
       ],
       [
         'the app module may NOT import @nestjs-cls/transactional-adapter-typeorm: the local-storage lib configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         '@nestjs-cls/transactional-adapter-typeorm',
       ],
       [
         'the app module may NOT import @nestjs/config: a setup module in app/setup configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         '@nestjs/config',
       ],
       [
         'the app module may NOT import @nestjs/typeorm: the database lib configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         '@nestjs/typeorm',
       ],
       [
         'the app module may NOT import joi: a setup module in app/setup configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         'joi',
       ],
       [
         'the app module may NOT import nestjs-cls: the local-storage lib configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         'nestjs-cls',
       ],
       [
         'the app module may NOT import typeorm: the database lib configures it',
-        'apps/__unused-fixture__/src/app/app.module.ts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
         'typeorm',
       ],
       [

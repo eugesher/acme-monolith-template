@@ -3,8 +3,8 @@ import type { DynamicModule } from '@nestjs/common';
 import { AppSetupBaseModule } from '@acme-libs/app';
 import { AppNameEnum } from '@acme-libs/kernel';
 
-import { entities } from '../entities';
 import { ConfigSetupModule } from './config/config-setup.module';
+import { entities } from './entities';
 
 export class AppSetupModule extends AppSetupBaseModule {
   public static forRoot(): DynamicModule {
