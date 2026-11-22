@@ -7,7 +7,6 @@ describe('libs by layer', () => {
   beforeAll(() => {
     scaffold = Scaffold.create([
       'libs/auth/src/index.ts',
-      'libs/bootstrap/src/index.ts',
       'libs/cache/src/index.ts',
       'libs/config/src/index.ts',
       'libs/credentials/src/index.ts',
@@ -45,8 +44,8 @@ describe('libs by layer', () => {
     ['core/contracts/src/__ledger-fixture__/__fixture__.ts', '../../../../libs'],
   ])('%s may reach only the framework-free libs', async (file, libs) => {
     const others = [
+      'app',
       'auth',
-      'bootstrap',
       'cache',
       'config',
       'database',
@@ -70,10 +69,10 @@ describe('libs by layer', () => {
   });
 
   it('main may reach only the libs that run before or outside DI', async () => {
-    const allowed = ['bootstrap', 'kernel', 'observability'];
+    const allowed = ['app', 'kernel', 'observability'];
     const libs = [
+      'app',
       'auth',
-      'bootstrap',
       'cache',
       'config',
       'database',
@@ -462,7 +461,7 @@ describe('libs by layer', () => {
     }).toPassArchitectureLint();
   });
 
-  it('main may NOT read the config: the bootstrap lib reads the port and the prefix', async () => {
+  it('main may NOT read the config: AppBootstrap of the app lib reads the port and the prefix', async () => {
     await expect({
       file: 'apps/__layers-fixture__/src/main.ts',
       code: 'import { ConfigService } from "@nestjs/config";',

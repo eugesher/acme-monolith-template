@@ -89,10 +89,10 @@ that each one did. processor-app has no `features/` left. The lint treats the fi
 **`AppE2EContext` mirrors `main.ts`.** Each context extends `E2EContext` of
 `libs/testing/src/e2e/e2e.context.ts`, which holds what the contexts share: `init()` compiles the
 `AppModule` it is given with `@nestjs/testing`, starts it with
-`AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap`, as `main.ts` does, and spies on the
-root logger; `close()`, `takeRootWarnings()`, `mountedRoutes()` and `routeDtos()` round it off. The
-class is not abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor,
-calls `super.init()` and adds its own.
+`AppBootstrap.create(app, <app>).execute()` of `libs/app`, as `main.ts` does, and spies on the root
+logger; `close()`, `takeRootWarnings()`, `mountedRoutes()` and `routeDtos()` round it off. The class
+is not abstract: a context passes its `AppModule` and its `AppNameEnum` to the constructor, calls
+`super.init()` and adds its own.
 
 **A context of an app with auth signs tokens.** `AuthE2EContext` of
 `libs/testing/src/e2e/auth-e2e.context.ts` extends `E2EContext` with the `AuthAudienceEnum` of the

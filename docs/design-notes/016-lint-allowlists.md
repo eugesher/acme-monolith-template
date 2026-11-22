@@ -196,8 +196,11 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   it may import `@acme-libs/app`, `@acme-libs/credentials`, the base libs, the files of its own
   `app/` and `@nestjs/common`. `AppModule` reaches only that file, the indexes of the features,
   processors and global modules and `@nestjs/common`, and the rest of `app/` reaches neither lib.
-  `libs/app` takes the libs it mounts, `cache`, `database`, `http`, `local-storage`, `observability`
-  and `queue`, and `@nestjs/core` for `APP_PIPE` and `APP_FILTER` (see `012-app-bootstrap.md`).
+  `libs/app` holds two parts behind one root, so `main.ts` and the app setup import `@acme-libs/app`
+  alike, and the `file` capture keeps an allowlist per part: `setup/` takes the libs it mounts,
+  `cache`, `database`, `http`, `local-storage`, `observability` and `queue`, and `@nestjs/core` for
+  `APP_PIPE` and `APP_FILTER`; `bootstrap/` takes `observability`, `openapi`, `@nestjs/config` and
+  `nestjs-pino` to start the app (see `012-app-bootstrap.md`).
 - **A module root binds no token.** An adapter carries its binding in a static `provider` (see
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
@@ -254,4 +257,4 @@ may reach `naming` and `orm/application` may reach `repository`.
 and the logger mock of `observability/pino-logger.mock.ts`. Any `*.spec.ts` may import it, through a
 policy that matches the path, and so may the e2e code and `test/system`; no layer of production code
 lists it, so lint refuses it there. The lib reaches the `outbound` of the cache lib for the Redis
-token and the bootstrap lib for `AppBootstrap`, and nothing else of another lib.
+token and the app lib for `AppBootstrap`, and nothing else of another lib.

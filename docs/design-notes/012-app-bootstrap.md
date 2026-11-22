@@ -19,8 +19,8 @@ schedules (see `023-processor-app.md`).
 2. `BootstrapLogger.setup(<app>)` gives a pino logger for the line outside DI:
    `<app> bootstrap error` with exit code 1 for a failed start.
 3. `NestFactory.create(AppModule, { bufferLogs: true })` creates the app, and
-   `AppBootstrap.create(app, <app>).execute()` of `libs/bootstrap` starts it, both inside the `try`
-   of the bootstrap error.
+   `AppBootstrap.create(app, <app>).execute()` of `libs/app` starts it, both inside the `try` of the
+   bootstrap error.
 
 `main.ts` creates the app the way any Nest app does, and `AppBootstrap.execute` holds the steps
 every app takes after that, so the three apps cannot start differently:
@@ -254,7 +254,9 @@ Lint gives `app.module.ts` its own category, `acme-app:app:module`:
 - only `main.ts` and `test/` of the same app may import it, and the system suites of `test/system`,
   which boot an API app next to processor-app (see `014-e2e-suites.md`);
 - `main.ts` sees nothing else of the app: not `setup/`, not `global/`;
-- it may import `@nestjs/core` for `APP_PIPE` and `APP_FILTER`, and the rest of `app/` may not.
+- it imports `app/setup/app-setup.module.ts`, the indexes of the features, processors and global
+  modules and `@nestjs/common`, and no lib: `libs/app` mounts them and binds `APP_PIPE` and
+  `APP_FILTER`.
 
-`main.ts` may also import the `bootstrap`, `kernel` and `observability` libs, the last only for the
-tracer, and no package: the bootstrap lib alone reads the config and sets the logger.
+`main.ts` may also import the `app`, `kernel` and `observability` libs, the last only for the
+tracer, and no package: `AppBootstrap` of `libs/app` alone reads the config and sets the logger.

@@ -251,11 +251,11 @@ describe('lib entry points', () => {
   });
 
   it.each(['apps/staff-app/src/main.ts', 'apps/customer-app/src/main.ts'])(
-    '%s MAY import the bootstrap lib by its alias',
+    '%s MAY import the bootstrap of the app lib by its alias',
     async (file) => {
       await expect({
         file,
-        code: 'import { AppBootstrap } from "@acme-libs/bootstrap";',
+        code: 'import { AppBootstrap } from "@acme-libs/app";',
       }).toPassArchitectureLint();
     },
   );

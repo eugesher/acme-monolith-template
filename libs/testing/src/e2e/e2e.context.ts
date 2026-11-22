@@ -14,7 +14,7 @@ import { DataSource } from 'typeorm';
 import type { INestApplication, Type } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 
-import { AppBootstrap } from '@acme-libs/bootstrap';
+import { AppBootstrap } from '@acme-libs/app';
 import type { AppNameEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 

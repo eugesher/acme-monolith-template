@@ -21,7 +21,7 @@ const appIndexes = [
 export const acmeApp = [
   from('acme-app:main', [
     to('acme-app:app:module', own('app')),
-    libs('bootstrap', 'kernel', 'observability'),
+    libs('app', 'kernel', 'observability'),
     packages('@nestjs/common', '@nestjs/core'),
   ]),
   from('acme-app:app:module', [
