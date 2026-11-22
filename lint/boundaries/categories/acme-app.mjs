@@ -71,7 +71,12 @@ export const acmeApp = [
   ...moduleAreas.flatMap((area) => [
     [`acme-app:${area}:index`, `apps/*/src/${area}/index.ts`, ['app']],
     [`acme-app:${area}:modules:index`, `apps/*/src/${area}/*/modules/index.ts`, ['app', 'module']],
-    ...moduleAreaLayers.map((layer) => [
+    [
+      `acme-app:${area}:shell:module`,
+      `apps/*/src/${area}/{*,*/modules/*}/shell/*.module.ts`,
+      ['app', 'module'],
+    ],
+    ...moduleAreaLayers[area].map((layer) => [
       `acme-app:${area}:${layer}`,
       `apps/*/src/${area}/{*,*/modules/*}/${layer.replace(':', '/')}/**`,
       layer.includes(':') || layer === 'outbound'

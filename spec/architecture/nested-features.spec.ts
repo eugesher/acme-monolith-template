@@ -12,7 +12,9 @@ describe('nested features (<module>/modules/<submodule>)', () => {
       'apps/__nested-fixture__/src/features/note/modules/index.ts',
       'apps/__nested-fixture__/src/features/ledger/ledger.module.ts',
       'apps/__nested-fixture__/src/features/ledger/modules/index.ts',
-      'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/ledger-export.module.ts',
+      'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/index.ts',
+      'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/shell/ledger-export.module.ts',
+      'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/application/index.ts',
       'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/presentation/index.ts',
     ]);
   });
@@ -35,10 +37,10 @@ describe('nested features (<module>/modules/<submodule>)', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the submodule root MAY see every layer of its own submodule', async () => {
+  it('the submodule root MAY see the layers of its own submodule', async () => {
     await expect({
-      file: 'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/__fixture__.ts',
-      code: 'import { x } from "./presentation";',
+      file: 'apps/__nested-fixture__/src/features/ledger/modules/ledger-export/shell/__fixture__.module.ts',
+      code: 'import { x } from "../application";',
     }).toPassArchitectureLint();
   });
 
@@ -52,7 +54,7 @@ describe('nested features (<module>/modules/<submodule>)', () => {
   it('the parent root may NOT skip modules/index.ts', async () => {
     await expect({
       file: 'apps/__nested-fixture__/src/features/ledger/__fixture__.ts',
-      code: 'import { x } from "./modules/ledger-export/ledger-export.module";',
+      code: 'import { x } from "./modules/ledger-export";',
     }).toBreakRule('boundaries/dependencies');
   });
 
@@ -66,7 +68,7 @@ describe('nested features (<module>/modules/<submodule>)', () => {
   it('the submodules index MAY re-export the nest modules of its own submodules', async () => {
     await expect({
       file: 'apps/__nested-fixture__/src/features/ledger/modules/index.ts',
-      code: 'export * from "./ledger-export/ledger-export.module";',
+      code: 'export * from "./ledger-export";',
     }).toPassArchitectureLint();
   });
 
@@ -80,7 +82,7 @@ describe('nested features (<module>/modules/<submodule>)', () => {
   it('the submodules index may NOT re-export submodules of another module', async () => {
     await expect({
       file: 'apps/__nested-fixture__/src/features/note/modules/index.ts',
-      code: 'export * from "../../ledger/modules/ledger-export/ledger-export.module";',
+      code: 'export * from "../../ledger/modules/ledger-export";',
     }).toBreakRule('boundaries/dependencies');
   });
 
@@ -129,14 +131,14 @@ describe('nested features (<module>/modules/<submodule>)', () => {
   it('the features index may NOT re-export a submodule', async () => {
     await expect({
       file: 'apps/__nested-fixture__/src/features/index.ts',
-      code: 'export * from "./ledger/modules/ledger-export/ledger-export.module";',
+      code: 'export * from "./ledger/modules/ledger-export";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('bootstrap may NOT mount a submodule', async () => {
     await expect({
       file: 'apps/__nested-fixture__/src/app/__fixture__.ts',
-      code: 'import { x } from "../features/ledger/modules/ledger-export/ledger-export.module";',
+      code: 'import { x } from "../features/ledger/modules/ledger-export";',
     }).toBreakRule('boundaries/dependencies');
   });
 

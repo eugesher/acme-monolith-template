@@ -1,1 +1,3 @@
-export * from './controllers/product.controller';
+export * from './dto';
+
+export * from './filters/product-http-exception.filter';

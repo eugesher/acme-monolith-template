@@ -20,7 +20,7 @@ describe('core modules', () => {
       'core/contracts/src/__ledger-fixture__/index.ts',
       'core/contracts/src/__identity-fixture__/index.ts',
       'core/entities/src/index.ts',
-      'apps/__core-fixture__/src/features/product/product.module.ts',
+      'apps/__core-fixture__/src/features/product/index.ts',
       'libs/cache/src/index.ts',
       'libs/kernel/src/index.ts',
       'apps/__core-fixture__/src/contracts/auth/index.ts',
@@ -148,7 +148,7 @@ describe('core modules', () => {
     it('a core module may NOT import an app', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
-        code: 'import { x } from "../../../../../apps/__core-fixture__/src/features/product/product.module";',
+        code: 'import { x } from "../../../../../apps/__core-fixture__/src/features/product";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -227,7 +227,7 @@ describe('core modules', () => {
     it.each([
       'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
       'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/processors/purge/__fixture__.ts',
+      'apps/__core-fixture__/src/processors/purge/shell/__fixture__.module.ts',
     ])('%s MAY take @nestjs/common', async (file) => {
       await expect({
         file,

@@ -1,2 +1,2 @@
-export * from './note/note.module';
-export * from './tag/tag.module';
+export * from './note';
+export * from './tag';

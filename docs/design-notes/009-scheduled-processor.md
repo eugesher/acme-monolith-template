@@ -8,7 +8,7 @@ repository of its own (see `024-code-placement.md`). It is a processor: a job of
 
 | Layer                        | What it holds                                                                                                                                                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `presentation/processors`    | `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                                                                                |
+| `shell`                      | `IdempotencyPurgeModule`; `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                                                      |
 | `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                                                                                        |
 | `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                                                                                      |
 | `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN`, `IDEMPOTENCY_PURGE_QUEUE` |
@@ -83,9 +83,9 @@ job carries no data, so the type is `Record<string, never>` and an add with any 
 compile. `IdempotencyPurgeScheduleQueueModule` registers the queue, binds
 `IdempotencyPurgeScheduleQueueAdapter` to `IDEMPOTENCY_PURGE_SCHEDULE_PORT` and exports the port,
 and `IdempotencyPurgeModule` imports it. The processor takes the name from `outbound` for
-`@Processor(IDEMPOTENCY_PURGE_QUEUE)`: lint lets the presentation of a processor take only a
-`*_QUEUE` name from its outbound, not a port (see `016-lint-allowlists.md`). The e2e context reaches
-the queue by the literal `'idempotency-purge'`, the name BullMQ sees. processor-app mounts
+`@Processor(IDEMPOTENCY_PURGE_QUEUE)`: lint lets the processor in `shell` take only a `*_QUEUE` name
+from its outbound, not a port (see `016-lint-allowlists.md`). The e2e context reaches the queue by
+the literal `'idempotency-purge'`, the name BullMQ sees. processor-app mounts
 `IdempotencyPurgeModule` through `@acme-processor/processors`.
 
 **The start of the app is an entry.** `IdempotencyPurgeProcessor` implements

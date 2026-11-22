@@ -9,7 +9,7 @@ coverage thresholds and the lint of tests.
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | use case in a transaction | `apps/staff-app/src/features/warehouse/modules/product-stock/application/use-cases/spec/product-stock-add.use-case.spec.ts` |
 | model                     | `apps/staff-app/src/features/tools/modules/tag/domain/models/spec/tag-rename.model.spec.ts`                                 |
-| controller                | `apps/staff-app/src/features/tools/modules/tag/presentation/controllers/spec/tag.controller.spec.ts`                        |
+| controller                | `apps/staff-app/src/features/tools/modules/tag/shell/spec/tag.controller.spec.ts`                                           |
 | request DTO               | `apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/spec/tag-rename.request.dto.spec.ts`               |
 | query builder             | `apps/staff-app/src/features/tools/modules/tag/infrastructure/persistence/builders/spec/tag-persistence.builder.spec.ts`    |
 | module                    | `libs/cache/src/shell/spec/cache-lib.module.spec.ts`                                                                        |

@@ -15,7 +15,8 @@ and the feature keeps the plain `Auth` prefix.
 
 | Layer          | Example                                                                                                                           |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| presentation   | `presentation/controllers/auth.controller.ts`, `presentation/filters/auth-http-exception.filter.ts`                               |
+| shell          | `shell/auth.module.ts`, `shell/auth.controller.ts`                                                                                |
+| presentation   | `presentation/dto/`, `presentation/filters/auth-http-exception.filter.ts`                                                         |
 | application    | `application/use-cases/auth-login.use-case.ts`                                                                                    |
 | outbound       | `outbound/ports/auth-login-repository.port.ts`                                                                                    |
 | infrastructure | `infrastructure/persistence/repositories/auth-login.repository.ts`, `infrastructure/lib-adapters/auth-credentials-lib.adapter.ts` |

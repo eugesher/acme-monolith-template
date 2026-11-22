@@ -22,7 +22,7 @@ describe('common modules (common/modules/<module>)', () => {
       'apps/__common-fixture__/src/common/shared/concurrency/index.ts',
       'apps/__common-fixture__/src/contracts/idempotency/index.ts',
       'apps/__common-fixture__/src/contracts/audit/index.ts',
-      'apps/__common-fixture__/src/features/product/product.module.ts',
+      'apps/__common-fixture__/src/features/product/index.ts',
       'apps/__common-fixture__/src/features/product/infrastructure/common-adapters/index.ts',
       'apps/__common-fixture__/src/global/index.ts',
       'core/modules/src/__ledger-fixture__/index.ts',
@@ -120,7 +120,7 @@ describe('common modules (common/modules/<module>)', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['../../../../features/product/product.module', '../../../../global'])(
+    it.each(['../../../../features/product', '../../../../global'])(
       'a common module may NOT reach the app: %s',
       async (source) => {
         await expect({
@@ -394,8 +394,8 @@ describe('common modules (common/modules/<module>)', () => {
 
     it('presentation may NOT reach app contracts — common modules are reached through common-adapters', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-        code: 'import { x } from "../../../../contracts/idempotency";',
+        file: 'apps/__common-fixture__/src/features/product/shell/__fixture__.ts',
+        code: 'import { x } from "../../../contracts/idempotency";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -407,7 +407,10 @@ describe('common modules (common/modules/<module>)', () => {
     });
 
     it.each([
-      ['apps/__common-fixture__/src/features/product/__fixture__.ts', '../../common/modules'],
+      [
+        'apps/__common-fixture__/src/features/product/shell/__fixture__.module.ts',
+        '../../../common/modules',
+      ],
       ['apps/__common-fixture__/src/global/auth/shell/__fixture__.ts', '../../../common/modules'],
     ])('the module root %s MAY mount a common module', async (file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toPassArchitectureLint();
@@ -432,23 +435,23 @@ describe('common modules (common/modules/<module>)', () => {
 
     it('an app may NOT take a deep path into a common module', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "../../common/modules/idempotency/application";',
+        file: 'apps/__common-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../../common/modules/idempotency/application";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it.each([
       [
-        'apps/__common-other-fixture__/src/features/health/presentation/controllers/__fixture__.ts',
-        '../../../../../../__common-fixture__/src/contracts/idempotency',
+        'apps/__common-other-fixture__/src/features/health/shell/__fixture__.ts',
+        '../../../../../__common-fixture__/src/contracts/idempotency',
       ],
       [
         'apps/__common-other-fixture__/src/features/health/infrastructure/common-adapters/__fixture__.ts',
         '../../../../../../__common-fixture__/src/contracts/idempotency',
       ],
       [
-        'apps/__common-other-fixture__/src/features/health/__fixture__.ts',
-        '../../../../__common-fixture__/src/common/modules',
+        'apps/__common-other-fixture__/src/features/health/shell/__fixture__.module.ts',
+        '../../../../../__common-fixture__/src/common/modules',
       ],
       [
         'apps/__common-other-fixture__/test/app/__fixture__.e2e-spec.ts',
@@ -490,7 +493,7 @@ describe('common modules (common/modules/<module>)', () => {
       ['processor-app', 'health'],
     ])('%s MAY mount any core module', async (app, feature) => {
       await expect({
-        file: `apps/${app}/src/features/${feature}/${feature}.module.ts`,
+        file: `apps/${app}/src/features/${feature}/shell/${feature}.module.ts`,
         code: 'import { LedgerCoreModule } from "@acme-core/modules/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });

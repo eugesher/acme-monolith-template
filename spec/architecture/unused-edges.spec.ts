@@ -179,13 +179,13 @@ describe('unused edges', () => {
       ],
       [
         'feature presentation may NOT reach the observability lib: the middleware of the app sets the correlation id',
-        'apps/__unused-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-        '../../../../../../../libs/observability/src',
+        'apps/__unused-fixture__/src/features/product/shell/__fixture__.ts',
+        '../../../../../../libs/observability/src',
       ],
       [
         'the feature root may NOT reach its domain: it wires providers, and the domain has none',
-        'apps/__unused-fixture__/src/features/product/__fixture__.ts',
-        './domain',
+        'apps/__unused-fixture__/src/features/product/shell/__fixture__.module.ts',
+        '../domain',
       ],
     ])('%s', async (_, file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(

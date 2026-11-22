@@ -18,7 +18,7 @@ describe('global modules (global/) — modules without controllers', () => {
       'apps/__global-fixture__/src/contracts/auth/index.ts',
       'apps/__global-fixture__/src/contracts/audit/index.ts',
       'apps/__global-fixture__/src/contracts/identity/index.ts',
-      'apps/__global-fixture__/src/features/product/product.module.ts',
+      'apps/__global-fixture__/src/features/product/index.ts',
       'core/modules/src/__identity-fixture__/index.ts',
       'core/contracts/src/__identity-fixture__/index.ts',
       'core/entities/src/index.ts',
@@ -117,7 +117,7 @@ describe('global modules (global/) — modules without controllers', () => {
   it('the module root may NOT reach a feature', async () => {
     await expect({
       file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
-      code: 'import { x } from "../../../features/product/product.module";',
+      code: 'import { x } from "../../../features/product";',
     }).toBreakRule('boundaries/dependencies');
   });
 
@@ -336,8 +336,8 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('a feature may NOT reach the global modules', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/features/product/__fixture__.ts',
-      code: 'import { x } from "../../global";',
+      file: 'apps/__global-fixture__/src/features/product/shell/__fixture__.module.ts',
+      code: 'import { x } from "../../../global";',
     }).toBreakRule('boundaries/dependencies');
   });
 });

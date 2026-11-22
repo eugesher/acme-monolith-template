@@ -1,1 +1,1 @@
-export * from './controllers/catalog.controller';
+export * from './dto';

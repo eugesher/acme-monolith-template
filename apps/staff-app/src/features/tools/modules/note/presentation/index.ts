@@ -1,1 +1,3 @@
-export * from './controllers/note.controller';
+export * from './dto';
+
+export * from './filters/note-http-exception.filter';

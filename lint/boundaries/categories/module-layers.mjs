@@ -1,6 +1,6 @@
 export const moduleAreas = ['features', 'processors'];
 
-export const moduleAreaLayers = [
+const layers = [
   'domain',
   'outbound',
   'application',
@@ -11,4 +11,10 @@ export const moduleAreaLayers = [
   'infrastructure:config',
   'infrastructure',
   'presentation',
+  'shell',
 ];
+
+export const moduleAreaLayers = {
+  features: layers,
+  processors: layers.filter((layer) => layer !== 'presentation'),
+};

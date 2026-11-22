@@ -9,7 +9,7 @@ binds that token to the configuration.
 | token    | `apps/staff-app/src/features/catalog/modules/product/outbound/tokens/product-occ-retry-attempts.token.ts` |
 | provider | `apps/staff-app/src/features/catalog/modules/product/infrastructure/config/product-config.provider.ts`    |
 | lib      | `ConfigValueProvider` in `libs/config/src/provider/config-value.provider.ts`                              |
-| module   | `apps/staff-app/src/features/catalog/modules/product/product.module.ts`                                   |
+| module   | `apps/staff-app/src/features/catalog/modules/product/shell/product.module.ts`                             |
 
 ```ts
 export const ProductConfigOccRetryAttemptsProvider = ConfigValueProvider.provide({

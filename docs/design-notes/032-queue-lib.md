@@ -31,8 +31,8 @@ that return the modules of `@nestjs/bullmq`, and the options are built in the pr
 
 **The lib has no port.** BullMQ is reached through its decorators: a producer injects the queue with
 `@InjectQueue` in its `infrastructure/queue` adapter, and a processor declares `@Processor` on a
-`WorkerHost` in its presentation (see `008-queue-processor.md`). The lib holds only what every app
-needs: the connection, the prefix, the job options and the registration of a queue.
+`WorkerHost` in its `shell` (see `008-queue-processor.md`). The lib holds only what every app needs:
+the connection, the prefix, the job options and the registration of a queue.
 
 ## The connection is per app, the job options are not
 

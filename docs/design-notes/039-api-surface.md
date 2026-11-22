@@ -4,14 +4,14 @@ The three apps answer one HTTP contract: the method of a route says what it does
 of digits, a header is parsed and described in one place, and every error answers one body that the
 OpenAPI document lists.
 
-| Part              | Example                                                                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------------- |
-| methods           | `apps/staff-app/src/features/catalog/modules/product/presentation/controllers/product.controller.ts` |
-| ids               | `@IsEntityId` in `libs/http/src/validation/decorators/is-entity-id.decorator.ts`                     |
-| headers           | `libs/http/src/concurrency`, `libs/http/src/idempotency`                                             |
-| error body        | `ErrorResponseDto` and `HttpExceptionFilter` in `libs/http`                                          |
-| error codes       | `<Context>ExceptionCodeEnum` in `domain/errors/codes`, the `STATUS` of the filter of the module      |
-| errors in OpenAPI | `@ApiErrorResponses` in `libs/http`, `ApiReference.setup` in `libs/openapi`                          |
+| Part              | Example                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| methods           | `apps/staff-app/src/features/catalog/modules/product/shell/product.controller.ts`               |
+| ids               | `@IsEntityId` in `libs/http/src/validation/decorators/is-entity-id.decorator.ts`                |
+| headers           | `libs/http/src/concurrency`, `libs/http/src/idempotency`                                        |
+| error body        | `ErrorResponseDto` and `HttpExceptionFilter` in `libs/http`                                     |
+| error codes       | `<Context>ExceptionCodeEnum` in `domain/errors/codes`, the `STATUS` of the filter of the module |
+| errors in OpenAPI | `@ApiErrorResponses` in `libs/http`, `ApiReference.setup` in `libs/openapi`                     |
 
 ## Methods
 

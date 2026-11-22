@@ -6,7 +6,7 @@ describe('specs the coverage cannot ask for', () => {
 
     expect(subjects).toEqual(
       expect.arrayContaining([
-        'apps/staff-app/src/features/tools/modules/tag/presentation/controllers/tag.controller.ts',
+        'apps/staff-app/src/features/tools/modules/tag/shell/tag.controller.ts',
         'apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/tag-rename.request.dto.ts',
         'apps/staff-app/src/features/access/modules/role/presentation/dto/params/role-id.param.dto.ts',
         'apps/staff-app/src/features/queue/presentation/dto/params/queue-job.param.dto.ts',
@@ -25,9 +25,8 @@ describe('specs the coverage cannot ask for', () => {
   describe('the rule itself', () => {
     it('accepts a subject with its spec in the spec folder next to it', () => {
       const violations = missingSpecs(
-        ['apps/x/src/features/item/presentation/controllers/item.controller.ts'],
-        (file) =>
-          file === 'apps/x/src/features/item/presentation/controllers/spec/item.controller.spec.ts',
+        ['apps/x/src/features/item/shell/item.controller.ts'],
+        (file) => file === 'apps/x/src/features/item/shell/spec/item.controller.spec.ts',
       );
 
       expect(violations).toEqual([]);

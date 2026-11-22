@@ -140,7 +140,7 @@ describe('lib entry points', () => {
     'apps/processor-app/src/processors/purge/application/services/__fixture__.ts',
     'apps/staff-app/src/common/modules/idempotency/application/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
-    'apps/staff-app/src/features/product/presentation/controllers/__fixture__.ts',
+    'apps/staff-app/src/features/product/shell/__fixture__.ts',
     'apps/staff-app/src/app/setup/config/__fixture__.ts',
   ])(
     '%s may NOT import the transaction port by its alias, the transaction adapter of the module wraps it',
@@ -235,7 +235,7 @@ describe('lib entry points', () => {
 
   it('a controller may NOT import the health lib root, only a module wires it', async () => {
     await expect({
-      file: 'apps/staff-app/src/features/product/presentation/controllers/__fixture__.ts',
+      file: 'apps/staff-app/src/features/product/shell/__fixture__.ts',
       code: 'import { HealthLibModule } from "@acme-libs/health";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -253,7 +253,7 @@ describe('lib entry points', () => {
   it.each([
     'apps/staff-app/src/main.ts',
     'apps/staff-app/src/app/app.module.ts',
-    'apps/staff-app/src/features/product/presentation/controllers/__fixture__.ts',
+    'apps/staff-app/src/features/product/shell/__fixture__.ts',
   ])('%s may NOT import the openapi lib, the document is built at startup only', async (file) => {
     await expect({
       file,
