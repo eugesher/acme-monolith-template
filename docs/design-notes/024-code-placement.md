@@ -61,6 +61,7 @@ common or core module may share a name, and the infix keeps them apart.
 ## Global modules have layers too
 
 When a global module (`app/global/<m>`) owns logic, it gets `application/` and `outbound/` like a
-feature: the facade calls a use case, the use case calls a repository port, and the repository lives
-in `infrastructure/persistence`. The lint categories `acme-app:app:global:application` and
+feature: the facade calls a use case, and the use case calls ports of its outbound, implemented by a
+repository in `infrastructure/persistence` or by an adapter in `infrastructure/common-adapters` or
+`infrastructure/lib-adapters`. The lint categories `acme-app:app:global:application` and
 `acme-app:app:global:outbound` cover them (see `016-lint-allowlists.md`).

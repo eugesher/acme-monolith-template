@@ -371,18 +371,11 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('the module root MAY mount the credentials lib', async () => {
-      await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { CredentialsLibModule } from "@acme-libs/credentials";',
-      }).toPassArchitectureLint();
-    });
-
-    it.each(['application', 'infrastructure'])(
-      '%s may NOT mount the credentials lib, only the module root does',
-      async (layer) => {
+    it.each(['__fixture__.ts', 'application/__fixture__.ts', 'infrastructure/__fixture__.ts'])(
+      'features/product/%s may NOT mount the credentials lib — the AppModule mounts it once for the app',
+      async (file) => {
         await expect({
-          file: `apps/__features-fixture__/src/features/product/${layer}/__fixture__.ts`,
+          file: `apps/__features-fixture__/src/features/product/${file}`,
           code: 'import { CredentialsLibModule } from "@acme-libs/credentials";',
         }).toBreakRule('boundaries/dependencies');
       },

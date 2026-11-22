@@ -27,7 +27,7 @@ export const acmeApp = [
   from('acme-app:app:module', [
     to('acme-app:app', own('app')),
     ...appIndexes,
-    baseLibs('cache', 'database', 'http', 'local-storage', 'observability', 'queue'),
+    baseLibs('cache', 'credentials', 'database', 'http', 'local-storage', 'observability', 'queue'),
     packages('@nestjs/common', '@nestjs/core'),
   ]),
   from('acme-app:app', [
@@ -83,6 +83,7 @@ export const acmeApp = [
     to('acme-app:app:global:infrastructure', own('app', 'module')),
     to('acme-app:app:global:infrastructure:core-adapters', own('app', 'module')),
     to('acme-app:app:global:infrastructure:common-adapters', own('app', 'module')),
+    to('acme-app:app:global:infrastructure:lib-adapters', own('app', 'module')),
     to('acme-app:app:global:outbound', own('app', 'module')),
     appContracts,
     to('acme-core:entities'),
@@ -103,6 +104,13 @@ export const acmeApp = [
     to('acme-app:app:global:infrastructure:common-adapters', own('app', 'module')),
     to('acme-app:app:global:outbound', own('app', 'module')),
     to('acme-app:contracts', own('app')),
+    baseLibs(),
+    to('acme-libs:contracts'),
+    packages('@nestjs/common'),
+  ]),
+  from('acme-app:app:global:infrastructure:lib-adapters', [
+    to('acme-app:app:global:infrastructure:lib-adapters', own('app', 'module')),
+    to('acme-app:app:global:outbound', own('app', 'module')),
     baseLibs(),
     to('acme-libs:contracts'),
     packages('@nestjs/common'),

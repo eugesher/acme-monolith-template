@@ -29,7 +29,7 @@ describe('CredentialsLibModule', () => {
             }),
           ],
         }),
-        CredentialsLibModule.register(AuthAudienceEnum.STAFF),
+        CredentialsLibModule.forRoot(AuthAudienceEnum.STAFF),
       ],
     })
     class TestModule {}
@@ -57,6 +57,33 @@ describe('CredentialsLibModule', () => {
       aud: 'staff',
       lifetime: 900,
     });
+  });
+
+  it('verifies an access token it signed and answers its subject', async () => {
+    const credentials = app.get<ICredentialsLibPort>(CREDENTIALS_LIB_PORT);
+    const token = await credentials.handleSignAccessToken({ sub: 'user-1' });
+
+    const claims = await credentials.handleVerifyAccessToken(token);
+
+    expect(claims).toEqual({ sub: 'user-1' });
+  });
+
+  it.each([
+    ['another secret', 'another-secret-of-at-least-thirty-two', { audience: 'staff' }],
+    ['another audience', 'access-secret-of-at-least-thirty-two-chars', { audience: 'customer' }],
+    ['no audience', 'access-secret-of-at-least-thirty-two-chars', {}],
+    [
+      'HS512',
+      'access-secret-of-at-least-thirty-two-chars',
+      { audience: 'staff', algorithm: 'HS512' as const },
+    ],
+  ])('answers no subject for a token signed with %s', async (_case, secret, options) => {
+    const credentials = app.get<ICredentialsLibPort>(CREDENTIALS_LIB_PORT);
+    const token = await new JwtService({ secret }).signAsync({ sub: 'user-1' }, options);
+
+    const claims = await credentials.handleVerifyAccessToken(token);
+
+    expect(claims).toBeNull();
   });
 
   it('hashes passwords with the costs of AUTH_ARGON2_*', async () => {

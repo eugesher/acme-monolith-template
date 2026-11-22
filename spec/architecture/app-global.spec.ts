@@ -10,6 +10,7 @@ describe('global modules (app/global) — modules without controllers', () => {
       'apps/__global-fixture__/src/app/global/auth/shell/auth.module.ts',
       'apps/__global-fixture__/src/app/global/auth/infrastructure/index.ts',
       'apps/__global-fixture__/src/app/global/auth/infrastructure/common-adapters/index.ts',
+      'apps/__global-fixture__/src/app/global/auth/infrastructure/lib-adapters/index.ts',
       'apps/__global-fixture__/src/app/global/auth/application/index.ts',
       'apps/__global-fixture__/src/app/global/auth/outbound/index.ts',
       'apps/__global-fixture__/src/common/modules/index.ts',
@@ -21,6 +22,7 @@ describe('global modules (app/global) — modules without controllers', () => {
       'core/modules/src/__identity-fixture__/index.ts',
       'core/contracts/src/__identity-fixture__/index.ts',
       'core/entities/src/index.ts',
+      'libs/contracts/src/credentials/index.ts',
     ]);
   });
 
@@ -168,10 +170,28 @@ describe('global modules (app/global) — modules without controllers', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
+  it('infrastructure/lib-adapters MAY reach the contracts of a lib and implement a port of its own outbound', async () => {
+    await expect({
+      file: 'apps/__global-fixture__/src/app/global/auth/infrastructure/lib-adapters/__fixture__.ts',
+      code: 'import { x } from "../../../../../../../../libs/contracts/src/credentials";\nimport { y } from "../../outbound";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    ['app contracts', '../../../../../contracts/identity'],
+    ['core contracts', '../../../../../../../../core/contracts/src/__identity-fixture__'],
+    ['entities', '../../../../../../../../core/entities/src'],
+  ])('infrastructure/lib-adapters may NOT reach %s', async (_case, source) => {
+    await expect({
+      file: 'apps/__global-fixture__/src/app/global/auth/infrastructure/lib-adapters/__fixture__.ts',
+      code: `import { x } from "${source}";`,
+    }).toBreakRule('boundaries/dependencies');
+  });
+
   it('the rest of infrastructure MAY reach entities, app contracts and its own adapters', async () => {
     await expect({
       file: 'apps/__global-fixture__/src/app/global/auth/infrastructure/persistence/__fixture__.ts',
-      code: 'import { x } from "../../../../../../../../core/entities/src";\nimport { y } from "../../../../../contracts/auth";\nimport { z } from "../common-adapters";',
+      code: 'import { x } from "../../../../../../../../core/entities/src";\nimport { y } from "../../../../../contracts/auth";\nimport { z } from "../common-adapters";\nimport { w } from "../lib-adapters";',
     }).toPassArchitectureLint();
   });
 

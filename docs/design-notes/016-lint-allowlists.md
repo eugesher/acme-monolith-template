@@ -140,15 +140,18 @@ module stay with its core-adapters.
 
 Code lives with its only caller (see `024-code-placement.md`), so the edges follow the code:
 
-- **A feature signs users in.** Its `infrastructure/lib-adapters` may take
-  `@acme-libs/contracts/credentials`, and its module root may mount `@acme-libs/credentials`: the
-  `auth` features of staff-app and of customer-app, and the `user` feature of staff-app for the hash
-  of a new password. No core or common module signs anyone in, so none may.
-- **A lib port is reached through a lib adapter.** A feature declares a port of its own in
-  `outbound` and implements it in `infrastructure/lib-adapters` on top of the port of the lib, as
-  `core-adapters` and `common-adapters` do for core and common modules. Only `lib-adapters` may take
-  `@acme-libs/contracts/credentials` and `@acme-libs/contracts/health`; the application and the
-  presentation may not. The types of `@acme-libs/contracts/auth` stay direct.
+- **A feature signs users in, a global module checks the token.** The `infrastructure/lib-adapters`
+  of a feature may take `@acme-libs/contracts/credentials`: the `auth` features of staff-app and of
+  customer-app, and the `user` feature of staff-app for the hash of a new password. So may the
+  `infrastructure/lib-adapters` of a global module, which verify the bearer token for the guard.
+  Only `AppModule` may mount `@acme-libs/credentials`, once for the app (see
+  `017-credentials-lib.md`): a feature that mounted it too would build a second module with its own
+  `JwtModule` and password hasher. No core or common module signs anyone in, so none may.
+- **A lib port is reached through a lib adapter.** A feature or a global module declares a port of
+  its own in `outbound` and implements it in `infrastructure/lib-adapters` on top of the port of the
+  lib, as `core-adapters` and `common-adapters` do for core and common modules. Only `lib-adapters`
+  may take `@acme-libs/contracts/credentials` and `@acme-libs/contracts/health`; the application and
+  the presentation may not. The types of `@acme-libs/contracts/auth` stay direct.
 - **A feature and a core module write to the ledger** as to any core module: the module root mounts
   `LedgerCoreModule` of `@acme-core/modules/ledger`, and `infrastructure/core-adapters` takes
   `LEDGER_CORE_PORT` from `@acme-core/contracts/ledger`. The ledger reads the correlation id of the
@@ -186,6 +189,10 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
 - **A global common-adapter reaches any contract of its app and its own outbound.** It implements a
   port of its module's outbound with the port of a common module, which is named after that module,
   not after the global module, so the namesake rule of `appContracts` would refuse it.
+- **A global lib-adapter reaches the contracts of the libs and its own outbound.** It implements a
+  port of its module's outbound with the port of a lib, as the lib-adapters of a feature do:
+  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_LIB_PORT`. The rest
+  of the global infrastructure may not take a lib contract other than that of `database`.
 
 ### No policy names an export
 

@@ -10,6 +10,7 @@ describe('libs by layer', () => {
       'libs/bootstrap/src/index.ts',
       'libs/cache/src/index.ts',
       'libs/config/src/index.ts',
+      'libs/credentials/src/index.ts',
       'libs/database/src/index.ts',
       'libs/domain/src/index.ts',
       'libs/health/src/index.ts',
@@ -363,6 +364,7 @@ describe('libs by layer', () => {
 
   it.each([
     ['apps/__layers-fixture__/src/app/app.module.ts', '../../../../libs', 'cache'],
+    ['apps/__layers-fixture__/src/app/app.module.ts', '../../../../libs', 'credentials'],
     ['apps/__layers-fixture__/src/features/product/__fixture__.ts', '../../../../../libs', 'auth'],
     [
       'apps/__layers-fixture__/src/features/product/__fixture__.ts',

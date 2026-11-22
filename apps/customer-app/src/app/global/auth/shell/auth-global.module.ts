@@ -1,16 +1,18 @@
 import { Global, Module, type ClassProvider } from '@nestjs/common';
 
 import { AuthJwtModule } from '@acme-libs/auth';
-import { AuthAudienceEnum } from '@acme-libs/kernel';
 import { AUTH_USER_VALIDATOR_PORT, type IAuthUserValidatorPort } from '@acme-libs/contracts/auth';
 
 import { AuthGlobalValidateSubjectUseCase } from '../application';
-import { AuthGlobalValidateSubjectRepository } from '../infrastructure';
+import {
+  AuthGlobalCredentialsLibAdapter,
+  AuthGlobalValidateSubjectRepository,
+} from '../infrastructure';
 import { AuthGlobalFacade } from './auth-global.facade';
 
 @Global()
 @Module({
-  imports: [AuthJwtModule.forRoot(AuthAudienceEnum.CUSTOMER)],
+  imports: [AuthJwtModule],
   exports: [AUTH_USER_VALIDATOR_PORT],
   providers: [
     {
@@ -19,6 +21,7 @@ import { AuthGlobalFacade } from './auth-global.facade';
     } satisfies ClassProvider<IAuthUserValidatorPort>,
     AuthGlobalValidateSubjectUseCase,
     AuthGlobalValidateSubjectRepository.provider,
+    AuthGlobalCredentialsLibAdapter.provider,
   ],
 })
 export class AuthGlobalModule {}

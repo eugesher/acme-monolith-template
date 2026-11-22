@@ -6,7 +6,7 @@ describe('CredentialsLibSignAccessTokenUseCase', () => {
   let useCase: CredentialsLibSignAccessTokenUseCase;
 
   beforeEach(() => {
-    accessToken = { sign: jest.fn() };
+    accessToken = { sign: jest.fn(), verify: jest.fn() };
     accessToken.sign.mockResolvedValue('access-token');
     useCase = new CredentialsLibSignAccessTokenUseCase(accessToken);
   });

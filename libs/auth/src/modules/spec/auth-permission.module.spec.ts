@@ -1,9 +1,7 @@
 import { Controller, Get, Global, Module, type INestApplication } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 
-import { AuthAudienceEnum, PermissionCodeEnum } from '@acme-libs/kernel';
+import { PermissionCodeEnum } from '@acme-libs/kernel';
 import { AUTH_USER_VALIDATOR_PORT, type IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import { RequiresPermission } from '../../decorators/auth-requires-permission.decorator';
@@ -31,33 +29,26 @@ describe('AuthPermissionModule', () => {
 
     @Global()
     @Module({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          ignoreEnvFile: true,
-          load: [() => ({ JWT_SECRET: 'access-secret-of-at-least-thirty-two-chars' })],
-        }),
-      ],
       exports: [AUTH_USER_VALIDATOR_PORT],
       providers: [
         {
           provide: AUTH_USER_VALIDATOR_PORT,
           useValue: {
-            handleValidate: (query: { sub: string }) => {
+            handleValidate: (command: { token: string }) => {
               const users: Record<string, IAuthCurrentUserView> = {
-                ann: {
+                'ann-token': {
                   id: 'ann',
                   email: 'ann@example.com',
                   permissionCodes: [PermissionCodeEnum.PRODUCT_READ],
                 },
-                bob: {
+                'bob-token': {
                   id: 'bob',
                   email: 'bob@example.com',
                   permissionCodes: [PermissionCodeEnum.LEDGER_READ],
                 },
               };
 
-              return Promise.resolve(users[query.sub]);
+              return Promise.resolve(users[command.token] ?? null);
             },
           },
         },
@@ -66,11 +57,7 @@ describe('AuthPermissionModule', () => {
     class ValidatorModule {}
 
     @Module({
-      imports: [
-        ValidatorModule,
-        AuthJwtModule.forRoot(AuthAudienceEnum.STAFF),
-        AuthPermissionModule,
-      ],
+      imports: [ValidatorModule, AuthJwtModule, AuthPermissionModule],
       controllers: [ProbeController],
     })
     class TestModule {}
@@ -91,36 +78,24 @@ describe('AuthPermissionModule', () => {
   });
 
   it('admits a user holding a required permission', async () => {
-    const token = await new JwtService({
-      secret: 'access-secret-of-at-least-thirty-two-chars',
-    }).signAsync({ sub: 'ann' }, { audience: 'staff' });
-
     const response = await fetch(`${url}/note`, {
-      headers: { authorization: `Bearer ${token}` },
+      headers: { authorization: 'Bearer ann-token' },
     });
 
     expect(response.status).toBe(200);
   });
 
   it('answers 403 to a user without the permission', async () => {
-    const token = await new JwtService({
-      secret: 'access-secret-of-at-least-thirty-two-chars',
-    }).signAsync({ sub: 'bob' }, { audience: 'staff' });
-
     const response = await fetch(`${url}/note`, {
-      headers: { authorization: `Bearer ${token}` },
+      headers: { authorization: 'Bearer bob-token' },
     });
 
     expect(response.status).toBe(403);
   });
 
   it('lets a route without claim decorators through for any authenticated user', async () => {
-    const token = await new JwtService({
-      secret: 'access-secret-of-at-least-thirty-two-chars',
-    }).signAsync({ sub: 'bob' }, { audience: 'staff' });
-
     const response = await fetch(`${url}/plain`, {
-      headers: { authorization: `Bearer ${token}` },
+      headers: { authorization: 'Bearer bob-token' },
     });
 
     expect(response.status).toBe(200);

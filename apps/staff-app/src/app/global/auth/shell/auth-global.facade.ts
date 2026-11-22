@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 import type { Nullable } from '@acme-libs/toolkit';
 import type {
+  IAuthAccessTokenCommand,
   IAuthCurrentUserView,
-  IAuthJwtPayloadCommand,
   IAuthUserValidatorPort,
 } from '@acme-libs/contracts/auth';
 
@@ -14,10 +14,10 @@ export class AuthGlobalFacade implements IAuthUserValidatorPort {
   constructor(private readonly validateSubject: AuthGlobalValidateSubjectUseCase) {}
 
   public async handleValidate(
-    command: IAuthJwtPayloadCommand,
+    command: IAuthAccessTokenCommand,
   ): Promise<Nullable<IAuthCurrentUserView>> {
-    const { sub } = command;
+    const { token } = command;
 
-    return await this.validateSubject.execute({ userId: sub });
+    return await this.validateSubject.execute({ token });
   }
 }

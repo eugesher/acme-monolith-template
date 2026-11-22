@@ -1,7 +1,11 @@
 import { Injectable, type ClassProvider } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import type { ICredentialsLibSignAccessTokenCommand } from '@acme-libs/contracts/credentials';
+import type { Nullable } from '@acme-libs/toolkit';
+import type {
+  ICredentialsLibSignAccessTokenCommand,
+  ICredentialsLibVerifyAccessTokenView,
+} from '@acme-libs/contracts/credentials';
 
 import {
   CREDENTIALS_LIB_ACCESS_TOKEN_PORT,
@@ -21,5 +25,19 @@ export class CredentialsLibAccessTokenAdapter implements ICredentialsLibAccessTo
     const { sub } = command;
 
     return await this.jwt.signAsync({ sub });
+  }
+
+  public async verify(token: string): Promise<Nullable<ICredentialsLibVerifyAccessTokenView>> {
+    const claims = await this.jwt
+      .verifyAsync<ICredentialsLibVerifyAccessTokenView>(token)
+      .catch(() => null);
+
+    if (!claims) {
+      return null;
+    }
+
+    const { sub } = claims;
+
+    return { sub };
   }
 }

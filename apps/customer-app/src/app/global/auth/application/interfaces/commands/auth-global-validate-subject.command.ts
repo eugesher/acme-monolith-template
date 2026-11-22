@@ -1,3 +1,3 @@
 export interface IAuthGlobalValidateSubjectCommand {
-  customerId: string;
+  token: string;
 }

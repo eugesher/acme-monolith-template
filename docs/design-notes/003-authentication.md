@@ -75,8 +75,8 @@ Each API app signs and verifies with its own `JWT_SECRET` and its audience: `sta
 `customer` for customer-app. A token of customer-app is refused by staff-app with 401, and the other
 way round, even if the secrets were the same (see `002-global-auth-guards.md`). Login carries
 `@Public()`; without it the global JWT guard would answer 401 before the controller runs. The token
-carries only `sub`, `aud`, `iat` and `exp`, and its lifetime is `JWT_EXPIRES_IN`. Signing lives in
-`libs/credentials` (see `017-credentials-lib.md`).
+carries only `sub`, `aud`, `iat` and `exp`, and its lifetime is `JWT_EXPIRES_IN`. Signing and
+verifying live in `libs/credentials` (see `017-credentials-lib.md`).
 
 **A disabled account stops at once, a token of an active one only at expiry.** The guard re-reads
 the user on every request (see `002-global-auth-guards.md`), so a disabled account or a changed role

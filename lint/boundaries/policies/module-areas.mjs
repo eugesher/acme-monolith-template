@@ -119,7 +119,7 @@ export const moduleAreas = [
       baseLibs('auth', 'http'),
       packages('@nestjs/common', '@nestjs/swagger', 'class-transformer', 'class-validator'),
     ],
-    module: [baseLibs('auth', 'credentials', 'health', 'http'), packages('@nestjs/common')],
+    module: [baseLibs('auth', 'health', 'http'), packages('@nestjs/common')],
   }),
   ...areaPolicies('processors', {
     outbound: [],
