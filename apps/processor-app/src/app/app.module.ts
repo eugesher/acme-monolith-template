@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 
-import { CacheLibModule } from '@acme-libs/cache';
+import { CacheModule } from '@acme-libs/cache';
 import { OrmModule } from '@acme-libs/database';
 import {
   HttpExceptionFilter,
@@ -31,7 +31,7 @@ import { ConfigSetupModule } from './setup';
     LocalStorageSetupModule.forRoot(),
     OrmModule.forRoot(entities),
     BullSetupModule.forRoot(),
-    CacheLibModule.forRoot(),
+    CacheModule.forRoot(),
     HttpSecurityModule.forRoot(),
     ThrottlerSetupModule.forRoot(),
     HealthModule,

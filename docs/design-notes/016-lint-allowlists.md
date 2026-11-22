@@ -204,8 +204,8 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   not after the global module, so the namesake rule of `appContracts` would refuse it.
 - **A global lib-adapter reaches the contracts of the libs and its own outbound.** It implements a
   port of its module's outbound with the port of a lib, as the lib-adapters of a feature do:
-  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_LIB_PORT`. The rest
-  of the global infrastructure may not take a lib contract other than that of `database`.
+  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_PORT`. The rest of
+  the global infrastructure may not take a lib contract other than that of `database`.
 
 ### No policy names an export
 

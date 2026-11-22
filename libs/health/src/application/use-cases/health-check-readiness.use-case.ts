@@ -1,0 +1,43 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
+
+import {
+  HealthDependencyStatusEnum,
+  HealthReadinessStatusEnum,
+  type AppNameEnum,
+} from '@acme-libs/kernel';
+import type { IHealthDependenciesView, IHealthReadinessView } from '@acme-libs/contracts/health';
+
+import {
+  HEALTH_APP_NAME_TOKEN,
+  HEALTH_DEPENDENCY_PROBE_PORT,
+  type IHealthDependencyProbePort,
+} from '../../outbound';
+
+@Injectable()
+export class HealthCheckReadinessUseCase {
+  constructor(
+    @Inject(HEALTH_APP_NAME_TOKEN)
+    private readonly appName: AppNameEnum,
+    @Inject(HEALTH_DEPENDENCY_PROBE_PORT)
+    private readonly probes: IHealthDependencyProbePort,
+    @InjectPinoLogger(HealthCheckReadinessUseCase.name)
+    private readonly logger: PinoLogger,
+  ) {}
+
+  public async execute(): Promise<IHealthReadinessView> {
+    const dependencies = await this.probes.probeAll();
+    const names = Object.keys(dependencies) as (keyof IHealthDependenciesView)[];
+    const failed = names.filter(
+      (name) => dependencies[name].status !== HealthDependencyStatusEnum.OK,
+    );
+
+    if (failed.length > 0) {
+      this.logger.warn({ failed }, 'Readiness check failed');
+
+      return { status: HealthReadinessStatusEnum.NOT_READY, app: this.appName, dependencies };
+    }
+
+    return { status: HealthReadinessStatusEnum.READY, app: this.appName, dependencies };
+  }
+}

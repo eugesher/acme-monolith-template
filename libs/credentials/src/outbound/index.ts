@@ -1,2 +1,2 @@
-export * from './ports/credentials-lib-access-token.port';
-export * from './ports/credentials-lib-password-hasher.port';
+export * from './ports/credentials-access-token.port';
+export * from './ports/credentials-password-hasher.port';

@@ -14,8 +14,8 @@ verifies a token: it takes the bearer token off the request and hands it to
 layers of a feature (see `024-code-placement.md`): every facade method calls a use case, and the use
 case reaches the token and the data through outbound ports. It verifies the token through
 `AUTH_GLOBAL_CREDENTIALS_PORT`, which `AuthGlobalCredentialsLibAdapter` implements in
-`infrastructure/lib-adapters` with `CREDENTIALS_LIB_PORT` (see `017-credentials-lib.md`), and reads
-the user of its subject. A token that does not verify ends there, without a read.
+`infrastructure/lib-adapters` with `CREDENTIALS_PORT` (see `017-credentials-lib.md`), and reads the
+user of its subject. A token that does not verify ends there, without a read.
 
 | App          | The user and its permission codes                                                                                                             | Ports bound                |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
@@ -31,7 +31,7 @@ one caller, so it lives in customer-app; its repository selects the id and the e
 module has no domain to rebuild them in.
 
 The global module imports the guard modules of `libs/auth`. `AppModule` mounts it next to
-`CredentialsLibModule.forRoot(audience)`, the one credentials module of the app, which the global
+`CredentialsModule.forRoot(audience)`, the one credentials module of the app, which the global
 module and the features share (see `012-app-bootstrap.md`).
 
 **Global classes carry the `AuthGlobal` prefix.** The folder stays `global/auth`, paired with the
@@ -116,11 +116,11 @@ tokens fail the signature check in staff-app.
 
 **The audience is code, not configuration.** `customer.id` and `staff_user.id` both count from 1, so
 a secret shared by mistake would let customer 5 in as staff user 5. Each API app passes
-`AuthAudienceEnum` of `libs/kernel` once, to `CredentialsLibModule.forRoot()` in its `AppModule`:
+`AuthAudienceEnum` of `libs/kernel` once, to `CredentialsModule.forRoot()` in its `AppModule`:
 `staff` in staff-app, `customer` in customer-app. The token carries it as `aud`, and the lib accepts
 only the audience of its app and the algorithm of `AuthTokenAlgorithmEnum` of `libs/kernel`,
 `HS256`, which it and the e2e contexts sign with too. An env variable could repeat the mistake of
 the secret; a constant in the module import cannot. The auth e2e of staff-app and of customer-app
 sends a token signed with the secret of the app for a subject of the app but the other audience and
-expects 401; `libs/credentials/src/shell/spec/credentials-lib.module.spec.ts` checks another secret,
+expects 401; `libs/credentials/src/shell/spec/credentials.module.spec.ts` checks another secret,
 another audience, no audience and `HS512`.

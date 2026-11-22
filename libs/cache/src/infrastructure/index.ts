@@ -1,5 +1,5 @@
-export * from './redis/cache-lib-redis-client.provider';
+export * from './redis/cache-redis-client.provider';
 
-export * from './store/cache-lib-store.adapter';
+export * from './store/cache-store.adapter';
 
-export * from './tracer/cache-lib-tracer.adapter';
+export * from './tracer/cache-tracer.adapter';

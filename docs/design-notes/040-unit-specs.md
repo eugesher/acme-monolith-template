@@ -12,7 +12,7 @@ coverage thresholds and the lint of tests.
 | controller                | `apps/staff-app/src/features/tools/modules/tag/shell/spec/tag.controller.spec.ts`                                           |
 | request DTO               | `apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/spec/tag-rename.request.dto.spec.ts`               |
 | query builder             | `apps/staff-app/src/features/tools/modules/tag/infrastructure/persistence/builders/spec/tag-persistence.builder.spec.ts`    |
-| module                    | `libs/cache/src/shell/spec/cache-lib.module.spec.ts`                                                                        |
+| module                    | `libs/cache/src/shell/spec/cache.module.spec.ts`                                                                            |
 | logger mock               | `libs/testing/src/observability/pino-logger.mock.ts`                                                                        |
 
 ## What gets a spec

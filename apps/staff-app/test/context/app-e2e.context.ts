@@ -3,7 +3,7 @@ import { Worker, type Job, type Queue } from 'bullmq';
 import type { Redis } from 'ioredis';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
-import { CACHE_LIB_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
+import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
 import {
   LEDGER_RECORD_QUEUE,
@@ -59,7 +59,7 @@ export class AppE2EContext extends AuthE2EContext {
   public override async init(): Promise<void> {
     await super.init();
 
-    const redis = this.moduleFixture.get<Redis>(CACHE_LIB_REDIS_CLIENT_TOKEN);
+    const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
     const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
       getQueueToken(LEDGER_RECORD_QUEUE),
     );

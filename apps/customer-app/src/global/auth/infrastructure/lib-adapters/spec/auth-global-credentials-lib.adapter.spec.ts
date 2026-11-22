@@ -1,9 +1,9 @@
-import type { ICredentialsLibPort } from '@acme-libs/contracts/credentials';
+import type { ICredentialsPort } from '@acme-libs/contracts/credentials';
 
 import { AuthGlobalCredentialsLibAdapter } from '../auth-global-credentials-lib.adapter';
 
 describe('AuthGlobalCredentialsLibAdapter', () => {
-  let credentials: jest.Mocked<ICredentialsLibPort>;
+  let credentials: jest.Mocked<ICredentialsPort>;
   let adapter: AuthGlobalCredentialsLibAdapter;
 
   beforeEach(() => {

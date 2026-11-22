@@ -1,0 +1,1 @@
+export const HEALTH_APP_NAME_TOKEN = Symbol('HEALTH_APP_NAME_TOKEN');

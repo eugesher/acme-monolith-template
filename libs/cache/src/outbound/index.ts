@@ -1,6 +1,6 @@
 export * from './interfaces';
 
-export * from './ports/cache-lib-store.port';
-export * from './ports/cache-lib-tracer.port';
+export * from './ports/cache-store.port';
+export * from './ports/cache-tracer.port';
 
-export * from './tokens/cache-lib-redis-client.token';
+export * from './tokens/cache-redis-client.token';

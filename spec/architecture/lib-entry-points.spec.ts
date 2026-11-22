@@ -39,15 +39,15 @@ describe('lib entry points', () => {
     '@acme-libs/queue/bull/bull-setup.module',
     '@acme-libs/health/shell/health-lib.module',
     '@acme-libs/auth/modules/auth-jwt.module',
-    '@acme-libs/credentials/shell/credentials-lib.module',
+    '@acme-libs/credentials/shell/credentials.module',
     '@acme-libs/local-storage/setup/local-storage-setup.module',
     '@acme-libs/contracts/local-storage/ports/local-storage-transaction.port',
     '@acme-libs/contracts/database/ports/orm.port',
-    '@acme-libs/cache/infrastructure/store/cache-lib-store.adapter',
-    '@acme-libs/contracts/cache/ports/cache-lib.port',
-    '@acme-libs/contracts/health/ports/health-lib.port',
+    '@acme-libs/cache/infrastructure/store/cache-store.adapter',
+    '@acme-libs/contracts/cache/ports/cache.port',
+    '@acme-libs/contracts/health/ports/health.port',
     '@acme-libs/contracts/auth/ports/auth-user-validator.port',
-    '@acme-libs/contracts/credentials/ports/credentials-lib.port',
+    '@acme-libs/contracts/credentials/ports/credentials.port',
   ])('a feature may NOT reach a deep path into a lib: %s', async (source) => {
     await expect({
       file: 'apps/staff-app/src/features/product/infrastructure/__fixture__.ts',
@@ -172,7 +172,7 @@ describe('lib entry points', () => {
   ])('%s MAY import the cache contracts by their alias', async (file) => {
     await expect({
       file,
-      code: 'import { CACHE_KEYS, CACHE_LIB_PORT } from "@acme-libs/contracts/cache";',
+      code: 'import { CACHE_KEYS, CACHE_PORT } from "@acme-libs/contracts/cache";',
     }).toPassArchitectureLint();
   });
 
@@ -184,14 +184,14 @@ describe('lib entry points', () => {
     async (file) => {
       await expect({
         file,
-        code: 'import { CACHE_LIB_PORT } from "@acme-libs/contracts/cache";',
+        code: 'import { CACHE_PORT } from "@acme-libs/contracts/cache";',
       }).toBreakRule('boundaries/dependencies');
     },
   );
   it('the app root MAY import the cache lib by its alias', async () => {
     await expect({
       file: 'apps/staff-app/src/app/app.module.ts',
-      code: 'import { CacheLibModule } from "@acme-libs/cache";',
+      code: 'import { CacheModule } from "@acme-libs/cache";',
     }).toPassArchitectureLint();
   });
 
@@ -201,35 +201,35 @@ describe('lib entry points', () => {
   ])('%s may NOT import the cache lib root, only the app root wires it', async (file) => {
     await expect({
       file,
-      code: 'import { CacheLibModule } from "@acme-libs/cache";',
+      code: 'import { CacheModule } from "@acme-libs/cache";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('the Redis client token may NOT be imported outside specs', async () => {
     await expect({
       file: 'apps/staff-app/src/app/__fixture__.ts',
-      code: 'import { CACHE_LIB_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
+      code: 'import { CACHE_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('an e2e spec MAY take the Redis client token', async () => {
     await expect({
       file: 'apps/staff-app/test/app/__fixture__.e2e-spec.ts',
-      code: 'import { CACHE_LIB_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
+      code: 'import { CACHE_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
     }).toPassArchitectureLint();
   });
 
   it('the health probes MAY import the cache contracts and their own contracts by their aliases', async () => {
     await expect({
       file: 'libs/health/src/infrastructure/probes/__fixture__.ts',
-      code: 'import { CACHE_KEYS, CACHE_LIB_PORT } from "@acme-libs/contracts/cache";\nimport { IHealthLibDependencyView } from "@acme-libs/contracts/health";',
+      code: 'import { CACHE_KEYS, CACHE_PORT } from "@acme-libs/contracts/cache";\nimport { IHealthDependencyView } from "@acme-libs/contracts/health";',
     }).toPassArchitectureLint();
   });
 
   it('the health lib may NOT import the cache lib root, it probes through the cache port', async () => {
     await expect({
       file: 'libs/health/src/infrastructure/probes/__fixture__.ts',
-      code: 'import { CacheLibModule } from "@acme-libs/cache";',
+      code: 'import { CacheModule } from "@acme-libs/cache";',
     }).toBreakRule('boundaries/dependencies');
   });
 

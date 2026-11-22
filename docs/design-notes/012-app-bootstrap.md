@@ -90,22 +90,22 @@ open (see `002-global-auth-guards.md`); processor-app has no auth and declares n
 
 ## AppModule
 
-| Piece                                      | Where                                                | What it does                                                                                                               |
-| ------------------------------------------ | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `ConfigSetupModule.forRoot()`              | `app/setup/config`                                   | validates the environment of the app with Joi                                                                              |
-| `LoggerSetupModule.forRoot(<app>)`         | `libs/observability`                                 | pino, HTTP request logs                                                                                                    |
-| `TracerSetupModule.forRoot()`              | `libs/observability`                                 | closes the tracer once the queues have closed                                                                              |
-| `LocalStorageSetupModule.forRoot()`        | `libs/local-storage`                                 | the CLS context of every request under its correlation id                                                                  |
-| `OrmModule.forRoot(entities)`              | `libs/database`, the entities of `app/entities`      | the connection, the entities of the app, `ORM_PORT`, `TRANSACTION_PORT` (see `026-transaction-port.md`)                    |
-| `BullSetupModule.forRoot()`                | `libs/queue`                                         | the BullMQ connection to Redis, the prefix and the job options of every queue                                              |
-| `CacheLibModule.forRoot()`                 | `libs/cache`                                         | global `CACHE_LIB_PORT`                                                                                                    |
-| `CredentialsLibModule.forRoot(<audience>)` | `libs/credentials`, in staff-app and customer-app    | global `CREDENTIALS_LIB_PORT`: one `JwtModule` that signs and verifies, one password hasher (see `017-credentials-lib.md`) |
-| `HttpSecurityModule.forRoot()`             | `libs/http`                                          | the security headers of `helmet` and CORS from `HTTP_CORS_ORIGINS` (see `037-http-edge.md`)                                |
-| `ThrottlerSetupModule.forRoot()`           | `libs/http`                                          | the global request limits over Redis and `trust proxy` (see `003-authentication.md`)                                       |
-| `AuthGlobalModule`                         | `global/auth`                                        | the global guards: JWT, and permissions in a staff app                                                                     |
-| features, processors                       | `@acme-<app>/features`, `@acme-processor/processors` | the routes and the processors                                                                                              |
-| `APP_PIPE`                                 | `StrictValidationPipe`                               | whitelist, forbid unknown properties, transform                                                                            |
-| `APP_FILTER`                               | `HttpExceptionFilter`                                | the error body and its log                                                                                                 |
+| Piece                                   | Where                                                | What it does                                                                                                           |
+| --------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `ConfigSetupModule.forRoot()`           | `app/setup/config`                                   | validates the environment of the app with Joi                                                                          |
+| `LoggerSetupModule.forRoot(<app>)`      | `libs/observability`                                 | pino, HTTP request logs                                                                                                |
+| `TracerSetupModule.forRoot()`           | `libs/observability`                                 | closes the tracer once the queues have closed                                                                          |
+| `LocalStorageSetupModule.forRoot()`     | `libs/local-storage`                                 | the CLS context of every request under its correlation id                                                              |
+| `OrmModule.forRoot(entities)`           | `libs/database`, the entities of `app/entities`      | the connection, the entities of the app, `ORM_PORT`, `TRANSACTION_PORT` (see `026-transaction-port.md`)                |
+| `BullSetupModule.forRoot()`             | `libs/queue`                                         | the BullMQ connection to Redis, the prefix and the job options of every queue                                          |
+| `CacheModule.forRoot()`                 | `libs/cache`                                         | global `CACHE_PORT`                                                                                                    |
+| `CredentialsModule.forRoot(<audience>)` | `libs/credentials`, in staff-app and customer-app    | global `CREDENTIALS_PORT`: one `JwtModule` that signs and verifies, one password hasher (see `017-credentials-lib.md`) |
+| `HttpSecurityModule.forRoot()`          | `libs/http`                                          | the security headers of `helmet` and CORS from `HTTP_CORS_ORIGINS` (see `037-http-edge.md`)                            |
+| `ThrottlerSetupModule.forRoot()`        | `libs/http`                                          | the global request limits over Redis and `trust proxy` (see `003-authentication.md`)                                   |
+| `AuthGlobalModule`                      | `global/auth`                                        | the global guards: JWT, and permissions in a staff app                                                                 |
+| features, processors                    | `@acme-<app>/features`, `@acme-processor/processors` | the routes and the processors                                                                                          |
+| `APP_PIPE`                              | `StrictValidationPipe`                               | whitelist, forbid unknown properties, transform                                                                        |
+| `APP_FILTER`                            | `HttpExceptionFilter`                                | the error body and its log                                                                                             |
 
 Every module in `app/setup/` is named `*SetupModule`.
 
@@ -178,12 +178,12 @@ Nest closes in phases: `onModuleDestroy`, `beforeApplicationShutdown`, the HTTP 
 come last. In the first phase `@nestjs/bullmq` closes the workers, and `worker.close()` waits for
 the job a processor runs. In the last phase:
 
-| Hook                | Where                                          | What it waits for            |
-| ------------------- | ---------------------------------------------- | ---------------------------- |
-| `queue.close()`     | the queue modules of `@nestjs/bullmq`          | its connections              |
-| the `DataSource`    | `TypeOrmCoreModule` of `OrmModule`             | the pool                     |
-| the Redis clients   | `CacheLibStoreAdapter`, `ThrottleRedisStorage` | `quit`                       |
-| `TracerSetupModule` | `libs/observability`                           | the export of the spans left |
+| Hook                | Where                                       | What it waits for            |
+| ------------------- | ------------------------------------------- | ---------------------------- |
+| `queue.close()`     | the queue modules of `@nestjs/bullmq`       | its connections              |
+| the `DataSource`    | `TypeOrmCoreModule` of `OrmModule`          | the pool                     |
+| the Redis clients   | `CacheStoreAdapter`, `ThrottleRedisStorage` | `quit`                       |
+| `TracerSetupModule` | `libs/observability`                        | the export of the spans left |
 
 **The tracer closes after the queues.** `@acme-libs/observability/tracer` starts the SDK before Nest
 loads and hands it to `TracerSetupModule.track`. The module is global, so its hook runs after the

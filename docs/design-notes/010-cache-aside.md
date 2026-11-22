@@ -9,7 +9,7 @@ write.
 | use case  | `apps/customer-app/src/features/catalog/application/use-cases/catalog-product-list.use-case.ts` |
 | adapter   | `apps/customer-app/src/features/catalog/infrastructure/cache/catalog-cache.adapter.ts`          |
 | keys      | `libs/contracts/src/cache/keys/cache-keys.ts`                                                   |
-| cache lib | `libs/cache`, `CACHE_LIB_PORT` in `libs/contracts/src/cache/ports/cache-lib.port.ts`            |
+| cache lib | `libs/cache`, `CACHE_PORT` in `libs/contracts/src/cache/ports/cache.port.ts`                    |
 
 ## The use case computes, the port caches
 
@@ -18,8 +18,8 @@ cache.read({ page, limit, ttlMs: this.cacheTtlMs, compute: () => this.listPage(p
 ```
 
 The use case has no key and no branch on a hit or a miss. The adapter has no repository: it calls
-`compute` on a miss through `CACHE_LIB_PORT.handleWrap`. The repository port belongs to the use
-case, so the rule of one repository per consumer holds.
+`compute` on a miss through `CACHE_PORT.handleWrap`. The repository port belongs to the use case, so
+the rule of one repository per consumer holds.
 
 **`handleWrap` already shares one computation among concurrent misses of a key**, and computes
 without caching when Redis fails, so an adapter has no single-flight and no fallback of its own. It
@@ -36,31 +36,31 @@ The use case injects it and passes it as `ttlMs` of the read command, and the ad
 
 ## The cache lib
 
-`libs/cache` has the shape of `libs/health` (see `017-credentials-lib.md`): `CacheLibFacade`
-implements `CACHE_LIB_PORT` and hands each method to a use case, and the use cases reach Redis and
-OpenTelemetry through two ports of the lib's own `outbound`:
+`libs/cache` has the shape of `libs/health` (see `017-credentials-lib.md`): `CacheFacade` implements
+`CACHE_PORT` and hands each method to a use case, and the use cases reach Redis and OpenTelemetry
+through two ports of the lib's own `outbound`:
 
-| Facade method       | Use case                     | Span                |
-| ------------------- | ---------------------------- | ------------------- |
-| `handleGet`         | `CacheLibGetUseCase`         | `cache.get`         |
-| `handleDelByPrefix` | `CacheLibDelByPrefixUseCase` | `cache.delByPrefix` |
-| `handleWrap`        | `CacheLibWrapUseCase`        | `cache.wrap`        |
+| Facade method       | Use case                  | Span                |
+| ------------------- | ------------------------- | ------------------- |
+| `handleGet`         | `CacheGetUseCase`         | `cache.get`         |
+| `handleDelByPrefix` | `CacheDelByPrefixUseCase` | `cache.delByPrefix` |
+| `handleWrap`        | `CacheWrapUseCase`        | `cache.wrap`        |
 
 The port holds exactly what its callers use: `handleWrap` for the catalog, `handleDelByPrefix` for
 its droppers and `handleGet` for the readiness probe of `libs/health`. A plain write or delete of
 one key has no caller, so the lib has none; a feature that needs one adds it with its first call.
 
-**`CacheLibStoreAdapter` is the ioredis adapter.** It holds the JSON encoding, `PX` TTLs, the `SCAN`
-and `UNLINK` loop over a prefix, and quits the client on shutdown. `CacheLibRedisClientProvider`
-builds the client from `RedisConfigHelper.failFast` of `libs/config`: the address and the password
-of `REDIS_*`, TLS from `REDIS_TLS_CA`, no offline queue and `REDIS_COMMAND_TIMEOUT_MS` on every
+**`CacheStoreAdapter` is the ioredis adapter.** It holds the JSON encoding, `PX` TTLs, the `SCAN`
+and `UNLINK` loop over a prefix, and quits the client on shutdown. `CacheRedisClientProvider` builds
+the client from `RedisConfigHelper.failFast` of `libs/config`: the address and the password of
+`REDIS_*`, TLS from `REDIS_TLS_CA`, no offline queue and `REDIS_COMMAND_TIMEOUT_MS` on every
 command, so a command fails at once while Redis is down instead of waiting for it (see
 `036-production-stack.md`).
 
-**`CacheLibTracerAdapter` is the OpenTelemetry adapter.** A use case names the span and its
-attributes, adds `cache.hit` or `cache.keys_unlinked` as it learns them, and the adapter records
-them when the work settles. Single-flight, the fallbacks on a failed read or write, and their logs
-stay in the use cases, so neither adapter decides what a failure means.
+**`CacheTracerAdapter` is the OpenTelemetry adapter.** A use case names the span and its attributes,
+adds `cache.hit` or `cache.keys_unlinked` as it learns them, and the adapter records them when the
+work settles. Single-flight, the fallbacks on a failed read or write, and their logs stay in the use
+cases, so neither adapter decides what a failure means.
 
 **A span shows a failure of the cache.** A failure the work passes on marks the span as an error and
 records the exception, as the ioredis instrumentation marks its command. A failure the use case

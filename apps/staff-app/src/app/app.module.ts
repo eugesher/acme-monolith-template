@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 
-import { CacheLibModule } from '@acme-libs/cache';
-import { CredentialsLibModule } from '@acme-libs/credentials';
+import { CacheModule } from '@acme-libs/cache';
+import { CredentialsModule } from '@acme-libs/credentials';
 import { OrmModule } from '@acme-libs/database';
 import {
   HttpExceptionFilter,
@@ -38,8 +38,8 @@ import { ConfigSetupModule } from './setup';
     LocalStorageSetupModule.forRoot(),
     OrmModule.forRoot(entities),
     BullSetupModule.forRoot(),
-    CacheLibModule.forRoot(),
-    CredentialsLibModule.forRoot(AuthAudienceEnum.STAFF),
+    CacheModule.forRoot(),
+    CredentialsModule.forRoot(AuthAudienceEnum.STAFF),
     HttpSecurityModule.forRoot(),
     ThrottlerSetupModule.forRoot(),
     AuthGlobalModule,

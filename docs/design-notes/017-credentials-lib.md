@@ -3,17 +3,17 @@
 Password hashing, token signing and token checking are used by both API apps, so they live in a lib.
 
 The lib has the shape of `libs/health`: one port in `libs/contracts/src/credentials`,
-`CREDENTIALS_LIB_PORT`, implemented by `CredentialsLibFacade`. The facade hands each method to a use
-case, and the use cases reach the libraries through ports of the lib's own `outbound`:
+`CREDENTIALS_PORT`, implemented by `CredentialsFacade`. The facade hands each method to a use case,
+and the use cases reach the libraries through ports of the lib's own `outbound`:
 
-| Facade method             | Use case                                 | Adapter                               | Reads                                                                                                                                        |
-| ------------------------- | ---------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `handleSignAccessToken`   | `CredentialsLibSignAccessTokenUseCase`   | `CredentialsLibAccessTokenAdapter`    | `JWT_SECRET`, `JWT_EXPIRES_IN`, the audience of `forRoot()`                                                                                  |
-| `handleVerifyAccessToken` | `CredentialsLibVerifyAccessTokenUseCase` | `CredentialsLibAccessTokenAdapter`    | `JWT_SECRET`, the audience of `forRoot()`                                                                                                    |
-| `handleHashPassword`      | `CredentialsLibHashPasswordUseCase`      | `CredentialsLibPasswordHasherAdapter` | `AUTH_ARGON2_MEMORY_COST`, `AUTH_ARGON2_PARALLELISM`, `AUTH_ARGON2_TIME_COST`, `AUTH_ARGON2_MAX_CONCURRENCY`, `AUTH_ARGON2_QUEUE_TIMEOUT_MS` |
-| `handleVerifyPassword`    | `CredentialsLibVerifyPasswordUseCase`    | `CredentialsLibPasswordHasherAdapter` | `AUTH_ARGON2_MAX_CONCURRENCY`, `AUTH_ARGON2_QUEUE_TIMEOUT_MS`                                                                                |
+| Facade method             | Use case                              | Adapter                            | Reads                                                                                                                                        |
+| ------------------------- | ------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `handleSignAccessToken`   | `CredentialsSignAccessTokenUseCase`   | `CredentialsAccessTokenAdapter`    | `JWT_SECRET`, `JWT_EXPIRES_IN`, the audience of `forRoot()`                                                                                  |
+| `handleVerifyAccessToken` | `CredentialsVerifyAccessTokenUseCase` | `CredentialsAccessTokenAdapter`    | `JWT_SECRET`, the audience of `forRoot()`                                                                                                    |
+| `handleHashPassword`      | `CredentialsHashPasswordUseCase`      | `CredentialsPasswordHasherAdapter` | `AUTH_ARGON2_MEMORY_COST`, `AUTH_ARGON2_PARALLELISM`, `AUTH_ARGON2_TIME_COST`, `AUTH_ARGON2_MAX_CONCURRENCY`, `AUTH_ARGON2_QUEUE_TIMEOUT_MS` |
+| `handleVerifyPassword`    | `CredentialsVerifyPasswordUseCase`    | `CredentialsPasswordHasherAdapter` | `AUTH_ARGON2_MAX_CONCURRENCY`, `AUTH_ARGON2_QUEUE_TIMEOUT_MS`                                                                                |
 
-**The lib reads the config of the app it runs in.** `CredentialsLibModule` takes the values from
+**The lib reads the config of the app it runs in.** `CredentialsModule` takes the values from
 `ConfigService`, as `libs/cache` does, so the features bind no config tokens of their own, and each
 app signs with its own secret.
 
@@ -24,7 +24,7 @@ library, so a caller that hands it a wider object cannot widen the token.
 that verifies with the secret, the audience and `HS256` of the app, and `null` for any other token,
 so no caller reads a claim the lib did not sign.
 
-**One module per app.** `AppModule` mounts `CredentialsLibModule.forRoot(audience)` once, and the
+**One module per app.** `AppModule` mounts `CredentialsModule.forRoot(audience)` once, and the
 module is global: one `JwtModule` signs and verifies with one set of options, and one password
 hasher serves every module of the app. Nest 12 keys a dynamic module by the object its method
 returns, not by the arguments, so a lib mounted by each module that uses it would build a
@@ -32,8 +32,8 @@ returns, not by the arguments, so a lib mounted by each module that uses it woul
 
 **The hasher runs a bounded number of hashes at once.** Each argon2id hash holds
 `AUTH_ARGON2_MEMORY_COST` KiB, so a flood of logins from many addresses would grow the memory of the
-process with every request. `CredentialsLibPasswordHasherAdapter` runs `hash` and `verify` through
-`CredentialsLibPasswordHasherSemaphore`: at most `AUTH_ARGON2_MAX_CONCURRENCY` at a time, the others
+process with every request. `CredentialsPasswordHasherAdapter` runs `hash` and `verify` through
+`CredentialsPasswordHasherSemaphore`: at most `AUTH_ARGON2_MAX_CONCURRENCY` at a time, the others
 wait in order. A call that waits longer than `AUTH_ARGON2_QUEUE_TIMEOUT_MS` leaves the queue with a
 `ServiceUnavailableException`, a `503` that the shared `HttpExceptionFilter` logs as an error. The
 semaphore lives in the adapter of the one module, so every caller of the lib shares one per process:
@@ -47,7 +47,7 @@ for an unknown email takes as long as one with a wrong password.
 
 **Modules reach the lib through lib adapters.** A feature or a global module declares a port of its
 own (`AUTH_CREDENTIALS_PORT`, `AUTH_GLOBAL_CREDENTIALS_PORT`) and implements it in
-`infrastructure/lib-adapters` on top of `CREDENTIALS_LIB_PORT`, so no module imports `argon2` or
+`infrastructure/lib-adapters` on top of `CREDENTIALS_PORT`, so no module imports `argon2` or
 `@nestjs/jwt` and the application never sees the lib. Examples:
 `apps/customer-app/src/features/auth/infrastructure/lib-adapters/auth-credentials-lib.adapter.ts`,
 `apps/customer-app/src/global/auth/infrastructure/lib-adapters/auth-global-credentials-lib.adapter.ts`.

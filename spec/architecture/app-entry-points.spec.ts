@@ -205,14 +205,14 @@ describe('app entry points', () => {
   it('a feature lib adapter MAY import the health lib contracts by their alias', async () => {
     await expect({
       file: 'apps/customer-app/src/features/health/infrastructure/lib-adapters/__fixture__.ts',
-      code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
+      code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
     }).toPassArchitectureLint();
   });
 
   it('a feature presentation may NOT import the health lib contracts', async () => {
     await expect({
       file: 'apps/customer-app/src/features/health/shell/__fixture__.ts',
-      code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
+      code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
     }).toBreakRule('boundaries/dependencies');
   });
 

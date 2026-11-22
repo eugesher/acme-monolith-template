@@ -16,11 +16,11 @@ describe('lib layers', () => {
 
   it.each([
     ['shell', 'outbound', '../outbound'],
-    ['application', 'shell', '../shell/cache-lib.module'],
+    ['application', 'shell', '../shell/cache.module'],
     ['application', 'infrastructure', '../infrastructure'],
-    ['infrastructure', 'shell', '../shell/cache-lib.module'],
+    ['infrastructure', 'shell', '../shell/cache.module'],
     ['infrastructure', 'application', '../application'],
-    ['outbound', 'shell', '../shell/cache-lib.module'],
+    ['outbound', 'shell', '../shell/cache.module'],
     ['outbound', 'application', '../application'],
     ['outbound', 'infrastructure', '../infrastructure'],
   ])('the %s of a lib may NOT reach its %s', async (from, _, source) => {
