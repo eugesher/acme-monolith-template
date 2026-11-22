@@ -4,11 +4,11 @@
 scheduled. staff-app and customer-app enqueue, and staff-app serves the staff the failed jobs (see
 `041-failed-jobs.md`). All three apps share one database and one Redis.
 
-| Processor       | Entered by                                          | What it does                                                                      |
-| --------------- | --------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `ledger`        | a job of the `ledger-record` queue                  | appends the record (see `008-queue-processor.md`)                                 |
-| `idempotency`   | a job of the `idempotency-purge` queue, every 5 min | deletes the expired and stuck idempotency keys (see `009-scheduled-processor.md`) |
-| `product-stock` | a job of the `product-stock-post-subtract` queue    | a transaction over two core modules (see below)                                   |
+| Processor                     | Entered by                                          | What it does                                                                      |
+| ----------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `ledger-append`               | a job of the `ledger-record` queue                  | appends the record (see `008-queue-processor.md`)                                 |
+| `idempotency-purge`           | a job of the `idempotency-purge` queue, every 5 min | deletes the expired and stuck idempotency keys (see `009-scheduled-processor.md`) |
+| `product-stock-post-subtract` | a job of the `product-stock-post-subtract` queue    | a transaction over two core modules (see below)                                   |
 
 ## Why a third app
 
@@ -49,16 +49,16 @@ logger and tracing, and the HTTP edge. No cache TTL and no `JWT_SECRET`.
 of the purge, the ledger append and the stock check, with `Order`, `OrderProduct` and `Customer`,
 which the relations of `ProductStock` need on the connection.
 
-## The product-stock processor
+## The product-stock-post-subtract processor
 
-`apps/processor-app/src/processors/product-stock` processes a queue that a core module fills after
-its commits (see `022-enqueue-after-commit.md`). `ProductStockPostSubtractProcessor` opens the
-correlation context of the job and runs one use case in one transaction:
+`apps/processor-app/src/processors/product-stock-post-subtract` processes a queue that a core module
+fills after its commits (see `022-enqueue-after-commit.md`). `ProductStockPostSubtractProcessor`
+opens the correlation context of the job and runs one use case in one transaction:
 
-1. `PRODUCT_STOCK_ON_HAND_PORT.lock` locks the rows and sums through
+1. `PRODUCT_STOCK_POST_SUBTRACT_ON_HAND_PORT.lock` locks the rows and sums through
    `core/modules/src/product-stock`;
 2. the processor's own repository reads what it needs of the same rows under that lock;
-3. `PRODUCT_STOCK_ARCHIVE_PORT` writes through `core/modules/src/product` (see
+3. `PRODUCT_STOCK_POST_SUBTRACT_ARCHIVE_PORT` writes through `core/modules/src/product` (see
    `027-core-module-outcomes.md`), which announces its write after the commit.
 
 **The lock makes the check exact.** A write that commits before the lock is counted, a write that

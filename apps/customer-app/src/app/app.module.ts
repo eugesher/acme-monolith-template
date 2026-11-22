@@ -15,9 +15,9 @@ import { LocalStorageSetupModule } from '@acme-libs/local-storage';
 import { LoggerSetupModule, TracerSetupModule } from '@acme-libs/observability';
 import { BullSetupModule } from '@acme-libs/queue';
 import { AuthModule, CatalogModule, HealthModule, OrderModule } from '@acme-customer/features';
+import { AuthGlobalModule } from '@acme-customer/global';
 
 import { entities } from './entities';
-import { AuthGlobalModule } from './global';
 import { ConfigSetupModule } from './setup';
 
 @Module({

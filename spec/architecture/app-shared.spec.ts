@@ -23,22 +23,22 @@ describe('app shared code (common/shared) — barrels and contracts', () => {
 
   it('a feature MAY reach common through its barrel', async () => {
     await expect({
-      file: 'apps/__shared-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-      code: 'import { x } from "../../../../common/shared";',
+      file: 'apps/__shared-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import { x } from "../../../common/shared";',
     }).toPassArchitectureLint();
   });
 
   it('a feature may NOT reach the barrel of a common/shared folder', async () => {
     await expect({
-      file: 'apps/__shared-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-      code: 'import { x } from "../../../../common/shared/auth";',
+      file: 'apps/__shared-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import { x } from "../../../common/shared/auth";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('a feature may NOT take a deep path into common', async () => {
     await expect({
-      file: 'apps/__shared-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-      code: 'import { x } from "../../../../common/shared/auth/guards/auth-jwt.guard";',
+      file: 'apps/__shared-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import { x } from "../../../common/shared/auth/guards/auth-jwt.guard";',
     }).toBreakRule('boundaries/dependencies');
   });
 
@@ -142,8 +142,8 @@ describe('app shared code (common/shared) — barrels and contracts', () => {
 
   it('another app may NOT reach this app common', async () => {
     await expect({
-      file: 'apps/__shared-other-fixture__/src/features/health/presentation/controllers/__fixture__.ts',
-      code: 'import { x } from "../../../../../../__shared-fixture__/src/common/shared";',
+      file: 'apps/__shared-other-fixture__/src/features/health/shell/__fixture__.ts',
+      code: 'import { x } from "../../../../../__shared-fixture__/src/common/shared";',
     }).toBreakRule('boundaries/dependencies');
   });
 });

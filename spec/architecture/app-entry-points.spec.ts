@@ -12,9 +12,9 @@ describe('app entry points', () => {
       'apps/__entry-fixture__/src/app/app.module.ts',
       'apps/__entry-fixture__/src/app/setup/config/config-setup.module.ts',
       'apps/__entry-fixture__/src/features/index.ts',
-      'apps/__entry-fixture__/src/features/health/health.module.ts',
+      'apps/__entry-fixture__/src/features/health/shell/health.module.ts',
       'apps/__entry-fixture__/src/processors/index.ts',
-      'apps/__entry-fixture__/src/processors/ledger/ledger.module.ts',
+      'apps/__entry-fixture__/src/processors/ledger/shell/ledger.module.ts',
       'apps/__entry-fixture__/src/common/modules/index.ts',
       'apps/__entry-fixture__/src/common/modules/tag/index.ts',
       'apps/__other-entry-fixture__/src/app/app.module.ts',
@@ -45,13 +45,16 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/__entry-fixture__/src/app/app.module.ts', '../features/health/health.module'],
-    ['apps/__entry-fixture__/src/app/app.module.ts', '../processors/ledger/ledger.module'],
+    ['apps/__entry-fixture__/src/app/app.module.ts', '../features/health/shell/health.module'],
+    ['apps/__entry-fixture__/src/app/app.module.ts', '../processors/ledger/shell/ledger.module'],
     [
-      'apps/__entry-fixture__/src/features/product/__fixture__.ts',
-      '../../app/setup/config/config-setup.module',
+      'apps/__entry-fixture__/src/features/product/shell/__fixture__.module.ts',
+      '../../../app/setup/config/config-setup.module',
     ],
-    ['apps/__entry-fixture__/src/features/product/__fixture__.ts', '../../common/modules/tag'],
+    [
+      'apps/__entry-fixture__/src/features/product/shell/__fixture__.module.ts',
+      '../../../common/modules/tag',
+    ],
   ])('%s may NOT reach a deep path: %s', async (file, source) => {
     await expect({
       file,
@@ -84,9 +87,15 @@ describe('app entry points', () => {
 
   it.each([
     ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../../app.module'],
-    ['apps/__entry-fixture__/src/app/global/auth/shell/__fixture__.ts', '../../../app.module'],
-    ['apps/__entry-fixture__/src/features/product/product.module.ts', '../../app/app.module'],
-    ['apps/__entry-fixture__/src/processors/idempotency/__fixture__.ts', '../../app/app.module'],
+    ['apps/__entry-fixture__/src/global/auth/shell/__fixture__.ts', '../../../app/app.module'],
+    [
+      'apps/__entry-fixture__/src/features/product/shell/product.module.ts',
+      '../../../app/app.module',
+    ],
+    [
+      'apps/__entry-fixture__/src/processors/idempotency/shell/__fixture__.module.ts',
+      '../../../app/app.module',
+    ],
     ['apps/__entry-fixture__/src/common/shared/ledger/__fixture__.ts', '../../../app/app.module'],
   ])('%s may NOT import the AppModule, only main and the tests do', async (file, source) => {
     await expect({
@@ -155,7 +164,7 @@ describe('app entry points', () => {
   it('the AppModule MAY import the processors of its own app', async () => {
     await expect({
       file: 'apps/__entry-fixture__/src/app/app.module.ts',
-      code: 'import { LedgerModule } from "../processors";',
+      code: 'import { LedgerAppendModule } from "../processors";',
     }).toPassArchitectureLint();
   });
 
@@ -164,20 +173,17 @@ describe('app entry points', () => {
       'apps/__other-entry-fixture__/src/app/app.module.ts',
       '../../../__entry-fixture__/src/processors',
     ],
-    ['apps/__entry-fixture__/src/features/health/health.module.ts', '../../processors'],
+    ['apps/__entry-fixture__/src/features/health/shell/health.module.ts', '../../../processors'],
     ['apps/__entry-fixture__/src/main.ts', './processors'],
   ])('%s may NOT import the processors index by %s', async (file, source) => {
     await expect({
       file,
-      code: `import { LedgerModule } from "${source}";`,
+      code: `import { LedgerAppendModule } from "${source}";`,
     }).toBreakRule('boundaries/dependencies');
   });
 
   it.each([
-    [
-      'apps/__entry-fixture__/src/features/health/presentation/controllers/__fixture__.ts',
-      '../../..',
-    ],
+    ['apps/__entry-fixture__/src/features/health/shell/__fixture__.ts', '../..'],
     ['apps/__entry-fixture__/src/main.ts', './features'],
   ])(
     '%s may NOT import the features index by %s, only the app root wires features',
@@ -191,7 +197,7 @@ describe('app entry points', () => {
 
   it('a feature root MAY import the health lib by its alias', async () => {
     await expect({
-      file: 'apps/customer-app/src/features/health/health.module.ts',
+      file: 'apps/customer-app/src/features/health/shell/health.module.ts',
       code: 'import { HealthLibModule } from "@acme-libs/health";',
     }).toPassArchitectureLint();
   });
@@ -205,22 +211,22 @@ describe('app entry points', () => {
 
   it('a feature presentation may NOT import the health lib contracts', async () => {
     await expect({
-      file: 'apps/customer-app/src/features/health/presentation/controllers/__fixture__.ts',
+      file: 'apps/customer-app/src/features/health/shell/__fixture__.ts',
       code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('a feature presentation may NOT import the health lib root', async () => {
     await expect({
-      file: 'apps/customer-app/src/features/health/presentation/controllers/__fixture__.ts',
+      file: 'apps/customer-app/src/features/health/shell/__fixture__.ts',
       code: 'import { HealthLibModule } from "@acme-libs/health";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it.each([
-    'apps/staff-app/src/features/health/health.module.ts',
-    'apps/customer-app/src/features/health/health.module.ts',
-    'apps/processor-app/src/processors/idempotency/idempotency.module.ts',
+    'apps/staff-app/src/features/health/shell/health.module.ts',
+    'apps/customer-app/src/features/health/shell/health.module.ts',
+    'apps/processor-app/src/processors/idempotency-purge/shell/idempotency-purge.module.ts',
   ])('%s MAY mount the idempotency core module by its alias', async (file) => {
     await expect({
       file,
@@ -230,13 +236,13 @@ describe('app entry points', () => {
 
   it('a staff-app feature presentation MAY import the header decorators of the http lib', async () => {
     await expect({
-      file: 'apps/staff-app/src/features/health/presentation/controllers/__fixture__.ts',
+      file: 'apps/staff-app/src/features/health/shell/__fixture__.ts',
       code: 'import { IdempotencyKey, IfMatch } from "@acme-libs/http";',
     }).toPassArchitectureLint();
   });
 
   it.each([
-    'apps/processor-app/src/processors/ledger/presentation/processors/ledger-append.processor.ts',
+    'apps/processor-app/src/processors/ledger-append/shell/ledger-append.processor.ts',
     'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
     'core/queues/src/ledger/ledger-queue.module.ts',
     'apps/staff-app/test/context/app-e2e.context.ts',
@@ -259,7 +265,7 @@ describe('app entry points', () => {
   });
 
   it.each([
-    'apps/processor-app/src/processors/ledger/ledger.module.ts',
+    'apps/processor-app/src/processors/ledger-append/shell/ledger-append.module.ts',
     'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
   ])('%s MAY register the ledger record queue through the core queues', async (file) => {
     await expect({
@@ -269,8 +275,8 @@ describe('app entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/product.module.ts',
-    'apps/customer-app/src/features/auth/auth.module.ts',
+    'apps/staff-app/src/features/product/shell/product.module.ts',
+    'apps/customer-app/src/features/auth/shell/auth.module.ts',
   ])('%s MAY mount the core ledger', async (file) => {
     await expect({
       file,
@@ -281,7 +287,7 @@ describe('app entry points', () => {
   it.each([
     'apps/staff-app/src/features/health/infrastructure/core-adapters/__fixture__.ts',
     'apps/customer-app/src/features/health/infrastructure/core-adapters/__fixture__.ts',
-    'apps/processor-app/src/processors/idempotency/infrastructure/core-adapters/__fixture__.ts',
+    'apps/processor-app/src/processors/idempotency-purge/infrastructure/core-adapters/__fixture__.ts',
   ])('%s MAY import the idempotency core contracts by their alias', async (file) => {
     await expect({
       file,
@@ -306,12 +312,12 @@ describe('app entry points', () => {
 
   it.each([
     [
-      'apps/__other-entry-fixture__/src/features/health/health.module.ts',
-      '../../../../__entry-fixture__/src/common/modules',
+      'apps/__other-entry-fixture__/src/features/health/shell/health.module.ts',
+      '../../../../../__entry-fixture__/src/common/modules',
     ],
     [
-      'apps/__other-entry-fixture__/src/features/health/presentation/controllers/__fixture__.ts',
-      '../../../../../../__entry-fixture__/src/common/modules',
+      'apps/__other-entry-fixture__/src/features/health/shell/__fixture__.ts',
+      '../../../../../__entry-fixture__/src/common/modules',
     ],
     [
       'apps/__other-entry-fixture__/src/app/app.module.ts',

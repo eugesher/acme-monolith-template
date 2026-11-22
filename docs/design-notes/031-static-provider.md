@@ -7,7 +7,7 @@ binding.
 | ------- | ----------------------------------------------------------------------------------------------------- |
 | port    | `apps/customer-app/src/features/order/outbound/ports/order-idempotency.port.ts`                       |
 | adapter | `apps/customer-app/src/features/order/infrastructure/core-adapters/order-idempotency-core.adapter.ts` |
-| module  | `apps/customer-app/src/features/order/order.module.ts`                                                |
+| module  | `apps/customer-app/src/features/order/shell/order.module.ts`                                          |
 
 ```ts
 @Injectable()

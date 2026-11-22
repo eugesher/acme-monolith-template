@@ -27,8 +27,8 @@ describe('app entities (@acme-<app>/common/entities)', () => {
   it.each([
     ['apps/__entities-fixture__/src/app/entities/index.ts', '../../common/entities'],
     [
-      'apps/__entities-fixture__/src/app/global/auth/infrastructure/persistence/repositories/__fixture__.ts',
-      '../../../../../../common/entities',
+      'apps/__entities-fixture__/src/global/auth/infrastructure/persistence/repositories/__fixture__.ts',
+      '../../../../../common/entities',
     ],
     [
       'apps/__entities-fixture__/src/features/product/infrastructure/persistence/repositories/__fixture__.ts',
@@ -59,10 +59,13 @@ describe('app entities (@acme-<app>/common/entities)', () => {
       '../../../../common/entities',
     ],
     [
-      'apps/__entities-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-      '../../../../common/entities',
+      'apps/__entities-fixture__/src/features/product/shell/__fixture__.ts',
+      '../../../common/entities',
     ],
-    ['apps/__entities-fixture__/src/features/product/product.module.ts', '../../common/entities'],
+    [
+      'apps/__entities-fixture__/src/features/product/shell/product.module.ts',
+      '../../../common/entities',
+    ],
     ['apps/__entities-fixture__/src/common/shared/auth/__fixture__.ts', '../../entities'],
     ['apps/__entities-fixture__/src/main.ts', './common/entities'],
   ])(

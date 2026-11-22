@@ -9,7 +9,7 @@ coverage thresholds and the lint of tests.
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | use case in a transaction | `apps/staff-app/src/features/warehouse/modules/product-stock/application/use-cases/spec/product-stock-add.use-case.spec.ts` |
 | model                     | `apps/staff-app/src/features/tools/modules/tag/domain/models/spec/tag-rename.model.spec.ts`                                 |
-| controller                | `apps/staff-app/src/features/tools/modules/tag/presentation/controllers/spec/tag.controller.spec.ts`                        |
+| controller                | `apps/staff-app/src/features/tools/modules/tag/shell/spec/tag.controller.spec.ts`                                           |
 | request DTO               | `apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/spec/tag-rename.request.dto.spec.ts`               |
 | query builder             | `apps/staff-app/src/features/tools/modules/tag/infrastructure/persistence/builders/spec/tag-persistence.builder.spec.ts`    |
 | module                    | `libs/cache/src/shell/spec/cache-lib.module.spec.ts`                                                                        |
@@ -54,7 +54,7 @@ a test that turned them on.
 | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
 | a port, or any interface                                                             | `jest.Mocked<IProductLedgerPort>`: an object with a `jest.fn()` per method, passed as is |
 | a class of the template (a service, a use case)                                      | `jest.Mocked<Pick<ProductWriteService, 'write'>>`, passed with one `as unknown as`       |
-| a port of an inner use case built by a presentation or shell spec                    | `jest.Mocked<ConstructorParameters<typeof CatalogProductListUseCase>[0]>`                |
+| a port of an inner use case built by a shell spec                                    | `jest.Mocked<ConstructorParameters<typeof CatalogProductListUseCase>[0]>`                |
 | the logger                                                                           | `makePinoLoggerMock()` of `libs/testing`, passed as is                                   |
 | a driver or a framework object (Redis, a BullMQ queue, a span, an execution context) | a partial fake with a cast                                                               |
 
@@ -67,8 +67,8 @@ member as well.
 
 **A class takes a cast because its private members make it nominal**: no object literal satisfies
 it, so the spec types the methods it mocks with `Pick` and casts once where it hands the mock over.
-A presentation or shell spec that builds a real use case may not import the `outbound` of its
-module, so it takes the type of the port from the constructor of the use case.
+A shell spec (a controller, a processor, a facade) that builds a real use case may not import the
+`outbound` of its module, so it takes the type of the port from the constructor of the use case.
 
 **A fake of a driver stays partial.** Its shape belongs to the library, and the e2e suites check it
 against the real Redis, MySQL and BullMQ; a full mock of `Redis` would repeat its typings and still

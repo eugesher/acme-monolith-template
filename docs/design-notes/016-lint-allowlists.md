@@ -78,15 +78,28 @@ Removing one of them turns its spec red.
 
 ### `module-areas.mjs` — processors share the layer model of features
 
-Features and processors are built by one function, `areaPolicies`, over the same list of layers
-(`categories/module-layers.mjs`). A processor uses fewer of them: `idempotency` has a domain helper
-and a repository, `ledger` neither. The entries stay, so a processor that grows a layer follows the
-same rules a feature does.
+Features and processors are built by one function, `areaPolicies`, over the layers of
+`categories/module-layers.mjs`. A processor has no `presentation`: it takes no request, so it has no
+DTO and no filter. It uses fewer of the other layers too: `idempotency-purge` has a domain helper
+and a repository, `ledger-append` neither. The entries stay, so a processor that grows a layer
+follows the same rules a feature does.
+
+**The shell holds the entries of a module.** The Nest module and the controller of a feature, or the
+Nest module and the processor of a processor, sit in `shell/`, and the root of the module holds only
+`index.ts`, which re-exports the Nest module. Lint gives the two kinds of file of `shell/` the
+rights they had before the move: `shell/*.module.ts` (`<area>:shell:module`) mounts and binds, and
+sees the application, the infrastructure, the controller or processor next to it, and the shared and
+module barrels; the rest of `shell/` (`<area>:shell`) is the controller or processor with its spec,
+and sees the domain, the application, the `presentation` of a feature and the HTTP or queue
+packages. A module root binds, so it does not see `presentation`; a DTO is the input of a
+controller, so `presentation` does not see the application. The root barrel sees only the Nest
+module in `shell/` and, in a parent feature, `modules/index.ts`: a parent keeps its Nest module at
+its root, next to `modules/` (see `025-feature-groups.md`).
 
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
 processor upserts its job scheduler (see `009-scheduled-processor.md`). The module next to the
 adapter takes `libs/queue` or `@acme-core/queues` to register the queue, in features and processors
-alike. The presentation of a processor takes the name of its queue from its own `outbound` for
+alike. The processor in `shell/` takes the name of its queue from its own `outbound` for
 `@Processor`, and `queue.mjs` keeps it to `*_QUEUE` names, so a port still reaches the processor
 only through a use case. The module root of a processor without a queue adapter, as the ledger,
 mounts its registration from `@acme-core/queues`.
@@ -150,14 +163,14 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
 - **A lib port is reached through a lib adapter.** A feature or a global module declares a port of
   its own in `outbound` and implements it in `infrastructure/lib-adapters` on top of the port of the
   lib, as `core-adapters` and `common-adapters` do for core and common modules. Only `lib-adapters`
-  may take `@acme-libs/contracts/credentials` and `@acme-libs/contracts/health`; the application and
-  the presentation may not. The types of `@acme-libs/contracts/auth` stay direct.
+  may take `@acme-libs/contracts/credentials` and `@acme-libs/contracts/health`; the application,
+  the presentation and the controller may not. The types of `@acme-libs/contracts/auth` stay direct.
 - **A feature and a core module write to the ledger** as to any core module: the module root mounts
   `LedgerCoreModule` of `@acme-core/modules/ledger`, and `infrastructure/core-adapters` takes
   `LEDGER_CORE_PORT` from `@acme-core/contracts/ledger`. The ledger reads the correlation id of the
   context itself, so no adapter needs the observability lib. What reads the queue takes the same
-  contracts, as it takes those of any core module: the presentation of a processor, the queue
-  registry of staff-app in `infrastructure/queue`, `core/queues`, the e2e code and `test/system`.
+  contracts, as it takes those of any core module: the processor in `shell/`, the queue registry of
+  staff-app in `infrastructure/queue`, `core/queues`, the e2e code and `test/system`.
 - **A processor and a global module read tables.** Their infrastructure may import `typeorm`,
   `@acme-libs/contracts/database` and `@nestjs/common`, as feature infrastructure does.
 - **No module touches `@nestjs-cls`.** A repository injects `ORM_PORT` of
@@ -201,9 +214,9 @@ Which decorator or type a layer takes from a package it may import is the choice
 service may implement `OnModuleInit`, a processor may throw `UnrecoverableError`, a queue adapter
 may pass `JobsOptions`. A list of names would turn each of them into an edit of the lint.
 
-One policy still names imports: `queue.mjs` keeps the presentation of a processor to the `*_QUEUE`
-names of its own `outbound`, so that a port reaches it only through a use case. The specifier is a
-pattern of the naming of `029-naming.md`, not a list of exports.
+One policy still names imports: `queue.mjs` keeps the processor in `shell/` to the `*_QUEUE` names
+of its own `outbound`, so that a port reaches it only through a use case. The specifier is a pattern
+of the naming of `029-naming.md`, not a list of exports.
 
 ### The layers of a lib
 

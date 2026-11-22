@@ -213,9 +213,10 @@ core module may import the core domain; the other layers may not.
 
 **A value with a rule of one module is a value object of that module.** It lives in
 `domain/values/<context>-<value>.value.ts` and extends `ValueObject` the same way:
-`LedgerInstantValue` of the processor ledger answers `hasExplicitZone()`, `isValid()` and
-`toDate()`, and `LedgerAppendEntryModel.initCandidate` refuses with `LedgerInstantInvalidException`.
-A value object answers booleans and leaves the refusal to the model, so its checks read as steps.
+`LedgerAppendInstantValue` of the processor ledger-append answers `hasExplicitZone()`, `isValid()`
+and `toDate()`, and `LedgerAppendEntryModel.initCandidate` refuses with
+`LedgerAppendInstantInvalidException`. A value object answers booleans and leaves the refusal to the
+model, so its checks read as steps.
 
 ## Access
 

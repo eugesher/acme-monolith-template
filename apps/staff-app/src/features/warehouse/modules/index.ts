@@ -1,1 +1,1 @@
-export * from './product-stock/product-stock.module';
+export * from './product-stock';

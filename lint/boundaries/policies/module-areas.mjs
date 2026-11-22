@@ -86,24 +86,45 @@ const areaPolicies = (area, sharedFacing) => {
     ]),
     fromSpec(`${prefix}:infrastructure:config`),
     from(`${prefix}:infrastructure:config`, [layer('outbound'), libs('config')]),
-    from(`${prefix}:presentation`, [
+    ...(sharedFacing.presentation
+      ? [
+          from(`${prefix}:presentation`, [
+            layer('domain'),
+            layer('presentation'),
+            ...sharedFacing.presentation,
+          ]),
+        ]
+      : []),
+    from(`${prefix}:shell`, [
       layer('domain'),
       layer('application'),
-      layer('presentation'),
-      ...sharedFacing.presentation,
+      ...(sharedFacing.presentation ? [layer('presentation')] : []),
+      layer('shell'),
+      ...sharedFacing.shell,
     ]),
-    from(`${prefix}:module`, [
+    from(`${prefix}:shell:module`, [
       layer('application'),
       layer('infrastructure'),
-      layer('presentation'),
-      layer('modules:index'),
+      layer('shell'),
       to('acme-app:common:shared:index', own('app')),
       to('acme-app:common:modules:index', own('app')),
       to('acme-core:modules:index'),
       ...sharedFacing.module,
     ]),
+    from(`${prefix}:module`, [
+      layer('shell:module'),
+      layer('modules:index'),
+      packages('@nestjs/common'),
+    ]),
   ];
 };
+
+const featureFacing = [
+  to('acme-app:common:shared:index', own('app')),
+  libContracts('auth'),
+  baseLibs('auth', 'http'),
+  packages('@nestjs/common', '@nestjs/swagger', 'class-transformer', 'class-validator'),
+];
 
 export const moduleAreas = [
   ...areaPolicies('features', {
@@ -113,12 +134,8 @@ export const moduleAreas = [
     commonAdapters: [packages('@nestjs/common')],
     libAdapters: [libContracts('credentials', 'health'), packages('@nestjs/common')],
     queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
-    presentation: [
-      to('acme-app:common:shared:index', own('app')),
-      libContracts('auth'),
-      baseLibs('auth', 'http'),
-      packages('@nestjs/common', '@nestjs/swagger', 'class-transformer', 'class-validator'),
-    ],
+    presentation: featureFacing,
+    shell: featureFacing,
     module: [baseLibs('auth', 'health', 'http'), packages('@nestjs/common')],
   }),
   ...areaPolicies('processors', {
@@ -128,7 +145,7 @@ export const moduleAreas = [
     commonAdapters: [packages('@nestjs/common')],
     libAdapters: [packages('@nestjs/common')],
     queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
-    presentation: [
+    shell: [
       layerOf('acme-app:processors', ['app', 'module'])('outbound'),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),

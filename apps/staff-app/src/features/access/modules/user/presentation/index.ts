@@ -1,1 +1,3 @@
-export * from './controllers/user.controller';
+export * from './dto';
+
+export * from './filters/user-http-exception.filter';

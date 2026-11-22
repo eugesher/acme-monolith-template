@@ -2,34 +2,26 @@ import { moduleAreaLayers, moduleAreas } from './module-layers.mjs';
 
 export const acmeApp = [
   ['acme-app:main', 'apps/*/src/main.ts', ['app']],
-  ['acme-app:app:global:index', 'apps/*/src/app/global/index.ts', ['app']],
+  ['acme-app:global:index', 'apps/*/src/global/index.ts', ['app']],
   [
-    'acme-app:app:global:infrastructure:core-adapters',
-    'apps/*/src/app/global/*/infrastructure/core-adapters/**',
+    'acme-app:global:infrastructure:core-adapters',
+    'apps/*/src/global/*/infrastructure/core-adapters/**',
     ['app', 'module'],
   ],
   [
-    'acme-app:app:global:infrastructure:common-adapters',
-    'apps/*/src/app/global/*/infrastructure/common-adapters/**',
+    'acme-app:global:infrastructure:common-adapters',
+    'apps/*/src/global/*/infrastructure/common-adapters/**',
     ['app', 'module'],
   ],
   [
-    'acme-app:app:global:infrastructure:lib-adapters',
-    'apps/*/src/app/global/*/infrastructure/lib-adapters/**',
+    'acme-app:global:infrastructure:lib-adapters',
+    'apps/*/src/global/*/infrastructure/lib-adapters/**',
     ['app', 'module'],
   ],
-  ['acme-app:app:global:application', 'apps/*/src/app/global/*/application/**', ['app', 'module']],
-  [
-    'acme-app:app:global:outbound',
-    'apps/*/src/app/global/*/outbound/**',
-    ['app', 'module', 'file'],
-  ],
-  [
-    'acme-app:app:global:infrastructure',
-    'apps/*/src/app/global/*/infrastructure/**',
-    ['app', 'module'],
-  ],
-  ['acme-app:app:global:shell', 'apps/*/src/app/global/*/shell/**', ['app', 'module']],
+  ['acme-app:global:application', 'apps/*/src/global/*/application/**', ['app', 'module']],
+  ['acme-app:global:outbound', 'apps/*/src/global/*/outbound/**', ['app', 'module', 'file']],
+  ['acme-app:global:infrastructure', 'apps/*/src/global/*/infrastructure/**', ['app', 'module']],
+  ['acme-app:global:shell', 'apps/*/src/global/*/shell/**', ['app', 'module']],
   ['acme-app:app:module', 'apps/*/src/app/app.module.ts', ['app']],
   ['acme-app:app', 'apps/*/src/app/**', ['app']],
   ['acme-app:common:modules:domain', 'apps/*/src/common/modules/*/domain/**', ['app', 'module']],
@@ -79,7 +71,12 @@ export const acmeApp = [
   ...moduleAreas.flatMap((area) => [
     [`acme-app:${area}:index`, `apps/*/src/${area}/index.ts`, ['app']],
     [`acme-app:${area}:modules:index`, `apps/*/src/${area}/*/modules/index.ts`, ['app', 'module']],
-    ...moduleAreaLayers.map((layer) => [
+    [
+      `acme-app:${area}:shell:module`,
+      `apps/*/src/${area}/{*,*/modules/*}/shell/*.module.ts`,
+      ['app', 'module'],
+    ],
+    ...moduleAreaLayers[area].map((layer) => [
       `acme-app:${area}:${layer}`,
       `apps/*/src/${area}/{*,*/modules/*}/${layer.replace(':', '/')}/**`,
       layer.includes(':') || layer === 'outbound'

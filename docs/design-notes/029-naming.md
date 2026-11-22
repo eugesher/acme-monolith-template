@@ -87,10 +87,12 @@ property into `LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN`. The token names where 
 from, not what the module does with it, so a reader finds the variable of `.env` by the name alone.
 A module that reads one property for two purposes injects the one token in both places; a purpose
 that needs a value of its own needs a property of its own, and with it a token of its own, so two
-tokens never share a name. A property that already starts with the module name is not repeated:
-`IDEMPOTENCY_KEY_TTL_HOURS` becomes `IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`. The suffix sets the token
-apart from the `_PORT` tokens in the same `outbound` barrel. The description of the `Symbol` repeats
-the constant, and the file drops the suffix: `order-redis-command-timeout-ms.token.ts`.
+tokens never share a name. A property that already starts with the whole module name is not
+repeated; one that shares only its first word is: `IDEMPOTENCY_KEY_TTL_HOURS` of the
+`idempotency-purge` processor becomes `IDEMPOTENCY_PURGE_IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`. The
+suffix sets the token apart from the `_PORT` tokens in the same `outbound` barrel. The description
+of the `Symbol` repeats the constant, and the file drops the suffix:
+`order-redis-command-timeout-ms.token.ts`.
 
 **A lib without layers names a type file by its role where the type has one.** Modules and layered
 libs name an interface file by its role: `.command`, `.view`, `.options`. The types of

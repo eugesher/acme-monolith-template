@@ -2,11 +2,11 @@
 
 Core belongs to no app: lint decides by the layer of the importing file, never by the app.
 
-| Core element           | Layers of an app that may import it                                                                      |
-| ---------------------- | -------------------------------------------------------------------------------------------------------- |
-| `@acme-core/entities`  | infrastructure, the persistence interfaces of outbound, the `app/` folder, common entities and e2e       |
-| `@acme-core/contracts` | core adapters, queue adapters, `core/queues`, processor presentation and e2e                             |
-| `@acme-core/modules`   | the module file of a feature or processor, the shell of a global module and the shell of a common module |
+| Core element           | Layers of an app that may import it                                                                |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `@acme-core/entities`  | infrastructure, the persistence interfaces of outbound, the `app/` folder, common entities and e2e |
+| `@acme-core/contracts` | core adapters, queue adapters, `core/queues`, the processors in `shell/` and e2e                   |
+| `@acme-core/modules`   | the Nest module in the shell of a feature, a processor, a global module and a common module        |
 
 `spec/architecture/common-modules.spec.ts` holds the cases that every app may import any core
 entity, contract and module in those layers.

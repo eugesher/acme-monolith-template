@@ -23,21 +23,22 @@ apps/staff-app/src/features/
     modules/
       index.ts
       role/
-        role.module.ts
-        domain/ outbound/ application/ infrastructure/ presentation/
+        index.ts
+        shell/ domain/ outbound/ application/ infrastructure/ presentation/
       permission/
       user/
 ```
 
 **The parent module only mounts.** `AccessModule` imports `PermissionModule`, `RoleModule` and
-`UserModule` and declares nothing. `features/index.ts` exports the parents, and `AppModule` imports
-`AccessModule`, not its children.
+`UserModule` and declares nothing; it stays at the root of the parent, next to `modules/`. A child
+keeps its Nest module and its controller in `shell/`, and its `index.ts` re-exports only the module.
+`features/index.ts` exports the parents, and `AppModule` imports `AccessModule`, not its children.
 
 **A child module is a feature.** It has the same layers and the same lint rules as a top-level
 feature: the categories match `features/{*,*/modules/*}/<layer>`, so a child domain stays
-framework-free and a child application cannot reach its presentation. The parent root reaches its
-children only through `modules/index.ts`, and `modules/index.ts` re-exports only the Nest modules of
-its own children (see `spec/architecture/nested-features.spec.ts`).
+framework-free and a child application cannot reach its presentation or its shell. The parent root
+reaches its children only through `modules/index.ts`, and `modules/index.ts` re-exports only the
+Nest modules of its own children (see `spec/architecture/nested-features.spec.ts`).
 
 **A child keeps its own name.** The classes of `access/modules/role` carry the `Role` prefix, not
 `AccessRole`: the group is a folder, not a context. Two children of different groups with one name

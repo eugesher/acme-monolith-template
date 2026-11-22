@@ -7,7 +7,7 @@ one processor appends.
 | -------------- | ----------------------------------------------------------------------------------------------------------------- |
 | queue contract | `core/contracts/src/ledger/queues/ledger-record.queue.ts`                                                         |
 | a producer     | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts` |
-| the appender   | `apps/processor-app/src/processors/ledger` (see `008-queue-processor.md`)                                         |
+| the appender   | `apps/processor-app/src/processors/ledger-append` (see `008-queue-processor.md`)                                  |
 | a reader       | `apps/staff-app/src/features/ledger` (see `005-page-window.md`)                                                   |
 
 **Producers enqueue, one processor appends.** No HTTP app writes the table, so the append has one
@@ -18,7 +18,7 @@ another.
 ## Append is the only verb
 
 **An entry is a frozen value object.** `LedgerAppendEntryModel`
-(`apps/processor-app/src/processors/ledger/domain/models/ledger-append-entry.model.ts`) calls
+(`apps/processor-app/src/processors/ledger-append/domain/models/ledger-append-entry.model.ts`) calls
 `Object.freeze`, has no behavior beyond its invariants, and a broken invariant throws a plain
 `Error`: it is a programming mistake of a producer, not a refusal a client sees.
 
@@ -41,8 +41,8 @@ subject and an empty payload; the email stays in the `customer` table.
 ## Time and correlation
 
 **An instant must carry its zone.** `LedgerAppendEntryModel.initCandidate` refuses
-`2026-01-01T00:00:00` through `LedgerInstantValue.hasExplicitZone()`, because `Date` would read it
-in the server's zone. With `Z` or an offset, every server stores the same instant.
+`2026-01-01T00:00:00` through `LedgerAppendInstantValue.hasExplicitZone()`, because `Date` would
+read it in the server's zone. With `Z` or an offset, every server stores the same instant.
 
 **The correlation id comes from the context.** The job carries the id of the request that produced
 it, the processor opens the context with that id, and `LedgerAppendUseCase` reads it with

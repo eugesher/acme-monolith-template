@@ -25,9 +25,9 @@ import {
   ToolsModule,
   WarehouseModule,
 } from '@acme-staff/features';
+import { AuthGlobalModule } from '@acme-staff/global';
 
 import { entities } from './entities';
-import { AuthGlobalModule } from './global';
 import { ConfigSetupModule } from './setup';
 
 @Module({

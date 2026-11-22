@@ -1,6 +1,6 @@
 export const queue = [
   {
-    from: { file: { categories: 'acme-app:processors:presentation' } },
+    from: { file: { categories: 'acme-app:processors:shell' } },
     disallow: [
       {
         to: { file: { categories: 'acme-app:processors:outbound' } },

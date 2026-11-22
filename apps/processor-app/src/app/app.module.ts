@@ -14,7 +14,11 @@ import { LocalStorageSetupModule } from '@acme-libs/local-storage';
 import { LoggerSetupModule, TracerSetupModule } from '@acme-libs/observability';
 import { BullSetupModule } from '@acme-libs/queue';
 import { HealthModule } from '@acme-processor/features';
-import { IdempotencyModule, LedgerModule, ProductStockModule } from '@acme-processor/processors';
+import {
+  IdempotencyPurgeModule,
+  LedgerAppendModule,
+  ProductStockPostSubtractModule,
+} from '@acme-processor/processors';
 
 import { entities } from './entities';
 import { ConfigSetupModule } from './setup';
@@ -31,9 +35,9 @@ import { ConfigSetupModule } from './setup';
     HttpSecurityModule.forRoot(),
     ThrottlerSetupModule.forRoot(),
     HealthModule,
-    IdempotencyModule,
-    LedgerModule,
-    ProductStockModule,
+    IdempotencyPurgeModule,
+    LedgerAppendModule,
+    ProductStockPostSubtractModule,
   ],
   providers: [
     { provide: APP_PIPE, useClass: StrictValidationPipe },

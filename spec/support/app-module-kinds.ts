@@ -4,17 +4,19 @@ import * as path from 'path';
 const ROOT = path.resolve(__dirname, '../..');
 const APPS = 'apps';
 const SUBMODULES = 'modules';
-const LAYERS = ['domain', 'outbound', 'application', 'infrastructure', 'presentation'];
+const SHELL = 'shell';
+const INDEX = 'index.ts';
+const LAYERS = ['domain', 'outbound', 'application', 'infrastructure', SHELL];
 const AREAS = {
   features: {
-    folder: path.join('presentation', 'controllers'),
+    layers: [...LAYERS, 'presentation'],
     suffix: '.controller.ts',
-    missing: 'a feature must have a controller in presentation/controllers',
+    missing: 'a feature must have a controller in shell/',
   },
   processors: {
-    folder: path.join('presentation', 'processors'),
+    layers: LAYERS,
     suffix: '.processor.ts',
-    missing: 'a processor must have a .processor.ts in presentation/processors',
+    missing: 'a processor must have a .processor.ts in shell/',
   },
 };
 
@@ -27,7 +29,7 @@ export interface IModuleFolder {
   nested: boolean;
   files: string[];
   folders: string[];
-  entryPoints: string[];
+  shellFiles: string[];
 }
 
 const entriesOf = (root: string, relPath: string): Pick<IModuleFolder, 'files' | 'folders'> => {
@@ -52,11 +54,9 @@ function* modulesIn(
   for (const name of entriesOf(root, relPath).folders) {
     const module = { relPath: path.join(relPath, name), name, area, nested };
     const entries = entriesOf(root, module.relPath);
-    const entryPoints = entriesOf(root, path.join(module.relPath, AREAS[area].folder)).files.filter(
-      (file) => file.endsWith(AREAS[area].suffix),
-    );
+    const shellFiles = entriesOf(root, path.join(module.relPath, SHELL)).files;
 
-    yield { ...module, ...entries, entryPoints };
+    yield { ...module, ...entries, shellFiles };
 
     if (!nested && entries.folders.includes(SUBMODULES)) {
       yield* modulesIn(root, path.join(module.relPath, SUBMODULES), area, true);
@@ -77,7 +77,7 @@ export const moduleKindViolationOf = ({
   nested,
   files,
   folders,
-  entryPoints,
+  shellFiles,
 }: IModuleFolder): string | null => {
   const moduleFile = `${name}.module.ts`;
   const isAggregator = folders.includes(SUBMODULES);
@@ -86,10 +86,11 @@ export const moduleKindViolationOf = ({
     return 'a submodule may not aggregate modules of its own';
   }
 
-  const allowedFolders = isAggregator ? [SUBMODULES] : LAYERS;
+  const rootFile = isAggregator ? moduleFile : INDEX;
+  const allowedFolders = isAggregator ? [SUBMODULES] : AREAS[area].layers;
   const extras = [
     ...folders.filter((folder) => !allowedFolders.includes(folder)).map((folder) => `${folder}/`),
-    ...files.filter((file) => file !== moduleFile),
+    ...files.filter((file) => file !== rootFile),
   ];
 
   if (extras.length > 0) {
@@ -97,14 +98,22 @@ export const moduleKindViolationOf = ({
       ? `an aggregator holds only ${SUBMODULES}/`
       : 'a regular module holds only layer folders';
 
-    return `${kind} and ${moduleFile}, found: ${extras.join(', ')}`;
+    return `${kind} and ${rootFile}, found: ${extras.join(', ')}`;
   }
 
-  if (!files.includes(moduleFile)) {
-    return `has no ${moduleFile}`;
+  if (!files.includes(rootFile)) {
+    return `has no ${rootFile}`;
   }
 
-  return isAggregator || entryPoints.length > 0 ? null : AREAS[area].missing;
+  if (isAggregator) {
+    return null;
+  }
+
+  if (!shellFiles.includes(moduleFile)) {
+    return `has no ${SHELL}/${moduleFile}`;
+  }
+
+  return shellFiles.some((file) => file.endsWith(AREAS[area].suffix)) ? null : AREAS[area].missing;
 };
 
 export const moduleKindViolations = (): { module: string; violation: string }[] =>

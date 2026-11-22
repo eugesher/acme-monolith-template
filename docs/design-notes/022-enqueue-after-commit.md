@@ -3,14 +3,14 @@
 A module announces a committed write on a queue, from a hook that runs after the commit, with a
 deadline and retries.
 
-| Part               | Example                                                                                                            |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| hook in a use case | `core/modules/src/product-stock/application/use-cases/product-stock-core-move.use-case.ts`                         |
-| queue adapter      | `core/modules/src/product-stock/infrastructure/queue/product-stock-core-post-subtract-queue.adapter.ts`            |
-| queue contract     | `core/contracts/src/product-stock/queues/product-stock-post-subtract.queue.ts`                                     |
-| queue registration | `core/queues/src/product-stock-post-subtract/product-stock-post-subtract-queue.module.ts`                          |
-| the processor      | `apps/processor-app/src/processors/product-stock/presentation/processors/product-stock-post-subtract.processor.ts` |
-| from a feature     | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts`  |
+| Part               | Example                                                                                                           |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| hook in a use case | `core/modules/src/product-stock/application/use-cases/product-stock-core-move.use-case.ts`                        |
+| queue adapter      | `core/modules/src/product-stock/infrastructure/queue/product-stock-core-post-subtract-queue.adapter.ts`           |
+| queue contract     | `core/contracts/src/product-stock/queues/product-stock-post-subtract.queue.ts`                                    |
+| queue registration | `core/queues/src/product-stock-post-subtract/product-stock-post-subtract-queue.module.ts`                         |
+| the processor      | `apps/processor-app/src/processors/product-stock-post-subtract/shell/product-stock-post-subtract.processor.ts`    |
+| from a feature     | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts` |
 
 ## After the commit
 

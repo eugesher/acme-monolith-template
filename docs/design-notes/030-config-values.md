@@ -9,7 +9,7 @@ binds that token to the configuration.
 | token    | `apps/staff-app/src/features/catalog/modules/product/outbound/tokens/product-occ-retry-attempts.token.ts` |
 | provider | `apps/staff-app/src/features/catalog/modules/product/infrastructure/config/product-config.provider.ts`    |
 | lib      | `ConfigValueProvider` in `libs/config/src/provider/config-value.provider.ts`                              |
-| module   | `apps/staff-app/src/features/catalog/modules/product/product.module.ts`                                   |
+| module   | `apps/staff-app/src/features/catalog/modules/product/shell/product.module.ts`                             |
 
 ```ts
 export const ProductConfigOccRetryAttemptsProvider = ConfigValueProvider.provide({
@@ -43,10 +43,10 @@ which variable of `.env` feeds the token. The token is named after the module an
 
 **One file per module binds its values.** `infrastructure/config/<module>-config.provider.ts`
 exports one constant per value, `<Module>Config<Property>Provider`, and the barrel of
-`infrastructure` exports the file. As in the token, a property that starts with the module name does
-not repeat it: `IdempotencyConfigKeyTtlHoursProvider`. The module root lists the constants next to
-the `provider` of its adapters (see `031-static-provider.md`) and so reaches neither `outbound` nor
-the config lib.
+`infrastructure` exports the file. As in the token, only a property that starts with the whole
+module name does not repeat it: `IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider`. The module
+root lists the constants next to the `provider` of its adapters (see `031-static-provider.md`) and
+so reaches neither `outbound` nor the config lib.
 
 **The options name what goes in.** `injectionToken` and `configProperty` keep the input apart from
 the `FactoryProvider` that comes out, whose fields `provide`, `inject` and `useFactory` belong to

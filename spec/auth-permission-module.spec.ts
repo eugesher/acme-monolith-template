@@ -25,23 +25,23 @@ describe('an app that requires a permission mounts AuthPermissionModule', () => 
 
       for (const [file, code] of [
         [
-          'apps/guarded/src/features/x/presentation/controllers/x.controller.ts',
+          'apps/guarded/src/features/x/shell/x.controller.ts',
           'import { CurrentUser, RequiresPermission } from "@acme-libs/auth";',
         ],
         [
-          'apps/guarded/src/app/global/auth/shell/auth-global.module.ts',
+          'apps/guarded/src/global/auth/shell/auth-global.module.ts',
           'import { AuthJwtModule, AuthPermissionModule } from "@acme-libs/auth";',
         ],
         [
-          'apps/guarded/src/features/x/presentation/controllers/spec/x.controller.spec.ts',
+          'apps/guarded/src/features/x/shell/spec/x.controller.spec.ts',
           'import { AuthPermissionModule } from "@acme-libs/auth";',
         ],
         [
-          'apps/aliased/src/features/x/presentation/controllers/x.controller.ts',
+          'apps/aliased/src/features/x/shell/x.controller.ts',
           'import { RequiresPermission as Requires } from "@acme-libs/auth";',
         ],
         [
-          'apps/aliased/src/features/x/presentation/controllers/y.controller.ts',
+          'apps/aliased/src/features/x/shell/y.controller.ts',
           'import { RequiresPermission } from "@acme-libs/other";\nimport * as auth from "@acme-libs/auth";\nimport "@acme-libs/auth";',
         ],
         ['apps/aliased/src/features/x/x.module.ts', 'export class XModule {}'],
@@ -64,13 +64,13 @@ describe('an app that requires a permission mounts AuthPermissionModule', () => 
       expect(appPermissionUses(root).sort((a, b) => a.app.localeCompare(b.app))).toEqual([
         {
           app: 'aliased',
-          requiring: ['apps/aliased/src/features/x/presentation/controllers/x.controller.ts'],
+          requiring: ['apps/aliased/src/features/x/shell/x.controller.ts'],
           mounting: [],
         },
         {
           app: 'guarded',
-          requiring: ['apps/guarded/src/features/x/presentation/controllers/x.controller.ts'],
-          mounting: ['apps/guarded/src/app/global/auth/shell/auth-global.module.ts'],
+          requiring: ['apps/guarded/src/features/x/shell/x.controller.ts'],
+          mounting: ['apps/guarded/src/global/auth/shell/auth-global.module.ts'],
         },
       ]);
     });

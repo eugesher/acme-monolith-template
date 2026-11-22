@@ -7,22 +7,24 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   beforeAll(() => {
     scaffold = Scaffold.create([
       'apps/__processors-fixture__/src/processors/index.ts',
-      'apps/__processors-fixture__/src/processors/ledger-record/ledger-record.module.ts',
+      'apps/__processors-fixture__/src/processors/ledger-record/index.ts',
+      'apps/__processors-fixture__/src/processors/ledger-record/shell/ledger-record.module.ts',
+      'apps/__processors-fixture__/src/processors/ledger-record/shell/ledger-record.processor.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/domain/index.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/outbound/index.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/application/index.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/application/services/ledger-record.service.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/index.ts',
-      'apps/__processors-fixture__/src/processors/ledger-record/presentation/index.ts',
-      'apps/__processors-fixture__/src/processors/ledger-record/presentation/processors/ledger-record.processor.ts',
-      'apps/__processors-fixture__/src/processors/ledger-record/presentation/handlers/ledger-record.handler.ts',
-      'apps/__processors-fixture__/src/processors/purge/purge.module.ts',
+      'apps/__processors-fixture__/src/processors/purge/index.ts',
+      'apps/__processors-fixture__/src/processors/purge/shell/purge.module.ts',
       'apps/__processors-fixture__/src/processors/purge/application/index.ts',
       'apps/__processors-fixture__/src/processors/digest/digest.module.ts',
       'apps/__processors-fixture__/src/processors/digest/modules/index.ts',
-      'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/digest-daily.module.ts',
-      'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/presentation/index.ts',
-      'apps/__processors-fixture__/src/features/product/product.module.ts',
+      'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/index.ts',
+      'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/shell/digest-daily.module.ts',
+      'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/application/index.ts',
+      'apps/__processors-fixture__/src/features/product/index.ts',
+      'apps/__processors-fixture__/src/features/product/shell/product.module.ts',
       'apps/__processors-fixture__/src/features/product/application/index.ts',
       'apps/__processors-fixture__/src/contracts/ledger-record/index.ts',
       'apps/__processors-fixture__/src/common/shared/ledger-record/index.ts',
@@ -52,14 +54,14 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
     it('bootstrap may NOT reach a processor past the index', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../processors/ledger-record/ledger-record.module";',
+        code: 'import { x } from "../processors/ledger-record";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('the index MAY re-export a processor root', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/index.ts',
-        code: 'export * from "./ledger-record/ledger-record.module";',
+        code: 'export * from "./ledger-record";',
       }).toPassArchitectureLint();
     });
 
@@ -81,34 +83,45 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   describe('the processor root', () => {
     it('MAY reach its layers, core and common modules', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/__fixture__.ts',
-        code: 'import { x } from "./application";\nimport { y } from "./presentation";\nimport { z } from "../../../../../core/modules/src/__ledger-fixture__";\nimport { w } from "../../common/modules";',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.module.ts',
+        code: 'import { x } from "../application";\nimport { y } from "./ledger-record.processor";\nimport { z } from "../../../../../../core/modules/src/__ledger-fixture__";\nimport { w } from "../../../common/modules";',
       }).toPassArchitectureLint();
     });
 
     it('may NOT import entities — it wires them through infrastructure', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/__fixture__.ts',
-        code: 'import { x } from "../../../../../core/entities/src";',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../../../../../core/entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('may NOT skip the barrel of another layer', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/__fixture__.ts',
-        code: 'import { x } from "./application/services/ledger-record.service";',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.module.ts',
+        code: 'import { x } from "../application/services/ledger-record.service";',
       }).toBreakRule('no-restricted-syntax');
     });
 
-    it.each(['processors/ledger-record.processor', 'handlers/ledger-record.handler'])(
-      'may NOT reach %s past the barrel of presentation',
-      async (source) => {
-        await expect({
-          file: 'apps/__processors-fixture__/src/processors/ledger-record/__fixture__.ts',
-          code: `import { x } from "./presentation/${source}";`,
-        }).toBreakRule('no-restricted-syntax');
-      },
-    );
+    it('the module barrel MAY re-export its module from shell', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/index.ts',
+        code: 'export * from "./shell/ledger-record.module";',
+      }).toPassArchitectureLint();
+    });
+
+    it('the module barrel may NOT re-export a layer', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/index.ts',
+        code: 'export * from "./application";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('a processor has no presentation layer', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        code: 'export const orphan = 1;',
+      }).toBreakRule('boundaries/no-unknown-files');
+    });
   });
 
   describe('layers', () => {
@@ -201,59 +214,59 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
     });
   });
 
-  describe('processors (presentation)', () => {
+  describe('processors (shell)', () => {
     it('a processor MAY reach its application, app contracts and the observability lib', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { x } from "../application";\nimport { y } from "../../../contracts/ledger-record";\nimport { z } from "../../../../../../libs/observability/src";',
       }).toPassArchitectureLint();
     });
 
     it('a processor may NOT import crypto — the correlation id comes from the observability lib', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { randomUUID } from "crypto";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('a processor may NOT reach the http lib', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { x } from "../../../../../../libs/http/src";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('a processor may NOT take a port from its outbound — ports belong to the application', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { X_PORT } from "../outbound";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('a processor MAY take the name of its queue from its outbound', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { X_QUEUE } from "../outbound";',
       }).toPassArchitectureLint();
     });
 
     it('a processor MAY take @nestjs/common', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { Injectable } from "@nestjs/common";',
       }).toPassArchitectureLint();
     });
 
     it('a processor MAY take OnApplicationBootstrap — the start of the app is one of its entries', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import type { OnApplicationBootstrap } from "@nestjs/common";',
       }).toPassArchitectureLint();
     });
 
     it('a processor MAY process a queue with Processor, WorkerHost, OnWorkerEvent and the Job type', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";\nimport type { Job } from "bullmq";',
       }).toPassArchitectureLint();
     });
@@ -324,7 +337,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
 
     it('a processor may NOT import the HTTP platform', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/presentation/__fixture__.ts',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { x } from "@nestjs/platform-express";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -341,14 +354,14 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
     it('the submodules index MAY re-export its own submodule roots', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/digest/modules/index.ts',
-        code: 'export * from "./digest-daily/digest-daily.module";',
+        code: 'export * from "./digest-daily";',
       }).toPassArchitectureLint();
     });
 
     it('the submodules index may NOT re-export a submodule layer', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/digest/modules/index.ts',
-        code: 'export * from "./digest-daily/presentation";',
+        code: 'export * from "./digest-daily/application";',
       }).toBreakRule('boundaries/dependencies');
     });
   });
@@ -363,15 +376,15 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
 
     it('a processor may NOT reach a feature', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/ledger-record/__fixture__.ts',
-        code: 'import { x } from "../../features/product/product.module";',
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../../features/product";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('a feature may NOT reach a processor', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "../../processors/ledger-record/ledger-record.module";',
+        file: 'apps/__processors-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../../processors/ledger-record";',
       }).toBreakRule('boundaries/dependencies');
     });
 

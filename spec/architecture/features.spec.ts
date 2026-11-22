@@ -8,7 +8,9 @@ describe('features', () => {
     scaffold = Scaffold.create([
       'apps/__features-fixture__/src/contracts/ledger-record/index.ts',
       'apps/__features-fixture__/src/features/index.ts',
-      'apps/__features-fixture__/src/features/product/product.module.ts',
+      'apps/__features-fixture__/src/features/product/index.ts',
+      'apps/__features-fixture__/src/features/product/shell/product.module.ts',
+      'apps/__features-fixture__/src/features/product/shell/product.controller.ts',
       'apps/__features-fixture__/src/features/product/domain/index.ts',
       'apps/__features-fixture__/src/features/product/domain/errors/index.ts',
       'apps/__features-fixture__/src/features/product/domain/errors/codes/product-exception-code.enum.ts',
@@ -97,10 +99,10 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('presentation may NOT reach its outbound — ports belong to the application', async () => {
+    it('the controller may NOT reach its outbound — ports belong to the application', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-        code: 'import { x } from "../../outbound";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        code: 'import { x } from "../outbound";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -145,37 +147,72 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('presentation may NOT reach infrastructure', async () => {
+    it('the controller may NOT reach infrastructure', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
-        code: 'import { x } from "../../infrastructure";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        code: 'import { x } from "../infrastructure";',
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('the module root MAY see every layer of its own module', async () => {
+    it('the module root MAY see its application, its infrastructure and its controller', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "./application";\nimport { y } from "./infrastructure";\nimport { z } from "./presentation";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../application";\nimport { y } from "../infrastructure";\nimport { z } from "./product.controller";',
       }).toPassArchitectureLint();
+    });
+
+    it('the module root may NOT reach presentation — the controller takes the DTOs', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../presentation";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('the controller MAY reach its application and presentation', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        code: 'import { x } from "../application";\nimport { y } from "../presentation";',
+      }).toPassArchitectureLint();
+    });
+
+    it('presentation may NOT reach application — the controller calls the use cases', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/presentation/dto/__fixture__.ts',
+        code: 'import { x } from "../../application";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('the module barrel MAY re-export its module from shell', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/index.ts',
+        code: 'export * from "./shell/product.module";',
+      }).toPassArchitectureLint();
+    });
+
+    it('the module barrel may NOT re-export a layer', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/index.ts',
+        code: 'export * from "./application";',
+      }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module root may NOT import entities — it wires them through infrastructure', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "../../../../../core/entities/src";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../../../../../core/entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module root MAY import @nestjs/common', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
         code: 'import { Module } from "@nestjs/common";',
       }).toPassArchitectureLint();
     });
 
-    it('presentation MAY import the HTTP and OpenAPI decorators', async () => {
+    it('the controller MAY import the HTTP and OpenAPI decorators', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/presentation/controllers/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
         code: 'import { Controller, Get } from "@nestjs/common";\nimport { ApiOkResponse } from "@nestjs/swagger";',
       }).toPassArchitectureLint();
     });
@@ -320,7 +357,7 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['application/use-cases', 'infrastructure/persistence', 'presentation/controllers'])(
+    it.each(['application/use-cases', 'infrastructure/persistence', 'shell'])(
       '%s may NOT take the credentials or health port — a lib port is reached through infrastructure/lib-adapters',
       async (layer) => {
         await expect({
@@ -366,12 +403,16 @@ describe('features', () => {
 
     it('the module root may NOT reach its own outbound — infrastructure binds the tokens', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { y } from "./outbound";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { y } from "../outbound";',
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['__fixture__.ts', 'application/__fixture__.ts', 'infrastructure/__fixture__.ts'])(
+    it.each([
+      'shell/__fixture__.module.ts',
+      'application/__fixture__.ts',
+      'infrastructure/__fixture__.ts',
+    ])(
       'features/product/%s may NOT mount the credentials lib — the AppModule mounts it once for the app',
       async (file) => {
         await expect({
@@ -383,7 +424,7 @@ describe('features', () => {
 
     it('the module root may NOT import a package off its allowlist', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
         code: 'import { x } from "@nestjs/core";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -441,15 +482,15 @@ describe('features', () => {
 
     it('the module root MAY import a layer barrel', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "./infrastructure";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../infrastructure";',
       }).toPassArchitectureLint();
     });
 
     it('the module root may NOT skip a layer barrel', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "./infrastructure/persistence/repositories/product.repository";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../infrastructure/persistence/repositories/product.repository";',
       }).toBreakRule('no-restricted-syntax');
     });
   });
@@ -508,15 +549,15 @@ describe('features', () => {
   describe('features and apps are isolated', () => {
     it('a module may NOT reach another module of the same app', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/__fixture__.ts',
-        code: 'import { x } from "../note/application";',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../note/application";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('an app may NOT reach another app', async () => {
       await expect({
-        file: 'apps/__features-other-fixture__/src/features/health/__fixture__.ts',
-        code: 'import { x } from "../../../../__features-fixture__/src/features/product/product.module";',
+        file: 'apps/__features-other-fixture__/src/features/health/shell/__fixture__.module.ts',
+        code: 'import { x } from "../../../../../__features-fixture__/src/features/product";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -530,14 +571,14 @@ describe('features', () => {
     it('bootstrap may NOT reach a module past the features index', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../features/product/product.module";',
+        code: 'import { x } from "../features/product";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('the features index MAY re-export a module root', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/index.ts',
-        code: 'export * from "./product/product.module";',
+        code: 'export * from "./product";',
       }).toPassArchitectureLint();
     });
 

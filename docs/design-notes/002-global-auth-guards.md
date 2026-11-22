@@ -2,11 +2,11 @@
 
 ## Where the pieces live
 
-| Piece                      | Location                         | Knows about                        |
-| -------------------------- | -------------------------------- | ---------------------------------- |
-| Guards, route decorators   | `libs/auth`                      | the request, the two ports below   |
-| Validator and claims ports | `libs/contracts/src/auth`        | kernel enums only                  |
-| Port implementations       | `apps/<app>/src/app/global/auth` | the token and the users of the app |
+| Piece                      | Location                     | Knows about                        |
+| -------------------------- | ---------------------------- | ---------------------------------- |
+| Guards, route decorators   | `libs/auth`                  | the request, the two ports below   |
+| Validator and claims ports | `libs/contracts/src/auth`    | kernel enums only                  |
+| Port implementations       | `apps/<app>/src/global/auth` | the token and the users of the app |
 
 **The lib guards, the app decides who the user is.** `libs/auth` never reads a table and never
 verifies a token: it takes the bearer token off the request and hands it to
@@ -34,15 +34,15 @@ The global module imports the guard modules of `libs/auth`. `AppModule` mounts i
 `CredentialsLibModule.forRoot(audience)`, the one credentials module of the app, which the global
 module and the features share (see `012-app-bootstrap.md`).
 
-**Global classes carry the `AuthGlobal` prefix.** The folder stays `app/global/auth`, paired with
-the lib contract below, but the `auth` feature owns the plain names: `AuthModule`, and
+**Global classes carry the `AuthGlobal` prefix.** The folder stays `global/auth`, paired with the
+lib contract below, but the `auth` feature owns the plain names: `AuthModule`, and
 `AuthIdentityCommonAdapter` for the common adapter of its own. The prefix keeps the two apart in
 imports, in stack traces and in DI errors.
 
-**A global module implements a lib contract.** `app/global/auth` binds `AUTH_USER_VALIDATOR_PORT` of
+**A global module implements a lib contract.** `global/auth` binds `AUTH_USER_VALIDATOR_PORT` of
 `libs/contracts/src/auth` in its module root and implements it in its facade. The shell, the
 common-adapters and the lib-adapters of a global module may import the contract of any lib, whatever
-the name of the module, so a future `app/global/<name>` implements the port it needs without a new
+the name of the module, so a future `global/<name>` implements the port it needs without a new
 policy.
 
 ## Two lib modules
