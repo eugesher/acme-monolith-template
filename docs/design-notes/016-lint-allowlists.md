@@ -144,9 +144,9 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   of a feature may take `@acme-libs/contracts/credentials`: the `auth` features of staff-app and of
   customer-app, and the `user` feature of staff-app for the hash of a new password. So may the
   `infrastructure/lib-adapters` of a global module, which verify the bearer token for the guard.
-  `AppModule` mounts `@acme-libs/credentials` once for the app (see `017-credentials-lib.md`); the
-  module root of a feature may mount it too, but the lib is global, so nothing else does. No core or
-  common module signs anyone in, so none may.
+  Only `AppModule` may mount `@acme-libs/credentials`, once for the app (see
+  `017-credentials-lib.md`): a feature that mounted it too would build a second module with its own
+  `JwtModule` and password hasher. No core or common module signs anyone in, so none may.
 - **A lib port is reached through a lib adapter.** A feature or a global module declares a port of
   its own in `outbound` and implements it in `infrastructure/lib-adapters` on top of the port of the
   lib, as `core-adapters` and `common-adapters` do for core and common modules. Only `lib-adapters`
