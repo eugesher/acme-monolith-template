@@ -1,3 +1,3 @@
-export * from './commands/auth-jwt-payload.command';
+export * from './commands/auth-access-token.command';
 
 export * from './views/auth-current-user.view';

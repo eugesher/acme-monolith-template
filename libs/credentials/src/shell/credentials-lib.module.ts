@@ -8,6 +8,7 @@ import { CREDENTIALS_LIB_PORT, type ICredentialsLibPort } from '@acme-libs/contr
 import {
   CredentialsLibHashPasswordUseCase,
   CredentialsLibSignAccessTokenUseCase,
+  CredentialsLibVerifyAccessTokenUseCase,
   CredentialsLibVerifyPasswordUseCase,
 } from '../application';
 import {
@@ -17,22 +18,11 @@ import {
 import { CredentialsLibFacade } from './credentials-lib.facade';
 
 export class CredentialsLibModule {
-  public static register(audience: AuthAudienceEnum): DynamicModule {
+  public static forRoot(audience: AuthAudienceEnum): DynamicModule {
     return {
       module: CredentialsLibModule,
-      imports: [
-        JwtModule.registerAsync({
-          inject: [ConfigService],
-          useFactory: (config: ConfigService) => ({
-            secret: config.getOrThrow<string>('JWT_SECRET'),
-            signOptions: {
-              algorithm: AuthTokenAlgorithmEnum.HS256,
-              audience,
-              expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN') as JwtSignOptions['expiresIn'],
-            },
-          }),
-        }),
-      ],
+      global: true,
+      imports: [CredentialsLibModule.registerJwt(audience)],
       exports: [CREDENTIALS_LIB_PORT],
       providers: [
         {
@@ -40,11 +30,27 @@ export class CredentialsLibModule {
           useClass: CredentialsLibFacade,
         } satisfies ClassProvider<ICredentialsLibPort>,
         CredentialsLibSignAccessTokenUseCase,
+        CredentialsLibVerifyAccessTokenUseCase,
         CredentialsLibHashPasswordUseCase,
         CredentialsLibVerifyPasswordUseCase,
         CredentialsLibAccessTokenAdapter.provider,
         CredentialsLibPasswordHasherAdapter.provider,
       ],
     };
+  }
+
+  private static registerJwt(audience: AuthAudienceEnum): DynamicModule {
+    return JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.getOrThrow<string>('JWT_SECRET'),
+        signOptions: {
+          algorithm: AuthTokenAlgorithmEnum.HS256,
+          audience,
+          expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN') as JwtSignOptions['expiresIn'],
+        },
+        verifyOptions: { algorithms: [AuthTokenAlgorithmEnum.HS256], audience },
+      }),
+    });
   }
 }

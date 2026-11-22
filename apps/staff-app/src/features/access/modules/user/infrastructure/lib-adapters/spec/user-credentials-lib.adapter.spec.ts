@@ -9,6 +9,7 @@ describe('UserCredentialsLibAdapter', () => {
   beforeEach(() => {
     credentials = {
       handleSignAccessToken: jest.fn(),
+      handleVerifyAccessToken: jest.fn(),
       handleHashPassword: jest.fn(),
       handleVerifyPassword: jest.fn(),
     };

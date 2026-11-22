@@ -1,6 +1,5 @@
 import { UnauthorizedException, type ExecutionContext } from '@nestjs/common';
 import type { Reflector } from '@nestjs/core';
-import type { JwtService } from '@nestjs/jwt';
 
 import type { IAuthUserValidatorPort } from '@acme-libs/contracts/auth';
 
@@ -8,7 +7,6 @@ import { AuthJwtGuard } from '../auth-jwt.guard';
 
 describe('AuthJwtGuard', () => {
   let validator: jest.Mocked<IAuthUserValidatorPort>;
-  let verifyAsync: jest.Mock;
   let getAllAndOverride: jest.Mock;
   let request: Record<string, unknown>;
   let context: ExecutionContext;
@@ -17,7 +15,6 @@ describe('AuthJwtGuard', () => {
   beforeEach(() => {
     validator = { handleValidate: jest.fn() };
     validator.handleValidate.mockResolvedValue({ id: 'user-1', email: 'ann@example.com' });
-    verifyAsync = jest.fn().mockResolvedValue({ sub: 'user-1', roles: ['ignored'] });
     getAllAndOverride = jest.fn().mockReturnValue(undefined);
     request = { headers: { authorization: 'Bearer token' } };
     context = {
@@ -25,19 +22,14 @@ describe('AuthJwtGuard', () => {
       getClass: () => 'class',
       switchToHttp: () => ({ getRequest: () => request }),
     } as unknown as ExecutionContext;
-    guard = new AuthJwtGuard(
-      validator,
-      { verifyAsync } as unknown as JwtService,
-      { getAllAndOverride } as unknown as Reflector,
-    );
+    guard = new AuthJwtGuard(validator, { getAllAndOverride } as unknown as Reflector);
   });
 
-  it('lets a valid token of an active user in and puts the re-derived user on the request', async () => {
+  it('hands the bearer token to the validator and puts the user it answers on the request', async () => {
     const allowed = await guard.canActivate(context);
 
     expect(allowed).toBe(true);
-    expect(verifyAsync).toHaveBeenCalledWith('token');
-    expect(validator.handleValidate).toHaveBeenCalledWith({ sub: 'user-1' });
+    expect(validator.handleValidate).toHaveBeenCalledWith({ token: 'token' });
     expect(request.user).toEqual({
       id: 'user-1',
       email: 'ann@example.com',
@@ -52,7 +44,7 @@ describe('AuthJwtGuard', () => {
 
     expect(allowed).toBe(true);
     expect(getAllAndOverride).toHaveBeenCalledWith('auth:public', ['handler', 'class']);
-    expect(verifyAsync).not.toHaveBeenCalled();
+    expect(validator.handleValidate).not.toHaveBeenCalled();
   });
 
   it('accepts the bearer scheme in any case', async () => {
@@ -76,22 +68,10 @@ describe('AuthJwtGuard', () => {
     await expect(allowed).rejects.toMatchObject({
       response: { statusCode: 401, message: 'Unauthorized' },
     });
-    expect(verifyAsync).not.toHaveBeenCalled();
-  });
-
-  it('rejects a token that does not verify with 401', async () => {
-    verifyAsync.mockRejectedValue(new Error('jwt expired'));
-
-    const allowed = guard.canActivate(context);
-
-    await expect(allowed).rejects.toBeInstanceOf(UnauthorizedException);
-    await expect(allowed).rejects.toMatchObject({
-      response: { statusCode: 401, message: 'Unauthorized' },
-    });
     expect(validator.handleValidate).not.toHaveBeenCalled();
   });
 
-  it('rejects a user that is gone or disabled with 401', async () => {
+  it('rejects a token the validator answers no user for with 401', async () => {
     validator.handleValidate.mockResolvedValue(null);
 
     const allowed = guard.canActivate(context);

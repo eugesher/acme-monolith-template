@@ -13,6 +13,11 @@ export const acmeApp = [
     'apps/*/src/app/global/*/infrastructure/common-adapters/**',
     ['app', 'module'],
   ],
+  [
+    'acme-app:app:global:infrastructure:lib-adapters',
+    'apps/*/src/app/global/*/infrastructure/lib-adapters/**',
+    ['app', 'module'],
+  ],
   ['acme-app:app:global:application', 'apps/*/src/app/global/*/application/**', ['app', 'module']],
   [
     'acme-app:app:global:outbound',
