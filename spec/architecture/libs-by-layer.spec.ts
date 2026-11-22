@@ -138,7 +138,7 @@ describe('libs by layer', () => {
 
   it('the global auth module MAY wire the claim guards', async () => {
     await expect({
-      file: 'apps/__layers-fixture__/src/app/global/auth/shell/__fixture__.ts',
+      file: 'apps/__layers-fixture__/src/global/auth/shell/__fixture__.ts',
       code: 'import { AuthJwtModule, AuthPermissionModule } from "@acme-libs/auth";\nimport { AUTH_USER_VALIDATOR_PORT } from "@acme-libs/contracts/auth";',
     }).toPassArchitectureLint();
   });
@@ -190,8 +190,8 @@ describe('libs by layer', () => {
       '../../../../../../../../libs',
     ],
     [
-      'apps/__layers-fixture__/src/app/global/auth/infrastructure/persistence/__fixture__.ts',
-      '../../../../../../../../libs',
+      'apps/__layers-fixture__/src/global/auth/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
     ],
     [
       'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
@@ -239,8 +239,8 @@ describe('libs by layer', () => {
       '../../../../../../../../libs',
     ],
     [
-      'apps/__layers-fixture__/src/app/global/auth/infrastructure/persistence/__fixture__.ts',
-      '../../../../../../../../libs',
+      'apps/__layers-fixture__/src/global/auth/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
     ],
     [
       'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
@@ -372,8 +372,8 @@ describe('libs by layer', () => {
       'health',
     ],
     [
-      'apps/__layers-fixture__/src/app/global/auth/shell/__fixture__.ts',
-      '../../../../../../../libs',
+      'apps/__layers-fixture__/src/global/auth/shell/__fixture__.ts',
+      '../../../../../../libs',
       'auth',
     ],
   ])(
@@ -422,7 +422,7 @@ describe('libs by layer', () => {
     'apps/__layers-fixture__/src/features/product/__fixture__.ts',
     'apps/__layers-fixture__/src/processors/purge/__fixture__.ts',
     'apps/__layers-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-    'apps/__layers-fixture__/src/app/global/auth/shell/__fixture__.ts',
+    'apps/__layers-fixture__/src/global/auth/shell/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
   ])(
     '%s may NOT reach the config lib — values arrive through tokens bound in infrastructure/config',

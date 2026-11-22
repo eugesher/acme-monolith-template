@@ -18,7 +18,7 @@ stays in core; a method of it that one app calls moves into that app, and the re
 | core `idempotency`   | `handleClaim`, `handleComplete`, `handleRelease`      | staff `product-stock`, customer `order`                                                  |
 | core `product`       | `handleArchive`                                       | staff `product`, the processor `product-stock`                                           |
 | core `product-stock` | `handleLock`, `handleMove`                            | staff `product-stock`, customer `order`, `handleLock` also the processor `product-stock` |
-| common `auth`        | `handleFindSubject`                                   | `app/global/auth` of staff-app, staff `auth`                                             |
+| common `auth`        | `handleFindSubject`                                   | `global/auth` of staff-app, staff `auth`                                                 |
 | common `tag`         | `handleFind`, `handleReplace`, `handleFindSubjectIds` | staff `product`, staff `order`                                                           |
 
 Everything else sits with its only caller, for example:
@@ -60,8 +60,8 @@ common or core module may share a name, and the infix keeps them apart.
 
 ## Global modules have layers too
 
-When a global module (`app/global/<m>`) owns logic, it gets `application/` and `outbound/` like a
+When a global module (`global/<m>`) owns logic, it gets `application/` and `outbound/` like a
 feature: the facade calls a use case, and the use case calls ports of its outbound, implemented by a
 repository in `infrastructure/persistence` or by an adapter in `infrastructure/common-adapters` or
-`infrastructure/lib-adapters`. The lint categories `acme-app:app:global:application` and
-`acme-app:app:global:outbound` cover them (see `016-lint-allowlists.md`).
+`infrastructure/lib-adapters`. The lint categories `acme-app:global:application` and
+`acme-app:global:outbound` cover them (see `016-lint-allowlists.md`).

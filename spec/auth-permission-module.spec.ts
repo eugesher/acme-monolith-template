@@ -29,7 +29,7 @@ describe('an app that requires a permission mounts AuthPermissionModule', () => 
           'import { CurrentUser, RequiresPermission } from "@acme-libs/auth";',
         ],
         [
-          'apps/guarded/src/app/global/auth/shell/auth-global.module.ts',
+          'apps/guarded/src/global/auth/shell/auth-global.module.ts',
           'import { AuthJwtModule, AuthPermissionModule } from "@acme-libs/auth";',
         ],
         [
@@ -70,7 +70,7 @@ describe('an app that requires a permission mounts AuthPermissionModule', () => 
         {
           app: 'guarded',
           requiring: ['apps/guarded/src/features/x/presentation/controllers/x.controller.ts'],
-          mounting: ['apps/guarded/src/app/global/auth/shell/auth-global.module.ts'],
+          mounting: ['apps/guarded/src/global/auth/shell/auth-global.module.ts'],
         },
       ]);
     });

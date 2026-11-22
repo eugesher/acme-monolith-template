@@ -121,18 +121,18 @@ describe('unused edges', () => {
     it.each([
       [
         'the root of a global module may NOT reach the observability lib: it wires providers and logs nothing',
-        'apps/__unused-fixture__/src/app/global/auth/shell/__fixture__.ts',
-        '../../../../../../../libs/observability/src',
+        'apps/__unused-fixture__/src/global/auth/shell/__fixture__.ts',
+        '../../../../../../libs/observability/src',
       ],
       [
         'global infrastructure may NOT reach the contracts of a lib: a core-adapter implements the lib port',
-        'apps/__unused-fixture__/src/app/global/auth/infrastructure/__fixture__.ts',
-        '../../../../../../../libs/contracts/src/auth',
+        'apps/__unused-fixture__/src/global/auth/infrastructure/__fixture__.ts',
+        '../../../../../../libs/contracts/src/auth',
       ],
       [
         'a global core-adapter may NOT reach a shared barrel: it translates between contracts only',
-        'apps/__unused-fixture__/src/app/global/auth/infrastructure/core-adapters/__fixture__.ts',
-        '../../../../../common/shared/concurrency',
+        'apps/__unused-fixture__/src/global/auth/infrastructure/core-adapters/__fixture__.ts',
+        '../../../../common/shared/concurrency',
       ],
     ])('%s', async (_, file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(

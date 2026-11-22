@@ -6,7 +6,7 @@ describe('app → core', () => {
 
   beforeAll(() => {
     scaffold = Scaffold.create([
-      'apps/__core-link-fixture__/src/app/global/index.ts',
+      'apps/__core-link-fixture__/src/global/index.ts',
       'apps/__core-link-fixture__/src/features/product/product.module.ts',
       'core/modules/src/__ledger-fixture__/index.ts',
       'core/modules/src/__ledger-fixture__/application/index.ts',
@@ -103,7 +103,7 @@ describe('app → core', () => {
       '../../../../../../core/entities/src',
       '../../../../../../core/modules/src/__ledger-fixture__',
       '../../../features/product/product.module',
-      '../../../app/global',
+      '../../../global',
     ])('common may NOT reach %s', async (source) => {
       await expect({
         file: 'apps/__core-link-fixture__/src/common/shared/auth/__fixture__.ts',

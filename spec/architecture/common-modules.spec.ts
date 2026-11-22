@@ -24,7 +24,7 @@ describe('common modules (common/modules/<module>)', () => {
       'apps/__common-fixture__/src/contracts/audit/index.ts',
       'apps/__common-fixture__/src/features/product/product.module.ts',
       'apps/__common-fixture__/src/features/product/infrastructure/common-adapters/index.ts',
-      'apps/__common-fixture__/src/app/global/index.ts',
+      'apps/__common-fixture__/src/global/index.ts',
       'core/modules/src/__ledger-fixture__/index.ts',
       'core/contracts/src/__ledger-fixture__/index.ts',
       'core/entities/src/index.ts',
@@ -120,7 +120,7 @@ describe('common modules (common/modules/<module>)', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['../../../../features/product/product.module', '../../../../app/global'])(
+    it.each(['../../../../features/product/product.module', '../../../../global'])(
       'a common module may NOT reach the app: %s',
       async (source) => {
         await expect({
@@ -408,10 +408,7 @@ describe('common modules (common/modules/<module>)', () => {
 
     it.each([
       ['apps/__common-fixture__/src/features/product/__fixture__.ts', '../../common/modules'],
-      [
-        'apps/__common-fixture__/src/app/global/auth/shell/__fixture__.ts',
-        '../../../../common/modules',
-      ],
+      ['apps/__common-fixture__/src/global/auth/shell/__fixture__.ts', '../../../common/modules'],
     ])('the module root %s MAY mount a common module', async (file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toPassArchitectureLint();
     });

@@ -84,7 +84,7 @@ describe('app entry points', () => {
 
   it.each([
     ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../../app.module'],
-    ['apps/__entry-fixture__/src/app/global/auth/shell/__fixture__.ts', '../../../app.module'],
+    ['apps/__entry-fixture__/src/global/auth/shell/__fixture__.ts', '../../../app/app.module'],
     ['apps/__entry-fixture__/src/features/product/product.module.ts', '../../app/app.module'],
     ['apps/__entry-fixture__/src/processors/idempotency/__fixture__.ts', '../../app/app.module'],
     ['apps/__entry-fixture__/src/common/shared/ledger/__fixture__.ts', '../../../app/app.module'],

@@ -109,7 +109,7 @@ naming of `029-naming.md`, and stays within the limit of the lint.
 
 1. `@nestjs/*`, then the other packages;
 2. the aliases of the repository: the libs, the lib contracts, the core, the core contracts, then
-   the `app`, `common`, `contracts`, `features` and `processors` of an app;
+   the `app`, `common`, `contracts`, `features`, `global` and `processors` of an app;
 3. relative imports: two levels up and more, one level up, the same folder.
 
 Within a block the groups follow each other without a blank line, and a group's `import type` comes

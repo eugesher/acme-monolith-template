@@ -16,6 +16,7 @@ const sections = [
     ['acme-app-common', `^${app}/common(/|$)`],
     ['acme-app-contracts', `^${app}/contracts(/|$)`],
     ['acme-app-features', `^${app}/features(/|$)`],
+    ['acme-app-global', `^${app}/global(/|$)`],
     ['acme-app-processors', `^${app}/processors(/|$)`],
   ],
   [
@@ -36,6 +37,7 @@ const order = [
     'acme-app-common',
     'acme-app-contracts',
     'acme-app-features',
+    'acme-app-global',
     'acme-app-processors',
   ],
   ['relative-deep', 'relative-parent', 'relative-sibling'],

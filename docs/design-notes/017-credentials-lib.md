@@ -50,7 +50,7 @@ own (`AUTH_CREDENTIALS_PORT`, `AUTH_GLOBAL_CREDENTIALS_PORT`) and implements it 
 `infrastructure/lib-adapters` on top of `CREDENTIALS_LIB_PORT`, so no module imports `argon2` or
 `@nestjs/jwt` and the application never sees the lib. Examples:
 `apps/customer-app/src/features/auth/infrastructure/lib-adapters/auth-credentials-lib.adapter.ts`,
-`apps/customer-app/src/app/global/auth/infrastructure/lib-adapters/auth-global-credentials-lib.adapter.ts`.
+`apps/customer-app/src/global/auth/infrastructure/lib-adapters/auth-global-credentials-lib.adapter.ts`.
 The guard of `libs/auth` does not take the lib, since a lib takes only its own contract: it hands
 the bearer token to `AUTH_USER_VALIDATOR_PORT`, and the global module of the app verifies it here
 (see `002-global-auth-guards.md`).
