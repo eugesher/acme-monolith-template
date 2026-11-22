@@ -6,6 +6,7 @@ describe('libs', () => {
 
   beforeAll(() => {
     scaffold = Scaffold.create([
+      'libs/app/src/index.ts',
       'libs/auth/src/index.ts',
       'libs/bootstrap/src/index.ts',
       'libs/cache/src/index.ts',
@@ -62,6 +63,20 @@ describe('libs', () => {
     ['kernel', []],
     ['toolkit', []],
     ['domain', []],
+    [
+      'app',
+      [
+        'kernel',
+        'toolkit',
+        'domain',
+        'cache',
+        'database',
+        'http',
+        'local-storage',
+        'observability',
+        'queue',
+      ],
+    ],
     ['auth', ['kernel', 'toolkit', 'domain']],
     ['bootstrap', ['kernel', 'toolkit', 'domain', 'observability', 'openapi']],
     ['cache', ['kernel', 'toolkit', 'domain', 'config', 'observability']],
@@ -77,6 +92,7 @@ describe('libs', () => {
     ['testing', ['kernel', 'toolkit', 'domain', 'bootstrap']],
   ])('%s may import only %j of the other libs', async (from, allowed) => {
     const libs = [
+      'app',
       'auth',
       'bootstrap',
       'cache',
@@ -248,6 +264,23 @@ describe('libs', () => {
       code: `import { x } from "${source}";`,
     }).toBreakRule('boundaries/dependencies');
   });
+
+  it('the app lib MAY import the Nest packages the setup of an app takes its options from', async () => {
+    await expect({
+      file: 'libs/app/src/setup/__fixture__.ts',
+      code: 'import type { DynamicModule } from "@nestjs/common";\nimport type { TypeOrmModuleOptions } from "@nestjs/typeorm";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each(['@nestjs/core', '@nestjs/config', 'typeorm'])(
+    'the app lib may NOT import %s',
+    async (source) => {
+      await expect({
+        file: 'libs/app/src/setup/__fixture__.ts',
+        code: `import { x } from "${source}";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
 
   it('the toolkit lib MAY import crypto (BodyFingerprintHelper)', async () => {
     await expect({

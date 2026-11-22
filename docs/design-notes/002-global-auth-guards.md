@@ -40,10 +40,11 @@ lib contract below, but the `auth` feature owns the plain names: `AuthModule`, a
 imports, in stack traces and in DI errors.
 
 **A global module implements a lib contract.** `global/auth` binds `AUTH_USER_VALIDATOR_PORT` of
-`libs/contracts/src/auth` in its module root and implements it in its facade. The shell, the
-common-adapters and the lib-adapters of a global module may import the contract of any lib, whatever
-the name of the module, so a future `global/<name>` implements the port it needs without a new
-policy.
+`libs/contracts/src/auth` in its module root and implements it in its facade. A global module takes
+the lib contracts it uses and no other: the shell takes `auth`, whatever the name of the module, the
+lib-adapters take `credentials`, and the common-adapters take none. A future `global/<name>` that
+needs another lib contract adds it to its layer in `policies/acme-app.mjs`, so the new edge shows in
+review.
 
 ## Two lib modules
 

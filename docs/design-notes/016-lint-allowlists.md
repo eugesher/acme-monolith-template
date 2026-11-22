@@ -190,7 +190,8 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   contracts of `database` may import `typeorm`; the other contracts see only the base libs.
 - **No module registers entities.** The entities of an app are listed once in `app/entities` and
   handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import `@nestjs/typeorm`;
-  `TypeOrmModule.forFeature` would add repository tokens that nothing injects.
+  `TypeOrmModule.forFeature` would add repository tokens that nothing injects. `libs/app` takes
+  `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to `OrmModule`.
 - **A module root binds no token.** An adapter carries its binding in a static `provider` (see
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
@@ -202,10 +203,12 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
 - **A global common-adapter reaches any contract of its app and its own outbound.** It implements a
   port of its module's outbound with the port of a common module, which is named after that module,
   not after the global module, so the namesake rule of `appContracts` would refuse it.
-- **A global lib-adapter reaches the contracts of the libs and its own outbound.** It implements a
+- **A global lib-adapter reaches the `credentials` contract and its own outbound.** It implements a
   port of its module's outbound with the port of a lib, as the lib-adapters of a feature do:
-  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_PORT`. The rest of
-  the global infrastructure may not take a lib contract other than that of `database`.
+  `AuthGlobalCredentialsLibAdapter` verifies the bearer token with `CREDENTIALS_PORT`. The shell of
+  a global module takes the `auth` contract, its common-adapters take no lib contract, and the rest
+  of the global infrastructure takes only that of `database`. Each layer names the contracts it
+  uses, so a new lib contract reaches a global module only through a new policy.
 
 ### No policy names an export
 

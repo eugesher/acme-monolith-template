@@ -287,23 +287,26 @@ describe('global modules (global/) — modules without controllers', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
+  it('the shell MAY reach the auth lib contract, whatever the name of the module', async () => {
+    await expect({
+      file: 'apps/__global-fixture__/src/global/session/shell/__fixture__.ts',
+      code: 'import { x } from "../../../../../../libs/contracts/src/auth";',
+    }).toPassArchitectureLint();
+  });
+
   it.each([
-    [
-      'apps/__global-fixture__/src/global/session/shell/__fixture__.ts',
-      '../../../../../../libs/contracts/src/auth',
-    ],
-    [
-      'apps/__global-fixture__/src/global/session/shell/__fixture__.ts',
-      '../../../../../../libs/contracts/src/cache',
-    ],
-    [
-      'apps/__global-fixture__/src/global/session/infrastructure/common-adapters/__fixture__.ts',
-      '../../../../../../../libs/contracts/src/auth',
-    ],
+    ['shell', 'cache', '../../../../../../libs/contracts/src/cache'],
+    ['shell', 'credentials', '../../../../../../libs/contracts/src/credentials'],
+    ['infrastructure/common-adapters', 'auth', '../../../../../../../libs/contracts/src/auth'],
+    ['infrastructure/lib-adapters', 'cache', '../../../../../../../libs/contracts/src/cache'],
+    ['infrastructure/lib-adapters', 'health', '../../../../../../../libs/contracts/src/health'],
   ])(
-    '%s MAY reach the lib contract %s, whatever the name of the module',
-    async (file, contracts) => {
-      await expect({ file, code: `import { x } from "${contracts}";` }).toPassArchitectureLint();
+    'the %s of a global module may NOT reach the %s lib contract it does not use',
+    async (layer, _lib, contracts) => {
+      await expect({
+        file: `apps/__global-fixture__/src/global/auth/${layer}/__fixture__.ts`,
+        code: `import { x } from "${contracts}";`,
+      }).toBreakRule('boundaries/dependencies');
     },
   );
 

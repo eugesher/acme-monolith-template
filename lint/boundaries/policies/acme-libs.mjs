@@ -21,6 +21,7 @@ export const acmeLibs = [
   fromLibContracts('database', [packages('typeorm')]),
   fromLib(
     [
+      'app',
       'auth',
       'bootstrap',
       'cache',
@@ -37,6 +38,10 @@ export const acmeLibs = [
     ],
     [baseLibs()],
   ),
+  fromLib('app', [
+    libs('cache', 'database', 'http', 'local-storage', 'observability', 'queue'),
+    packages('@nestjs/common', '@nestjs/typeorm'),
+  ]),
   fromLib('bootstrap', [
     libs('observability', 'openapi'),
     packages('@nestjs/common', '@nestjs/config', 'nestjs-pino'),
