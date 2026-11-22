@@ -38,7 +38,7 @@ import { ConfigSetupModule } from './setup';
     LocalStorageSetupModule.forRoot(),
     OrmModule.forRoot(entities),
     BullSetupModule.forRoot(),
-    CacheLibModule,
+    CacheLibModule.forRoot(),
     CredentialsLibModule.forRoot(AuthAudienceEnum.STAFF),
     HttpSecurityModule.forRoot(),
     ThrottlerSetupModule.forRoot(),

@@ -52,7 +52,7 @@ describe('CacheLibModule', () => {
       imports: [
         LoggerModule.forRoot({ pinoHttp: { level: 'silent' } }),
         ConfigStubModule,
-        CacheLibModule,
+        CacheLibModule.forRoot(),
       ],
     })
     class TestModule {}
