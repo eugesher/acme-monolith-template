@@ -12,7 +12,6 @@ export class AppSetupModule extends AppSetupBaseModule {
       appName: AppNameEnum.PROCESSOR_APP,
       config: ConfigSetupModule.forRoot(),
       entities,
-      imports: [],
     });
   }
 }

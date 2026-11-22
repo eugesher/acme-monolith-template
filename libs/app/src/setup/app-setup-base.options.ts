@@ -7,5 +7,5 @@ export interface IAppSetupBaseOptions {
   appName: AppNameEnum;
   config: Promise<DynamicModule>;
   entities: TypeOrmModuleOptions['entities'];
-  imports: DynamicModule[];
+  imports?: DynamicModule[];
 }

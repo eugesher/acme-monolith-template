@@ -17,7 +17,7 @@ import type { IAppSetupBaseOptions } from './app-setup-base.options';
 
 export class AppSetupBaseModule {
   protected static setup(options: IAppSetupBaseOptions): DynamicModule {
-    const { appName, config, entities, imports } = options;
+    const { appName, config, entities, imports = [] } = options;
 
     return {
       module: this,
