@@ -16,9 +16,9 @@ import { AuthController } from './auth.controller';
   providers: [
     AuthLoginUseCase,
     AuthMeUseCase,
-    AuthLoginRepository.provider,
-    AuthCredentialsLibAdapter.provider,
-    AuthIdentityCommonAdapter.provider,
+    AuthLoginRepository.PROVIDER,
+    AuthCredentialsLibAdapter.PROVIDER,
+    AuthIdentityCommonAdapter.PROVIDER,
   ],
 })
 export class AuthModule {}

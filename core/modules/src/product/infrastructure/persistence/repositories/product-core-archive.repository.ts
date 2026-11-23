@@ -15,7 +15,7 @@ export class ProductCoreArchiveRepository
   extends ProductCorePersistenceHost
   implements IProductCoreArchiveRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductCoreArchiveRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductCoreArchiveRepositoryPort> = {
     provide: PRODUCT_CORE_ARCHIVE_REPOSITORY_PORT,
     useClass: ProductCoreArchiveRepository,
   };

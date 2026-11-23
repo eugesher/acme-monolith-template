@@ -17,7 +17,7 @@ export class IdempotencyCoreClaimRepository
   extends IdempotencyCorePersistenceHost
   implements IIdempotencyCoreClaimRepositoryPort
 {
-  public static readonly provider: ClassProvider<IIdempotencyCoreClaimRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IIdempotencyCoreClaimRepositoryPort> = {
     provide: IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
     useClass: IdempotencyCoreClaimRepository,
   };

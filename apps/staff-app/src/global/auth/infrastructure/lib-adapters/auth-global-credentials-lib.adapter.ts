@@ -7,7 +7,7 @@ import { AUTH_GLOBAL_CREDENTIALS_PORT, type IAuthGlobalCredentialsPort } from '.
 
 @Injectable()
 export class AuthGlobalCredentialsLibAdapter implements IAuthGlobalCredentialsPort {
-  public static readonly provider: ClassProvider<IAuthGlobalCredentialsPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthGlobalCredentialsPort> = {
     provide: AUTH_GLOBAL_CREDENTIALS_PORT,
     useClass: AuthGlobalCredentialsLibAdapter,
   };

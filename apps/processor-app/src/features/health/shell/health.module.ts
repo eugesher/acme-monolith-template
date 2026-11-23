@@ -10,6 +10,6 @@ import { HealthController } from './health.controller';
 @Module({
   imports: [HealthLibModule.forRoot(AppNameEnum.PROCESSOR_APP)],
   controllers: [HealthController],
-  providers: [HealthLivenessUseCase, HealthReadinessUseCase, HealthStatusLibAdapter.provider],
+  providers: [HealthLivenessUseCase, HealthReadinessUseCase, HealthStatusLibAdapter.PROVIDER],
 })
 export class HealthModule {}

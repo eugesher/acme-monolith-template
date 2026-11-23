@@ -13,7 +13,7 @@ export class ProductGetManyRepository
   extends ProductPersistenceHost
   implements IProductGetManyRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductGetManyRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductGetManyRepositoryPort> = {
     provide: PRODUCT_GET_MANY_REPOSITORY_PORT,
     useClass: ProductGetManyRepository,
   };

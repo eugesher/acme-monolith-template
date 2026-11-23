@@ -6,7 +6,7 @@ import { NOTE_TRANSACTION_PORT, type INoteTransactionPort } from '../../../outbo
 
 @Injectable()
 export class NoteTransactionAdapter implements INoteTransactionPort {
-  public static readonly provider: ClassProvider<INoteTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<INoteTransactionPort> = {
     provide: NOTE_TRANSACTION_PORT,
     useClass: NoteTransactionAdapter,
   };

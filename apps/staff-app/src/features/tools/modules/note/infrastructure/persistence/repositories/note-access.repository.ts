@@ -12,7 +12,7 @@ import { NotePersistenceHost } from '../host/note-persistence.host';
 
 @Injectable()
 export class NoteAccessRepository extends NotePersistenceHost implements INoteAccessRepositoryPort {
-  public static readonly provider: ClassProvider<INoteAccessRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<INoteAccessRepositoryPort> = {
     provide: NOTE_ACCESS_REPOSITORY_PORT,
     useClass: NoteAccessRepository,
   };

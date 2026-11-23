@@ -23,9 +23,9 @@ export class HealthLibModule {
         } satisfies ClassProvider<IHealthLibPort>,
         HealthLibCheckLivenessUseCase,
         HealthLibCheckReadinessUseCase,
-        HealthLibDependencyProbeAdapter.provider,
+        HealthLibDependencyProbeAdapter.PROVIDER,
         HealthLibAppNameProvider.provide(appName),
-        HealthLibUptimeAdapter.provider,
+        HealthLibUptimeAdapter.PROVIDER,
       ],
     };
   }

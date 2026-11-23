@@ -9,7 +9,7 @@ import {
 
 @Injectable()
 export class ProductStockPostSubtractTransactionAdapter implements IProductStockPostSubtractTransactionPort {
-  public static readonly provider: ClassProvider<IProductStockPostSubtractTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockPostSubtractTransactionPort> = {
     provide: PRODUCT_STOCK_POST_SUBTRACT_TRANSACTION_PORT,
     useClass: ProductStockPostSubtractTransactionAdapter,
   };

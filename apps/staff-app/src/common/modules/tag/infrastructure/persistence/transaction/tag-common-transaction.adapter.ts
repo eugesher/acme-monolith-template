@@ -6,7 +6,7 @@ import { TAG_COMMON_TRANSACTION_PORT, type ITagCommonTransactionPort } from '../
 
 @Injectable()
 export class TagCommonTransactionAdapter implements ITagCommonTransactionPort {
-  public static readonly provider: ClassProvider<ITagCommonTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagCommonTransactionPort> = {
     provide: TAG_COMMON_TRANSACTION_PORT,
     useClass: TagCommonTransactionAdapter,
   };

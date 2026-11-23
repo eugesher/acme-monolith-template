@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class AuthIdentityCommonAdapter implements IAuthIdentityPort {
-  public static readonly provider: ClassProvider<IAuthIdentityPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthIdentityPort> = {
     provide: AUTH_IDENTITY_PORT,
     useClass: AuthIdentityCommonAdapter,
   };

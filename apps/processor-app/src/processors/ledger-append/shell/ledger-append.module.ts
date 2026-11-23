@@ -12,7 +12,7 @@ import { LedgerAppendProcessor } from './ledger-append.processor';
     LedgerAppendProcessor,
     LedgerAppendUseCase,
     LedgerAppendReportFailureUseCase,
-    LedgerAppendRepository.provider,
+    LedgerAppendRepository.PROVIDER,
   ],
 })
 export class LedgerAppendModule {}

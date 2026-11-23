@@ -6,6 +6,6 @@ import { LedgerController } from './ledger.controller';
 
 @Module({
   controllers: [LedgerController],
-  providers: [LedgerListEntriesUseCase, LedgerListEntriesRepository.provider],
+  providers: [LedgerListEntriesUseCase, LedgerListEntriesRepository.PROVIDER],
 })
 export class LedgerModule {}

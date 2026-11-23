@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 export class HealthLibDependencyProbeAdapter implements IHealthLibDependencyProbePort {
-  public static readonly provider: ClassProvider<IHealthLibDependencyProbePort> = {
+  public static readonly PROVIDER: ClassProvider<IHealthLibDependencyProbePort> = {
     provide: HEALTH_LIB_DEPENDENCY_PROBE_PORT,
     useClass: HealthLibDependencyProbeAdapter,
   };

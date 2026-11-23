@@ -19,7 +19,7 @@ import {
 
 @Injectable()
 export class ProductStockIdempotencyCoreAdapter implements IProductStockIdempotencyPort {
-  public static readonly provider: ClassProvider<IProductStockIdempotencyPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockIdempotencyPort> = {
     provide: PRODUCT_STOCK_IDEMPOTENCY_PORT,
     useClass: ProductStockIdempotencyCoreAdapter,
   };

@@ -11,7 +11,7 @@ import { IdempotencyPurgeQueue, type IIdempotencyPurgeQueuePayload } from '../..
 
 @Injectable()
 export class IdempotencyPurgeScheduleQueueAdapter implements IIdempotencyPurgeSchedulePort {
-  public static readonly provider: ClassProvider<IIdempotencyPurgeSchedulePort> = {
+  public static readonly PROVIDER: ClassProvider<IIdempotencyPurgeSchedulePort> = {
     provide: IDEMPOTENCY_PURGE_SCHEDULE_PORT,
     useClass: IdempotencyPurgeScheduleQueueAdapter,
   };

@@ -13,7 +13,7 @@ export class OrderGetManyRepository
   extends OrderPersistenceHost
   implements IOrderGetManyRepositoryPort
 {
-  public static readonly provider: ClassProvider<IOrderGetManyRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderGetManyRepositoryPort> = {
     provide: ORDER_GET_MANY_REPOSITORY_PORT,
     useClass: OrderGetManyRepository,
   };

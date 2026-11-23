@@ -26,12 +26,12 @@ import { OrderController } from './order.controller';
     OrderGetOneUseCase,
     OrderGetTagsUseCase,
     OrderReplaceTagsUseCase,
-    OrderGetManyRepository.provider,
-    OrderGetOneRepository.provider,
-    OrderGetTagsRepository.provider,
-    OrderReplaceTagsRepository.provider,
-    OrderTagCommonAdapter.provider,
-    OrderTransactionAdapter.provider,
+    OrderGetManyRepository.PROVIDER,
+    OrderGetOneRepository.PROVIDER,
+    OrderGetTagsRepository.PROVIDER,
+    OrderReplaceTagsRepository.PROVIDER,
+    OrderTagCommonAdapter.PROVIDER,
+    OrderTransactionAdapter.PROVIDER,
   ],
 })
 export class OrderModule {}

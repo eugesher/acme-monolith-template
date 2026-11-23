@@ -4,7 +4,7 @@ import { HEALTH_LIB_UPTIME_PORT, type IHealthLibUptimePort } from '../../outboun
 
 @Injectable()
 export class HealthLibUptimeAdapter implements IHealthLibUptimePort {
-  public static readonly provider: ClassProvider<IHealthLibUptimePort> = {
+  public static readonly PROVIDER: ClassProvider<IHealthLibUptimePort> = {
     provide: HEALTH_LIB_UPTIME_PORT,
     useClass: HealthLibUptimeAdapter,
   };

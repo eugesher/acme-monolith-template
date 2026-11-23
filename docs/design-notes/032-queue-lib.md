@@ -19,7 +19,7 @@ export class LedgerQueue {
 ```
 
 **A queue is registered by the module root that binds its adapter.** A queue adapter of
-`infrastructure/queue` carries its binding in a static `provider` (see `031-static-provider.md`),
+`infrastructure/queue` carries its binding in a static `PROVIDER` (see `031-static-provider.md`),
 and the module root imports the registration next to it: `LedgerCoreModule`,
 `ProductStockCoreModule` and `QueueModule` of staff-app mount registrations of `@acme-core/queues`,
 `IdempotencyPurgeModule` the one of its `queues/`. Registering the queue and binding the adapter sit

@@ -161,6 +161,11 @@ uses on purpose:
 - `no-confusing-void-expression` allows an arrow shorthand, as in `expect(() => model.assert())`;
 - `no-invalid-void-type` allows `this: void` on a static method passed as a callback.
 
+`naming-convention` names three kinds: an interface is `I<Name>`, an enum `<Name>Enum`, and a
+`static readonly` property of a class is UPPER_CASE, as `NAME`, `STATUS`, `MAX_PAGE` and the
+`PROVIDER` of an adapter (see `031-static-provider.md`): a constant of a class reads as a constant
+wherever it is used.
+
 A spec asserts that a `void` method resolves with `await expect(call).resolves.toBeUndefined()`, not
 by keeping its result. Where a declared type is narrower than the runtime value, such as the CLS id,
 `PinoLogger.root` before the logger starts or `JSON.stringify(undefined)`, the value is widened with

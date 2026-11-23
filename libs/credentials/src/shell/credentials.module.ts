@@ -30,8 +30,8 @@ export class CredentialsModule {
         CredentialsVerifyAccessTokenUseCase,
         CredentialsHashPasswordUseCase,
         CredentialsVerifyPasswordUseCase,
-        CredentialsAccessTokenAdapter.provider,
-        CredentialsPasswordHasherAdapter.provider,
+        CredentialsAccessTokenAdapter.PROVIDER,
+        CredentialsPasswordHasherAdapter.PROVIDER,
       ],
     };
   }

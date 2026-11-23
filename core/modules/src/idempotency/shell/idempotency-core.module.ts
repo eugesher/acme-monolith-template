@@ -24,9 +24,9 @@ import { IdempotencyCoreFacade } from './idempotency-core.facade';
     IdempotencyCoreClaimUseCase,
     IdempotencyCoreCompleteUseCase,
     IdempotencyCoreReleaseUseCase,
-    IdempotencyCoreClaimRepository.provider,
-    IdempotencyCoreCompleteRepository.provider,
-    IdempotencyCoreReleaseRepository.provider,
+    IdempotencyCoreClaimRepository.PROVIDER,
+    IdempotencyCoreCompleteRepository.PROVIDER,
+    IdempotencyCoreReleaseRepository.PROVIDER,
   ],
 })
 export class IdempotencyCoreModule {}

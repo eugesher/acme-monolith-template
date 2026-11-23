@@ -13,7 +13,7 @@ import { CredentialsPasswordHasherSemaphore } from './credentials-password-hashe
 
 @Injectable()
 export class CredentialsPasswordHasherAdapter implements ICredentialsPasswordHasherPort {
-  public static readonly provider: ClassProvider<ICredentialsPasswordHasherPort> = {
+  public static readonly PROVIDER: ClassProvider<ICredentialsPasswordHasherPort> = {
     provide: CREDENTIALS_PASSWORD_HASHER_PORT,
     useClass: CredentialsPasswordHasherAdapter,
   };

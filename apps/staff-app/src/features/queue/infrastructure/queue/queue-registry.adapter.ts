@@ -17,7 +17,7 @@ import {
 
 @Injectable()
 export class QueueRegistryAdapter implements IQueueRegistryPort {
-  public static readonly provider: ClassProvider<IQueueRegistryPort> = {
+  public static readonly PROVIDER: ClassProvider<IQueueRegistryPort> = {
     provide: QUEUE_REGISTRY_PORT,
     useClass: QueueRegistryAdapter,
   };

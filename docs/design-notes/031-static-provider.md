@@ -12,7 +12,7 @@ binding.
 ```ts
 @Injectable()
 export class OrderIdempotencyCoreAdapter implements IOrderIdempotencyPort {
-  public static readonly provider: ClassProvider<IOrderIdempotencyPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderIdempotencyPort> = {
     provide: ORDER_IDEMPOTENCY_PORT,
     useClass: OrderIdempotencyCoreAdapter,
   };
@@ -20,7 +20,7 @@ export class OrderIdempotencyCoreAdapter implements IOrderIdempotencyPort {
 ```
 
 ```ts
-providers: [OrderGetManyRepository.provider, OrderIdempotencyCoreAdapter.provider],
+providers: [OrderGetManyRepository.PROVIDER, OrderIdempotencyCoreAdapter.PROVIDER],
 ```
 
 **Every class of `infrastructure/` that implements a port carries the field**: repositories, core,
@@ -33,13 +33,13 @@ check that `useClass` implements the port. A bare `{ provide, useClass }` in the
 `ClassProvider<any>`, so a token bound to the wrong class fails only when Nest resolves it.
 
 **The binding lives with the implementation.** The class imports the token from the same `outbound`
-barrel as its port, so the module root lists `X.provider` and does not import the token. Together
+barrel as its port, so the module root lists `X.PROVIDER` and does not import the token. Together
 with the config values of `infrastructure/config` (see `030-config-values.md`), this leaves the
 module root with no use of `outbound`, and lint does not allow it.
 
 **A decorated class may name itself in a static initializer.** TypeScript aliases a decorated class
 and sets the alias in a static block that runs before the other static fields, so `useClass` is the
-class and not `undefined`. The SWC build of rspack defines `provider` right after the class and
+class and not `undefined`. The SWC build of rspack defines `PROVIDER` right after the class and
 before the decorators run. `@Injectable()` returns the class it decorates, so the metadata of DI
 lands on the object that `useClass` holds.
 
@@ -51,7 +51,7 @@ lands on the object that `useClass` holds.
   exported port. `implements` checks that the facade answers its port, not that the token is the
   token of that port, so the literal is
   `{ provide, useClass } satisfies ClassProvider<I<Module><Layer>Port>`: a facade bound under the
-  token of another port does not compile, as `ClassProvider<IPort>` makes `.provider` checked.
+  token of another port does not compile, as `ClassProvider<IPort>` makes `.PROVIDER` checked.
 - **The facades of `libs/database` and `libs/local-storage`** (`OrmFacade`,
   `LocalStorageTransactionalFacade`) are bound under the contract tokens `ORM_PORT` and
   `TRANSACTION_PORT` by `OrmModule` and `LocalStorageTransactionalModule` of their libs, next to the

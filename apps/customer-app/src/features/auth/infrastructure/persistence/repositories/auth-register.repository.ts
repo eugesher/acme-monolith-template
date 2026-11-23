@@ -16,7 +16,7 @@ export class AuthRegisterRepository
   extends AuthPersistenceHost
   implements IAuthRegisterRepositoryPort
 {
-  public static readonly provider: ClassProvider<IAuthRegisterRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthRegisterRepositoryPort> = {
     provide: AUTH_REGISTER_REPOSITORY_PORT,
     useClass: AuthRegisterRepository,
   };

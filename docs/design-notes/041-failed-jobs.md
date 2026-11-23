@@ -14,7 +14,7 @@ two apps meet in one Redis.
 
 **A queue is read, not processed.** `QueueModule` mounts `LedgerQueue.register()` and
 `ProductStockPostSubtractQueue.register()` of `@acme-core/queues` next to
-`QueueRegistryAdapter.provider` (see `032-queue-lib.md`), and the adapter injects both queues. A
+`QueueRegistryAdapter.PROVIDER` (see `032-queue-lib.md`), and the adapter injects both queues. A
 BullMQ queue without a worker reads and moves jobs and runs none, so staff-app takes no job from
 processor-app.
 

@@ -7,7 +7,7 @@ import { ORM_HOST_PORT, type IOrmHostPort } from '../../outbound';
 
 @Injectable()
 export class OrmHostAdapter implements IOrmHostPort {
-  public static readonly provider: ClassProvider<IOrmHostPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrmHostPort> = {
     provide: ORM_HOST_PORT,
     useClass: OrmHostAdapter,
   };

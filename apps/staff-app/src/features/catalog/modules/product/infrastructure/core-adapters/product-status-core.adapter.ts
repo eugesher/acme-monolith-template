@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 export class ProductStatusCoreAdapter implements IProductStatusPort {
-  public static readonly provider: ClassProvider<IProductStatusPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStatusPort> = {
     provide: PRODUCT_STATUS_PORT,
     useClass: ProductStatusCoreAdapter,
   };

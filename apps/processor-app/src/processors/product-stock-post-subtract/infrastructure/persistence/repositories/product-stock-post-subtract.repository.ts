@@ -12,7 +12,7 @@ export class ProductStockPostSubtractRepository
   extends ProductStockPostSubtractPersistenceHost
   implements IProductStockPostSubtractRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductStockPostSubtractRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockPostSubtractRepositoryPort> = {
     provide: PRODUCT_STOCK_POST_SUBTRACT_REPOSITORY_PORT,
     useClass: ProductStockPostSubtractRepository,
   };

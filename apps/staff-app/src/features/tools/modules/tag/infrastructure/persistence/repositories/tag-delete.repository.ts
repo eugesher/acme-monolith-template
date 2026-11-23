@@ -5,7 +5,7 @@ import { TagPersistenceHost } from '../host/tag-persistence.host';
 
 @Injectable()
 export class TagDeleteRepository extends TagPersistenceHost implements ITagDeleteRepositoryPort {
-  public static readonly provider: ClassProvider<ITagDeleteRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagDeleteRepositoryPort> = {
     provide: TAG_DELETE_REPOSITORY_PORT,
     useClass: TagDeleteRepository,
   };

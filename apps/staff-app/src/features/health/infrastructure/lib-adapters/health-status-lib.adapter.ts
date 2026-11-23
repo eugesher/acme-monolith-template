@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class HealthStatusLibAdapter implements IHealthStatusPort {
-  public static readonly provider: ClassProvider<IHealthStatusPort> = {
+  public static readonly PROVIDER: ClassProvider<IHealthStatusPort> = {
     provide: HEALTH_STATUS_PORT,
     useClass: HealthStatusLibAdapter,
   };

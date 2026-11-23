@@ -83,7 +83,7 @@ The queue lives in `queues/` of the module, next to its layers: no other module 
 `register()`, which hands the name to `BullSetupModule.registerQueue`. The type of its job data,
 `IIdempotencyPurgeQueuePayload` of `queues/types`, is `Record<string, never>`: the job carries no
 data, and an add with any field does not compile. `IdempotencyPurgeModule` imports
-`IdempotencyPurgeQueue.register()` and binds `IdempotencyPurgeScheduleQueueAdapter.provider` to
+`IdempotencyPurgeQueue.register()` and binds `IdempotencyPurgeScheduleQueueAdapter.PROVIDER` to
 `IDEMPOTENCY_PURGE_SCHEDULE_PORT` (see `031-static-provider.md`); the processor takes
 `IdempotencyPurgeQueue.NAME` for `@Processor`, and the adapter for `@InjectQueue` and the id of its
 scheduler. Lint lets `shell/` and `infrastructure/queue` reach `queues/`, and no other layer (see

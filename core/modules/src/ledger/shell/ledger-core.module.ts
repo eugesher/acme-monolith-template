@@ -20,7 +20,7 @@ import { LedgerCoreFacade } from './ledger-core.facade';
       useClass: LedgerCoreFacade,
     } satisfies ClassProvider<ILedgerCorePort>,
     LedgerCoreEnqueueUseCase,
-    LedgerCoreQueueAdapter.provider,
+    LedgerCoreQueueAdapter.PROVIDER,
     LedgerCoreConfigRedisCommandTimeoutMsProvider,
     LedgerCoreConfigEnqueueRetryAttemptsProvider,
   ],

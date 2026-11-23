@@ -6,7 +6,7 @@ import { PRODUCT_CORE_TRANSACTION_PORT, type IProductCoreTransactionPort } from 
 
 @Injectable()
 export class ProductCoreTransactionAdapter implements IProductCoreTransactionPort {
-  public static readonly provider: ClassProvider<IProductCoreTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductCoreTransactionPort> = {
     provide: PRODUCT_CORE_TRANSACTION_PORT,
     useClass: ProductCoreTransactionAdapter,
   };

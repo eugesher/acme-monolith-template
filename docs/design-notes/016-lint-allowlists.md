@@ -131,7 +131,7 @@ edges exist for it:
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
   `@nestjs/bullmq`, `bullmq` and its own contracts.
 - **The module root registers the queue of its adapter** with `<Queue>.register()` of
-  `@acme-core/queues`, next to `<Adapter>.provider`, and takes neither `libs/queue` nor BullMQ
+  `@acme-core/queues`, next to `<Adapter>.PROVIDER`, and takes neither `libs/queue` nor BullMQ
   itself; `infrastructure/queue` takes the queue for its `NAME` and never `libs/queue`. A core
   module is mounted by features of several apps, so the queue comes with it rather than with each
   app.
@@ -208,7 +208,7 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `cache`, `database`, `http`, `local-storage`, `observability` and `queue`, and `@nestjs/core` for
   `APP_PIPE` and `APP_FILTER`; `bootstrap/` takes `observability`, `openapi`, `@nestjs/config` and
   `nestjs-pino` to start the app (see `012-app-bootstrap.md`).
-- **A module root binds no token.** An adapter carries its binding in a static `provider` (see
+- **A module root binds no token.** An adapter carries its binding in a static `PROVIDER` (see
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
   module may reach neither its own `outbound` nor `@acme-libs/config`. Only `infrastructure/config`,

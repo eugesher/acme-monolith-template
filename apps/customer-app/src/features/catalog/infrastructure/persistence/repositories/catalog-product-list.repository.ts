@@ -13,7 +13,7 @@ export class CatalogProductListRepository
   extends CatalogPersistenceHost
   implements ICatalogProductListRepositoryPort
 {
-  public static readonly provider: ClassProvider<ICatalogProductListRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ICatalogProductListRepositoryPort> = {
     provide: CATALOG_PRODUCT_LIST_REPOSITORY_PORT,
     useClass: CatalogProductListRepository,
   };

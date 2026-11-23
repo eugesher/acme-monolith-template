@@ -13,7 +13,7 @@ export class ProductStockCoreMoveRepository
   extends ProductStockCoreBaseRepository
   implements IProductStockCoreMoveRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductStockCoreMoveRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockCoreMoveRepositoryPort> = {
     provide: PRODUCT_STOCK_CORE_MOVE_REPOSITORY_PORT,
     useClass: ProductStockCoreMoveRepository,
   };

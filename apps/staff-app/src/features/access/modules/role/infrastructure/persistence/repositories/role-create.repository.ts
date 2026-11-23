@@ -14,7 +14,7 @@ import { RolePersistenceHost } from '../host/role-persistence.host';
 
 @Injectable()
 export class RoleCreateRepository extends RolePersistenceHost implements IRoleCreateRepositoryPort {
-  public static readonly provider: ClassProvider<IRoleCreateRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IRoleCreateRepositoryPort> = {
     provide: ROLE_CREATE_REPOSITORY_PORT,
     useClass: RoleCreateRepository,
   };

@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class CatalogCacheAdapter implements ICatalogCachePort {
-  public static readonly provider: ClassProvider<ICatalogCachePort> = {
+  public static readonly PROVIDER: ClassProvider<ICatalogCachePort> = {
     provide: CATALOG_CACHE_PORT,
     useClass: CatalogCacheAdapter,
   };

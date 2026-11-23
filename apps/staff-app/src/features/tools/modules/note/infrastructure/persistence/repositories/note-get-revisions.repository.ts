@@ -13,7 +13,7 @@ export class NoteGetRevisionsRepository
   extends NotePersistenceHost
   implements INoteGetRevisionsRepositoryPort
 {
-  public static readonly provider: ClassProvider<INoteGetRevisionsRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<INoteGetRevisionsRepositoryPort> = {
     provide: NOTE_GET_REVISIONS_REPOSITORY_PORT,
     useClass: NoteGetRevisionsRepository,
   };

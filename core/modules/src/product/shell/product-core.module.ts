@@ -21,10 +21,10 @@ import { ProductCoreFacade } from './product-core.facade';
       useClass: ProductCoreFacade,
     } satisfies ClassProvider<IProductCorePort>,
     ProductCoreArchiveUseCase,
-    ProductCoreArchiveRepository.provider,
-    ProductCoreCatalogCacheAdapter.provider,
-    ProductCoreLedgerCoreAdapter.provider,
-    ProductCoreTransactionAdapter.provider,
+    ProductCoreArchiveRepository.PROVIDER,
+    ProductCoreCatalogCacheAdapter.PROVIDER,
+    ProductCoreLedgerCoreAdapter.PROVIDER,
+    ProductCoreTransactionAdapter.PROVIDER,
   ],
 })
 export class ProductCoreModule {}

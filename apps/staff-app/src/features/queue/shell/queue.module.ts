@@ -21,7 +21,7 @@ import { QueueController } from './queue.controller';
     QueueRetryFailedJobUseCase,
     QueueDeleteFailedJobUseCase,
     QueueFailedJobService,
-    QueueRegistryAdapter.provider,
+    QueueRegistryAdapter.PROVIDER,
   ],
 })
 export class QueueModule {}

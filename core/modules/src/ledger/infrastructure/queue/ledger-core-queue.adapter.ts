@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class LedgerCoreQueueAdapter implements ILedgerCoreQueuePort {
-  public static readonly provider: ClassProvider<ILedgerCoreQueuePort> = {
+  public static readonly PROVIDER: ClassProvider<ILedgerCoreQueuePort> = {
     provide: LEDGER_CORE_QUEUE_PORT,
     useClass: LedgerCoreQueueAdapter,
   };

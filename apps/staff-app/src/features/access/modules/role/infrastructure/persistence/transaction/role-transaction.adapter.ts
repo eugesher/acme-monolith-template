@@ -6,7 +6,7 @@ import { ROLE_TRANSACTION_PORT, type IRoleTransactionPort } from '../../../outbo
 
 @Injectable()
 export class RoleTransactionAdapter implements IRoleTransactionPort {
-  public static readonly provider: ClassProvider<IRoleTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IRoleTransactionPort> = {
     provide: ROLE_TRANSACTION_PORT,
     useClass: RoleTransactionAdapter,
   };

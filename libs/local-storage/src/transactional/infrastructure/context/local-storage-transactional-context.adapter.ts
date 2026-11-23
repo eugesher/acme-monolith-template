@@ -10,7 +10,7 @@ import {
 
 @Injectable()
 export class LocalStorageTransactionalContextAdapter implements ILocalStorageTransactionalContextPort {
-  public static readonly provider: ClassProvider<ILocalStorageTransactionalContextPort> = {
+  public static readonly PROVIDER: ClassProvider<ILocalStorageTransactionalContextPort> = {
     provide: LOCAL_STORAGE_TRANSACTIONAL_CONTEXT_PORT,
     useClass: LocalStorageTransactionalContextAdapter,
   };

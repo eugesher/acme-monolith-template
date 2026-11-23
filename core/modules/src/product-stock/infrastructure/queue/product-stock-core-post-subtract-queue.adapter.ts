@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class ProductStockCorePostSubtractQueueAdapter implements IProductStockCorePostSubtractPort {
-  public static readonly provider: ClassProvider<IProductStockCorePostSubtractPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockCorePostSubtractPort> = {
     provide: PRODUCT_STOCK_CORE_POST_SUBTRACT_PORT,
     useClass: ProductStockCorePostSubtractQueueAdapter,
   };

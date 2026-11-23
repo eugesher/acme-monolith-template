@@ -15,7 +15,7 @@ import {
 
 @Injectable()
 export class ProductStockPostSubtractArchiveCoreAdapter implements IProductStockPostSubtractArchivePort {
-  public static readonly provider: ClassProvider<IProductStockPostSubtractArchivePort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockPostSubtractArchivePort> = {
     provide: PRODUCT_STOCK_POST_SUBTRACT_ARCHIVE_PORT,
     useClass: ProductStockPostSubtractArchiveCoreAdapter,
   };

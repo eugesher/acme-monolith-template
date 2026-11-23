@@ -14,7 +14,7 @@ export class OrderReplaceTagsRepository
   extends OrderPersistenceHost
   implements IOrderReplaceTagsRepositoryPort
 {
-  public static readonly provider: ClassProvider<IOrderReplaceTagsRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderReplaceTagsRepositoryPort> = {
     provide: ORDER_REPLACE_TAGS_REPOSITORY_PORT,
     useClass: OrderReplaceTagsRepository,
   };

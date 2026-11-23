@@ -19,11 +19,11 @@ import { ProductStockController } from './product-stock.controller';
   controllers: [ProductStockController],
   providers: [
     ProductStockAddUseCase,
-    ProductStockAddRepository.provider,
-    ProductStockIdempotencyCoreAdapter.provider,
-    ProductStockMovementCoreAdapter.provider,
-    ProductStockLedgerCoreAdapter.provider,
-    ProductStockTransactionAdapter.provider,
+    ProductStockAddRepository.PROVIDER,
+    ProductStockIdempotencyCoreAdapter.PROVIDER,
+    ProductStockMovementCoreAdapter.PROVIDER,
+    ProductStockLedgerCoreAdapter.PROVIDER,
+    ProductStockTransactionAdapter.PROVIDER,
   ],
 })
 export class ProductStockModule {}

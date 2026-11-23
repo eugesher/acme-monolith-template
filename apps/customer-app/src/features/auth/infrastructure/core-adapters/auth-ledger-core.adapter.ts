@@ -15,7 +15,7 @@ import {
 
 @Injectable()
 export class AuthLedgerCoreAdapter implements IAuthLedgerPort {
-  public static readonly provider: ClassProvider<IAuthLedgerPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthLedgerPort> = {
     provide: AUTH_LEDGER_PORT,
     useClass: AuthLedgerCoreAdapter,
   };

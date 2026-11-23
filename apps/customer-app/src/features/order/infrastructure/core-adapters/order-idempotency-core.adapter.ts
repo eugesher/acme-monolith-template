@@ -19,7 +19,7 @@ import {
 
 @Injectable()
 export class OrderIdempotencyCoreAdapter implements IOrderIdempotencyPort {
-  public static readonly provider: ClassProvider<IOrderIdempotencyPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderIdempotencyPort> = {
     provide: ORDER_IDEMPOTENCY_PORT,
     useClass: OrderIdempotencyCoreAdapter,
   };

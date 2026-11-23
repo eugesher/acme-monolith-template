@@ -80,7 +80,7 @@ export abstract class ProductPersistenceHost {
 ```
 
 **A repository declares no constructor.** It extends the host, directly or through a base
-repository, and carries only its `provider` and its methods. Nest reads the parameters of a class
+repository, and carries only its `PROVIDER` and its methods. Nest reads the parameters of a class
 through its prototype chain: TypeScript and the SWC loader of the build put `design:paramtypes` and
 the token of `@Inject` on the host, and a class without a constructor has none of its own, so the
 repository gets `ORM_PORT` from the host. A repository that needs another dependency declares its

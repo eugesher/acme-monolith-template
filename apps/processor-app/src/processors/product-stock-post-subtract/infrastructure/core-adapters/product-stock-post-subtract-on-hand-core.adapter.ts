@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class ProductStockPostSubtractOnHandCoreAdapter implements IProductStockPostSubtractOnHandPort {
-  public static readonly provider: ClassProvider<IProductStockPostSubtractOnHandPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockPostSubtractOnHandPort> = {
     provide: PRODUCT_STOCK_POST_SUBTRACT_ON_HAND_PORT,
     useClass: ProductStockPostSubtractOnHandCoreAdapter,
   };

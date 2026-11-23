@@ -14,7 +14,7 @@ export class AuthCommonFindSubjectRepository
   extends AuthCommonPersistenceHost
   implements IAuthCommonFindSubjectRepositoryPort
 {
-  public static readonly provider: ClassProvider<IAuthCommonFindSubjectRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthCommonFindSubjectRepositoryPort> = {
     provide: AUTH_COMMON_FIND_SUBJECT_REPOSITORY_PORT,
     useClass: AuthCommonFindSubjectRepository,
   };

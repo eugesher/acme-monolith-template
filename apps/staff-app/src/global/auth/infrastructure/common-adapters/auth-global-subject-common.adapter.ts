@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class AuthGlobalSubjectCommonAdapter implements IAuthGlobalSubjectPort {
-  public static readonly provider: ClassProvider<IAuthGlobalSubjectPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthGlobalSubjectPort> = {
     provide: AUTH_GLOBAL_SUBJECT_PORT,
     useClass: AuthGlobalSubjectCommonAdapter,
   };

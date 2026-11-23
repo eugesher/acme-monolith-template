@@ -15,10 +15,10 @@ import { RoleController } from './role.controller';
     RoleListUseCase,
     RoleCreateUseCase,
     RoleReassignPermissionsUseCase,
-    RoleListRepository.provider,
-    RoleCreateRepository.provider,
-    RoleReassignPermissionsRepository.provider,
-    RoleTransactionAdapter.provider,
+    RoleListRepository.PROVIDER,
+    RoleCreateRepository.PROVIDER,
+    RoleReassignPermissionsRepository.PROVIDER,
+    RoleTransactionAdapter.PROVIDER,
   ],
 })
 export class RoleModule {}

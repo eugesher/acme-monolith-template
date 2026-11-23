@@ -6,7 +6,7 @@ import { USER_CREDENTIALS_PORT, type IUserCredentialsPort } from '../../outbound
 
 @Injectable()
 export class UserCredentialsLibAdapter implements IUserCredentialsPort {
-  public static readonly provider: ClassProvider<IUserCredentialsPort> = {
+  public static readonly PROVIDER: ClassProvider<IUserCredentialsPort> = {
     provide: USER_CREDENTIALS_PORT,
     useClass: UserCredentialsLibAdapter,
   };

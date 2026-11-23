@@ -15,7 +15,7 @@ export class UserReassignRolesRepository
   extends UserPersistenceHost
   implements IUserReassignRolesRepositoryPort
 {
-  public static readonly provider: ClassProvider<IUserReassignRolesRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IUserReassignRolesRepositoryPort> = {
     provide: USER_REASSIGN_ROLES_REPOSITORY_PORT,
     useClass: UserReassignRolesRepository,
   };

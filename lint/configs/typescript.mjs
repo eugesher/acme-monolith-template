@@ -41,6 +41,11 @@ export const typescript = {
         format: ['PascalCase'],
         custom: { regex: '[A-Za-z]Enum$', match: true },
       },
+      {
+        selector: 'classProperty',
+        modifiers: ['static', 'readonly'],
+        format: ['UPPER_CASE'],
+      },
     ],
     '@typescript-eslint/promise-function-async': ['error', { checkArrowFunctions: false }],
     '@typescript-eslint/return-await': ['error', 'always'],

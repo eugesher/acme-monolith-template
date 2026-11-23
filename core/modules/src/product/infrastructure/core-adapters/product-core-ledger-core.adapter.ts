@@ -15,7 +15,7 @@ import {
 
 @Injectable()
 export class ProductCoreLedgerCoreAdapter implements IProductCoreLedgerPort {
-  public static readonly provider: ClassProvider<IProductCoreLedgerPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductCoreLedgerPort> = {
     provide: PRODUCT_CORE_LEDGER_PORT,
     useClass: ProductCoreLedgerCoreAdapter,
   };

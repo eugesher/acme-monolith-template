@@ -13,7 +13,7 @@ export class LedgerListEntriesRepository
   extends LedgerPersistenceHost
   implements ILedgerListEntriesRepositoryPort
 {
-  public static readonly provider: ClassProvider<ILedgerListEntriesRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ILedgerListEntriesRepositoryPort> = {
     provide: LEDGER_LIST_ENTRIES_REPOSITORY_PORT,
     useClass: LedgerListEntriesRepository,
   };

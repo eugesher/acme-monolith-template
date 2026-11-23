@@ -5,7 +5,7 @@ import { NotePersistenceHost } from '../host/note-persistence.host';
 
 @Injectable()
 export class NoteDeleteRepository extends NotePersistenceHost implements INoteDeleteRepositoryPort {
-  public static readonly provider: ClassProvider<INoteDeleteRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<INoteDeleteRepositoryPort> = {
     provide: NOTE_DELETE_REPOSITORY_PORT,
     useClass: NoteDeleteRepository,
   };

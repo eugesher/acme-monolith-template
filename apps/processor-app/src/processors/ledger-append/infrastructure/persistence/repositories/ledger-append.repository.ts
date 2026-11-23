@@ -19,7 +19,7 @@ export class LedgerAppendRepository
   extends LedgerAppendPersistenceHost
   implements ILedgerAppendRepositoryPort
 {
-  public static readonly provider: ClassProvider<ILedgerAppendRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ILedgerAppendRepositoryPort> = {
     provide: LEDGER_APPEND_REPOSITORY_PORT,
     useClass: LedgerAppendRepository,
   };

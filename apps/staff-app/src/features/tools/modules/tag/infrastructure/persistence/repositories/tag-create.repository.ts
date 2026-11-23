@@ -14,7 +14,7 @@ import { TagPersistenceHost } from '../host/tag-persistence.host';
 
 @Injectable()
 export class TagCreateRepository extends TagPersistenceHost implements ITagCreateRepositoryPort {
-  public static readonly provider: ClassProvider<ITagCreateRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagCreateRepositoryPort> = {
     provide: TAG_CREATE_REPOSITORY_PORT,
     useClass: TagCreateRepository,
   };
