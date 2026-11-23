@@ -16,7 +16,7 @@ describe('features', () => {
       'apps/__features-fixture__/src/features/product/domain/errors/codes/product-exception-code.enum.ts',
       'apps/__features-fixture__/src/features/product/domain/errors/exceptions/product-name-invalid.exception.ts',
       'apps/__features-fixture__/src/features/product/domain/types/index.ts',
-      'apps/__features-fixture__/src/features/product/domain/types/params/product-create.interface.ts',
+      'apps/__features-fixture__/src/features/product/domain/types/data/product-create.interface.ts',
       'apps/__features-fixture__/src/features/product/domain/models/product.model.ts',
       'apps/__features-fixture__/src/features/product/outbound/index.ts',
       'apps/__features-fixture__/src/features/product/application/index.ts',
@@ -513,7 +513,7 @@ describe('features', () => {
     it('a domain import may NOT skip the barrel of types', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/domain/models/__fixture__.ts',
-        code: 'import type { x } from "../types/params/product-create.interface";',
+        code: 'import type { x } from "../types/data/product-create.interface";',
       }).toBreakRule('no-restricted-syntax');
     });
 

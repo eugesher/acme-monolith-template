@@ -1,8 +1,8 @@
-export * from './params/note-create-candidate-init.interface';
-export * from './params/note-edit-revision-insert-payload-build.interface';
-export * from './params/note-get-many-reconstitute.interface';
-export * from './params/note-get-revisions-reconstitute.interface';
-export * from './params/note-reconstitute.interface';
+export * from './data/note-create-candidate-init.interface';
+export * from './data/note-edit-revision-insert-payload-build.interface';
+export * from './data/note-get-many-reconstitute.interface';
+export * from './data/note-get-revisions-reconstitute.interface';
+export * from './data/note-reconstitute.interface';
 
 export * from './snapshots/note-create-candidate.interface';
 export * from './snapshots/note-create-logger-payload.interface';

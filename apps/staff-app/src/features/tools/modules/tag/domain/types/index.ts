@@ -1,6 +1,6 @@
-export * from './params/tag-create-candidate-init.interface';
-export * from './params/tag-get-many-reconstitute.interface';
-export * from './params/tag-reconstitute.interface';
+export * from './data/tag-create-candidate-init.interface';
+export * from './data/tag-get-many-reconstitute.interface';
+export * from './data/tag-reconstitute.interface';
 
 export * from './snapshots/tag-create-candidate.interface';
 export * from './snapshots/tag-create-logger-payload.interface';

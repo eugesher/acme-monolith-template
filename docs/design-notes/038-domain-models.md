@@ -49,10 +49,10 @@ entity keeps its name, `createOrderProducts`. A model in another context takes i
 from others stays out (`units`, `onHand`, `nameAsRead`): the message carries the outcome, as
 `Ledger record already appended` does.
 
-**Two values of one type travel in a params object.** Positional strings swap without an error, so
+**Two values of one type travel in one object.** Positional strings swap without an error, so
 `IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` and
 `NoteEditModel.toRevisionInsertPayload({ bodyBefore, editorId, correlationId })` take one object,
-named as the params of a helper (see `029-naming.md`): `IIdempotencyCoreReleaseLoggerPayloadBuild`.
+`I<Model><Answer>Build` of `types/data`: `IIdempotencyCoreReleaseLoggerPayloadBuild`.
 
 **What stays in the use case.**
 
@@ -71,13 +71,12 @@ named as the params of a helper (see `029-naming.md`): `IIdempotencyCoreReleaseL
 
 ## Domain interfaces
 
-The interfaces of a domain lie in two folders, by the side of the model they are on. They follow the
-params and snapshots of a helper (see `029-naming.md`): a method of a model takes one params object,
-and every shape a model answers is a snapshot.
+The interfaces of a domain lie in two folders, by the side of the model they are on: `data/` holds
+what a method of a model takes, one object per method, and `snapshots/` every shape a model answers.
 
 | Folder                    | Name                                             | What it is                                                                                                                                                                                       |
 | ------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `domain/types/params/`    | `I<Model>Reconstitute`                           | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                    |
+| `domain/types/data/`      | `I<Model>Reconstitute`                           | the row a model is rebuilt from, `Model.reconstitute(record)`                                                                                                                                    |
 |                           | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                           |
 |                           | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductUpdateModel.update(changes)`                                                                                                          |
 |                           | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                            |
@@ -99,7 +98,7 @@ of what it holds: `record`, `proposal`, `changes`.
 an aggregate reads keeps the name of the aggregate, `IProductReconstitute`, `IProductSnapshot`,
 `IProductUpdatePayload`.
 
-A part of a params object is `I<Params><Part>`, unexported in the file of its params until another
+A part of a data object is `I<Data><Part>`, unexported in the file of its data object until another
 file names it: `IProductStockCoreOnHandReconstituteStockSum` is the element of `stockSums` in
 `IProductStockCoreOnHandReconstitute`. A part of a snapshot is the snapshot of its noun:
 `IOrderProductSnapshot` is an element of `IOrderSnapshot`.
@@ -129,7 +128,7 @@ An order is checked against rows the use case reads only after a lock (see
 empty request before any read, `distinctProductIds` names the rows to lock and read, counted once in
 `create` and handed `readonly` to the lock of core and the read, `assertProducts` and
 `assertStockQuantities` check what was read, `toInsertPayload()` and `createOrderProducts(orderId)`
-answer the rows to insert. Each check takes its own params, `IOrderCandidateActiveProduct` and
+answer the rows to insert. Each check takes its own data object, `IOrderCandidateActiveProduct` and
 `IOrderCandidateStockQuantity`.
 
 ## Read models

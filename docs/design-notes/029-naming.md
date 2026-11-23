@@ -20,8 +20,8 @@ A name says who or where; the action lives in the method or in the port.
 | binding of an infrastructure class | `public static readonly provider: ClassProvider<I…Port>`; a queue adapter is bound by its module (`031-static-provider.md`) | `OrderIdempotencyCoreAdapter.provider`                     |
 | provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                                                           | `ProductConfigOccRetryAttemptsProvider`                    |
 | type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                                                      | `replay-retry.options.ts`, `utility.type.ts`               |
-| params of a helper method          | `I<Subject><Action>`, `types/params/<subject>-<action>.interface.ts`                                                        | `IPageWindowClamp`, `IPageBuild`                           |
-| snapshot of a helper method        | `I<Subject>`, `types/snapshots/<subject>.interface.ts`                                                                      | `IPageWindow`, `IPage`                                     |
+| options of a helper method         | `I<Subject><Action>Options`, `<subject>-<action>.options.ts` next to the helper                                             | `IPageWindowClampOptions`, `IPageBuildOptions`             |
+| answer of a helper method          | `I<Subject>`, `<subject>.interface.ts` next to the helper                                                                   | `IPageWindow`, `IPage`                                     |
 
 **A module with one port names it after the module.** The port, its token and its facade carry the
 name of the module and its layer (`Core`, `Common`) and nothing else, so a consumer finds the facade
@@ -62,7 +62,7 @@ as in `libs/config/src/provider`, has no barrel, so a file path to it stays, and
 `libs/http/src/errors`, which holds the error body of the HTTP lib, not the exceptions of a domain.
 
 **A layer keeps its types in `types/`.** The interfaces lie in a subfolder per role, `commands/`,
-`queries/`, `records/`, `views/`, `params/` or `snapshots/`, and the enums of the same layer in
+`queries/`, `records/`, `views/`, `data/` or `snapshots/`, and the enums of the same layer in
 `types/enums/`, so the barrel of `types/` exports both and a caller imports an outcome and the
 record that carries it from one path. An enum folder with no interfaces beside it stays on its own,
 as `libs/http/src/throttle/enums`. `libs/auth` sorts its two types the same way, the request a guard
@@ -111,28 +111,28 @@ provider or a guard rather than a use case. The options of a helper take `.optio
 suffix of its syntax, `.interface.ts` or `.type.ts` (`hosted-repository.interface.ts`,
 `utility.type.ts`).
 
-**A helper method takes one params object and answers a snapshot.** The types of the method live in
-`types/params` and `types/snapshots` next to the helper, as those of `PaginationHelper` in
-`libs/toolkit/src/pagination/types`. The folder names the role, so both files end with
-`.interface.ts`.
+**A helper method takes one options object and answers a noun.** The types of the method lie next to
+the helper, as the options of every helper of `libs/toolkit` do: those of `PaginationHelper` in
+`libs/toolkit/src/pagination`.
 
-- One params interface per public method. The argument takes the name of what it holds, and `params`
-  where nothing more exact fits: `clampPageWindow(params: IPageWindowClamp)`,
-  `toPage<T>(params: IPageBuild<T>)`.
-- A params interface is `I<Subject><Action>`: what the method builds, then what it does to it, in
-  `<subject>-<action>.interface.ts`. A method whose name is not a verb takes the verb of its work:
-  `toPage` builds a page, `IPageBuild`. Subject first keeps the files of one subject together.
-- The parts of a params object are `I<Params><Part>` in the same file: the data the caller has in
-  `query`, the optional defaults and caps in `options`, as `IPageWindowClampQuery` and
-  `IPageWindowClampOptions`. A caller then hands over its own object, `{ query: command }`. A part
-  stays unexported until another file needs it; until then `IPageWindowClamp['query']` reaches it.
-- A snapshot interface is the noun of the answer, `I<Subject>`, without a role suffix, in
-  `<subject>.interface.ts`: `IPageWindow`, `IPage<T>`. Two methods with the same answer share one
-  snapshot.
-- Snapshots leave the lib through its index, because callers keep and pass them on (`IPage<T>` in
-  the views of the lists, `IPageWindow` in `CatalogProductListUseCase`). Params leave only through
-  the barrel of `types`: callers pass literals.
+- One options interface per public method, and the argument is `options`:
+  `clampPageWindow(options: IPageWindowClampOptions)`, `toPage<T>(options: IPageBuildOptions<T>)`.
+- An options interface is `I<Subject><Action>Options` in `<subject>-<action>.options.ts`: what the
+  method builds, then what it does to it. A method whose name is not a verb takes the verb of its
+  work: `toPage` builds a page, `IPageBuildOptions`. Subject first keeps the files of one subject
+  together.
+- The parts of an options object are `I<Subject><Action><Part>` in the same file: the data the
+  caller has in `query`, the optional defaults and caps in `limits`, as `IPageWindowClampQuery` and
+  `IPageWindowClampLimits`. A caller then hands over its own object, `{ query: command }`. A part
+  stays unexported until another file needs it; until then `IPageWindowClampOptions['query']`
+  reaches it.
+- The answer is the noun, `I<Subject>`, in `<subject>.interface.ts`: `IPageWindow`, `IPage<T>`. Two
+  methods with the same answer share one.
+- The answers leave the lib through its index, because callers keep and pass them on (`IPage<T>` in
+  the views of the lists, `IPageWindow` in `CatalogProductListUseCase`). The options do not: callers
+  pass literals.
 
-A layered lib keeps `commands` and `views` for the input and output of a use case or a port: a
-params interface is to a helper what a command is to a use case, a snapshot what a view is. A domain
-names its params and snapshots the same way (see `038-domain-models.md`).
+A layered lib keeps `commands` and `views` for the input and output of a use case or a port: an
+options interface is to a helper what a command is to a use case, its answer what a view is. A
+domain keeps what a model takes in `types/data` and what it answers in `types/snapshots` (see
+`038-domain-models.md`).

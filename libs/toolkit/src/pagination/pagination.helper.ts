@@ -1,18 +1,21 @@
-import type { IPage, IPageBuild, IPageWindow, IPageWindowClamp } from './types';
+import type { IPageBuildOptions } from './page-build.options';
+import type { IPageWindowClampOptions } from './page-window-clamp.options';
+import type { IPageWindow } from './page-window.interface';
+import type { IPage } from './page.interface';
 
 export class PaginationHelper {
   public static readonly MAX_PAGE = 1000;
   public static readonly MAX_LIMIT = 100;
 
-  public static clampPageWindow(params: IPageWindowClamp): IPageWindow {
-    const { query, options = {} } = params;
+  public static clampPageWindow(options: IPageWindowClampOptions): IPageWindow {
+    const { query, limits = {} } = options;
     const { page: queryPage, limit: queryLimit } = query;
     const {
       defaultPage = 1,
       defaultLimit = 20,
       maxLimit = PaginationHelper.MAX_LIMIT,
       maxPage = PaginationHelper.MAX_PAGE,
-    } = options;
+    } = limits;
     const flooredPage = Math.floor(queryPage ?? 0);
     const flooredLimit = Math.floor(queryLimit ?? 0);
     const page = flooredPage > 0 ? Math.min(flooredPage, maxPage) : defaultPage;
@@ -22,8 +25,8 @@ export class PaginationHelper {
     return { page, limit, offset };
   }
 
-  public static toPage<T>(params: IPageBuild<T>): IPage<T> {
-    const { data, page, limit, total } = params;
+  public static toPage<T>(options: IPageBuildOptions<T>): IPage<T> {
+    const { data, page, limit, total } = options;
     const count = data.length;
     const pageCount = Math.ceil(total / limit);
 

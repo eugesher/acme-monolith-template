@@ -3,14 +3,14 @@ interface IPageWindowClampQuery {
   limit?: number;
 }
 
-interface IPageWindowClampOptions {
+interface IPageWindowClampLimits {
   defaultPage?: number;
   defaultLimit?: number;
   maxLimit?: number;
   maxPage?: number;
 }
 
-export interface IPageWindowClamp {
+export interface IPageWindowClampOptions {
   query: IPageWindowClampQuery;
-  options?: IPageWindowClampOptions;
+  limits?: IPageWindowClampLimits;
 }

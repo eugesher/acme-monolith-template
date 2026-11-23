@@ -1,7 +1,7 @@
-export * from './params/product-create-candidate-init.interface';
-export * from './params/product-get-many-reconstitute.interface';
-export * from './params/product-reconstitute.interface';
-export * from './params/product-update.interface';
+export * from './data/product-create-candidate-init.interface';
+export * from './data/product-get-many-reconstitute.interface';
+export * from './data/product-reconstitute.interface';
+export * from './data/product-update.interface';
 
 export * from './snapshots/product-create-candidate.interface';
 export * from './snapshots/product-create-ledger-payload.interface';

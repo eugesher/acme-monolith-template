@@ -1,9 +1,9 @@
-export * from './params/order-candidate-active-product.interface';
-export * from './params/order-candidate-create.interface';
-export * from './params/order-candidate-stock-quantity.interface';
-export * from './params/order-get-many-reconstitute.interface';
-export * from './params/order-place-reconstitute.interface';
-export * from './params/order-reconstitute.interface';
+export * from './data/order-candidate-active-product.interface';
+export * from './data/order-candidate-create.interface';
+export * from './data/order-candidate-stock-quantity.interface';
+export * from './data/order-get-many-reconstitute.interface';
+export * from './data/order-place-reconstitute.interface';
+export * from './data/order-reconstitute.interface';
 
 export * from './snapshots/order-candidate-insert-payload.interface';
 export * from './snapshots/order-candidate-order-product.interface';

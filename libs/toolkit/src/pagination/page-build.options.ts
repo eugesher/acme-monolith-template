@@ -1,4 +1,4 @@
-export interface IPageBuild<T> {
+export interface IPageBuildOptions<T> {
   data: T[];
   page: number;
   limit: number;
