@@ -199,3 +199,20 @@ of a constructor parameter only when the parameter names no token, so a class be
 `PinoLogger` in every use case. A class in a constructor parameter without a token, in a decorated
 property or in the signature of a decorated method stays a value import: DI, Swagger,
 `ValidationPipe` and TypeORM read it there.
+
+## Module-level const types
+
+A module-level `const` that holds a call result states its type: the call hides what it returns, as
+`ConfigValueProvider.provide` hides `FactoryProvider<number>` and `BullSetupModule.registerQueue`
+hides `DynamicModule`. The selector of `lint/syntax/module-const-type.selectors.mjs` reports a
+`const` at the top of a module, exported or not, whose initializer is a call or an `await` and whose
+name has no type. The source config, the specs and the plain node scripts carry it, since each of
+them sets its own `no-restricted-syntax`.
+
+The type stays inferred where the initializer shows it: a literal, an array or object literal, a
+`new` expression, an arrow function with a typed signature, a cast with `as`, a destructured name. A
+`const` inside a function is inferred too. Two calls are exempt: `Symbol(…)` gives a token the type
+`unique symbol`, which an annotation would widen to `symbol`, and `createParamDecorator(…)` answers
+the signature of a Nest parameter decorator, which an annotation would only copy. The entity list of
+`app/setup/entities` is an array literal, yet it states `TypeOrmModuleOptions['entities']`, the type
+of the options it is passed into; it is the one file of `app/` that takes `@nestjs/typeorm`.

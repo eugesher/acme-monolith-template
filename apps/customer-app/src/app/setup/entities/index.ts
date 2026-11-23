@@ -1,4 +1,4 @@
-import type { Type } from '@nestjs/common';
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import {
   Customer,
@@ -9,7 +9,7 @@ import {
   ProductStock,
 } from '@acme-core/entities';
 
-export const entities: Type[] = [
+export const entities: TypeOrmModuleOptions['entities'] = [
   Customer,
   IdempotencyKey,
   Order,

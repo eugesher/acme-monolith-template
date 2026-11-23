@@ -1,4 +1,4 @@
-import type { Type } from '@nestjs/common';
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import {
   Customer,
@@ -17,7 +17,7 @@ import {
 } from '@acme-staff/common/entities';
 import { Note, NoteRevision, SubjectTag, Tag } from '@acme-staff/common/entities';
 
-export const entities: Type[] = [
+export const entities: TypeOrmModuleOptions['entities'] = [
   Customer,
   IdempotencyKey,
   LedgerEntry,

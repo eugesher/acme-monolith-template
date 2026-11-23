@@ -13,13 +13,13 @@ interface IMigrationEnv {
   DATABASE_SSL_CA: string;
 }
 
-const directory = join(import.meta.dirname, '../../env/migrations');
+const directory: string = join(import.meta.dirname, '../../env/migrations');
 const isTest = process.env.NODE_ENV === 'test';
 const envFile = isTest ? '.env.test' : '.env';
 
 dotenv.config({ path: join(directory, envFile), override: isTest, quiet: true });
 
-const schema = Joi.object<IMigrationEnv>({
+const schema: Joi.ObjectSchema<IMigrationEnv> = Joi.object<IMigrationEnv>({
   DATABASE_HOST: Joi.string().hostname().required(),
   DATABASE_PORT: Joi.number().port().min(1).required(),
   DATABASE_USER: Joi.string().required(),
@@ -27,7 +27,7 @@ const schema = Joi.object<IMigrationEnv>({
   DATABASE_NAME: Joi.string().required(),
   DATABASE_SSL_CA: Joi.string().allow('').required(),
 }).unknown();
-const result = schema.validate(process.env);
+const result: Joi.ValidationResult<IMigrationEnv> = schema.validate(process.env);
 
 if (result.error) {
   throw new Error(`Config validation error: ${result.error.message}`);
@@ -35,7 +35,7 @@ if (result.error) {
 
 const env: IMigrationEnv = result.value;
 
-const migrations = join(import.meta.dirname, '../snapshots/*.ts');
+const migrations: string = join(import.meta.dirname, '../snapshots/*.ts');
 const ssl =
   env.DATABASE_SSL_CA === '' ? undefined : { ca: readFileSync(env.DATABASE_SSL_CA, 'utf8') };
 

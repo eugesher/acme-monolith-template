@@ -1,6 +1,7 @@
 import jestPlugin from 'eslint-plugin-jest';
 
 import { barrelBypassSelectors } from '../syntax/barrel-bypass.selectors.mjs';
+import { moduleConstTypeSelectors } from '../syntax/module-const-type.selectors.mjs';
 
 export const specs = {
   files: [
@@ -22,6 +23,6 @@ export const specs = {
     'jest/no-disabled-tests': 'error',
     'jest/unbound-method': 'error',
     'jest/valid-expect': ['error', { asyncMatchers: ['toBreakRule', 'toPassArchitectureLint'] }],
-    'no-restricted-syntax': ['error', ...barrelBypassSelectors],
+    'no-restricted-syntax': ['error', ...barrelBypassSelectors, ...moduleConstTypeSelectors],
   },
 };

@@ -32,14 +32,18 @@ export const acmeApp = [
   ]),
   from('acme-app:app:setup', [
     to('acme-app:app', own('app')),
+    to('acme-app:app:entities', own('app')),
     baseLibs('app', 'credentials'),
     packages('@nestjs/common'),
+  ]),
+  from('acme-app:app:entities', [
+    to('acme-core:entities'),
+    to('acme-app:common:entities', own('app')),
+    packages('@nestjs/typeorm'),
   ]),
   from('acme-app:app', [
     to('acme-app:app', own('app')),
     ...appIndexes,
-    to('acme-core:entities'),
-    to('acme-app:common:entities', own('app')),
     baseLibs('config'),
     packages('@nestjs/common', '@nestjs/config', 'joi'),
   ]),

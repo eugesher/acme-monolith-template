@@ -192,7 +192,8 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   and handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import
   `@nestjs/typeorm`; `TypeOrmModule.forFeature` would add repository tokens that nothing injects.
   `libs/app` takes `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to
-  `OrmModule`.
+  `OrmModule`. The entity list is the category `acme-app:app:entities`: it alone in `app/` reaches
+  the core and app entities, and it takes the same type from `@nestjs/typeorm`.
 - **One file sets an app up.** `app/setup/app-setup.module.ts` is the category `acme-app:app:setup`:
   it may import `@acme-libs/app`, `@acme-libs/credentials`, the base libs, the files of its own
   `app/` and `@nestjs/common`. `AppModule` reaches only that file, the indexes of the features,

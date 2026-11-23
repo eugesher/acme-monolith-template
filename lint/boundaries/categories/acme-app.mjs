@@ -25,6 +25,7 @@ export const acmeApp = [
   ['acme-app:app:index', 'apps/*/src/app/index.ts', ['app']],
   ['acme-app:app:module', 'apps/*/src/app/shell/app.module.ts', ['app']],
   ['acme-app:app:setup', 'apps/*/src/app/setup/app-setup.module.ts', ['app']],
+  ['acme-app:app:entities', 'apps/*/src/app/setup/entities/**', ['app']],
   ['acme-app:app', 'apps/*/src/app/**', ['app']],
   ['acme-app:common:modules:domain', 'apps/*/src/common/modules/*/domain/**', ['app', 'module']],
   [
