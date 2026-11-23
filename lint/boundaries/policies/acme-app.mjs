@@ -60,7 +60,8 @@ export const acmeApp = [
     to('acme-app:common:shared', own('app')),
   ]),
   from('acme-app:common:shared:module:index', [to('acme-app:common:shared', own('app'))]),
-  from('acme-app:global:index', [to('acme-app:global:shell', { ...own('app'), module: '*' })]),
+  from('acme-app:global:index', [to('acme-app:global:module:index', own('app'))]),
+  from('acme-app:global:module:index', [to('acme-app:global:shell', own('app', 'module'))]),
   from('acme-app:global:outbound', [
     to('acme-app:global:outbound', own('app', 'module')),
     baseLibs(),

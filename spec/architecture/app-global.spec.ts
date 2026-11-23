@@ -7,6 +7,7 @@ describe('global modules (global/) — modules without controllers', () => {
   beforeAll(() => {
     scaffold = Scaffold.create([
       'apps/__global-fixture__/src/global/index.ts',
+      'apps/__global-fixture__/src/global/auth/index.ts',
       'apps/__global-fixture__/src/global/auth/shell/auth.module.ts',
       'apps/__global-fixture__/src/global/auth/infrastructure/index.ts',
       'apps/__global-fixture__/src/global/auth/infrastructure/common-adapters/index.ts',
@@ -44,11 +45,32 @@ describe('global modules (global/) — modules without controllers', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the index MAY re-export a module root', async () => {
+  it('the index MAY re-export the barrel of a global module', async () => {
+    await expect({
+      file: 'apps/__global-fixture__/src/global/index.ts',
+      code: 'export * from "./auth";',
+    }).toPassArchitectureLint();
+  });
+
+  it('the index may NOT take a deep path into a global module', async () => {
     await expect({
       file: 'apps/__global-fixture__/src/global/index.ts',
       code: 'export * from "./auth/shell/auth.module";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it('the global module barrel MAY export the nest module', async () => {
+    await expect({
+      file: 'apps/__global-fixture__/src/global/auth/index.ts',
+      code: 'export * from "./shell/auth.module";',
     }).toPassArchitectureLint();
+  });
+
+  it('the global module barrel may NOT export anything else', async () => {
+    await expect({
+      file: 'apps/__global-fixture__/src/global/auth/index.ts',
+      code: 'export * from "./application";',
+    }).toBreakRule('boundaries/dependencies');
   });
 
   it('the index may NOT re-export infrastructure', async () => {

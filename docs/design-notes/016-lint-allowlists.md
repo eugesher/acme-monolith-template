@@ -214,7 +214,8 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `FactoryProvider` and `DynamicModule`.
 - **A global module has the layers of a feature.** `application/` sees its own outbound, the base
   libs and `@nestjs/common`; `outbound/` sees itself and the base libs; the module root sees the
-  application.
+  application. Its barrel `global/<module>/index.ts` exports only the Nest module of `shell/`, and
+  `global/index.ts` exports the barrels, as a common module and `common/modules/index.ts` do.
 - **A global common-adapter reaches any contract of its app and its own outbound.** It implements a
   port of its module's outbound with the port of a common module, which is named after that module,
   not after the global module, so the namesake rule of `appContracts` would refuse it.
