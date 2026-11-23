@@ -18,7 +18,7 @@ a threshold.
 | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `index.ts`                                                                         | barrels                                                                                                               |
 | `*.{port,token,enum,entity,dto,view,type,interface,const,command,query,record}.ts` | declarations                                                                                                          |
-| `*.module.ts`, `apps/*/src/main.ts`                                                | wiring, booted by the e2e suites                                                                                      |
+| `*.module.ts`, `*.queue.ts`, `apps/*/src/main.ts`                                  | wiring, booted by the e2e suites                                                                                      |
 | `infrastructure/persistence/repositories/**`                                       | SQL, checked against the database by the e2e suites                                                                   |
 | `infrastructure/persistence/host/**`                                               | repository getters and query builder factories                                                                        |
 | `shell/*.controller.ts`                                                            | routes, guards and pipes, checked over HTTP by the e2e suites                                                         |
