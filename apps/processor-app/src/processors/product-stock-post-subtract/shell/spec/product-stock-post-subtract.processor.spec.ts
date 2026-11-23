@@ -78,29 +78,5 @@ describe('ProductStockPostSubtractProcessor', () => {
       });
       expect(correlationIds).toEqual(['c0ffee00-0000-4000-8000-000000000001']);
     });
-
-    it('treats a job without attempts as a single attempt', async () => {
-      await processor.handleFailed(
-        {
-          data: { productIds: ['100'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
-          attemptsMade: 1,
-          opts: {},
-        } as unknown as Job<IProductStockPostSubtractPayload>,
-        new Error('deadlock'),
-      );
-
-      expect(reportFailure.execute).toHaveBeenCalledWith({
-        productIds: ['100'],
-        attempt: 1,
-        attempts: 1,
-        error: new Error('deadlock'),
-      });
-    });
-
-    it('reports nothing for a failure without a job', async () => {
-      await processor.handleFailed(undefined, new Error('stalled'));
-
-      expect(reportFailure.execute).not.toHaveBeenCalled();
-    });
   });
 });

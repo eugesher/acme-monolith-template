@@ -1,6 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
-import type { Queue } from 'bullmq';
+import type { JobsOptions, Queue } from 'bullmq';
 
 import { LEDGER_RECORD_QUEUE } from '@acme-core/contracts/ledger';
 import { PRODUCT_STOCK_POST_SUBTRACT_QUEUE } from '@acme-core/contracts/product-stock';
@@ -95,8 +95,9 @@ export class QueueRegistryAdapter implements IQueueRegistryPort {
   private static toFailedJob(
     job: Awaited<ReturnType<Queue['getFailed']>>[number],
   ): IQueueRegistryFailedJobView {
-    const { id, name, opts, attemptsMade, failedReason, stacktrace, timestamp } = job;
-    const { processedOn, finishedOn } = job;
+    const { id, name, opts, attemptsMade, failedReason, timestamp, processedOn, finishedOn } = job;
+    const { attempts } = opts as Required<Pick<JobsOptions, 'attempts'>>;
+    const { stacktrace } = job as { stacktrace: string[] };
     const data: unknown = job.data;
     const createdAt = new Date(timestamp).toISOString();
     const processedAt = QueueRegistryAdapter.toInstant(processedOn);
@@ -106,10 +107,10 @@ export class QueueRegistryAdapter implements IQueueRegistryPort {
       id: String(id),
       name,
       data,
-      attempts: opts.attempts ?? 1,
+      attempts,
       attemptsMade,
       failedReason,
-      stacktrace: stacktrace ?? [],
+      stacktrace,
       createdAt,
       processedAt,
       failedAt,

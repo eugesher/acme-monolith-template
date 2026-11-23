@@ -9,7 +9,7 @@ coverage thresholds and the lint of tests.
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | use case in a transaction | `apps/staff-app/src/features/warehouse/modules/product-stock/application/use-cases/spec/product-stock-add.use-case.spec.ts` |
 | model                     | `apps/staff-app/src/features/tools/modules/tag/domain/models/spec/tag-rename.model.spec.ts`                                 |
-| controller                | `apps/staff-app/src/features/tools/modules/tag/shell/spec/tag.controller.spec.ts`                                           |
+| processor                 | `apps/processor-app/src/processors/ledger-append/shell/spec/ledger-append.processor.spec.ts`                                |
 | request DTO               | `apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/spec/tag-rename.request.dto.spec.ts`               |
 | query builder             | `apps/staff-app/src/features/tools/modules/tag/infrastructure/persistence/builders/spec/tag-persistence.builder.spec.ts`    |
 | module                    | `libs/cache/src/shell/spec/cache.module.spec.ts`                                                                            |
@@ -23,11 +23,20 @@ through the public one that calls it. No member is public for a test: neither a 
 context reaches a part of a class that production code does not call, so what they check is the path
 the app takes (see `014-e2e-suites.md`).
 
-**Every file the coverage counts gets one**, because the threshold is 100% per file. A controller
-and a request, query or param DTO that declares validation of its own get one too, though the
-coverage cannot see them: `spec/required-specs.spec.ts` asks for them (see `015-quality-gates.md`).
-What the coverage excludes needs none: barrels, declarations, modules, repositories, persistence
-hosts and facades are wiring or SQL, and the e2e suites run them.
+**Every file the coverage counts gets one**, because the threshold is 100% per file. A request,
+query or param DTO that declares validation of its own and the module in `shell/` of a lib get one
+too, though the coverage cannot see them: `spec/required-specs.spec.ts` asks for them (see
+`015-quality-gates.md`). What the coverage excludes needs none: barrels, declarations, the modules
+of an app, repositories, persistence hosts, controllers and facades are wiring or SQL, and the e2e
+suites run them.
+
+**A controller and a facade get no spec.** Each method of either reads its input and hands one
+command to a use case, so a spec of it would repeat the spec of the use case. What a controller
+adds, the route, its guard and the DTOs it validates with, lives in decorators that a unit spec does
+not read and that the tables of the e2e suites check (see `014-e2e-suites.md`); a dropped `await` is
+caught by `return-await`, a missing field of the command by the typecheck.
+`spec/required-specs.spec.ts` refuses a spec of a controller or a facade, and
+`spec/e2e-endpoints.spec.ts` asks for a case of every route handler instead.
 
 ## The shape of a spec
 
@@ -67,8 +76,8 @@ member as well.
 
 **A class takes a cast because its private members make it nominal**: no object literal satisfies
 it, so the spec types the methods it mocks with `Pick` and casts once where it hands the mock over.
-A shell spec (a controller, a processor, a facade) that builds a real use case may not import the
-`outbound` of its module, so it takes the type of the port from the constructor of the use case.
+A processor spec that builds a real use case may not import the `outbound` of its module, so it
+takes the type of the port from the constructor of the use case.
 
 **A fake of a driver stays partial.** Its shape belongs to the library, and the e2e suites check it
 against the real Redis, MySQL and BullMQ; a full mock of `Redis` would repeat its typings and still
@@ -106,7 +115,11 @@ one unit check of the SQL. The `DataSource` of the spec spies the `connect` of i
 **A module spec boots its module in Nest**, an application when the module serves HTTP and an
 application context otherwise, with stubs of what the module reads, such as `ConfigService`. It
 checks wiring the e2e suites cannot see in isolation, such as the options of a Redis client or the
-order of the shutdown hooks, and closes what it booted when the case ends.
+order of the shutdown hooks, and closes what it booted when the case ends. Every module in `shell/`
+of a lib has one, since a lib configures a driver or a client with options no e2e case reads:
+`orm.module.spec.ts` replaces `connect` of the MySQL driver on its prototype, taken from a probe
+`DataSource` because TypeORM does not export the driver class, and checks the options of
+`DATABASE_*` and the snake_case names of a registered entity.
 
 ## A guarantee is proven once by breaking it
 

@@ -26,8 +26,11 @@ the answer.
 **A failed job answers what the staff acts on, not the job of BullMQ.** `QueueRegistryAdapter` maps
 each job to the view of its port: the id as a string, the name, the `data`, `attempts` and
 `attemptsMade`, the `failedReason` and the `stacktrace`, and the instants `createdAt`, `processedAt`
-and `failedAt` as ISO strings in UTC, `null` when BullMQ has none. The options, the progress and the
-return value of BullMQ stay in the adapter, so an upgrade of BullMQ does not change the response.
+and `failedAt` as ISO strings in UTC, `null` when BullMQ has none. `attempts` and `stacktrace` are
+mapped as BullMQ loads the job, without a fallback: `Job` gives a job `attempts: 0` when its options
+have none, and `getFailed` restores the stacktrace as an array (see `008-queue-processor.md`). The
+options, the progress and the return value of BullMQ stay in the adapter, so an upgrade of BullMQ
+does not change the response.
 
 An unknown queue or job answers 404, a job that is not failed 409. A retried job keeps its
 `attemptsMade`, so its next failure sends it straight back to the failed set: a retry is one more

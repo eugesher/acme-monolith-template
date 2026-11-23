@@ -16,7 +16,9 @@ lives with the rule that covers the importer:
   module may NOT import `typeorm`, because the database lib configures it.
 
 **An edge used only by specs counts as used.** A lib module spec imports `@nestjs/core`, and a
-common-module spec imports the kernel; both are code the lint checks.
+common-module spec imports the kernel; both are code the lint checks. Where only the specs of a lib
+need a package, the `file` capture scopes it to them: the database lib takes `@nestjs/core` and
+`nestjs-pino` in `**/*.spec.ts` alone.
 
 **No rule names an app.** A category matches `apps/*` and captures the folder as `app`, a policy
 compares it with `own('app')`, and the import groups of `imports.mjs` match any `@acme-<app>` alias

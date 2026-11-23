@@ -38,13 +38,16 @@ moves the number. A per-file key fails on the file that lost its spec and names 
 Jest checks every file matched by `./{apps,core,libs}/**/*.ts` against it, and `collectCoverageFrom`
 decides which files are counted, including those no spec loads, which count at 0%.
 
-**Some specs the coverage cannot ask for.** A controller is excluded above, yet its spec checks how
-a request becomes a command and that a failure is awaited. A DTO is covered the moment any file
-imports it, since its decorators run on import, yet only a spec checks its validation, and only the
-table of the e2e suite that a route validates with it (see `014-e2e-suites.md`).
-`spec/required-specs.spec.ts` asks for a spec next to every controller and every request, query and
-param DTO that declares validation of its own; a DTO that only extends `PageQueryDto` declares none
-and inherits the spec of its parent.
+**Some specs the coverage cannot ask for.** A DTO is covered the moment any file imports it, since
+its decorators run on import, yet only a spec checks its validation, and only the table of the e2e
+suite that a route validates with it (see `014-e2e-suites.md`). A module is excluded above, yet the
+module in `shell/` of a lib configures a driver or a client that no e2e case reads the options of.
+`spec/required-specs.spec.ts` asks for a spec next to every request, query and param DTO that
+declares validation of its own and next to every module in `shell/` of a lib; a DTO that only
+extends `PageQueryDto` declares none and inherits the spec of its parent. The same spec refuses a
+spec of a controller or a facade: both only hand a command to a use case, and
+`spec/e2e-endpoints.spec.ts` asks the e2e suites for a case of every route handler instead (see
+`040-unit-specs.md`).
 
 **ts-jest compiles the unit suite with type information** (`isolatedModules: false`). With
 `emitDecoratorMetadata`, a file compiled on its own cannot tell whether a constructor parameter type

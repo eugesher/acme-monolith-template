@@ -133,6 +133,7 @@ export const acmeLibs = [
       'typeorm',
     ),
   ]),
+  fromLib('database', [packages('@nestjs/core', 'nestjs-pino')], '**/*.spec.ts'),
   fromLib('local-storage', [
     libs('observability'),
     packages(

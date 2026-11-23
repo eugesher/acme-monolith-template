@@ -1,12 +1,11 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
-import type { Job } from 'bullmq';
+import type { Job, JobsOptions } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import {
   PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
   type IProductStockPostSubtractPayload,
 } from '@acme-core/contracts/product-stock';
-import type { Maybe } from '@acme-libs/toolkit';
 
 import {
   ProductStockPostSubtractReportFailureUseCase,
@@ -33,16 +32,12 @@ export class ProductStockPostSubtractProcessor extends WorkerHost {
 
   @OnWorkerEvent('failed')
   public async handleFailed(
-    job: Maybe<Job<IProductStockPostSubtractPayload>>,
+    job: Job<IProductStockPostSubtractPayload>,
     error: Error,
   ): Promise<void> {
-    if (!job) {
-      return;
-    }
-
     const { data, attemptsMade, opts } = job;
     const { productIds, correlationId } = data;
-    const attempts = opts.attempts ?? 1;
+    const { attempts } = opts as Required<Pick<JobsOptions, 'attempts'>>;
 
     await CorrelationContextHelper.run(correlationId, () => {
       this.reportFailure.execute({ productIds, attempt: attemptsMade, attempts, error });
