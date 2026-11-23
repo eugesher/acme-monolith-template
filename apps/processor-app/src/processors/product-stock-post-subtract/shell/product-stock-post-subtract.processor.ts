@@ -2,17 +2,15 @@ import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import type { Job, JobsOptions } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import {
-  PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
-  type IProductStockPostSubtractPayload,
-} from '@acme-core/contracts/product-stock';
+import { ProductStockPostSubtractQueue } from '@acme-core/queues';
+import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
 import {
   ProductStockPostSubtractReportFailureUseCase,
   ProductStockPostSubtractUseCase,
 } from '../application';
 
-@Processor(PRODUCT_STOCK_POST_SUBTRACT_QUEUE)
+@Processor(ProductStockPostSubtractQueue.NAME)
 export class ProductStockPostSubtractProcessor extends WorkerHost {
   constructor(
     private readonly postSubtract: ProductStockPostSubtractUseCase,

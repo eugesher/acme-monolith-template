@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { LedgerQueueModule, ProductStockPostSubtractQueueModule } from '@acme-core/queues';
+import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 
 import {
   QueueDeleteFailedJobUseCase,
@@ -13,7 +13,7 @@ import { QueueRegistryAdapter } from '../infrastructure';
 import { QueueController } from './queue.controller';
 
 @Module({
-  imports: [LedgerQueueModule, ProductStockPostSubtractQueueModule],
+  imports: [LedgerQueue.register(), ProductStockPostSubtractQueue.register()],
   controllers: [QueueController],
   providers: [
     QueueListUseCase,

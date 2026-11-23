@@ -81,6 +81,7 @@ const areaPolicies = (area, sharedFacing) => {
       ...(sharedFacing.queues ? [layer('queues')] : []),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
+      to('acme-core:queues'),
       baseLibs(),
       ...sharedFacing.queue,
     ]),
@@ -162,6 +163,7 @@ export const moduleAreas = [
     shell: [
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
+      to('acme-core:queues'),
       baseLibs('observability'),
       packages('@nestjs/bullmq', '@nestjs/common', 'bullmq'),
     ],

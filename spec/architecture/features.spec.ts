@@ -305,22 +305,23 @@ describe('features', () => {
     it('the module root MAY register a queue through the core queues, next to the binding of its adapter', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
-        code: 'import { LedgerQueueModule } from "@acme-core/queues";',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 
-    it.each([
-      ['the core queues', 'import { LedgerQueueModule } from "@acme-core/queues";'],
-      ['the queue lib', 'import { BullSetupModule } from "@acme-libs/queue";'],
-    ])(
-      'infrastructure/queue may NOT register a queue with %s — the module root does',
-      async (_case, code) => {
-        await expect({
-          file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
-          code,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
+    it('infrastructure/queue MAY take the name of a core queue for InjectQueue', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
+      }).toPassArchitectureLint();
+    });
+
+    it('infrastructure/queue may NOT register a queue with the queue lib', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
+      }).toBreakRule('boundaries/dependencies');
+    });
 
     it('infrastructure/queue may NOT reach a lib contract', async () => {
       await expect({

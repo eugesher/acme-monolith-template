@@ -3,16 +3,11 @@ import type { Queue } from 'bullmq';
 
 import { AppNameEnum } from '@acme-libs/kernel';
 import { E2EContext } from '@acme-libs/testing';
-import {
-  LEDGER_RECORD_QUEUE,
-  type ILedgerRecordProcessorPayload,
-} from '@acme-core/contracts/ledger';
-import {
-  PRODUCT_STOCK_POST_SUBTRACT_QUEUE,
-  type IProductStockPostSubtractPayload,
-} from '@acme-core/contracts/product-stock';
+import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 import { AppModule } from '@acme-processor/app';
 import type { Maybe } from '@acme-libs/toolkit';
+import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
 interface IAppE2EState {
   ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
@@ -54,10 +49,10 @@ export class AppE2EContext extends E2EContext {
     await super.init();
 
     const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LEDGER_RECORD_QUEUE),
+      getQueueToken(LedgerQueue.NAME),
     );
     const postSubtractQueue = this.moduleFixture.get<Queue<IProductStockPostSubtractPayload>>(
-      getQueueToken(PRODUCT_STOCK_POST_SUBTRACT_QUEUE),
+      getQueueToken(ProductStockPostSubtractQueue.NAME),
     );
     const purgeQueue = this.moduleFixture.get<Queue>(getQueueToken('idempotency-purge'));
 
@@ -77,7 +72,7 @@ export class AppE2EContext extends E2EContext {
   }
 
   public async waitForLedgerRecordQueue(): Promise<void> {
-    await this.waitFor(`the ${LEDGER_RECORD_QUEUE} queue to drain`, async () => {
+    await this.waitFor(`the ${LedgerQueue.NAME} queue to drain`, async () => {
       const counts = await this.ledgerRecordQueue.getJobCounts();
 
       return counts.waiting + counts.active + counts.delayed === 0;
@@ -85,7 +80,7 @@ export class AppE2EContext extends E2EContext {
   }
 
   public async waitForPostSubtractQueue(): Promise<void> {
-    await this.waitFor(`the ${PRODUCT_STOCK_POST_SUBTRACT_QUEUE} queue to drain`, async () => {
+    await this.waitFor(`the ${ProductStockPostSubtractQueue.NAME} queue to drain`, async () => {
       const counts = await this.postSubtractQueue.getJobCounts();
 
       return counts.waiting + counts.active + counts.delayed === 0;

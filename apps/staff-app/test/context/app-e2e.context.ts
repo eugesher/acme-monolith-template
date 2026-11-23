@@ -5,12 +5,10 @@ import type { Redis } from 'ioredis';
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
-import {
-  LEDGER_RECORD_QUEUE,
-  type ILedgerRecordProcessorPayload,
-} from '@acme-core/contracts/ledger';
+import { LedgerQueue } from '@acme-core/queues';
 import { AppModule } from '@acme-staff/app';
 import type { Maybe } from '@acme-libs/toolkit';
+import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
 
 interface IAppE2EState {
   redis: Redis;
@@ -61,10 +59,10 @@ export class AppE2EContext extends AuthE2EContext {
 
     const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
     const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LEDGER_RECORD_QUEUE),
+      getQueueToken(LedgerQueue.NAME),
     );
     const { connection, prefix } = ledgerRecordQueue.opts;
-    const failingWorker = new Worker<ILedgerRecordProcessorPayload>(LEDGER_RECORD_QUEUE, null, {
+    const failingWorker = new Worker<ILedgerRecordProcessorPayload>(LedgerQueue.NAME, null, {
       connection,
       prefix,
     });
@@ -91,12 +89,12 @@ export class AppE2EContext extends AuthE2EContext {
   public async failLedgerRecord(
     record: ILedgerRecordProcessorPayload,
   ): Promise<Job<ILedgerRecordProcessorPayload>> {
-    const added = await this.ledgerRecordQueue.add(LEDGER_RECORD_QUEUE, record, { attempts: 1 });
+    const added = await this.ledgerRecordQueue.add(LedgerQueue.NAME, record, { attempts: 1 });
     const token = 'e2e-failing-worker';
     const job = await this.started.failingWorker.getNextJob(token);
 
     if (job.id !== added.id) {
-      throw new Error(`Job ${added.id} of queue ${LEDGER_RECORD_QUEUE} is not the next to fail`);
+      throw new Error(`Job ${added.id} of queue ${LedgerQueue.NAME} is not the next to fail`);
     }
 
     await job.moveToFailed(new Error('The e2e case failed the record'), token);

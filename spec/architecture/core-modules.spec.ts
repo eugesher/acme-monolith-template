@@ -351,21 +351,28 @@ describe('core modules', () => {
     it('a queue adapter MAY take InjectQueue, the Queue type and the queue contract', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { InjectQueue } from "@nestjs/bullmq";\nimport type { Queue } from "bullmq";\nimport { X_QUEUE } from "../../../../../contracts/src/__ledger-fixture__";',
+        code: 'import { InjectQueue } from "@nestjs/bullmq";\nimport type { Queue } from "bullmq";\nimport type { X } from "../../../../../contracts/src/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
-    it('a queue adapter may NOT register its queue — the module root does', async () => {
+    it('a queue adapter MAY take the name of its queue from the core queues', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { LedgerQueueModule } from "@acme-core/queues";',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a queue adapter may NOT register a queue with the queue lib', async () => {
+      await expect({
+        file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module root MAY register a queue through the core queues, next to the binding of its adapter', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { LedgerQueueModule } from "@acme-core/queues";',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 

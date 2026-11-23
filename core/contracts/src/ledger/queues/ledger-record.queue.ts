@@ -7,5 +7,3 @@ export interface ILedgerRecordProcessorPayload {
   occurredAt: string;
   correlationId: string;
 }
-
-export const LEDGER_RECORD_QUEUE = 'ledger-record';

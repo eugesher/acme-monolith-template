@@ -1,3 +1,2 @@
-export * from './ledger/ledger-queue.module';
-
-export * from './product-stock-post-subtract/product-stock-post-subtract-queue.module';
+export * from './definitions/ledger.queue';
+export * from './definitions/product-stock-post-subtract.queue';

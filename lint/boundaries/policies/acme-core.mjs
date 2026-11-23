@@ -45,6 +45,7 @@ export const acmeCore = [
     layer('outbound'),
     layer('infrastructure:queue'),
     ownContracts,
+    to('acme-core:queues'),
     baseLibs(),
     packages('@nestjs/bullmq', '@nestjs/common', 'bullmq'),
   ]),
@@ -88,10 +89,5 @@ export const acmeCore = [
   from('acme-core:contracts', [ownContracts, baseLibs()]),
   from('acme-core:domain', [coreDomain, baseLibs()]),
   from('acme-core:entities', [to('acme-core:entities'), libs('kernel'), packages('typeorm')]),
-  from('acme-core:queues', [
-    to('acme-core:queues'),
-    to('acme-core:contracts'),
-    libs('queue'),
-    packages('@nestjs/common'),
-  ]),
+  from('acme-core:queues', [to('acme-core:queues'), libs('queue'), packages('@nestjs/common')]),
 ];

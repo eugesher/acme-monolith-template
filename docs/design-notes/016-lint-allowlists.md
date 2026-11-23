@@ -61,8 +61,8 @@ Some edges are part of the documented shape of the template and have a `MAY` cas
   contracts;
 - shared code that reaches the contracts of its namesake, the http lib, the cache contracts and
   `nestjs-pino`;
-- the e2e code that reaches app contracts, the queue contracts `@acme-core/contracts/ledger` and
-  `@acme-core/contracts/product-stock`, and the testing lib;
+- the e2e code that reaches app contracts, the payloads in `@acme-core/contracts/ledger` and
+  `@acme-core/contracts/product-stock`, the queues of `@acme-core/queues`, and the testing lib;
 - a feature queue adapter and a processor that reach app contracts: a queue between the modules of
   one app keeps its contract in the app, while a queue written by more than one app keeps it in core
   or in the lib that writes it, `product-stock-post-subtract` in
@@ -130,10 +130,11 @@ edges exist for it:
 
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
   `@nestjs/bullmq`, `bullmq` and its own contracts.
-- **The module root registers the queue of its adapter** from `@acme-core/queues`, next to
-  `<Adapter>.provider`, and takes neither `libs/queue` nor BullMQ itself; `infrastructure/queue`
-  takes neither `@acme-core/queues` nor `libs/queue`. A core module is mounted by features of
-  several apps, so the queue comes with it rather than with each app.
+- **The module root registers the queue of its adapter** with `<Queue>.register()` of
+  `@acme-core/queues`, next to `<Adapter>.provider`, and takes neither `libs/queue` nor BullMQ
+  itself; `infrastructure/queue` takes the queue for its `NAME` and never `libs/queue`. A core
+  module is mounted by features of several apps, so the queue comes with it rather than with each
+  app.
 - **Core infrastructure may take `@acme-libs/contracts/cache`**, to drop the keys a write makes
   stale; the application still may not, so caching stays an adapter behind a port.
 
@@ -172,8 +173,9 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `LedgerCoreModule` of `@acme-core/modules/ledger`, and `infrastructure/core-adapters` takes
   `LEDGER_CORE_PORT` from `@acme-core/contracts/ledger`. The ledger reads the correlation id of the
   context itself, so no adapter needs the observability lib. What reads the queue takes the same
-  contracts, as it takes those of any core module: the processor in `shell/`, the queue registry of
-  staff-app in `infrastructure/queue`, `core/queues`, the e2e code and `test/system`.
+  contracts and the queue of `@acme-core/queues`: the processor in `shell/`, the queue adapters in
+  `infrastructure/queue`, the e2e code and `test/system`. `core/queues` holds its names itself and
+  takes no contract.
 - **A processor and a global module read tables.** Their infrastructure may import `typeorm`,
   `@acme-libs/contracts/database` and `@nestjs/common`, as feature infrastructure does.
 - **No module touches `@nestjs-cls`.** A repository injects `ORM_PORT` of
@@ -211,8 +213,8 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
   module may reach neither its own `outbound` nor `@acme-libs/config`. Only `infrastructure/config`,
   `app/setup/config` and the observability lib import the config lib. `infrastructure/config` and
-  `core/queues` also take `@nestjs/common`, for the type of the constants they export:
-  `FactoryProvider` and `DynamicModule`.
+  `core/queues` also take `@nestjs/common`, for the types they answer: `FactoryProvider` and
+  `DynamicModule`.
 - **A global module has the layers of a feature.** `application/` sees its own outbound, the base
   libs and `@nestjs/common`; `outbound/` sees itself and the base libs; the module root sees the
   application. Its barrel `global/<module>/index.ts` exports only the Nest module of `shell/`, and

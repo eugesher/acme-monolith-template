@@ -1,6 +1,6 @@
 import { Module, type ClassProvider } from '@nestjs/common';
 
-import { LedgerQueueModule } from '@acme-core/queues';
+import { LedgerQueue } from '@acme-core/queues';
 import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
 
 import { LedgerCoreEnqueueUseCase } from '../application';
@@ -12,7 +12,7 @@ import {
 import { LedgerCoreFacade } from './ledger-core.facade';
 
 @Module({
-  imports: [LedgerQueueModule],
+  imports: [LedgerQueue.register()],
   exports: [LEDGER_CORE_PORT],
   providers: [
     {

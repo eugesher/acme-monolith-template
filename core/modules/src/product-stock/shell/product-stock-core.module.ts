@@ -1,6 +1,6 @@
 import { Module, type ClassProvider } from '@nestjs/common';
 
-import { ProductStockPostSubtractQueueModule } from '@acme-core/queues';
+import { ProductStockPostSubtractQueue } from '@acme-core/queues';
 import {
   PRODUCT_STOCK_CORE_PORT,
   type IProductStockCorePort,
@@ -18,7 +18,7 @@ import {
 import { ProductStockCoreFacade } from './product-stock-core.facade';
 
 @Module({
-  imports: [ProductStockPostSubtractQueueModule],
+  imports: [ProductStockPostSubtractQueue.register()],
   exports: [PRODUCT_STOCK_CORE_PORT],
   providers: [
     {

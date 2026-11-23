@@ -2,14 +2,12 @@ import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import type { Job, JobsOptions } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import {
-  LEDGER_RECORD_QUEUE,
-  type ILedgerRecordProcessorPayload,
-} from '@acme-core/contracts/ledger';
+import { LedgerQueue } from '@acme-core/queues';
+import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
 
 import { LedgerAppendReportFailureUseCase, LedgerAppendUseCase } from '../application';
 
-@Processor(LEDGER_RECORD_QUEUE)
+@Processor(LedgerQueue.NAME)
 export class LedgerAppendProcessor extends WorkerHost {
   constructor(
     private readonly append: LedgerAppendUseCase,

@@ -302,18 +302,19 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toPassArchitectureLint();
     });
 
-    it.each([
-      ['the queue lib', 'import { BullSetupModule } from "@acme-libs/queue";'],
-      ['the core queues', 'import { LedgerQueueModule } from "@acme-core/queues";'],
-    ])(
-      'infrastructure/queue may NOT register a queue with %s — queues/ or the module root does',
-      async (_case, code) => {
-        await expect({
-          file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
-          code,
-        }).toBreakRule('boundaries/dependencies');
-      },
-    );
+    it('infrastructure/queue may NOT register a queue with the queue lib — queues/ does', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('a processor MAY take the name of a core queue for Processor', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
+      }).toPassArchitectureLint();
+    });
 
     it('infrastructure/queue MAY take the queue of its module from queues/', async () => {
       await expect({

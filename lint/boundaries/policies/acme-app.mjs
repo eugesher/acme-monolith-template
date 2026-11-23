@@ -135,6 +135,7 @@ export const acmeApp = [
     to('acme-app:contracts', own('app')),
     to('acme-core:contracts'),
     to('acme-core:entities'),
+    to('acme-core:queues'),
     to('acme-app:common:entities', own('app')),
     baseLibs('database', 'observability', 'testing'),
     packages(
