@@ -5,24 +5,24 @@ import type {
 } from '@acme-libs/kernel';
 import type { Nullable } from '@acme-libs/toolkit';
 
-export interface IHealthLivenessView {
+export interface IHealthLibLivenessView {
   status: HealthLivenessStatusEnum;
   app: string;
   uptimeSeconds: number;
 }
 
-export interface IHealthDependencyView {
+export interface IHealthLibDependencyView {
   status: HealthDependencyStatusEnum;
   latencyMs: Nullable<number>;
 }
 
-export interface IHealthDependenciesView {
-  database: IHealthDependencyView;
-  cache: IHealthDependencyView;
+export interface IHealthLibDependenciesView {
+  database: IHealthLibDependencyView;
+  cache: IHealthLibDependencyView;
 }
 
-export interface IHealthReadinessView {
+export interface IHealthLibReadinessView {
   status: HealthReadinessStatusEnum;
   app: string;
-  dependencies: IHealthDependenciesView;
+  dependencies: IHealthLibDependenciesView;
 }

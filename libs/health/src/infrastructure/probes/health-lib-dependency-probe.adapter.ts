@@ -4,15 +4,21 @@ import { DataSource } from 'typeorm';
 import { HealthDependencyStatusEnum } from '@acme-libs/kernel';
 import { DeadlineHelper } from '@acme-libs/toolkit';
 import { CACHE_KEYS, CACHE_PORT, type ICachePort } from '@acme-libs/contracts/cache';
-import type { IHealthDependenciesView, IHealthDependencyView } from '@acme-libs/contracts/health';
+import type {
+  IHealthLibDependenciesView,
+  IHealthLibDependencyView,
+} from '@acme-libs/contracts/health';
 
-import { HEALTH_DEPENDENCY_PROBE_PORT, type IHealthDependencyProbePort } from '../../outbound';
+import {
+  HEALTH_LIB_DEPENDENCY_PROBE_PORT,
+  type IHealthLibDependencyProbePort,
+} from '../../outbound';
 
 @Injectable()
-export class HealthDependencyProbeAdapter implements IHealthDependencyProbePort {
-  public static readonly provider: ClassProvider<IHealthDependencyProbePort> = {
-    provide: HEALTH_DEPENDENCY_PROBE_PORT,
-    useClass: HealthDependencyProbeAdapter,
+export class HealthLibDependencyProbeAdapter implements IHealthLibDependencyProbePort {
+  public static readonly provider: ClassProvider<IHealthLibDependencyProbePort> = {
+    provide: HEALTH_LIB_DEPENDENCY_PROBE_PORT,
+    useClass: HealthLibDependencyProbeAdapter,
   };
 
   private static readonly TIMEOUT_MS = 1000;
@@ -23,21 +29,21 @@ export class HealthDependencyProbeAdapter implements IHealthDependencyProbePort 
     private readonly dataSource: DataSource,
   ) {}
 
-  public async probeAll(): Promise<IHealthDependenciesView> {
+  public async probeAll(): Promise<IHealthLibDependenciesView> {
     const [database, cache] = await Promise.all([
-      HealthDependencyProbeAdapter.timed(() => this.dataSource.query('SELECT 1')),
-      HealthDependencyProbeAdapter.timed(() => this.cache.handleGet(CACHE_KEYS.healthProbe())),
+      HealthLibDependencyProbeAdapter.timed(() => this.dataSource.query('SELECT 1')),
+      HealthLibDependencyProbeAdapter.timed(() => this.cache.handleGet(CACHE_KEYS.healthProbe())),
     ]);
 
     return { database, cache };
   }
 
-  private static async timed(probe: () => Promise<unknown>): Promise<IHealthDependencyView> {
+  private static async timed(probe: () => Promise<unknown>): Promise<IHealthLibDependencyView> {
     const startedAt = Date.now();
 
     try {
       await DeadlineHelper.race(probe, {
-        timeoutMs: HealthDependencyProbeAdapter.TIMEOUT_MS,
+        timeoutMs: HealthLibDependencyProbeAdapter.TIMEOUT_MS,
         message: 'probe timed out',
       });
 

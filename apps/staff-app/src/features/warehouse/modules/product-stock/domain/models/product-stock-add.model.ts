@@ -1,6 +1,6 @@
 import { Entity } from '@acme-libs/domain';
 
-import { ProductQuantityInvalidException } from '../errors';
+import { ProductStockQuantityInvalidException } from '../errors';
 import type {
   IProductStockAddLedgerPayload,
   IProductStockAddLedgerPayloadBuild,
@@ -63,7 +63,10 @@ export class ProductStockAddModel extends Entity {
       quantity < 1 ||
       quantity > ProductStockAddModel.ADD_MAX_QUANTITY
     ) {
-      throw new ProductQuantityInvalidException(ProductStockAddModel.ADD_MAX_QUANTITY, quantity);
+      throw new ProductStockQuantityInvalidException(
+        ProductStockAddModel.ADD_MAX_QUANTITY,
+        quantity,
+      );
     }
 
     return quantity;

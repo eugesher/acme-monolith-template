@@ -5,13 +5,13 @@ import { DataSource } from 'typeorm';
 
 import { AppNameEnum } from '@acme-libs/kernel';
 import { CACHE_PORT } from '@acme-libs/contracts/cache';
-import { HEALTH_PORT, type IHealthPort } from '@acme-libs/contracts/health';
+import { HEALTH_LIB_PORT, type IHealthLibPort } from '@acme-libs/contracts/health';
 
 import { HealthLibModule } from '../health-lib.module';
 
 describe('HealthLibModule', () => {
   let context: INestApplicationContext;
-  let port: IHealthPort;
+  let port: IHealthLibPort;
 
   beforeEach(async () => {
     @Global()
@@ -37,7 +37,7 @@ describe('HealthLibModule', () => {
     class TestModule {}
 
     context = await NestFactory.createApplicationContext(TestModule, { logger: false });
-    port = context.get(HEALTH_PORT);
+    port = context.get(HEALTH_LIB_PORT);
   });
 
   afterEach(async () => {

@@ -2,10 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import {
-  ProductIdempotencyKeyReusedException,
-  ProductIdempotentRequestInFlightException,
-  ProductNotFoundException,
   ProductStockAddModel,
+  ProductStockIdempotencyKeyReusedException,
+  ProductStockIdempotentRequestInFlightException,
+  ProductStockProductNotFoundException,
 } from '../../domain';
 import {
   PRODUCT_STOCK_ADD_REPOSITORY_PORT,
@@ -58,11 +58,11 @@ export class ProductStockAddUseCase {
     }
 
     if (idempotencyClaim.outcome === ProductStockIdempotencyOutcomeEnum.IN_FLIGHT) {
-      throw new ProductIdempotentRequestInFlightException(idempotencyKey);
+      throw new ProductStockIdempotentRequestInFlightException(idempotencyKey);
     }
 
     if (idempotencyClaim.outcome === ProductStockIdempotencyOutcomeEnum.MISMATCH) {
-      throw new ProductIdempotencyKeyReusedException(idempotencyKey);
+      throw new ProductStockIdempotencyKeyReusedException(idempotencyKey);
     }
 
     const writeResult = await this.write(command);
@@ -101,7 +101,7 @@ export class ProductStockAddUseCase {
     const productRecord = await this.repository.findById(productId);
 
     if (!productRecord) {
-      throw new ProductNotFoundException(productId);
+      throw new ProductStockProductNotFoundException(productId);
     }
 
     const productStock = ProductStockAddModel.reconstitute(productRecord);

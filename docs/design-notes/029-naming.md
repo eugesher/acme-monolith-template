@@ -27,8 +27,13 @@ A name says who or where; the action lives in the method or in the port.
 name of the module and its layer (`Core`, `Common`) and nothing else, so a consumer finds the facade
 of `@acme-core/contracts/idempotency` under `IdempotencyCoreFacade` without knowing what the module
 stores. A lib names no layer, since its import path `@acme-libs/<lib>` already says where it lives:
-`CACHE_PORT`, `CacheFacade`, `CacheModule`. The one exception is `HealthLibModule`, because every
-app has a `HealthModule` of its own, the feature that serves the health routes.
+`CACHE_PORT`, `CacheFacade`, `CacheModule`. The one exception is the health lib: every app has a
+`HealthModule` of its own, the feature that serves the health routes and imports the module of the
+lib, so the lib module is `HealthLibModule`, and every name of the lib takes the same prefix to
+follow its module: `HealthLibFacade`, `HealthLibCheckReadinessUseCase`, `HEALTH_LIB_UPTIME_PORT`,
+`health-lib-uptime.adapter.ts`, and so do its contracts in `libs/contracts/src/health`:
+`HEALTH_LIB_PORT`, `IHealthLibReadinessView`, `health-lib.port.ts`. The folders and the alias keep
+the name of the lib, `@acme-libs/contracts/health`.
 
 **A facade method is `handle<Action>`, its use case is `<action>`.** The facade forwards each method
 to one use case. The field that holds the use case takes the action alone, because its type already

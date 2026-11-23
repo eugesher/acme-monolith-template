@@ -45,7 +45,7 @@ describe('lib entry points', () => {
     '@acme-libs/contracts/database/ports/orm.port',
     '@acme-libs/cache/infrastructure/store/cache-store.adapter',
     '@acme-libs/contracts/cache/ports/cache.port',
-    '@acme-libs/contracts/health/ports/health.port',
+    '@acme-libs/contracts/health/ports/health-lib.port',
     '@acme-libs/contracts/auth/ports/auth-user-validator.port',
     '@acme-libs/contracts/credentials/ports/credentials.port',
   ])('a feature may NOT reach a deep path into a lib: %s', async (source) => {
@@ -232,7 +232,7 @@ describe('lib entry points', () => {
   it('the health probes MAY import the cache contracts and their own contracts by their aliases', async () => {
     await expect({
       file: 'libs/health/src/infrastructure/probes/__fixture__.ts',
-      code: 'import { CACHE_KEYS, CACHE_PORT } from "@acme-libs/contracts/cache";\nimport { IHealthDependencyView } from "@acme-libs/contracts/health";',
+      code: 'import { CACHE_KEYS, CACHE_PORT } from "@acme-libs/contracts/cache";\nimport { IHealthLibDependencyView } from "@acme-libs/contracts/health";',
     }).toPassArchitectureLint();
   });
 

@@ -6,28 +6,31 @@ import {
   HealthReadinessStatusEnum,
   type AppNameEnum,
 } from '@acme-libs/kernel';
-import type { IHealthDependenciesView, IHealthReadinessView } from '@acme-libs/contracts/health';
+import type {
+  IHealthLibDependenciesView,
+  IHealthLibReadinessView,
+} from '@acme-libs/contracts/health';
 
 import {
-  HEALTH_APP_NAME_TOKEN,
-  HEALTH_DEPENDENCY_PROBE_PORT,
-  type IHealthDependencyProbePort,
+  HEALTH_LIB_APP_NAME_TOKEN,
+  HEALTH_LIB_DEPENDENCY_PROBE_PORT,
+  type IHealthLibDependencyProbePort,
 } from '../../outbound';
 
 @Injectable()
-export class HealthCheckReadinessUseCase {
+export class HealthLibCheckReadinessUseCase {
   constructor(
-    @Inject(HEALTH_APP_NAME_TOKEN)
+    @Inject(HEALTH_LIB_APP_NAME_TOKEN)
     private readonly appName: AppNameEnum,
-    @Inject(HEALTH_DEPENDENCY_PROBE_PORT)
-    private readonly probes: IHealthDependencyProbePort,
-    @InjectPinoLogger(HealthCheckReadinessUseCase.name)
+    @Inject(HEALTH_LIB_DEPENDENCY_PROBE_PORT)
+    private readonly probes: IHealthLibDependencyProbePort,
+    @InjectPinoLogger(HealthLibCheckReadinessUseCase.name)
     private readonly logger: PinoLogger,
   ) {}
 
-  public async execute(): Promise<IHealthReadinessView> {
+  public async execute(): Promise<IHealthLibReadinessView> {
     const dependencies = await this.probes.probeAll();
-    const names = Object.keys(dependencies) as (keyof IHealthDependenciesView)[];
+    const names = Object.keys(dependencies) as (keyof IHealthLibDependenciesView)[];
     const failed = names.filter(
       (name) => dependencies[name].status !== HealthDependencyStatusEnum.OK,
     );

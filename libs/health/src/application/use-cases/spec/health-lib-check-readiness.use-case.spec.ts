@@ -1,9 +1,9 @@
 import { AppNameEnum, HealthDependencyStatusEnum } from '@acme-libs/kernel';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { HealthCheckReadinessUseCase } from '../health-check-readiness.use-case';
+import { HealthLibCheckReadinessUseCase } from '../health-lib-check-readiness.use-case';
 
-describe('HealthCheckReadinessUseCase', () => {
+describe('HealthLibCheckReadinessUseCase', () => {
   let logger: PinoLoggerMock;
 
   beforeEach(() => {
@@ -11,7 +11,7 @@ describe('HealthCheckReadinessUseCase', () => {
   });
 
   it('is ready when every dependency is ok, and logs nothing', async () => {
-    const useCase = new HealthCheckReadinessUseCase(
+    const useCase = new HealthLibCheckReadinessUseCase(
       AppNameEnum.CUSTOMER_APP,
       {
         probeAll: () =>
@@ -37,7 +37,7 @@ describe('HealthCheckReadinessUseCase', () => {
   });
 
   it('is not ready when ANY dependency fails, and names the failures in the log', async () => {
-    const useCase = new HealthCheckReadinessUseCase(
+    const useCase = new HealthLibCheckReadinessUseCase(
       AppNameEnum.CUSTOMER_APP,
       {
         probeAll: () =>

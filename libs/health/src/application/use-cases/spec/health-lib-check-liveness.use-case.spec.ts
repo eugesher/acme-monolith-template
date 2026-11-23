@@ -1,10 +1,10 @@
 import { AppNameEnum } from '@acme-libs/kernel';
 
-import { HealthCheckLivenessUseCase } from '../health-check-liveness.use-case';
+import { HealthLibCheckLivenessUseCase } from '../health-lib-check-liveness.use-case';
 
-describe('HealthCheckLivenessUseCase', () => {
+describe('HealthLibCheckLivenessUseCase', () => {
   it('names the deployable and reports whole seconds of uptime', () => {
-    const useCase = new HealthCheckLivenessUseCase(AppNameEnum.CUSTOMER_APP, {
+    const useCase = new HealthLibCheckLivenessUseCase(AppNameEnum.CUSTOMER_APP, {
       seconds: () => 42.9,
     });
 

@@ -30,10 +30,10 @@ export class ProductStockController {
   @ApiErrorResponses({
     statuses: ProductStockHttpExceptionFilter.STATUS,
     codes: [
-      ProductStockExceptionCodeEnum.PRODUCT_QUANTITY_INVALID,
-      ProductStockExceptionCodeEnum.PRODUCT_NOT_FOUND,
-      ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENT_REQUEST_IN_FLIGHT,
-      ProductStockExceptionCodeEnum.PRODUCT_IDEMPOTENCY_KEY_REUSED,
+      ProductStockExceptionCodeEnum.PRODUCT_STOCK_QUANTITY_INVALID,
+      ProductStockExceptionCodeEnum.PRODUCT_STOCK_PRODUCT_NOT_FOUND,
+      ProductStockExceptionCodeEnum.PRODUCT_STOCK_IDEMPOTENT_REQUEST_IN_FLIGHT,
+      ProductStockExceptionCodeEnum.PRODUCT_STOCK_IDEMPOTENCY_KEY_REUSED,
     ],
   })
   public async handleAdd(

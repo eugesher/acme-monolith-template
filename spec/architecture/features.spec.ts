@@ -353,7 +353,7 @@ describe('features', () => {
     it('infrastructure/lib-adapters MAY take the health port', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/lib-adapters/__fixture__.ts',
-        code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
+        code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
       }).toPassArchitectureLint();
     });
 
@@ -362,7 +362,7 @@ describe('features', () => {
       async (layer) => {
         await expect({
           file: `apps/__features-fixture__/src/features/product/${layer}/__fixture__.ts`,
-          code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_PORT } from "@acme-libs/contracts/health";',
+          code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
         }).toBreakRule('boundaries/dependencies');
       },
     );

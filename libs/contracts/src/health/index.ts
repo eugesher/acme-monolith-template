@@ -1,3 +1,3 @@
-export * from './types';
+export * from './ports/health-lib.port';
 
-export * from './ports/health.port';
+export * from './types';

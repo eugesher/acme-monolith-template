@@ -2,18 +2,18 @@ import type { DataSource } from 'typeorm';
 
 import type { ICachePort } from '@acme-libs/contracts/cache';
 
-import { HealthDependencyProbeAdapter } from '../health-dependency-probe.adapter';
+import { HealthLibDependencyProbeAdapter } from '../health-lib-dependency-probe.adapter';
 
-describe('HealthDependencyProbeAdapter', () => {
+describe('HealthLibDependencyProbeAdapter', () => {
   let query: jest.Mock;
   let cache: jest.Mocked<ICachePort>;
-  let adapter: HealthDependencyProbeAdapter;
+  let adapter: HealthLibDependencyProbeAdapter;
 
   beforeEach(() => {
     query = jest.fn().mockResolvedValue([{ 1: '1' }]);
     cache = { handleGet: jest.fn(), handleDelByPrefix: jest.fn(), handleWrap: jest.fn() };
     cache.handleGet.mockResolvedValue(undefined);
-    adapter = new HealthDependencyProbeAdapter(cache, { query } as unknown as DataSource);
+    adapter = new HealthLibDependencyProbeAdapter(cache, { query } as unknown as DataSource);
   });
 
   afterEach(() => {

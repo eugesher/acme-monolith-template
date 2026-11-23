@@ -1,3 +1,3 @@
-export * from './types';
-
 export * from './ports/credentials.port';
+
+export * from './types';

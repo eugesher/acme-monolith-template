@@ -1,6 +1,6 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import { HEALTH_PORT, type IHealthPort } from '@acme-libs/contracts/health';
+import { HEALTH_LIB_PORT, type IHealthLibPort } from '@acme-libs/contracts/health';
 
 import {
   HEALTH_STATUS_PORT,
@@ -17,8 +17,8 @@ export class HealthStatusLibAdapter implements IHealthStatusPort {
   };
 
   constructor(
-    @Inject(HEALTH_PORT)
-    private readonly health: IHealthPort,
+    @Inject(HEALTH_LIB_PORT)
+    private readonly health: IHealthLibPort,
   ) {}
 
   public liveness(): IHealthStatusLivenessView {
