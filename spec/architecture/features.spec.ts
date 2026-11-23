@@ -374,10 +374,10 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('infrastructure/config MAY take the config lib and the outbound tokens', async () => {
+    it('infrastructure/config MAY take the config lib, the outbound tokens and the provider type', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/config/__fixture__.ts',
-        code: 'import { ConfigValueProvider } from "@acme-libs/config";\nimport { X_TOKEN } from "../../outbound";',
+        code: 'import type { FactoryProvider } from "@nestjs/common";\nimport { ConfigValueProvider } from "@acme-libs/config";\nimport { X_TOKEN } from "../../outbound";',
       }).toPassArchitectureLint();
     });
 
@@ -391,7 +391,7 @@ describe('features', () => {
       },
     );
 
-    it.each(['@nestjs/common', '@acme-libs/cache'])(
+    it.each(['@nestjs/config', '@acme-libs/cache'])(
       'infrastructure/config may NOT take %s — it only binds config values',
       async (source) => {
         await expect({

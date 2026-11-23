@@ -59,6 +59,7 @@ describe('core queues (@acme-core/queues)', () => {
   );
 
   it.each([
+    'import type { DynamicModule } from "@nestjs/common";',
     'import { BullSetupModule } from "@acme-libs/queue";',
     'import { LEDGER_RECORD_QUEUE } from "@acme-core/contracts/__ledger-fixture__";',
   ])('the core queues MAY take %s', async (code) => {

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'fs';
 import * as path from 'path';
 
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT: string = path.resolve(__dirname, '../..');
 
 export interface INestProject {
   type: 'application' | 'library';
@@ -13,9 +13,10 @@ export interface INestProject {
 
 const readJson = (file: string): unknown => JSON.parse(readFileSync(path.join(ROOT, file), 'utf8'));
 
-export const projects = (readJson('nest-cli.json') as { projects: Record<string, INestProject> })
-  .projects;
-const aliases = (
+export const projects: Record<string, INestProject> = (
+  readJson('nest-cli.json') as { projects: Record<string, INestProject> }
+).projects;
+const aliases: Record<string, string[]> = (
   readJson('tsconfig.json') as { compilerOptions: { paths: Record<string, string[]> } }
 ).compilerOptions.paths;
 

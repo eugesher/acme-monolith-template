@@ -9,7 +9,7 @@ All three apps connect BullMQ the same way, so the connection lives in a lib:
 | `BullSetupModule.registerQueue` | `core/queues`, the module of a queue adapter | `BullModule.registerQueue({ name })`                                    |
 
 ```ts
-export const LedgerQueueModule = BullSetupModule.registerQueue(LEDGER_RECORD_QUEUE);
+export const LedgerQueueModule: DynamicModule = BullSetupModule.registerQueue(LEDGER_RECORD_QUEUE);
 ```
 
 **A queue is registered by the module of the adapter that injects it.** Each queue adapter of

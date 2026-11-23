@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT: string = path.resolve(__dirname, '../..');
 
 export class Scaffold {
   private static readonly MANIFEST = path.join(ROOT, '.scaffold-manifest');

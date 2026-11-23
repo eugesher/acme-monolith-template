@@ -1,3 +1,5 @@
+import type { Type } from '@nestjs/common';
+
 import {
   Customer,
   IdempotencyKey,
@@ -8,7 +10,7 @@ import {
   ProductStock,
 } from '@acme-core/entities';
 
-export const entities = [
+export const entities: Type[] = [
   Customer,
   IdempotencyKey,
   LedgerEntry,

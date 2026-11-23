@@ -206,7 +206,9 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
   module may reach neither its own `outbound` nor `@acme-libs/config`. Only `infrastructure/config`,
-  `app/setup/config` and the observability lib import the config lib.
+  `app/setup/config` and the observability lib import the config lib. `infrastructure/config` and
+  `core/queues` also take `@nestjs/common`, for the type of the constants they export:
+  `FactoryProvider` and `DynamicModule`.
 - **A global module has the layers of a feature.** `application/` sees its own outbound, the base
   libs and `@nestjs/common`; `outbound/` sees itself and the base libs; the module root sees the
   application.

@@ -66,6 +66,7 @@ export const acmeCore = [
     layer('outbound'),
     layer('infrastructure:config'),
     libs('config'),
+    packages('@nestjs/common'),
   ]),
   from('acme-core:modules:shell:facade', [
     layer('application'),
@@ -87,5 +88,10 @@ export const acmeCore = [
   from('acme-core:contracts', [ownContracts, baseLibs()]),
   from('acme-core:domain', [coreDomain, baseLibs()]),
   from('acme-core:entities', [to('acme-core:entities'), libs('kernel'), packages('typeorm')]),
-  from('acme-core:queues', [to('acme-core:queues'), to('acme-core:contracts'), libs('queue')]),
+  from('acme-core:queues', [
+    to('acme-core:queues'),
+    to('acme-core:contracts'),
+    libs('queue'),
+    packages('@nestjs/common'),
+  ]),
 ];

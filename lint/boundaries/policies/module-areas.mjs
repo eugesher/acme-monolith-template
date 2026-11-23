@@ -85,7 +85,11 @@ const areaPolicies = (area, sharedFacing) => {
       ...sharedFacing.queue,
     ]),
     fromSpec(`${prefix}:infrastructure:config`),
-    from(`${prefix}:infrastructure:config`, [layer('outbound'), libs('config')]),
+    from(`${prefix}:infrastructure:config`, [
+      layer('outbound'),
+      libs('config'),
+      packages('@nestjs/common'),
+    ]),
     ...(sharedFacing.presentation
       ? [
           from(`${prefix}:presentation`, [

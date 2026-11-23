@@ -1,3 +1,5 @@
+import type { Type } from '@nestjs/common';
+
 import {
   Customer,
   IdempotencyKey,
@@ -15,7 +17,7 @@ import {
 } from '@acme-staff/common/entities';
 import { Note, NoteRevision, SubjectTag, Tag } from '@acme-staff/common/entities';
 
-export const entities = [
+export const entities: Type[] = [
   Customer,
   IdempotencyKey,
   LedgerEntry,

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from 'fs';
 import * as path from 'path';
 
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT: string = path.resolve(__dirname, '../..');
 const SKIPPED = new Set(['node_modules', 'dist']);
 const BARREL = 'index.ts';
 const SPEC = 'spec';

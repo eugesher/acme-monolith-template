@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT: string = path.resolve(__dirname, '../..');
 const TOPS = ['apps', 'core', 'libs'];
 const SKIPPED = new Set(['node_modules', 'dist', 'spec', 'test']);
 const REPOSITORY_TYPE = /^I?(\w+)Repository(Port)?$/;

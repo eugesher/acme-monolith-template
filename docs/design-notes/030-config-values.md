@@ -12,16 +12,18 @@ binds that token to the configuration.
 | module   | `apps/staff-app/src/features/catalog/modules/product/shell/product.module.ts`                             |
 
 ```ts
-export const ProductConfigOccRetryAttemptsProvider = ConfigValueProvider.provide({
-  injectionToken: PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN,
-  configProperty: 'OCC_RETRY_ATTEMPTS',
-});
+export const ProductConfigOccRetryAttemptsProvider: FactoryProvider<number> =
+  ConfigValueProvider.provide({
+    injectionToken: PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN,
+    configProperty: 'OCC_RETRY_ATTEMPTS',
+  });
 ```
 
 **The schema validates, the provider binds.** `ConfigSetupModule` of each app checks and converts
 every variable with Joi, so `OCC_RETRY_ATTEMPTS` is already a number when it reaches
 `ConfigService`. `ConfigValueProvider.provide` answers a plain `FactoryProvider` that reads the
-property with `getOrThrow`.
+property with `getOrThrow`. The constant states that type, so `infrastructure/config` takes
+`@nestjs/common` besides the config lib and its outbound tokens.
 
 **The lib lists the properties a module may read.** `IConfigValueProperties` of `libs/config` maps
 each of them to the type its Joi schema produces, `ENQUEUE_RETRY_ATTEMPTS: number`. `configProperty`

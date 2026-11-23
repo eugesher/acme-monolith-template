@@ -429,7 +429,7 @@ describe('core modules', () => {
     it('infrastructure/config MAY bind config values with the config lib', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/config/__fixture__.ts',
-        code: 'import { ConfigValueProvider } from "@acme-libs/config";',
+        code: 'import type { FactoryProvider } from "@nestjs/common";\nimport { ConfigValueProvider } from "@acme-libs/config";',
       }).toPassArchitectureLint();
     });
 
