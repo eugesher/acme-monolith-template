@@ -52,15 +52,15 @@ infrastructure of `test/infra`, so a copy of it is all an app needs. A schema ha
 missing or invalid variable stops the app at boot, and a Redis without `REDIS_PASSWORD` is refused.
 
 **The schema of an app is assembled from fragments.** `ConfigSchema` of `libs/config` holds one
-fragment per concern, each the rules of its variables: `APP`, `DATABASE`, `REDIS`, `QUEUE`, `AUTH`,
-`CREDENTIALS`, `HTTP` and `OBSERVABILITY`. `AUTH` holds the secret an API app checks a token with,
-`CREDENTIALS` the lifetime and the argon2 costs of signing users in; processor-app checks no token
-and spreads neither. `ConfigSetupModule` spreads the fragments an app reads into `Joi.object` and
-adds the keys of its own modules after them: `OCC_RETRY_ATTEMPTS` in staff-app and customer-app,
-`CACHE_TTL_MS_DEFAULT` in customer-app, the `IDEMPOTENCY_*` variables in processor-app. A rule that
-changes for every app changes once, and the schema of an app still lists exactly what the app reads.
-A key in two fragments would be overwritten silently by the spread, so the spec of `ConfigSchema`
-checks that every key appears once.
+fragment per concern, each the rules of its variables: `APP`, `DATABASE`, `REDIS`, `QUEUE`,
+`CREDENTIALS`, `HTTP` and `OBSERVABILITY`. `CREDENTIALS` holds what `libs/credentials` reads: the
+secret and the lifetime of a token and the argon2 costs, since one module signs and verifies; an API
+app spreads it, processor-app checks no token and does not. `ConfigSetupModule` spreads the
+fragments an app reads into `Joi.object` and adds the keys of its own modules after them:
+`OCC_RETRY_ATTEMPTS` in staff-app and customer-app, `CACHE_TTL_MS_DEFAULT` in customer-app, the
+`IDEMPOTENCY_*` variables in processor-app. A rule that changes for every app changes once, and the
+schema of an app still lists exactly what the app reads. A key in two fragments would be overwritten
+silently by the spread, so the spec of `ConfigSchema` checks that every key appears once.
 
 `ConfigSetupModule` loads `env/apps/<app>/.env`, or `env/apps/<app>/.env.test` under
 `NODE_ENV=test`. Each file sits next to its example. `migrations/config/data-source.ts` chooses

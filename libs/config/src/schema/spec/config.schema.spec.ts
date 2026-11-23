@@ -30,6 +30,7 @@ describe('ConfigSchema', () => {
   describe('CREDENTIALS', () => {
     it('refuses an argon2 memory cost below eight KiB per lane', () => {
       const { error } = Joi.object(ConfigSchema.CREDENTIALS).validate({
+        JWT_SECRET: 'access-secret-of-at-least-thirty-two-chars',
         JWT_EXPIRES_IN: '15m',
         AUTH_ARGON2_MEMORY_COST: 31,
         AUTH_ARGON2_TIME_COST: 2,
@@ -50,7 +51,6 @@ describe('ConfigSchema', () => {
       ConfigSchema.DATABASE,
       ConfigSchema.REDIS,
       ConfigSchema.QUEUE,
-      ConfigSchema.AUTH,
       ConfigSchema.CREDENTIALS,
       ConfigSchema.HTTP,
       ConfigSchema.OBSERVABILITY,
