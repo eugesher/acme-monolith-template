@@ -44,6 +44,10 @@ export class ConfigSchema {
           adjust: (parallelism: number) => parallelism * 8,
         }),
       )
+      .messages({
+        'number.min':
+          '{{#label}} must be at least {{AUTH_ARGON2_PARALLELISM * 8}}: 8 KiB per lane of AUTH_ARGON2_PARALLELISM',
+      })
       .required(),
     AUTH_ARGON2_TIME_COST: Joi.number().integer().positive().required(),
     AUTH_ARGON2_PARALLELISM: Joi.number().integer().positive().required(),

@@ -40,7 +40,7 @@ describe('ConfigSchema', () => {
       });
 
       expect(error?.message).toBe(
-        '"AUTH_ARGON2_MEMORY_COST" must be greater than or equal to ref:AUTH_ARGON2_PARALLELISM',
+        '"AUTH_ARGON2_MEMORY_COST" must be at least 32: 8 KiB per lane of AUTH_ARGON2_PARALLELISM',
       );
     });
   });
