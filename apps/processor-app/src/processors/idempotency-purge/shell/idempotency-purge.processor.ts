@@ -4,9 +4,9 @@ import type { OnApplicationBootstrap } from '@nestjs/common';
 import { CorrelationContextHelper } from '@acme-libs/observability';
 
 import { IdempotencyPurgeScheduleUseCase, IdempotencyPurgeUseCase } from '../application';
-import { IDEMPOTENCY_PURGE_QUEUE } from '../outbound';
+import { IdempotencyPurgeQueue } from '../queues';
 
-@Processor(IDEMPOTENCY_PURGE_QUEUE)
+@Processor(IdempotencyPurgeQueue.NAME)
 export class IdempotencyPurgeProcessor extends WorkerHost implements OnApplicationBootstrap {
   constructor(
     private readonly schedule: IdempotencyPurgeScheduleUseCase,

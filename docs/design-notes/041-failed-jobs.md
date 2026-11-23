@@ -12,9 +12,9 @@ two apps meet in one Redis.
 | `POST /queues/:queueName/jobs/failed/:jobId/retry` | `queue:retry`  | returns the job to the queue                      |
 | `DELETE /queues/:queueName/jobs/failed/:jobId`     | `queue:delete` | removes the job                                   |
 
-**A queue is read, not processed.** `QueueRegistryModule` next to the adapter mounts
-`LedgerQueueModule` and `ProductStockPostSubtractQueueModule` of `@acme-core/queues` (see
-`032-queue-lib.md`), and `QueueRegistryAdapter` injects them. A BullMQ queue without a worker reads
+**A queue is read, not processed.** `QueueModule` mounts `LedgerQueueModule` and
+`ProductStockPostSubtractQueueModule` of `@acme-core/queues` next to `QueueRegistryAdapter.provider`
+(see `032-queue-lib.md`), and the adapter injects both queues. A BullMQ queue without a worker reads
 and moves jobs and runs none, so staff-app takes no job from processor-app.
 
 **A pause belongs to the queue, not to a job.** BullMQ keeps the jobs of a paused queue waiting and

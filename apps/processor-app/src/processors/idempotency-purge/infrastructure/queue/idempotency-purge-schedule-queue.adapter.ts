@@ -1,28 +1,33 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 
 import {
-  IDEMPOTENCY_PURGE_QUEUE,
-  type IIdempotencyPurgePayload,
+  IDEMPOTENCY_PURGE_SCHEDULE_PORT,
   type IIdempotencyPurgeSchedulePort,
   type IIdempotencyPurgeScheduleRegisterCommand,
 } from '../../outbound';
+import { IdempotencyPurgeQueue, type IIdempotencyPurgeQueuePayload } from '../../queues';
 
 @Injectable()
 export class IdempotencyPurgeScheduleQueueAdapter implements IIdempotencyPurgeSchedulePort {
+  public static readonly provider: ClassProvider<IIdempotencyPurgeSchedulePort> = {
+    provide: IDEMPOTENCY_PURGE_SCHEDULE_PORT,
+    useClass: IdempotencyPurgeScheduleQueueAdapter,
+  };
+
   constructor(
-    @InjectQueue(IDEMPOTENCY_PURGE_QUEUE)
-    private readonly queue: Queue<IIdempotencyPurgePayload>,
+    @InjectQueue(IdempotencyPurgeQueue.NAME)
+    private readonly queue: Queue<IIdempotencyPurgeQueuePayload>,
   ) {}
 
   public async register(command: IIdempotencyPurgeScheduleRegisterCommand): Promise<void> {
     const { pattern } = command;
 
     await this.queue.upsertJobScheduler(
-      IDEMPOTENCY_PURGE_QUEUE,
+      IdempotencyPurgeQueue.NAME,
       { pattern },
-      { name: IDEMPOTENCY_PURGE_QUEUE },
+      { name: IdempotencyPurgeQueue.NAME },
     );
   }
 }

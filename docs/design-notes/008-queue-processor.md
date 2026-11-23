@@ -19,8 +19,8 @@ as it is, so a new producer needs no change here. The producers do not process t
 processor-app does (see `023-processor-app.md`), and the apps reach the queue through one Redis.
 
 The queue name and the job type live in `@acme-core/contracts/ledger`, because an app may not import
-another. `LedgerCoreQueueModule` of the producers and the module root of the ledger processor both
-mount `LedgerQueueModule` of `@acme-core/queues`, which is
+another. `LedgerCoreModule` of the producers and the module root of the ledger processor both mount
+`LedgerQueueModule` of `@acme-core/queues`, which is
 `BullSetupModule.registerQueue(LEDGER_RECORD_QUEUE)`. BullMQ applies the job options of the
 producer, so every producer enqueues with the same `attempts` and `backoff` because `registerQueue`
 takes the name alone and every queue gets the fixed job options of `BullSetupModule.forRoot()`.

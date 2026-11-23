@@ -99,12 +99,13 @@ module in `shell/` and, in a parent feature, `modules/index.ts`: a parent keeps 
 its root, next to `modules/` (see `025-feature-groups.md`).
 
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
-processor upserts its job scheduler (see `009-scheduled-processor.md`). The module next to the
-adapter takes `libs/queue` or `@acme-core/queues` to register the queue, in features and processors
-alike. The processor in `shell/` takes the name of its queue from its own `outbound` for
-`@Processor`, and `queue.mjs` keeps it to `*_QUEUE` names, so a port still reaches the processor
-only through a use case. The module root of a processor without a queue adapter, as the ledger,
-mounts its registration from `@acme-core/queues`.
+processor upserts its job scheduler (see `009-scheduled-processor.md`). The module root that binds
+the adapter registers the queue it injects. A queue of one processor lives in `queues/` of the
+processor, the one folder of a processor besides its layers (`spec/support/app-module-kinds.ts`): it
+takes `libs/queue` and `@nestjs/common` and nothing of the module, and only `shell/` and
+`infrastructure/queue` reach it. The processor in `shell/` takes nothing from its `outbound`, so a
+port reaches it only through a use case. The module root of a processor without a queue adapter, as
+the ledger, mounts its registration from `@acme-core/queues`.
 
 The module root of a feature or a processor may reach a shared barrel, as the module root of a
 common module may (a positive case of the common modules spec).
@@ -129,10 +130,10 @@ edges exist for it:
 
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
   `@nestjs/bullmq`, `bullmq` and its own contracts.
-- **The module of a queue adapter registers its queue** from `@acme-core/queues`, and the module
-  root mounts that module and takes neither `@acme-core/queues`, `libs/queue` nor BullMQ itself. A
-  core module is mounted by features of several apps, so the queue comes with it rather than with
-  each app.
+- **The module root registers the queue of its adapter** from `@acme-core/queues`, next to
+  `<Adapter>.provider`, and takes neither `libs/queue` nor BullMQ itself; `infrastructure/queue`
+  takes neither `@acme-core/queues` nor `libs/queue`. A core module is mounted by features of
+  several apps, so the queue comes with it rather than with each app.
 - **Core infrastructure may take `@acme-libs/contracts/cache`**, to drop the keys a write makes
   stale; the application still may not, so caching stays an adapter behind a port.
 
@@ -232,10 +233,6 @@ A policy allows a layer other layers, libs and packages, never a list of the nam
 Which decorator or type a layer takes from a package it may import is the choice of the code: a core
 service may implement `OnModuleInit`, a processor may throw `UnrecoverableError`, a queue adapter
 may pass `JobsOptions`. A list of names would turn each of them into an edit of the lint.
-
-One policy still names imports: `queue.mjs` keeps the processor in `shell/` to the `*_QUEUE` names
-of its own `outbound`, so that a port reaches it only through a use case. The specifier is a pattern
-of the naming of `029-naming.md`, not a list of exports.
 
 ### The layers of a lib
 

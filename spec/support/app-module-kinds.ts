@@ -14,7 +14,7 @@ const AREAS = {
     missing: 'a feature must have a controller in shell/',
   },
   processors: {
-    layers: LAYERS,
+    layers: [...LAYERS, 'queues'],
     suffix: '.processor.ts',
     missing: 'a processor must have a .processor.ts in shell/',
   },

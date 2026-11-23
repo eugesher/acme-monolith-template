@@ -1,22 +1,28 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { JobsOptions, Queue } from 'bullmq';
 
 import { LEDGER_RECORD_QUEUE } from '@acme-core/contracts/ledger';
 import { PRODUCT_STOCK_POST_SUBTRACT_QUEUE } from '@acme-core/contracts/product-stock';
 import type { Maybe, Nullable } from '@acme-libs/toolkit';
 
-import type {
-  IQueueRegistryFailedJobsView,
-  IQueueRegistryFailedJobView,
-  IQueueRegistryFindFailedJobsCommand,
-  IQueueRegistryJobCommand,
-  IQueueRegistryJobCountsView,
-  IQueueRegistryPort,
+import {
+  QUEUE_REGISTRY_PORT,
+  type IQueueRegistryFailedJobsView,
+  type IQueueRegistryFailedJobView,
+  type IQueueRegistryFindFailedJobsCommand,
+  type IQueueRegistryJobCommand,
+  type IQueueRegistryJobCountsView,
+  type IQueueRegistryPort,
 } from '../../outbound';
 
 @Injectable()
 export class QueueRegistryAdapter implements IQueueRegistryPort {
+  public static readonly provider: ClassProvider<IQueueRegistryPort> = {
+    provide: QUEUE_REGISTRY_PORT,
+    useClass: QueueRegistryAdapter,
+  };
+
   private readonly queues: Map<string, Queue>;
 
   constructor(

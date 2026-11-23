@@ -336,7 +336,7 @@ describe('app entry points', () => {
 
   it.each([
     'apps/processor-app/src/processors/ledger-append/shell/ledger-append.module.ts',
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
+    'apps/staff-app/src/features/queue/shell/queue.module.ts',
   ])('%s MAY register the ledger record queue through the core queues', async (file) => {
     await expect({
       file,

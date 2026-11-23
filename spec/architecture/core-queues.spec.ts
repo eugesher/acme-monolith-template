@@ -22,17 +22,17 @@ describe('core queues (@acme-core/queues)', () => {
     expect('@acme-core/queues').toResolve();
   });
 
-  it('a queue adapter module may NOT reach a deep path into the core queues', async () => {
+  it('a module root may NOT reach a deep path into the core queues', async () => {
     await expect({
-      file: 'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
+      file: 'apps/staff-app/src/features/queue/shell/queue.module.ts',
       code: 'import { LedgerQueueModule } from "@acme-core/queues/__fixture__/fixture-queue.module";',
     }).toBreakRule('no-restricted-imports');
   });
 
   it.each([
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
-    'core/modules/src/ledger/infrastructure/queue/ledger-core-queue.module.ts',
-    'core/modules/src/product-stock/infrastructure/queue/product-stock-core-post-subtract-queue.module.ts',
+    'apps/staff-app/src/features/queue/shell/queue.module.ts',
+    'core/modules/src/ledger/shell/ledger-core.module.ts',
+    'core/modules/src/product-stock/shell/product-stock-core.module.ts',
     'apps/processor-app/src/processors/ledger-append/shell/ledger-append.module.ts',
   ])('%s MAY register a queue of the core queues', async (file) => {
     await expect({
@@ -42,14 +42,14 @@ describe('core queues (@acme-core/queues)', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/queue/shell/queue.module.ts',
+    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
     'apps/staff-app/src/features/queue/application/use-cases/__fixture__.ts',
     'apps/processor-app/src/processors/ledger-append/shell/__fixture__.ts',
     'apps/staff-app/src/common/shared/ledger/__fixture__.ts',
-    'core/modules/src/ledger/shell/ledger-core.module.ts',
+    'core/modules/src/ledger/infrastructure/queue/ledger-core-queue.adapter.ts',
     'libs/queue/src/__fixture__.ts',
   ])(
-    '%s may NOT import the core queues, the module of a queue adapter registers a queue',
+    '%s may NOT import the core queues, the module root that binds the queue adapter registers a queue',
     async (file) => {
       await expect({
         file,

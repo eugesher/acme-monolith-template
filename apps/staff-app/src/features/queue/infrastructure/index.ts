@@ -1,1 +1,1 @@
-export * from './queue/queue-registry.module';
+export * from './queue/queue-registry.adapter';

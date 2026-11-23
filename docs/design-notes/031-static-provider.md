@@ -45,12 +45,6 @@ lands on the object that `useClass` holds.
 
 ## Where the scheme stops
 
-- **Queue adapters** are bound by a module next to them, `<context>-<target>-queue.module.ts` in
-  `infrastructure/queue`. The module registers the queue the adapter injects, from `core/queues` or
-  with `BullSetupModule.registerQueue` for a queue of the module alone, binds the adapter as
-  `{ provide, useClass } satisfies ClassProvider<IPort>` and exports the port. The module root
-  imports that module and lists no binding, so registering the queue and implementing the port
-  cannot drift apart, and the module is the one place that shows which class answers the port.
 - **Facades** in `shell/` stay `{ provide: <MODULE>_<LAYER>_PORT, useClass: <Facade> }`. A facade is
   the public entry of a module, not an implementation of one of its outbound ports, and the module
   exports the port it binds: the literal next to `exports` shows at a glance which class answers the

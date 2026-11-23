@@ -1,17 +1,18 @@
 import { Module, type ClassProvider } from '@nestjs/common';
 
+import { LedgerQueueModule } from '@acme-core/queues';
 import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
 
 import { LedgerCoreEnqueueUseCase } from '../application';
 import {
   LedgerCoreConfigEnqueueRetryAttemptsProvider,
   LedgerCoreConfigRedisCommandTimeoutMsProvider,
-  LedgerCoreQueueModule,
+  LedgerCoreQueueAdapter,
 } from '../infrastructure';
 import { LedgerCoreFacade } from './ledger-core.facade';
 
 @Module({
-  imports: [LedgerCoreQueueModule],
+  imports: [LedgerQueueModule],
   exports: [LEDGER_CORE_PORT],
   providers: [
     {
@@ -19,6 +20,7 @@ import { LedgerCoreFacade } from './ledger-core.facade';
       useClass: LedgerCoreFacade,
     } satisfies ClassProvider<ILedgerCorePort>,
     LedgerCoreEnqueueUseCase,
+    LedgerCoreQueueAdapter.provider,
     LedgerCoreConfigRedisCommandTimeoutMsProvider,
     LedgerCoreConfigEnqueueRetryAttemptsProvider,
   ],

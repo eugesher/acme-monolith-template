@@ -5,17 +5,19 @@ import {
   IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider,
   IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider,
   IdempotencyPurgeRepository,
-  IdempotencyPurgeScheduleQueueModule,
+  IdempotencyPurgeScheduleQueueAdapter,
 } from '../infrastructure';
+import { IdempotencyPurgeQueue } from '../queues';
 import { IdempotencyPurgeProcessor } from './idempotency-purge.processor';
 
 @Module({
-  imports: [IdempotencyPurgeScheduleQueueModule],
+  imports: [IdempotencyPurgeQueue.register()],
   providers: [
     IdempotencyPurgeProcessor,
     IdempotencyPurgeScheduleUseCase,
     IdempotencyPurgeUseCase,
     IdempotencyPurgeRepository.provider,
+    IdempotencyPurgeScheduleQueueAdapter.provider,
     IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider,
     IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider,
   ],

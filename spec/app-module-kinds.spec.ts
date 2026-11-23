@@ -143,6 +143,18 @@ describe('feature kinds: an aggregator or a regular module, never both', () => {
           shellFiles: ['x.module.ts', 'x.processor.ts'],
         },
       ],
+      [
+        'a processor with the queue of its module in queues/',
+        {
+          relPath: 'x',
+          name: 'x',
+          area: 'processors' as const,
+          nested: false,
+          files: ['index.ts'],
+          folders: ['application', 'queues', 'shell'],
+          shellFiles: ['x.module.ts', 'x.processor.ts'],
+        },
+      ],
     ])('accepts %s', (_, module) => {
       expect(moduleKindViolationOf(module)).toBeNull();
     });
@@ -290,6 +302,18 @@ describe('feature kinds: an aggregator or a regular module, never both', () => {
           files: ['index.ts'],
           folders: ['application', 'shell'],
           shellFiles: ['x.module.ts'],
+        },
+      ],
+      [
+        'a feature with a queues folder',
+        {
+          relPath: 'x',
+          name: 'x',
+          area: 'features' as const,
+          nested: false,
+          files: ['index.ts'],
+          folders: ['queues', 'shell'],
+          shellFiles: ['x.module.ts', 'x.controller.ts'],
         },
       ],
       [

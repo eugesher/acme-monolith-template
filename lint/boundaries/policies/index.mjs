@@ -4,7 +4,6 @@ import { acmeLibs } from './acme-libs.mjs';
 import { commonModules } from './common-modules.mjs';
 import { libLayers } from './lib-layers.mjs';
 import { moduleAreas } from './module-areas.mjs';
-import { queue } from './queue.mjs';
 import { repo } from './repo.mjs';
 
 export const policies = [
@@ -14,6 +13,5 @@ export const policies = [
   ...acmeCore,
   ...acmeLibs,
   ...repo,
-  ...queue,
   ...libLayers,
 ];

@@ -78,10 +78,10 @@ const areaPolicies = (area, sharedFacing) => {
     from(`${prefix}:infrastructure:queue`, [
       layer('outbound'),
       layer('infrastructure:queue'),
+      ...(sharedFacing.queues ? [layer('queues')] : []),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
-      to('acme-core:queues'),
-      baseLibs('queue'),
+      baseLibs(),
       ...sharedFacing.queue,
     ]),
     fromSpec(`${prefix}:infrastructure:config`),
@@ -99,16 +99,21 @@ const areaPolicies = (area, sharedFacing) => {
           ]),
         ]
       : []),
+    ...(sharedFacing.queues
+      ? [from(`${prefix}:queues`, [layer('queues'), ...sharedFacing.queues])]
+      : []),
     from(`${prefix}:shell`, [
       layer('domain'),
       layer('application'),
       ...(sharedFacing.presentation ? [layer('presentation')] : []),
+      ...(sharedFacing.queues ? [layer('queues')] : []),
       layer('shell'),
       ...sharedFacing.shell,
     ]),
     from(`${prefix}:shell:module`, [
       layer('application'),
       layer('infrastructure'),
+      ...(sharedFacing.queues ? [layer('queues')] : []),
       layer('shell'),
       to('acme-app:common:shared:index', own('app')),
       to('acme-app:common:modules:index', own('app')),
@@ -140,7 +145,11 @@ export const moduleAreas = [
     queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
     presentation: featureFacing,
     shell: featureFacing,
-    module: [baseLibs('auth', 'health', 'http'), packages('@nestjs/common')],
+    module: [
+      to('acme-core:queues'),
+      baseLibs('auth', 'health', 'http'),
+      packages('@nestjs/common'),
+    ],
   }),
   ...areaPolicies('processors', {
     outbound: [],
@@ -149,8 +158,8 @@ export const moduleAreas = [
     commonAdapters: [packages('@nestjs/common')],
     libAdapters: [packages('@nestjs/common')],
     queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
+    queues: [libs('queue'), packages('@nestjs/common')],
     shell: [
-      layerOf('acme-app:processors', ['app', 'module'])('outbound'),
       to('acme-app:contracts', own('app')),
       to('acme-core:contracts'),
       baseLibs('observability'),

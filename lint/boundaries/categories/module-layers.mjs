@@ -16,5 +16,5 @@ const layers = [
 
 export const moduleAreaLayers = {
   features: layers,
-  processors: layers.filter((layer) => layer !== 'presentation'),
+  processors: [...layers.filter((layer) => layer !== 'presentation'), 'queues'],
 };
