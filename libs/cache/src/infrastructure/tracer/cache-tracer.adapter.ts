@@ -9,7 +9,7 @@ import {
 
 @Injectable()
 export class CacheTracerAdapter implements ICacheTracerPort {
-  public static readonly provider: ClassProvider<ICacheTracerPort> = {
+  public static readonly PROVIDER: ClassProvider<ICacheTracerPort> = {
     provide: CACHE_TRACER_PORT,
     useClass: CacheTracerAdapter,
   };

@@ -17,7 +17,7 @@ export class ProductCreateRepository
   extends ProductPersistenceHost
   implements IProductCreateRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductCreateRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductCreateRepositoryPort> = {
     provide: PRODUCT_CREATE_REPOSITORY_PORT,
     useClass: ProductCreateRepository,
   };

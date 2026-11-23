@@ -11,7 +11,7 @@ export class ProductStockCoreLockRepository
   extends ProductStockCoreBaseRepository
   implements IProductStockCoreLockRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductStockCoreLockRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockCoreLockRepositoryPort> = {
     provide: PRODUCT_STOCK_CORE_LOCK_REPOSITORY_PORT,
     useClass: ProductStockCoreLockRepository,
   };

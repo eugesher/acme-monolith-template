@@ -1,5 +1,7 @@
 import { builtinModules } from 'module';
 
+import { moduleConstTypeSelectors } from '../syntax/module-const-type.selectors.mjs';
+
 const nodeModules = builtinModules.map((name) => name.replace('/', '\\/')).join('|');
 const message = 'runs under plain node as an ES module';
 
@@ -21,6 +23,7 @@ export const plainNode = {
         selector: `ImportDeclaration:not([source.value=/^(node:)?(${nodeModules})$/]) > ImportNamespaceSpecifier`,
         message: `${message}: import a CommonJS package by its default export, a namespace import has no callable members`,
       },
+      ...moduleConstTypeSelectors,
     ],
   },
 };

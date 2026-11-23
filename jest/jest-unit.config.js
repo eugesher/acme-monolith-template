@@ -35,6 +35,7 @@ module.exports = {
     '!**/index.ts',
     '!**/*.{port,token,enum,entity,dto,view,type,interface,const,command,query,record}.ts',
     '!**/*.module.ts',
+    '!**/*.queue.ts',
     '!**/infrastructure/persistence/repositories/**',
     '!**/infrastructure/persistence/host/**',
     '!**/shell/*.controller.ts',

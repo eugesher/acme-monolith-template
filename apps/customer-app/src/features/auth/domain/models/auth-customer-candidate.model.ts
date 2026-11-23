@@ -6,7 +6,7 @@ import type {
   IAuthCustomerCandidateCreate,
   IAuthCustomerCandidateInsertPayload,
   IAuthCustomerRegisterReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class AuthCustomerCandidateModel {
   private static readonly MIN_PASSWORD_LENGTH = 12;

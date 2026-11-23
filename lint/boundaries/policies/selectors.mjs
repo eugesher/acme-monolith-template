@@ -40,7 +40,7 @@ export const libLayerFiles = (...names) => {
   return `{${folders}}/**`;
 };
 
-export const persistenceInterfaces = 'interfaces/{records,queries}/*.ts';
+export const persistenceTypes = 'types/{records,queries}/*.ts';
 
 export const fromSpec = (category) => ({
   from: { file: { categories: category, captured: { file: 'spec/*.spec.ts' } } },

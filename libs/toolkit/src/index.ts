@@ -5,8 +5,8 @@ export * from './database/mysql-error.helper';
 
 export * from './idempotency/body-fingerprint.helper';
 
-export * from './pagination/interfaces/snapshots/page-window.interface';
-export * from './pagination/interfaces/snapshots/page.interface';
+export * from './pagination/page-window.interface';
+export * from './pagination/page.interface';
 export * from './pagination/pagination.helper';
 
 export * from './resilience/deadline.helper';

@@ -1,6 +1,6 @@
 import type { Nullable } from '@acme-libs/toolkit';
 
-import type { IAuthLoginStaffUserRecord } from '../interfaces';
+import type { IAuthLoginStaffUserRecord } from '../types';
 
 export interface IAuthLoginRepositoryPort {
   findByEmail(email: string): Promise<Nullable<IAuthLoginStaffUserRecord>>;

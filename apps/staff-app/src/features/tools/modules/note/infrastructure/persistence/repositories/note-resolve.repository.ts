@@ -8,7 +8,7 @@ export class NoteResolveRepository
   extends NoteBaseRepository
   implements INoteResolveRepositoryPort
 {
-  public static readonly provider: ClassProvider<INoteResolveRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<INoteResolveRepositoryPort> = {
     provide: NOTE_RESOLVE_REPOSITORY_PORT,
     useClass: NoteResolveRepository,
   };

@@ -4,7 +4,7 @@ import type {
   IOrderTagFindView,
   IOrderTagReplaceCommand,
   IOrderTagReplaceView,
-} from '../interfaces';
+} from '../types';
 
 export interface IOrderTagPort {
   find(command: IOrderTagFindCommand): Promise<IOrderTagFindView[]>;

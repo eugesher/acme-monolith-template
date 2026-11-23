@@ -12,7 +12,7 @@ export class ProductWriteRepository
   extends ProductBaseRepository
   implements IProductWriteRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductWriteRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductWriteRepositoryPort> = {
     provide: PRODUCT_WRITE_REPOSITORY_PORT,
     useClass: ProductWriteRepository,
   };

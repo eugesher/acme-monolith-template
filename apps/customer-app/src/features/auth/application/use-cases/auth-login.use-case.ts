@@ -10,7 +10,7 @@ import {
   type IAuthCredentialsPort,
   type IAuthLoginRepositoryPort,
 } from '../../outbound';
-import type { IAuthLoginCommand, IAuthLoginView } from '../interfaces';
+import type { IAuthLoginCommand, IAuthLoginView } from '../types';
 
 @Injectable()
 export class AuthLoginUseCase {

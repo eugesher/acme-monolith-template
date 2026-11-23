@@ -13,7 +13,7 @@ export class TagCommonFindSubjectIdsRepository
   extends TagCommonPersistenceHost
   implements ITagCommonFindSubjectIdsRepositoryPort
 {
-  public static readonly provider: ClassProvider<ITagCommonFindSubjectIdsRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagCommonFindSubjectIdsRepositoryPort> = {
     provide: TAG_COMMON_FIND_SUBJECT_IDS_REPOSITORY_PORT,
     useClass: TagCommonFindSubjectIdsRepository,
   };

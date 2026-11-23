@@ -4,7 +4,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { NoteDeleteModel } from '../../domain';
 import { NOTE_DELETE_REPOSITORY_PORT, type INoteDeleteRepositoryPort } from '../../outbound';
 import { NoteAccessService } from '../services/note-access.service';
-import type { INoteDeleteCommand } from '../interfaces';
+import type { INoteDeleteCommand } from '../types';
 
 @Injectable()
 export class NoteDeleteUseCase {

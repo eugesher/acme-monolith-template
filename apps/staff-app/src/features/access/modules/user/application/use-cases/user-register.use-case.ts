@@ -15,7 +15,7 @@ import {
   type IUserRegisterRepositoryPort,
   type IUserTransactionPort,
 } from '../../outbound';
-import type { IUserRegisterCommand, IUserRegisterView } from '../interfaces';
+import type { IUserRegisterCommand, IUserRegisterView } from '../types';
 
 @Injectable()
 export class UserRegisterUseCase {

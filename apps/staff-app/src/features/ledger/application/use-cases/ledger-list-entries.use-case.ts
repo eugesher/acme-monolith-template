@@ -7,7 +7,7 @@ import {
   LEDGER_LIST_ENTRIES_REPOSITORY_PORT,
   type ILedgerListEntriesRepositoryPort,
 } from '../../outbound';
-import type { ILedgerListEntriesCommand, ILedgerListEntriesView } from '../interfaces';
+import type { ILedgerListEntriesCommand, ILedgerListEntriesView } from '../types';
 
 @Injectable()
 export class LedgerListEntriesUseCase {

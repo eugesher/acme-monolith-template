@@ -11,7 +11,7 @@ import {
   type INoteTransactionPort,
 } from '../../outbound';
 import { NoteWriteService } from '../services/note-write.service';
-import type { INoteEditCommand, INoteEditSaveCommand, INoteView } from '../interfaces';
+import type { INoteEditCommand, INoteEditSaveCommand, INoteView } from '../types';
 
 @Injectable()
 export class NoteEditUseCase {

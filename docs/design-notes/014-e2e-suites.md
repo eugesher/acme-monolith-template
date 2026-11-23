@@ -79,6 +79,17 @@ method wraps the `describe` of that endpoint. `ProductE2E.of(ctx)` builds it ove
 feature that needs a hook before each case has `hooks()`, as `CatalogE2E` of customer-app deletes
 the `acme:catalog:*` keys from Redis.
 
+**Every route handler has a case, and nothing else runs a controller.** A controller has no unit
+spec (see `040-unit-specs.md`), so `spec/e2e-endpoints.spec.ts` asks the suites for it: each
+decorated method of a controller has a method of the same name in the e2e class of its module, with
+at least one case, and the file that builds that class with `<Class>.of(` calls it on
+`<class>.<method>()`. The class mirrors the path of the module: `features/auth/shell` to
+`test/features/auth/auth.e2e.ts`, `features/tools/modules/tag/shell` to
+`test/features/tools/modules/tag.e2e.ts`, and a section every app runs alike to
+`libs/testing/src/e2e/<name>.e2e.ts`. The cases cover what the command of a route reads: an optional
+field of a request, a query or a path reaches the use case in at least one case, since the typecheck
+does not miss a dropped optional field.
+
 **A section every app runs alike lives in the testing lib.** The health endpoints, the headers of
 helmet, CORS and the correlation id answer the same in the three apps, so `HealthE2E` of
 `libs/testing/src/e2e/health.e2e.ts` holds their cases once and takes any `E2EContext`. Each entry
@@ -114,22 +125,22 @@ the code of `@RequiresPermission`, or `authenticated` for a route that needs a t
 `auth:permission` itself. The table is the whole set: a route of the other app, a new route without
 a row and a route that lost its decorator fail the case alike, the last because a route without a
 code is open to every signed-in staff user. The notes are open on purpose: their use cases answer
-only the notes of the caller, and their cases check that. The controller specs read no metadata, and
-the specs of `libs/auth` check the guards on a route of their own, so the table is the only check of
-the code each route asks for. Beyond it the suites keep one case per guard that shows it is
-installed: 401 without a token, 403 to the viewer on `GET /api/access/permissions`, the permissions
-read from the database rather than the claims of the token, and a revoked permission refused at
-once.
+only the notes of the caller, and their cases check that. No unit spec reads the metadata of a
+route, and the specs of `libs/auth` check the guards on a route of their own, so the table is the
+only check of the code each route asks for. Beyond it the suites keep one case per guard that shows
+it is installed: 401 without a token, 403 to the viewer on `GET /api/access/permissions`, the
+permissions read from the database rather than the claims of the token, and a revoked permission
+refused at once.
 
 **A suite checks that each route validates, not what.** `routeDtos()` of `E2EContext` answers per
 route the classes of its `@Param()`, `@Query()` and `@Body()` arguments, in that order, read from
 the design types the global `ValidationPipe` validates with, and a second case of the entry of
 staff-app and customer-app compares them with a table. A parameter typed with an interface or a
-`Pick` reads as `Object`, and the pipe lets it through unchecked: typecheck and the spec of the
-controller pass, and only this table fails. The rules of a DTO are checked by its spec (see
-`015-quality-gates.md`), so a suite sends one invalid path parameter, query and body to show that
-the pipe is installed and how its 400 reads, a request without the key on each route that requires
-`Idempotency-Key`, and one malformed `If-Match`.
+`Pick` reads as `Object`, and the pipe lets it through unchecked: the typecheck passes, and only
+this table fails. The rules of a DTO are checked by its spec (see `015-quality-gates.md`), so a
+suite sends one invalid path parameter, query and body to show that the pipe is installed and how
+its 400 reads, a request without the key on each route that requires `Idempotency-Key`, and one
+malformed `If-Match`.
 
 **A catalog case clears its own keys, not the database.** The queues live in the same Redis, under
 `acme:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters. `hooks()`

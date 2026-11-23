@@ -20,7 +20,7 @@ import {
   type IOrderProductStockPort,
   type IOrderTransactionPort,
 } from '../../outbound';
-import type { IOrderPlaceCommand, IOrderView } from '../interfaces';
+import type { IOrderPlaceCommand, IOrderView } from '../types';
 
 @Injectable()
 export class OrderPlaceUseCase {

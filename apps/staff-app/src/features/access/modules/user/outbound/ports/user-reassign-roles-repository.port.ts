@@ -2,7 +2,7 @@ import type {
   IUserReassignRolesStaffRoleRecord,
   IUserReassignRolesStaffUserRoleDeleteQuery,
   IUserReassignRolesStaffUserRoleInsertQuery,
-} from '../interfaces';
+} from '../types';
 
 export interface IUserReassignRolesRepositoryPort {
   existsUser(id: string): Promise<boolean>;

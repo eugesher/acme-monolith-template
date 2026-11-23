@@ -1,4 +1,4 @@
-import type { ILedgerListEntriesReconstitute, ILedgerListEntriesSnapshot } from '../interfaces';
+import type { ILedgerListEntriesReconstitute, ILedgerListEntriesSnapshot } from '../types';
 
 export class LedgerListEntriesModel {
   private constructor(

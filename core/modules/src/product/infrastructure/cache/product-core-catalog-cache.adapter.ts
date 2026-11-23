@@ -6,7 +6,7 @@ import { PRODUCT_CORE_CATALOG_CACHE_PORT, type IProductCoreCatalogCachePort } fr
 
 @Injectable()
 export class ProductCoreCatalogCacheAdapter implements IProductCoreCatalogCachePort {
-  public static readonly provider: ClassProvider<IProductCoreCatalogCachePort> = {
+  public static readonly PROVIDER: ClassProvider<IProductCoreCatalogCachePort> = {
     provide: PRODUCT_CORE_CATALOG_CACHE_PORT,
     useClass: ProductCoreCatalogCacheAdapter,
   };

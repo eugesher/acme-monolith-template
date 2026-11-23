@@ -14,7 +14,7 @@ export class IdempotencyCoreReleaseRepository
   extends IdempotencyCorePersistenceHost
   implements IIdempotencyCoreReleaseRepositoryPort
 {
-  public static readonly provider: ClassProvider<IIdempotencyCoreReleaseRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IIdempotencyCoreReleaseRepositoryPort> = {
     provide: IDEMPOTENCY_CORE_RELEASE_REPOSITORY_PORT,
     useClass: IdempotencyCoreReleaseRepository,
   };

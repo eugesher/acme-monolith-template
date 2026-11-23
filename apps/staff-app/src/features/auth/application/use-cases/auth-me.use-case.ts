@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { AuthUserNotFoundException } from '../../domain';
 import { AUTH_IDENTITY_PORT, type IAuthIdentityPort } from '../../outbound';
-import type { IAuthMeCommand, IAuthMeView } from '../interfaces';
+import type { IAuthMeCommand, IAuthMeView } from '../types';
 
 @Injectable()
 export class AuthMeUseCase {

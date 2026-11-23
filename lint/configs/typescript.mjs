@@ -3,6 +3,7 @@ import typescriptEslint from 'typescript-eslint';
 
 import { awaitedArgumentSelectors } from '../syntax/awaited-argument.selectors.mjs';
 import { barrelBypassSelectors } from '../syntax/barrel-bypass.selectors.mjs';
+import { moduleConstTypeSelectors } from '../syntax/module-const-type.selectors.mjs';
 
 export const typescript = {
   files: ['**/*.ts'],
@@ -40,9 +41,19 @@ export const typescript = {
         format: ['PascalCase'],
         custom: { regex: '[A-Za-z]Enum$', match: true },
       },
+      {
+        selector: 'classProperty',
+        modifiers: ['static', 'readonly'],
+        format: ['UPPER_CASE'],
+      },
     ],
     '@typescript-eslint/promise-function-async': ['error', { checkArrowFunctions: false }],
     '@typescript-eslint/return-await': ['error', 'always'],
-    'no-restricted-syntax': ['error', ...barrelBypassSelectors, ...awaitedArgumentSelectors],
+    'no-restricted-syntax': [
+      'error',
+      ...barrelBypassSelectors,
+      ...awaitedArgumentSelectors,
+      ...moduleConstTypeSelectors,
+    ],
   },
 };

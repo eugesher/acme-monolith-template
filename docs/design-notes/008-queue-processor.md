@@ -18,14 +18,14 @@ The job type `ILedgerRecordProcessorPayload` carries the whole record, and the p
 as it is, so a new producer needs no change here. The producers do not process the queue:
 processor-app does (see `023-processor-app.md`), and the apps reach the queue through one Redis.
 
-The queue name and the job type live in `@acme-core/contracts/ledger`, because an app may not import
-another. `LedgerCoreQueueModule` of the producers and the module root of the ledger processor both
-mount `LedgerQueueModule` of `@acme-core/queues`, which is
-`BullSetupModule.registerQueue(LEDGER_RECORD_QUEUE)`. BullMQ applies the job options of the
-producer, so every producer enqueues with the same `attempts` and `backoff` because `registerQueue`
-takes the name alone and every queue gets the fixed job options of `BullSetupModule.forRoot()`.
+The queue is `LedgerQueue` of `@acme-core/queues` and the job type lives in
+`@acme-core/contracts/ledger`, because an app may not import another. `LedgerCoreModule` of the
+producers and the module root of the ledger processor both mount `LedgerQueue.register()`, which is
+`BullSetupModule.registerQueue(LedgerQueue.NAME)`. BullMQ applies the job options of the producer,
+so every producer enqueues with the same `attempts` and `backoff` because `registerQueue` takes the
+name alone and every queue gets the fixed job options of `BullSetupModule.forRoot()`.
 
-**A processor is a `WorkerHost`.** `@Processor(LEDGER_RECORD_QUEUE)` makes `@nestjs/bullmq` start a
+**A processor is a `WorkerHost`.** `@Processor(LedgerQueue.NAME)` makes `@nestjs/bullmq` start a
 worker for the queue, and the worker calls `process(job)`. A queue carries one kind of job, so a
 producer names the job after its queue.
 
@@ -60,9 +60,12 @@ the job. Every failed attempt reaches `@OnWorkerEvent('failed')` after BullMQ ha
 `libs/toolkit`: at `warn` while attempts are left, at `error` after the last one, with the label and
 the context the use case passes, so every processor words the two lines the same way. A job that ran
 out of attempts stays in the failed set of the queue until someone returns it to the queue or
-deletes it through `/queues` (see `041-failed-jobs.md`). The types of BullMQ allow the event without
-a job, for a stalled job that ran out of retries and was removed; the handler then reports nothing,
-since there is no record to name.
+deletes it through `/queues` (see `041-failed-jobs.md`). The handler takes the job as BullMQ hands
+it, not as its types allow. The types let the event come without a job and a job without `attempts`,
+yet BullMQ emits `failed` only from the attempt it just ran, with that job, and the constructor of
+`Job` gives every job `attempts: 0` when its options have none. So the handler has no branch for
+either and reads `attempts` through `Required<Pick<JobsOptions, 'attempts'>>`; a job with
+`attempts: 0` has one attempt, and `JobFailureHelper` logs its failure as the last one.
 
 **The job is trusted.** The producers are the apps of the template, and they build the job from the
 type of the contract, so the processor does not validate it. A job of another shape, such as one an

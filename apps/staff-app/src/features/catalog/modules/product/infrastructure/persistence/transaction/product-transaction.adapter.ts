@@ -6,7 +6,7 @@ import { PRODUCT_TRANSACTION_PORT, type IProductTransactionPort } from '../../..
 
 @Injectable()
 export class ProductTransactionAdapter implements IProductTransactionPort {
-  public static readonly provider: ClassProvider<IProductTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductTransactionPort> = {
     provide: PRODUCT_TRANSACTION_PORT,
     useClass: ProductTransactionAdapter,
   };

@@ -26,6 +26,7 @@ export const repo = [
     to('repo:system'),
     to('acme-app:app:index'),
     to('acme-core:contracts'),
+    to('acme-core:queues'),
     baseLibs('testing'),
     packages('@nestjs/bullmq', '@nestjs/common', 'bullmq', 'ioredis', 'supertest'),
   ]),

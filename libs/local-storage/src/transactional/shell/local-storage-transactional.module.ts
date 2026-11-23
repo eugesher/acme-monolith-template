@@ -33,8 +33,8 @@ export class LocalStorageTransactionalModule {
         } satisfies ClassProvider<ITransactionPort>,
         LocalStorageTransactionalRunUseCase,
         LocalStorageTransactionalAfterCommitUseCase,
-        LocalStorageTransactionalHostAdapter.provider,
-        LocalStorageTransactionalContextAdapter.provider,
+        LocalStorageTransactionalHostAdapter.PROVIDER,
+        LocalStorageTransactionalContextAdapter.PROVIDER,
       ],
     };
   }

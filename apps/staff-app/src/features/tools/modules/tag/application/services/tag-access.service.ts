@@ -6,7 +6,7 @@ import {
   type ITagAccessRecord,
   type ITagAccessRepositoryPort,
 } from '../../outbound';
-import type { ITagAccessLoadCommand } from '../interfaces';
+import type { ITagAccessLoadCommand } from '../types';
 
 @Injectable()
 export class TagAccessService {

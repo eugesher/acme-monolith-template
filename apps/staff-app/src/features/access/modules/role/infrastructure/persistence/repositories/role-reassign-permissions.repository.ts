@@ -15,7 +15,7 @@ export class RoleReassignPermissionsRepository
   extends RolePersistenceHost
   implements IRoleReassignPermissionsRepositoryPort
 {
-  public static readonly provider: ClassProvider<IRoleReassignPermissionsRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IRoleReassignPermissionsRepositoryPort> = {
     provide: ROLE_REASSIGN_PERMISSIONS_REPOSITORY_PORT,
     useClass: RoleReassignPermissionsRepository,
   };

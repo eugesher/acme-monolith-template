@@ -21,10 +21,10 @@ import { ProductStockPostSubtractProcessor } from './product-stock-post-subtract
     ProductStockPostSubtractProcessor,
     ProductStockPostSubtractUseCase,
     ProductStockPostSubtractReportFailureUseCase,
-    ProductStockPostSubtractRepository.provider,
-    ProductStockPostSubtractOnHandCoreAdapter.provider,
-    ProductStockPostSubtractArchiveCoreAdapter.provider,
-    ProductStockPostSubtractTransactionAdapter.provider,
+    ProductStockPostSubtractRepository.PROVIDER,
+    ProductStockPostSubtractOnHandCoreAdapter.PROVIDER,
+    ProductStockPostSubtractArchiveCoreAdapter.PROVIDER,
+    ProductStockPostSubtractTransactionAdapter.PROVIDER,
   ],
 })
 export class ProductStockPostSubtractModule {}

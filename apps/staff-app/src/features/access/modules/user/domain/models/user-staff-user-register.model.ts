@@ -2,7 +2,7 @@ import type {
   IUserStaffUserRegisterLoggerPayload,
   IUserStaffUserRegisterReconstitute,
   IUserStaffUserRegisterSnapshot,
-} from '../interfaces';
+} from '../types';
 
 export class UserStaffUserRegisterModel {
   private constructor(

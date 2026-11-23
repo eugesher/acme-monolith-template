@@ -18,8 +18,8 @@ import { AuthGlobalFacade } from './auth-global.facade';
       useClass: AuthGlobalFacade,
     } satisfies ClassProvider<IAuthUserValidatorPort>,
     AuthGlobalValidateSubjectUseCase,
-    AuthGlobalSubjectCommonAdapter.provider,
-    AuthGlobalCredentialsLibAdapter.provider,
+    AuthGlobalSubjectCommonAdapter.PROVIDER,
+    AuthGlobalCredentialsLibAdapter.PROVIDER,
   ],
 })
 export class AuthGlobalModule {}

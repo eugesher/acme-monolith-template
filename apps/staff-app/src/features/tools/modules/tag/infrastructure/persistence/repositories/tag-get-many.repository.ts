@@ -10,7 +10,7 @@ import { TagPersistenceHost } from '../host/tag-persistence.host';
 
 @Injectable()
 export class TagGetManyRepository extends TagPersistenceHost implements ITagGetManyRepositoryPort {
-  public static readonly provider: ClassProvider<ITagGetManyRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagGetManyRepositoryPort> = {
     provide: TAG_GET_MANY_REPOSITORY_PORT,
     useClass: TagGetManyRepository,
   };

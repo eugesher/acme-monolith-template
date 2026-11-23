@@ -9,7 +9,7 @@ import {
 
 @Injectable()
 export class LocalStorageTransactionalHostAdapter implements ILocalStorageTransactionalHostPort {
-  public static readonly provider: ClassProvider<ILocalStorageTransactionalHostPort> = {
+  public static readonly PROVIDER: ClassProvider<ILocalStorageTransactionalHostPort> = {
     provide: LOCAL_STORAGE_TRANSACTIONAL_HOST_PORT,
     useClass: LocalStorageTransactionalHostAdapter,
   };

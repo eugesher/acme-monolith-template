@@ -8,7 +8,7 @@ import {
   libs,
   own,
   packages,
-  persistenceInterfaces,
+  persistenceTypes,
   to,
 } from './selectors.mjs';
 
@@ -19,7 +19,7 @@ const ownContracts = to('acme-core:contracts', own('module'));
 export const acmeCore = [
   from('acme-core:modules:domain', [layer('domain'), coreDomain, baseLibs()]),
   from('acme-core:modules:outbound', [layer('outbound'), ownContracts, baseLibs()]),
-  fromFile('acme-core:modules:outbound', persistenceInterfaces, [to('acme-core:entities')]),
+  fromFile('acme-core:modules:outbound', persistenceTypes, [to('acme-core:entities')]),
   from('acme-core:modules:application', [
     layer('domain'),
     layer('outbound'),
@@ -66,6 +66,7 @@ export const acmeCore = [
     layer('outbound'),
     layer('infrastructure:config'),
     libs('config'),
+    packages('@nestjs/common'),
   ]),
   from('acme-core:modules:shell:facade', [
     layer('application'),
@@ -80,6 +81,7 @@ export const acmeCore = [
     layer('shell'),
     ownContracts,
     to('acme-core:modules:index'),
+    to('acme-core:queues'),
     baseLibs(),
     packages('@nestjs/common'),
   ]),
@@ -87,5 +89,5 @@ export const acmeCore = [
   from('acme-core:contracts', [ownContracts, baseLibs()]),
   from('acme-core:domain', [coreDomain, baseLibs()]),
   from('acme-core:entities', [to('acme-core:entities'), libs('kernel'), packages('typeorm')]),
-  from('acme-core:queues', [to('acme-core:queues'), to('acme-core:contracts'), libs('queue')]),
+  from('acme-core:queues', [to('acme-core:queues'), libs('queue'), packages('@nestjs/common')]),
 ];

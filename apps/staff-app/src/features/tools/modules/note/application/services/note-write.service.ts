@@ -12,7 +12,7 @@ import {
 import { NOTE_OCC_RETRY_ATTEMPTS_TOKEN } from '../../outbound';
 import { NoteWriteConflictError } from '../errors/note-write-conflict.error';
 import { NoteAccessService } from './note-access.service';
-import type { INoteWriteCommand, INoteWriteSaveCommand, INoteWriteView } from '../interfaces';
+import type { INoteWriteCommand, INoteWriteSaveCommand, INoteWriteView } from '../types';
 
 @Injectable()
 export class NoteWriteService {

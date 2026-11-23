@@ -1,4 +1,4 @@
-import type { IAuthLedgerRecordRegisteredCommand } from '../interfaces';
+import type { IAuthLedgerRecordRegisteredCommand } from '../types';
 
 export interface IAuthLedgerPort {
   recordRegistered(command: IAuthLedgerRecordRegisteredCommand): Promise<void>;

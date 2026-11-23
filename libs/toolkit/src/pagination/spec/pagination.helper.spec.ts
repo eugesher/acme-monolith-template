@@ -41,14 +41,14 @@ describe('PaginationHelper', () => {
       expect(pageWindow).toEqual({ page: 1000, limit: 100, offset: 99_900 });
     });
 
-    it('takes the defaults and the cap from the options', () => {
+    it('takes the defaults and the cap from the limits', () => {
       const absent = PaginationHelper.clampPageWindow({
         query: {},
-        options: { defaultPage: 2, defaultLimit: 5 },
+        limits: { defaultPage: 2, defaultLimit: 5 },
       });
       const oversized = PaginationHelper.clampPageWindow({
         query: { page: 10, limit: 10_000 },
-        options: { maxLimit: 50, maxPage: 3 },
+        limits: { maxLimit: 50, maxPage: 3 },
       });
 
       expect(absent).toEqual({ page: 2, limit: 5, offset: 5 });

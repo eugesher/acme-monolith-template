@@ -21,7 +21,7 @@ export class OrmModule {
       providers: [
         { provide: ORM_PORT, useClass: OrmFacade } satisfies ClassProvider<IOrmPort>,
         OrmGetRepositoryUseCase,
-        OrmHostAdapter.provider,
+        OrmHostAdapter.PROVIDER,
       ],
     };
   }

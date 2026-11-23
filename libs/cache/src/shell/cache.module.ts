@@ -20,9 +20,9 @@ export class CacheModule {
         CacheGetUseCase,
         CacheDelByPrefixUseCase,
         CacheWrapUseCase,
-        CacheStoreAdapter.provider,
-        CacheTracerAdapter.provider,
-        CacheRedisClientProvider.provider,
+        CacheStoreAdapter.PROVIDER,
+        CacheTracerAdapter.PROVIDER,
+        CacheRedisClientProvider.PROVIDER,
       ],
     };
   }

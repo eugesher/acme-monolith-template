@@ -6,7 +6,7 @@ import { ORDER_TRANSACTION_PORT, type IOrderTransactionPort } from '../../../out
 
 @Injectable()
 export class OrderTransactionAdapter implements IOrderTransactionPort {
-  public static readonly provider: ClassProvider<IOrderTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderTransactionPort> = {
     provide: ORDER_TRANSACTION_PORT,
     useClass: OrderTransactionAdapter,
   };

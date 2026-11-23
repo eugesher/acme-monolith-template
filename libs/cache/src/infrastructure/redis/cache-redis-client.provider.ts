@@ -8,7 +8,7 @@ import { RedisConfigHelper } from '@acme-libs/config';
 import { CACHE_REDIS_CLIENT_TOKEN } from '../../outbound';
 
 export class CacheRedisClientProvider {
-  public static readonly provider: FactoryProvider<Redis> = {
+  public static readonly PROVIDER: FactoryProvider<Redis> = {
     provide: CACHE_REDIS_CLIENT_TOKEN,
     inject: [ConfigService, PinoLogger],
     useFactory: (config: ConfigService, logger: PinoLogger): Redis =>

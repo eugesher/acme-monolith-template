@@ -1,4 +1,4 @@
-import type { INoteGetRevisionsReconstitute, INoteGetRevisionsSnapshot } from '../interfaces';
+import type { INoteGetRevisionsReconstitute, INoteGetRevisionsSnapshot } from '../types';
 
 export class NoteGetRevisionsModel {
   private constructor(

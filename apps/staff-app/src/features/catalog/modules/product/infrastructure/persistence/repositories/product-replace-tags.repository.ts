@@ -14,7 +14,7 @@ export class ProductReplaceTagsRepository
   extends ProductPersistenceHost
   implements IProductReplaceTagsRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductReplaceTagsRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductReplaceTagsRepositoryPort> = {
     provide: PRODUCT_REPLACE_TAGS_REPOSITORY_PORT,
     useClass: ProductReplaceTagsRepository,
   };

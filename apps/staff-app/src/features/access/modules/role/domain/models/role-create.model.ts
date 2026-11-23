@@ -1,5 +1,5 @@
 import { RoleAggregate } from '../aggregates/role.aggregate';
-import type { IRoleCreateLoggerPayload, IRoleCreateReconstitute } from '../interfaces';
+import type { IRoleCreateLoggerPayload, IRoleCreateReconstitute } from '../types';
 
 export class RoleCreateModel extends RoleAggregate {
   public static reconstitute(record: IRoleCreateReconstitute): RoleCreateModel {

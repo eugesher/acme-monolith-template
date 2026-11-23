@@ -14,10 +14,10 @@ import { UserController } from './user.controller';
   providers: [
     UserRegisterUseCase,
     UserReassignRolesUseCase,
-    UserReassignRolesRepository.provider,
-    UserRegisterRepository.provider,
-    UserCredentialsLibAdapter.provider,
-    UserTransactionAdapter.provider,
+    UserReassignRolesRepository.PROVIDER,
+    UserRegisterRepository.PROVIDER,
+    UserCredentialsLibAdapter.PROVIDER,
+    UserTransactionAdapter.PROVIDER,
   ],
 })
 export class UserModule {}

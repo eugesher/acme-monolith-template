@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { ProductGetOneModel } from '../../domain';
 import { ProductAccessService } from '../services/product-access.service';
-import type { IProductGetOneCommand, IProductView } from '../interfaces';
+import type { IProductGetOneCommand, IProductView } from '../types';
 
 @Injectable()
 export class ProductGetOneUseCase {

@@ -12,6 +12,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       'apps/__processors-fixture__/src/processors/ledger-record/shell/ledger-record.processor.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/domain/index.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/outbound/index.ts',
+      'apps/__processors-fixture__/src/processors/ledger-record/queues/index.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/application/index.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/application/services/ledger-record.service.ts',
       'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/index.ts',
@@ -243,10 +244,20 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('a processor MAY take the name of its queue from its outbound', async () => {
+    it('a processor may NOT take anything from its outbound — its queue lives in queues/', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
         code: 'import { X_QUEUE } from "../outbound";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it.each([
+      'apps/__processors-fixture__/src/processors/ledger-record/shell/ledger-record.processor.ts',
+      'apps/__processors-fixture__/src/processors/ledger-record/shell/ledger-record.module.ts',
+    ])('%s MAY take the queue of its module from queues/', async (file) => {
+      await expect({
+        file,
+        code: 'import { LedgerRecordQueue } from "../queues";',
       }).toPassArchitectureLint();
     });
 
@@ -291,12 +302,54 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       }).toPassArchitectureLint();
     });
 
-    it('the module of a queue adapter MAY register its queue with the queue lib', async () => {
+    it('infrastructure/queue may NOT register a queue with the queue lib — queues/ does', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
-        code: 'import { BullSetupModule } from "@acme-libs/queue";\nimport { X_QUEUE } from "../../outbound";',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('a processor MAY take the name of a core queue for Processor', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/shell/__fixture__.ts',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
+
+    it('infrastructure/queue MAY take the queue of its module from queues/', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/infrastructure/queue/__fixture__.ts',
+        code: 'import { LedgerRecordQueue } from "../../queues";',
+      }).toPassArchitectureLint();
+    });
+
+    it('queues/ MAY register its queue with the queue lib', async () => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/queues/definitions/__fixture__.ts',
+        code: 'import type { DynamicModule } from "@nestjs/common";\nimport { BullSetupModule } from "@acme-libs/queue";',
+      }).toPassArchitectureLint();
+    });
+
+    it.each([
+      ['its outbound', 'import { X } from "../../outbound";'],
+      ['its application', 'import { X } from "../../application";'],
+      ['Bull itself', 'import { BullModule } from "@nestjs/bullmq";'],
+    ])('queues/ may NOT take %s', async (_case, code) => {
+      await expect({
+        file: 'apps/__processors-fixture__/src/processors/ledger-record/queues/definitions/__fixture__.ts',
+        code,
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it.each(['application', 'domain', 'outbound'])(
+      '%s may NOT take the queue of its module — only shell/ and infrastructure/queue do',
+      async (layer) => {
+        await expect({
+          file: `apps/__processors-fixture__/src/processors/ledger-record/${layer}/__fixture__.ts`,
+          code: 'import { LedgerRecordQueue } from "../queues";',
+        }).toBreakRule('boundaries/dependencies');
+      },
+    );
 
     it('common/shared may NOT register a queue — the module of its queue adapter does', async () => {
       await expect({

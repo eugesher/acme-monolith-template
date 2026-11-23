@@ -7,8 +7,8 @@ deadline and retries.
 | ------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | hook in a use case | `core/modules/src/product-stock/application/use-cases/product-stock-core-move.use-case.ts`                        |
 | queue adapter      | `core/modules/src/product-stock/infrastructure/queue/product-stock-core-post-subtract-queue.adapter.ts`           |
-| queue contract     | `core/contracts/src/product-stock/queues/product-stock-post-subtract.queue.ts`                                    |
-| queue registration | `core/queues/src/product-stock-post-subtract/product-stock-post-subtract-queue.module.ts`                         |
+| job payload        | `core/contracts/src/product-stock/queues/product-stock-post-subtract.queue.ts`                                    |
+| queue definition   | `core/queues/src/definitions/product-stock-post-subtract.queue.ts`                                                |
 | the processor      | `apps/processor-app/src/processors/product-stock-post-subtract/shell/product-stock-post-subtract.processor.ts`    |
 | from a feature     | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts` |
 
@@ -74,14 +74,13 @@ processor e2e does (see `014-e2e-suites.md`).
 
 ## Where the queue is declared
 
-**A queue written by several apps keeps its contract outside the apps**: the name and the payload
-type, in core or in the lib that writes it. Its registration lives in `core/queues`, and the module
-of the core queue adapter mounts it next to the binding of the adapter
-(`ProductStockCorePostSubtractQueueModule`), so every module that mounts the core module brings the
-queue with it; the processor and the failed jobs of staff-app mount the same registration. A queue
-of one module keeps its name in the `outbound/queues` of the module and is registered by the module
-of its adapter (see `009-scheduled-processor.md`). BullMQ applies the job options of the producer,
-so `registerQueue` takes the name alone and every registration gets the job options of
+**A queue written by several apps keeps its contract outside the apps**: its name and registration
+in `core/queues`, the payload type in `@acme-core/contracts`. and the module root of the core module
+mounts it next to the binding of its adapter (`ProductStockCoreModule`), so every module that mounts
+the core module brings the queue with it; the processor and the failed jobs of staff-app mount the
+same registration. A queue of one processor keeps its name and its registration in `queues/` of the
+processor (see `009-scheduled-processor.md`). BullMQ applies the job options of the producer, so
+`registerQueue` takes the name alone and every registration gets the job options of
 `BullSetupModule.forRoot()`.
 
 The lint edges for a core queue adapter are in `lint/boundaries/policies/acme-core.mjs` (see

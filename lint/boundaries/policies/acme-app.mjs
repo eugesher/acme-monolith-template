@@ -8,7 +8,7 @@ import {
   libs,
   own,
   packages,
-  persistenceInterfaces,
+  persistenceTypes,
   to,
 } from './selectors.mjs';
 
@@ -32,14 +32,18 @@ export const acmeApp = [
   ]),
   from('acme-app:app:setup', [
     to('acme-app:app', own('app')),
+    to('acme-app:app:entities', own('app')),
     baseLibs('app', 'credentials'),
     packages('@nestjs/common'),
+  ]),
+  from('acme-app:app:entities', [
+    to('acme-core:entities'),
+    to('acme-app:common:entities', own('app')),
+    packages('@nestjs/typeorm'),
   ]),
   from('acme-app:app', [
     to('acme-app:app', own('app')),
     ...appIndexes,
-    to('acme-core:entities'),
-    to('acme-app:common:entities', own('app')),
     baseLibs('config'),
     packages('@nestjs/common', '@nestjs/config', 'joi'),
   ]),
@@ -56,12 +60,13 @@ export const acmeApp = [
     to('acme-app:common:shared', own('app')),
   ]),
   from('acme-app:common:shared:module:index', [to('acme-app:common:shared', own('app'))]),
-  from('acme-app:global:index', [to('acme-app:global:shell', { ...own('app'), module: '*' })]),
+  from('acme-app:global:index', [to('acme-app:global:module:index', own('app'))]),
+  from('acme-app:global:module:index', [to('acme-app:global:shell', own('app', 'module'))]),
   from('acme-app:global:outbound', [
     to('acme-app:global:outbound', own('app', 'module')),
     baseLibs(),
   ]),
-  fromFile('acme-app:global:outbound', persistenceInterfaces, [
+  fromFile('acme-app:global:outbound', persistenceTypes, [
     to('acme-core:entities'),
     to('acme-app:common:entities', own('app')),
   ]),
@@ -130,6 +135,7 @@ export const acmeApp = [
     to('acme-app:contracts', own('app')),
     to('acme-core:contracts'),
     to('acme-core:entities'),
+    to('acme-core:queues'),
     to('acme-app:common:entities', own('app')),
     baseLibs('database', 'observability', 'testing'),
     packages(

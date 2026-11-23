@@ -1,5 +1,5 @@
 import { NoteAggregate } from '../aggregates/note.aggregate';
-import type { INoteDeleteLoggerPayload, INoteReconstitute } from '../interfaces';
+import type { INoteDeleteLoggerPayload, INoteReconstitute } from '../types';
 
 export class NoteDeleteModel extends NoteAggregate {
   public static reconstitute(this: void, record: INoteReconstitute): NoteDeleteModel {

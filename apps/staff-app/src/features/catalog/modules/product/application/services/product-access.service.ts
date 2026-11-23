@@ -6,7 +6,7 @@ import {
   type IProductAccessRecord,
   type IProductAccessRepositoryPort,
 } from '../../outbound';
-import type { IProductAccessLoadCommand } from '../interfaces';
+import type { IProductAccessLoadCommand } from '../types';
 
 @Injectable()
 export class ProductAccessService {

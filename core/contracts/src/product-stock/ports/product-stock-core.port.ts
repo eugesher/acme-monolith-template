@@ -3,7 +3,7 @@ import type {
   IProductStockCoreMoveCommand,
   IProductStockCoreMoveView,
   IProductStockCoreOnHandView,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductStockCorePort {
   handleLock(command: IProductStockCoreLockCommand): Promise<IProductStockCoreOnHandView[]>;

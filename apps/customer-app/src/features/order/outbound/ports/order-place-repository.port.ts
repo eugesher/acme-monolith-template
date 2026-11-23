@@ -3,7 +3,7 @@ import type {
   IOrderPlaceOrderProductInsertQuery,
   IOrderPlaceProductRecord,
   IOrderPlaceRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface IOrderPlaceRepositoryPort {
   findActiveProducts(productIds: readonly string[]): Promise<IOrderPlaceProductRecord[]>;

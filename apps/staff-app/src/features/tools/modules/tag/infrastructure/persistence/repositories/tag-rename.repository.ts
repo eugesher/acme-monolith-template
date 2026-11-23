@@ -12,7 +12,7 @@ import { TagPersistenceHost } from '../host/tag-persistence.host';
 
 @Injectable()
 export class TagRenameRepository extends TagPersistenceHost implements ITagRenameRepositoryPort {
-  public static readonly provider: ClassProvider<ITagRenameRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagRenameRepositoryPort> = {
     provide: TAG_RENAME_REPOSITORY_PORT,
     useClass: TagRenameRepository,
   };

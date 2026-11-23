@@ -11,7 +11,7 @@ export class ProductAccessRepository
   extends ProductBaseRepository
   implements IProductAccessRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductAccessRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductAccessRepositoryPort> = {
     provide: PRODUCT_ACCESS_REPOSITORY_PORT,
     useClass: ProductAccessRepository,
   };

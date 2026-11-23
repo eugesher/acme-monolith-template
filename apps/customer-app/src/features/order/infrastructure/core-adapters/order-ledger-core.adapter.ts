@@ -15,7 +15,7 @@ import {
 
 @Injectable()
 export class OrderLedgerCoreAdapter implements IOrderLedgerPort {
-  public static readonly provider: ClassProvider<IOrderLedgerPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderLedgerPort> = {
     provide: ORDER_LEDGER_PORT,
     useClass: OrderLedgerCoreAdapter,
   };

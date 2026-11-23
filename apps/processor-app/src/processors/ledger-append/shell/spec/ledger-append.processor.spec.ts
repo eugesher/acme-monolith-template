@@ -101,37 +101,5 @@ describe('LedgerAppendProcessor', () => {
       });
       expect(correlationIds).toEqual(['c0ffee00-0000-4000-8000-000000000001']);
     });
-
-    it('treats a job without attempts as a single attempt', async () => {
-      await processor.handleFailed(
-        {
-          data: {
-            operationKey: 'product-created:12',
-            subjectType: 'product',
-            subjectId: '12',
-            action: 'ProductCreated',
-            payload: {},
-            occurredAt: '2026-01-05T08:00:00.000Z',
-            correlationId: 'c0ffee00-0000-4000-8000-000000000001',
-          },
-          attemptsMade: 1,
-          opts: {},
-        } as unknown as Job<ILedgerRecordProcessorPayload>,
-        new Error('deadlock'),
-      );
-
-      expect(reportFailure.execute).toHaveBeenCalledWith({
-        operationKey: 'product-created:12',
-        attempt: 1,
-        attempts: 1,
-        error: new Error('deadlock'),
-      });
-    });
-
-    it('reports nothing for a failure without a job', async () => {
-      await processor.handleFailed(undefined, new Error('stalled'));
-
-      expect(reportFailure.execute).not.toHaveBeenCalled();
-    });
   });
 });

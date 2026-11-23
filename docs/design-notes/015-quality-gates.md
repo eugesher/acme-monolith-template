@@ -18,7 +18,7 @@ a threshold.
 | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `index.ts`                                                                         | barrels                                                                                                               |
 | `*.{port,token,enum,entity,dto,view,type,interface,const,command,query,record}.ts` | declarations                                                                                                          |
-| `*.module.ts`, `apps/*/src/main.ts`                                                | wiring, booted by the e2e suites                                                                                      |
+| `*.module.ts`, `*.queue.ts`, `apps/*/src/main.ts`                                  | wiring, booted by the e2e suites                                                                                      |
 | `infrastructure/persistence/repositories/**`                                       | SQL, checked against the database by the e2e suites                                                                   |
 | `infrastructure/persistence/host/**`                                               | repository getters and query builder factories                                                                        |
 | `shell/*.controller.ts`                                                            | routes, guards and pipes, checked over HTTP by the e2e suites                                                         |
@@ -38,13 +38,16 @@ moves the number. A per-file key fails on the file that lost its spec and names 
 Jest checks every file matched by `./{apps,core,libs}/**/*.ts` against it, and `collectCoverageFrom`
 decides which files are counted, including those no spec loads, which count at 0%.
 
-**Some specs the coverage cannot ask for.** A controller is excluded above, yet its spec checks how
-a request becomes a command and that a failure is awaited. A DTO is covered the moment any file
-imports it, since its decorators run on import, yet only a spec checks its validation, and only the
-table of the e2e suite that a route validates with it (see `014-e2e-suites.md`).
-`spec/required-specs.spec.ts` asks for a spec next to every controller and every request, query and
-param DTO that declares validation of its own; a DTO that only extends `PageQueryDto` declares none
-and inherits the spec of its parent.
+**Some specs the coverage cannot ask for.** A DTO is covered the moment any file imports it, since
+its decorators run on import, yet only a spec checks its validation, and only the table of the e2e
+suite that a route validates with it (see `014-e2e-suites.md`). A module is excluded above, yet the
+module in `shell/` of a lib configures a driver or a client that no e2e case reads the options of.
+`spec/required-specs.spec.ts` asks for a spec next to every request, query and param DTO that
+declares validation of its own and next to every module in `shell/` of a lib; a DTO that only
+extends `PageQueryDto` declares none and inherits the spec of its parent. The same spec refuses a
+spec of a controller or a facade: both only hand a command to a use case, and
+`spec/e2e-endpoints.spec.ts` asks the e2e suites for a case of every route handler instead (see
+`040-unit-specs.md`).
 
 **ts-jest compiles the unit suite with type information** (`isolatedModules: false`). With
 `emitDecoratorMetadata`, a file compiled on its own cannot tell whether a constructor parameter type
@@ -158,6 +161,11 @@ uses on purpose:
 - `no-confusing-void-expression` allows an arrow shorthand, as in `expect(() => model.assert())`;
 - `no-invalid-void-type` allows `this: void` on a static method passed as a callback.
 
+`naming-convention` names three kinds: an interface is `I<Name>`, an enum `<Name>Enum`, and a
+`static readonly` property of a class is UPPER_CASE, as `NAME`, `STATUS`, `MAX_PAGE` and the
+`PROVIDER` of an adapter (see `031-static-provider.md`): a constant of a class reads as a constant
+wherever it is used.
+
 A spec asserts that a `void` method resolves with `await expect(call).resolves.toBeUndefined()`, not
 by keeping its result. Where a declared type is narrower than the runtime value, such as the CLS id,
 `PinoLogger.root` before the logger starts or `JSON.stringify(undefined)`, the value is widened with
@@ -199,3 +207,20 @@ of a constructor parameter only when the parameter names no token, so a class be
 `PinoLogger` in every use case. A class in a constructor parameter without a token, in a decorated
 property or in the signature of a decorated method stays a value import: DI, Swagger,
 `ValidationPipe` and TypeORM read it there.
+
+## Module-level const types
+
+A module-level `const` that holds a call result states its type: the call hides what it returns, as
+`ConfigValueProvider.provide` hides `FactoryProvider<number>` and `BullSetupModule.registerQueue`
+hides `DynamicModule`. The selector of `lint/syntax/module-const-type.selectors.mjs` reports a
+`const` at the top of a module, exported or not, whose initializer is a call or an `await` and whose
+name has no type. The source config, the specs and the plain node scripts carry it, since each of
+them sets its own `no-restricted-syntax`.
+
+The type stays inferred where the initializer shows it: a literal, an array or object literal, a
+`new` expression, an arrow function with a typed signature, a cast with `as`, a destructured name. A
+`const` inside a function is inferred too. Two calls are exempt: `Symbol(…)` gives a token the type
+`unique symbol`, which an annotation would widen to `symbol`, and `createParamDecorator(…)` answers
+the signature of a Nest parameter decorator, which an annotation would only copy. The entity list of
+`app/setup/entities` is an array literal, yet it states `TypeOrmModuleOptions['entities']`, the type
+of the options it is passed into; it is the one file of `app/` that takes `@nestjs/typeorm`.

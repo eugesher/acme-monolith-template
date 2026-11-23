@@ -1,6 +1,6 @@
 import type { Nullable } from '@acme-libs/toolkit';
 
-import type { IOrderGetOneRecord } from '../interfaces';
+import type { IOrderGetOneRecord } from '../types';
 
 export interface IOrderGetOneRepositoryPort {
   findById(orderId: string): Promise<Nullable<IOrderGetOneRecord>>;

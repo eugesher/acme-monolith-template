@@ -1,4 +1,4 @@
-import type { IProductCoreArchiveCommand, IProductCoreArchiveView } from '../interfaces';
+import type { IProductCoreArchiveCommand, IProductCoreArchiveView } from '../types';
 
 export interface IProductCorePort {
   handleArchive(command: IProductCoreArchiveCommand): Promise<IProductCoreArchiveView>;

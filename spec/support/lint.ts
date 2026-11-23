@@ -20,9 +20,12 @@ declare global {
   }
 }
 
-const ROOT = path.resolve(__dirname, '../..');
-const TSCONFIG = path.join(ROOT, 'tsconfig.json');
-const RESOLVING_FILE = path.join(ROOT, 'apps/__resolving-fixture__/src/features/__fixture__.ts');
+const ROOT: string = path.resolve(__dirname, '../..');
+const TSCONFIG: string = path.join(ROOT, 'tsconfig.json');
+const RESOLVING_FILE: string = path.join(
+  ROOT,
+  'apps/__resolving-fixture__/src/features/__fixture__.ts',
+);
 
 const ARCHITECTURE_RULES = [
   'boundaries/dependencies',

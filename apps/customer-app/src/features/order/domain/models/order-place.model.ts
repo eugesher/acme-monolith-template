@@ -6,7 +6,7 @@ import type {
   IOrderProductReferenceSnapshot,
   IOrderProductSnapshot,
   IOrderProductStockMovement,
-} from '../interfaces';
+} from '../types';
 
 export class OrderPlaceModel extends OrderAggregate {
   private constructor(

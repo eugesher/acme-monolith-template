@@ -8,10 +8,7 @@ import {
   type IAuthGlobalCredentialsPort,
   type IAuthGlobalSubjectPort,
 } from '../../outbound';
-import type {
-  IAuthGlobalValidateSubjectCommand,
-  IAuthGlobalValidateSubjectView,
-} from '../interfaces';
+import type { IAuthGlobalValidateSubjectCommand, IAuthGlobalValidateSubjectView } from '../types';
 
 @Injectable()
 export class AuthGlobalValidateSubjectUseCase {

@@ -98,11 +98,18 @@ describe('app → core', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('bootstrap MAY reach entities', async () => {
+    it('the entity list of the app setup MAY reach the core entities', async () => {
+      await expect({
+        file: 'apps/__core-link-fixture__/src/app/setup/entities/index.ts',
+        code: 'import { x } from "../../../../../../core/entities/src";',
+      }).toPassArchitectureLint();
+    });
+
+    it('the rest of app/ may NOT reach the core entities, only the entity list does', async () => {
       await expect({
         file: 'apps/__core-link-fixture__/src/app/__fixture__.ts',
         code: 'import { x } from "../../../../core/entities/src";',
-      }).toPassArchitectureLint();
+      }).toBreakRule('boundaries/dependencies');
     });
   });
 

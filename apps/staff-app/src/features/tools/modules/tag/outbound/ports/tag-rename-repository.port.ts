@@ -1,5 +1,4 @@
-import type { TagRenameUpdateOutcomeEnum } from '../enums/tag-rename-update-outcome.enum';
-import type { ITagRenameQuery } from '../interfaces';
+import type { ITagRenameQuery, TagRenameUpdateOutcomeEnum } from '../types';
 
 export interface ITagRenameRepositoryPort {
   update(query: ITagRenameQuery): Promise<TagRenameUpdateOutcomeEnum>;

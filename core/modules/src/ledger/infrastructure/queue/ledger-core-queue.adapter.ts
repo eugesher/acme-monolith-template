@@ -1,19 +1,26 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 
 import { DeadlineHelper } from '@acme-libs/toolkit';
-import {
-  LEDGER_RECORD_QUEUE,
-  type ILedgerRecordProcessorPayload,
-} from '@acme-core/contracts/ledger';
+import { LedgerQueue } from '@acme-core/queues';
+import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
 
-import type { ILedgerCoreQueueAddCommand, ILedgerCoreQueuePort } from '../../outbound';
+import {
+  LEDGER_CORE_QUEUE_PORT,
+  type ILedgerCoreQueueAddCommand,
+  type ILedgerCoreQueuePort,
+} from '../../outbound';
 
 @Injectable()
 export class LedgerCoreQueueAdapter implements ILedgerCoreQueuePort {
+  public static readonly PROVIDER: ClassProvider<ILedgerCoreQueuePort> = {
+    provide: LEDGER_CORE_QUEUE_PORT,
+    useClass: LedgerCoreQueueAdapter,
+  };
+
   constructor(
-    @InjectQueue(LEDGER_RECORD_QUEUE)
+    @InjectQueue(LedgerQueue.NAME)
     private readonly queue: Queue<ILedgerRecordProcessorPayload>,
   ) {}
 
@@ -25,7 +32,7 @@ export class LedgerCoreQueueAdapter implements ILedgerCoreQueuePort {
     await DeadlineHelper.race(
       () =>
         this.queue.add(
-          LEDGER_RECORD_QUEUE,
+          LedgerQueue.NAME,
           { operationKey, subjectType, subjectId, action, payload, occurredAt, correlationId },
           { deduplication: { id: operationKey } },
         ),

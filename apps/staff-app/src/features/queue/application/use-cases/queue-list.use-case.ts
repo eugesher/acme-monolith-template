@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { QUEUE_REGISTRY_PORT, type IQueueRegistryPort } from '../../outbound';
-import type { IQueueListView } from '../interfaces';
+import type { IQueueListView } from '../types';
 
 @Injectable()
 export class QueueListUseCase {

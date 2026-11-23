@@ -1,4 +1,4 @@
-import type { INoteGetRevisionsListForNoteQuery, INoteGetRevisionsRecord } from '../interfaces';
+import type { INoteGetRevisionsListForNoteQuery, INoteGetRevisionsRecord } from '../types';
 
 export interface INoteGetRevisionsRepositoryPort {
   listForNote(query: INoteGetRevisionsListForNoteQuery): Promise<INoteGetRevisionsRecord>;

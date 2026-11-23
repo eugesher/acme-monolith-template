@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 export class ProductStockMovementCoreAdapter implements IProductStockMovementPort {
-  public static readonly provider: ClassProvider<IProductStockMovementPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockMovementPort> = {
     provide: PRODUCT_STOCK_MOVEMENT_PORT,
     useClass: ProductStockMovementCoreAdapter,
   };

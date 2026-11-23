@@ -22,10 +22,10 @@ import { TagCommonFacade } from './tag-common.facade';
     TagCommonFindSubjectIdsUseCase,
     TagCommonFindUseCase,
     TagCommonReplaceUseCase,
-    TagCommonFindRepository.provider,
-    TagCommonFindSubjectIdsRepository.provider,
-    TagCommonReplaceRepository.provider,
-    TagCommonTransactionAdapter.provider,
+    TagCommonFindRepository.PROVIDER,
+    TagCommonFindSubjectIdsRepository.PROVIDER,
+    TagCommonReplaceRepository.PROVIDER,
+    TagCommonTransactionAdapter.PROVIDER,
   ],
 })
 export class TagCommonModule {}

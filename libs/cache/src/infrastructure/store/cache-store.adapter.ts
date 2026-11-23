@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class CacheStoreAdapter implements ICacheStorePort, OnApplicationShutdown {
-  public static readonly provider: ClassProvider<ICacheStorePort> = {
+  public static readonly PROVIDER: ClassProvider<ICacheStorePort> = {
     provide: CACHE_STORE_PORT,
     useClass: CacheStoreAdapter,
   };

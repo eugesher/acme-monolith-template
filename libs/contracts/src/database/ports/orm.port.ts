@@ -1,6 +1,6 @@
 import type { EntityTarget, ObjectLiteral } from 'typeorm';
 
-import type { IHostedRepository } from '../interfaces/hosted-repository.interface';
+import type { IHostedRepository } from '../types/hosted-repository.interface';
 
 export interface IOrmPort {
   getRepository<Entity extends ObjectLiteral>(

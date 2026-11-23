@@ -15,8 +15,8 @@ describe('features', () => {
       'apps/__features-fixture__/src/features/product/domain/errors/index.ts',
       'apps/__features-fixture__/src/features/product/domain/errors/codes/product-exception-code.enum.ts',
       'apps/__features-fixture__/src/features/product/domain/errors/exceptions/product-name-invalid.exception.ts',
-      'apps/__features-fixture__/src/features/product/domain/interfaces/index.ts',
-      'apps/__features-fixture__/src/features/product/domain/interfaces/params/product-create.interface.ts',
+      'apps/__features-fixture__/src/features/product/domain/types/index.ts',
+      'apps/__features-fixture__/src/features/product/domain/types/data/product-create.interface.ts',
       'apps/__features-fixture__/src/features/product/domain/models/product.model.ts',
       'apps/__features-fixture__/src/features/product/outbound/index.ts',
       'apps/__features-fixture__/src/features/product/application/index.ts',
@@ -73,7 +73,7 @@ describe('features', () => {
 
     it('outbound may NOT reach domain — a port speaks its own types', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/outbound/interfaces/commands/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/outbound/types/commands/__fixture__.ts',
         code: 'import { x } from "../../../domain";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -107,20 +107,20 @@ describe('features', () => {
     });
 
     it.each(['records', 'queries'])(
-      'outbound/interfaces/%s MAY reach the entities — they mirror what persistence reads',
+      'outbound/types/%s MAY reach the entities — they mirror what persistence reads',
       async (folder) => {
         await expect({
-          file: `apps/__features-fixture__/src/features/product/outbound/interfaces/${folder}/__fixture__.ts`,
+          file: `apps/__features-fixture__/src/features/product/outbound/types/${folder}/__fixture__.ts`,
           code: 'import { x } from "../../../../../../../../core/entities/src";',
         }).toPassArchitectureLint();
       },
     );
 
     it.each(['commands', 'views'])(
-      'outbound/interfaces/%s may NOT reach the entities',
+      'outbound/types/%s may NOT reach the entities',
       async (folder) => {
         await expect({
-          file: `apps/__features-fixture__/src/features/product/outbound/interfaces/${folder}/__fixture__.ts`,
+          file: `apps/__features-fixture__/src/features/product/outbound/types/${folder}/__fixture__.ts`,
           code: 'import { x } from "../../../../../../../../core/entities/src";',
         }).toBreakRule('boundaries/dependencies');
       },
@@ -302,6 +302,27 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
+    it('the module root MAY register a queue through the core queues, next to the binding of its adapter', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
+      }).toPassArchitectureLint();
+    });
+
+    it('infrastructure/queue MAY take the name of a core queue for InjectQueue', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
+        code: 'import { LedgerQueue } from "@acme-core/queues";',
+      }).toPassArchitectureLint();
+    });
+
+    it('infrastructure/queue may NOT register a queue with the queue lib', async () => {
+      await expect({
+        file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
+        code: 'import { BullSetupModule } from "@acme-libs/queue";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
     it('infrastructure/queue may NOT reach a lib contract', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
@@ -353,7 +374,7 @@ describe('features', () => {
     it('infrastructure/lib-adapters MAY take the health port', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/lib-adapters/__fixture__.ts',
-        code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
+        code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
       }).toPassArchitectureLint();
     });
 
@@ -362,7 +383,7 @@ describe('features', () => {
       async (layer) => {
         await expect({
           file: `apps/__features-fixture__/src/features/product/${layer}/__fixture__.ts`,
-          code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_PORT } from "@acme-libs/contracts/health";',
+          code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
         }).toBreakRule('boundaries/dependencies');
       },
     );
@@ -374,10 +395,10 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it('infrastructure/config MAY take the config lib and the outbound tokens', async () => {
+    it('infrastructure/config MAY take the config lib, the outbound tokens and the provider type', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/config/__fixture__.ts',
-        code: 'import { ConfigValueProvider } from "@acme-libs/config";\nimport { X_TOKEN } from "../../outbound";',
+        code: 'import type { FactoryProvider } from "@nestjs/common";\nimport { ConfigValueProvider } from "@acme-libs/config";\nimport { X_TOKEN } from "../../outbound";',
       }).toPassArchitectureLint();
     });
 
@@ -391,7 +412,7 @@ describe('features', () => {
       },
     );
 
-    it.each(['@nestjs/common', '@acme-libs/cache'])(
+    it.each(['@nestjs/config', '@acme-libs/cache'])(
       'infrastructure/config may NOT take %s — it only binds config values',
       async (source) => {
         await expect({
@@ -510,17 +531,17 @@ describe('features', () => {
       }).toBreakRule('no-restricted-syntax');
     });
 
-    it('a domain import may NOT skip the barrel of interfaces', async () => {
+    it('a domain import may NOT skip the barrel of types', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/domain/models/__fixture__.ts',
-        code: 'import type { x } from "../interfaces/params/product-create.interface";',
+        code: 'import type { x } from "../types/data/product-create.interface";',
       }).toBreakRule('no-restricted-syntax');
     });
 
-    it('a domain import MAY go through the barrels of errors and interfaces', async () => {
+    it('a domain import MAY go through the barrels of errors and types', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/domain/models/__fixture__.ts',
-        code: 'import { x } from "../errors";\nimport type { y } from "../interfaces";',
+        code: 'import { x } from "../errors";\nimport type { y } from "../types";',
       }).toPassArchitectureLint();
     });
 
@@ -538,10 +559,10 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it('a folder of interfaces without subfolders MAY be reached by a file path', async () => {
+    it('a folder of types without subfolders MAY be reached by a file path', async () => {
       await expect({
-        file: 'libs/auth/src/guards/__fixture__.ts',
-        code: 'import type { x } from "../interfaces/auth-request.interface";',
+        file: 'libs/config/src/provider/__fixture__.ts',
+        code: 'import type { x } from "./types/config-value-properties.interface";',
       }).toPassArchitectureLint();
     });
   });

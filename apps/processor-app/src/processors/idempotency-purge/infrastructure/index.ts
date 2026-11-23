@@ -2,4 +2,4 @@ export * from './config/idempotency-purge-config.provider';
 
 export * from './persistence/repositories/idempotency-purge.repository';
 
-export * from './queue/idempotency-purge-schedule-queue.module';
+export * from './queue/idempotency-purge-schedule-queue.adapter';

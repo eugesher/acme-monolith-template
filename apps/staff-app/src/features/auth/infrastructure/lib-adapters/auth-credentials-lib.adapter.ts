@@ -10,7 +10,7 @@ import {
 
 @Injectable()
 export class AuthCredentialsLibAdapter implements IAuthCredentialsPort {
-  public static readonly provider: ClassProvider<IAuthCredentialsPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthCredentialsPort> = {
     provide: AUTH_CREDENTIALS_PORT,
     useClass: AuthCredentialsLibAdapter,
   };

@@ -14,7 +14,7 @@ export class AuthGlobalValidateSubjectRepository
   extends AuthGlobalPersistenceHost
   implements IAuthGlobalValidateSubjectRepositoryPort
 {
-  public static readonly provider: ClassProvider<IAuthGlobalValidateSubjectRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthGlobalValidateSubjectRepositoryPort> = {
     provide: AUTH_GLOBAL_VALIDATE_SUBJECT_REPOSITORY_PORT,
     useClass: AuthGlobalValidateSubjectRepository,
   };

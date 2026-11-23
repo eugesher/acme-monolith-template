@@ -12,8 +12,8 @@ import { CatalogController } from './catalog.controller';
   controllers: [CatalogController],
   providers: [
     CatalogProductListUseCase,
-    CatalogProductListRepository.provider,
-    CatalogCacheAdapter.provider,
+    CatalogProductListRepository.PROVIDER,
+    CatalogCacheAdapter.PROVIDER,
     CatalogConfigCacheTtlMsDefaultProvider,
   ],
 })

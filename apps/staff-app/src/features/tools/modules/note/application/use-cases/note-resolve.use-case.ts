@@ -4,7 +4,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { NoteResolveModel } from '../../domain';
 import { NOTE_RESOLVE_REPOSITORY_PORT, type INoteResolveRepositoryPort } from '../../outbound';
 import { NoteWriteService } from '../services/note-write.service';
-import type { INoteResolveCommand, INoteView, INoteWriteSaveCommand } from '../interfaces';
+import type { INoteResolveCommand, INoteView, INoteWriteSaveCommand } from '../types';
 
 @Injectable()
 export class NoteResolveUseCase {

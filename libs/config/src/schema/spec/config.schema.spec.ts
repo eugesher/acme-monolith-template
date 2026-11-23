@@ -30,6 +30,7 @@ describe('ConfigSchema', () => {
   describe('CREDENTIALS', () => {
     it('refuses an argon2 memory cost below eight KiB per lane', () => {
       const { error } = Joi.object(ConfigSchema.CREDENTIALS).validate({
+        JWT_SECRET: 'access-secret-of-at-least-thirty-two-chars',
         JWT_EXPIRES_IN: '15m',
         AUTH_ARGON2_MEMORY_COST: 31,
         AUTH_ARGON2_TIME_COST: 2,
@@ -39,7 +40,7 @@ describe('ConfigSchema', () => {
       });
 
       expect(error?.message).toBe(
-        '"AUTH_ARGON2_MEMORY_COST" must be greater than or equal to ref:AUTH_ARGON2_PARALLELISM',
+        '"AUTH_ARGON2_MEMORY_COST" must be at least 32: 8 KiB per lane of AUTH_ARGON2_PARALLELISM',
       );
     });
   });
@@ -50,7 +51,6 @@ describe('ConfigSchema', () => {
       ConfigSchema.DATABASE,
       ConfigSchema.REDIS,
       ConfigSchema.QUEUE,
-      ConfigSchema.AUTH,
       ConfigSchema.CREDENTIALS,
       ConfigSchema.HTTP,
       ConfigSchema.OBSERVABILITY,

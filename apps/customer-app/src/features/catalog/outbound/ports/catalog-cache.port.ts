@@ -1,7 +1,4 @@
-import type {
-  ICatalogCacheProductListReadCommand,
-  ICatalogCacheProductListView,
-} from '../interfaces';
+import type { ICatalogCacheProductListReadCommand, ICatalogCacheProductListView } from '../types';
 
 export interface ICatalogCachePort {
   read(command: ICatalogCacheProductListReadCommand): Promise<ICatalogCacheProductListView>;

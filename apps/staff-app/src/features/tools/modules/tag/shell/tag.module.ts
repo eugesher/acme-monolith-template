@@ -24,11 +24,11 @@ import { TagController } from './tag.controller';
     TagGetManyUseCase,
     TagRenameUseCase,
     TagAccessService,
-    TagAccessRepository.provider,
-    TagCreateRepository.provider,
-    TagDeleteRepository.provider,
-    TagGetManyRepository.provider,
-    TagRenameRepository.provider,
+    TagAccessRepository.PROVIDER,
+    TagCreateRepository.PROVIDER,
+    TagDeleteRepository.PROVIDER,
+    TagGetManyRepository.PROVIDER,
+    TagRenameRepository.PROVIDER,
   ],
 })
 export class TagModule {}

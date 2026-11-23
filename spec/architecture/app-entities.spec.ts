@@ -45,6 +45,23 @@ describe('app entities (@acme-<app>/common/entities)', () => {
     }).toPassArchitectureLint();
   });
 
+  it('the entity list of the app setup MAY take its type from @nestjs/typeorm', async () => {
+    await expect({
+      file: 'apps/__entities-fixture__/src/app/setup/entities/index.ts',
+      code: 'import type { TypeOrmModuleOptions } from "@nestjs/typeorm";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    ['import { Note } from "../../../common/entities";'],
+    ['import type { TypeOrmModuleOptions } from "@nestjs/typeorm";'],
+  ])('the rest of app/setup may NOT take %s, only the entity list does', async (code) => {
+    await expect({
+      file: 'apps/__entities-fixture__/src/app/setup/config/__fixture__.ts',
+      code,
+    }).toBreakRule('boundaries/dependencies');
+  });
+
   it.each([
     [
       'apps/__entities-fixture__/src/features/product/domain/__fixture__.ts',

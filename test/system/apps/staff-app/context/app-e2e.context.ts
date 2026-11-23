@@ -4,13 +4,11 @@ import type { Queue } from 'bullmq';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { AuthE2EContext } from '@acme-libs/testing';
-import {
-  LEDGER_RECORD_QUEUE,
-  type ILedgerRecordProcessorPayload,
-} from '@acme-core/contracts/ledger';
+import { LedgerQueue } from '@acme-core/queues';
 import { AppModule as ProcessorAppModule } from '@acme-processor/app';
 import { AppModule } from '@acme-staff/app';
 import type { Maybe } from '@acme-libs/toolkit';
+import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
 
 interface IAppE2EState {
   processor: INestApplication;
@@ -57,7 +55,7 @@ export class AppE2EContext extends AuthE2EContext {
     await super.init();
 
     const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LEDGER_RECORD_QUEUE),
+      getQueueToken(LedgerQueue.NAME),
     );
     const adminToken = this.jwt.sign({ sub: '1' });
     const editorToken = this.jwt.sign({ sub: '2' });

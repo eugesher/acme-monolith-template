@@ -16,7 +16,6 @@ export class ConfigSetupModule {
         ...ConfigSchema.DATABASE,
         ...ConfigSchema.REDIS,
         ...ConfigSchema.QUEUE,
-        ...ConfigSchema.AUTH,
         ...ConfigSchema.CREDENTIALS,
         ...ConfigSchema.HTTP,
         ...ConfigSchema.OBSERVABILITY,

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from 'fs';
 import * as path from 'path';
 
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT: string = path.resolve(__dirname, '../..');
 const APPS = 'apps';
 const SUBMODULES = 'modules';
 const SHELL = 'shell';
@@ -14,7 +14,7 @@ const AREAS = {
     missing: 'a feature must have a controller in shell/',
   },
   processors: {
-    layers: LAYERS,
+    layers: [...LAYERS, 'queues'],
     suffix: '.processor.ts',
     missing: 'a processor must have a .processor.ts in shell/',
   },

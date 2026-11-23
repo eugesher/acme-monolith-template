@@ -1,6 +1,6 @@
 import type { Nullable } from '@acme-libs/toolkit';
 
-import type { IProductAccessRecord } from '../interfaces';
+import type { IProductAccessRecord } from '../types';
 
 export interface IProductAccessRepositoryPort {
   findById(productId: string): Promise<Nullable<IProductAccessRecord>>;

@@ -1,4 +1,4 @@
-import type { IProductGetManyListQuery, IProductGetManyRecord } from '../interfaces';
+import type { IProductGetManyListQuery, IProductGetManyRecord } from '../types';
 
 export interface IProductGetManyRepositoryPort {
   list(query: IProductGetManyListQuery): Promise<IProductGetManyRecord>;

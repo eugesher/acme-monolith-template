@@ -3,17 +3,17 @@
 The `ledger_entry` table is an append-only journal. Every app writes to it through one queue, and
 one processor appends.
 
-| Part           | Example                                                                                                           |
-| -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| queue contract | `core/contracts/src/ledger/queues/ledger-record.queue.ts`                                                         |
-| a producer     | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts` |
-| the appender   | `apps/processor-app/src/processors/ledger-append` (see `008-queue-processor.md`)                                  |
-| a reader       | `apps/staff-app/src/features/ledger` (see `005-page-window.md`)                                                   |
+| Part         | Example                                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| job payload  | `core/contracts/src/ledger/queues/ledger-record.queue.ts`                                                         |
+| a producer   | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts` |
+| the appender | `apps/processor-app/src/processors/ledger-append` (see `008-queue-processor.md`)                                  |
+| a reader     | `apps/staff-app/src/features/ledger` (see `005-page-window.md`)                                                   |
 
 **Producers enqueue, one processor appends.** No HTTP app writes the table, so the append has one
-caller and lives in the processor (see `024-code-placement.md`). The queue contract lives in
-`@acme-core/contracts/ledger`, because every app writes to the queue and an app may not import
-another.
+caller and lives in the processor (see `024-code-placement.md`). The queue lives in
+`@acme-core/queues` and its payload in `@acme-core/contracts/ledger`, because every app writes to
+the queue and an app may not import another.
 
 ## Append is the only verb
 

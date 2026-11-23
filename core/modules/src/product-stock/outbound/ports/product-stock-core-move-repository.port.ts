@@ -3,7 +3,7 @@ import type {
   IProductStockCoreMoveInsertRecord,
   IProductStockCoreMoveProductRecord,
   IProductStockCoreMoveSumRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductStockCoreMoveRepositoryPort {
   lockProducts(productIds: readonly string[]): Promise<IProductStockCoreMoveProductRecord[]>;

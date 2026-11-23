@@ -14,7 +14,7 @@ import { AuthCommonFacade } from './auth-common.facade';
       useClass: AuthCommonFacade,
     } satisfies ClassProvider<IAuthCommonPort>,
     AuthCommonFindSubjectUseCase,
-    AuthCommonFindSubjectRepository.provider,
+    AuthCommonFindSubjectRepository.PROVIDER,
   ],
 })
 export class AuthCommonModule {}

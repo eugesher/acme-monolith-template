@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT: string = path.resolve(__dirname, '../..');
 const APPS = 'apps';
 const SKIPPED = new Set(['spec']);
 const AUTH_LIB = '@acme-libs/auth';

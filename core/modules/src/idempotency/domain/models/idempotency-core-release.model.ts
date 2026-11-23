@@ -1,7 +1,7 @@
 import type {
   IIdempotencyCoreReleaseLoggerPayload,
   IIdempotencyCoreReleaseLoggerPayloadBuild,
-} from '../interfaces';
+} from '../types';
 
 export class IdempotencyCoreReleaseModel {
   public static toLoggerPayload(

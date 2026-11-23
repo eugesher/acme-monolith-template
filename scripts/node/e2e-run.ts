@@ -72,8 +72,8 @@ const formatTable = (rows: ISuiteResult[]): string => {
   );
 };
 
-const directory = mkdtempSync(join(tmpdir(), 'acme-e2e-'));
-const results = SUITES.map((suite) => runSuite(suite, directory));
+const directory: string = mkdtempSync(join(tmpdir(), 'acme-e2e-'));
+const results: ISuiteResult[] = SUITES.map((suite) => runSuite(suite, directory));
 
 rmSync(directory, { recursive: true, force: true });
 

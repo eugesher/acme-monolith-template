@@ -9,7 +9,7 @@ import {
   type IProductGetManyRepositoryPort,
   type IProductTagPort,
 } from '../../outbound';
-import type { IProductGetManyCommand, IProductView } from '../interfaces';
+import type { IProductGetManyCommand, IProductView } from '../types';
 
 @Injectable()
 export class ProductGetManyUseCase {

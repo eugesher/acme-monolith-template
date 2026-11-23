@@ -16,7 +16,9 @@ lives with the rule that covers the importer:
   module may NOT import `typeorm`, because the database lib configures it.
 
 **An edge used only by specs counts as used.** A lib module spec imports `@nestjs/core`, and a
-common-module spec imports the kernel; both are code the lint checks.
+common-module spec imports the kernel; both are code the lint checks. Where only the specs of a lib
+need a package, the `file` capture scopes it to them: the database lib takes `@nestjs/core` and
+`nestjs-pino` in `**/*.spec.ts` alone.
 
 **No rule names an app.** A category matches `apps/*` and captures the folder as `app`, a policy
 compares it with `own('app')`, and the import groups of `imports.mjs` match any `@acme-<app>` alias
@@ -59,8 +61,8 @@ Some edges are part of the documented shape of the template and have a `MAY` cas
   contracts;
 - shared code that reaches the contracts of its namesake, the http lib, the cache contracts and
   `nestjs-pino`;
-- the e2e code that reaches app contracts, the queue contracts `@acme-core/contracts/ledger` and
-  `@acme-core/contracts/product-stock`, and the testing lib;
+- the e2e code that reaches app contracts, the payloads in `@acme-core/contracts/ledger` and
+  `@acme-core/contracts/product-stock`, the queues of `@acme-core/queues`, and the testing lib;
 - a feature queue adapter and a processor that reach app contracts: a queue between the modules of
   one app keeps its contract in the app, while a queue written by more than one app keeps it in core
   or in the lib that writes it, `product-stock-post-subtract` in
@@ -97,12 +99,13 @@ module in `shell/` and, in a parent feature, `modules/index.ts`: a parent keeps 
 its root, next to `modules/` (see `025-feature-groups.md`).
 
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
-processor upserts its job scheduler (see `009-scheduled-processor.md`). The module next to the
-adapter takes `libs/queue` or `@acme-core/queues` to register the queue, in features and processors
-alike. The processor in `shell/` takes the name of its queue from its own `outbound` for
-`@Processor`, and `queue.mjs` keeps it to `*_QUEUE` names, so a port still reaches the processor
-only through a use case. The module root of a processor without a queue adapter, as the ledger,
-mounts its registration from `@acme-core/queues`.
+processor upserts its job scheduler (see `009-scheduled-processor.md`). The module root that binds
+the adapter registers the queue it injects. A queue of one processor lives in `queues/` of the
+processor, the one folder of a processor besides its layers (`spec/support/app-module-kinds.ts`): it
+takes `libs/queue` and `@nestjs/common` and nothing of the module, and only `shell/` and
+`infrastructure/queue` reach it. The processor in `shell/` takes nothing from its `outbound`, so a
+port reaches it only through a use case. The module root of a processor without a queue adapter, as
+the ledger, mounts its registration from `@acme-core/queues`.
 
 The module root of a feature or a processor may reach a shared barrel, as the module root of a
 common module may (a positive case of the common modules spec).
@@ -127,10 +130,11 @@ edges exist for it:
 
 - **`infrastructure/queue`**, a category of its own, holds the queue adapters. It takes
   `@nestjs/bullmq`, `bullmq` and its own contracts.
-- **The module of a queue adapter registers its queue** from `@acme-core/queues`, and the module
-  root mounts that module and takes neither `@acme-core/queues`, `libs/queue` nor BullMQ itself. A
-  core module is mounted by features of several apps, so the queue comes with it rather than with
-  each app.
+- **The module root registers the queue of its adapter** with `<Queue>.register()` of
+  `@acme-core/queues`, next to `<Adapter>.PROVIDER`, and takes neither `libs/queue` nor BullMQ
+  itself; `infrastructure/queue` takes the queue for its `NAME` and never `libs/queue`. A core
+  module is mounted by features of several apps, so the queue comes with it rather than with each
+  app.
 - **Core infrastructure may take `@acme-libs/contracts/cache`**, to drop the keys a write makes
   stale; the application still may not, so caching stays an adapter behind a port.
 
@@ -169,8 +173,9 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `LedgerCoreModule` of `@acme-core/modules/ledger`, and `infrastructure/core-adapters` takes
   `LEDGER_CORE_PORT` from `@acme-core/contracts/ledger`. The ledger reads the correlation id of the
   context itself, so no adapter needs the observability lib. What reads the queue takes the same
-  contracts, as it takes those of any core module: the processor in `shell/`, the queue registry of
-  staff-app in `infrastructure/queue`, `core/queues`, the e2e code and `test/system`.
+  contracts and the queue of `@acme-core/queues`: the processor in `shell/`, the queue adapters in
+  `infrastructure/queue`, the e2e code and `test/system`. `core/queues` holds its names itself and
+  takes no contract.
 - **A processor and a global module read tables.** Their infrastructure may import `typeorm`,
   `@acme-libs/contracts/database` and `@nestjs/common`, as feature infrastructure does.
 - **No module touches `@nestjs-cls`.** A repository injects `ORM_PORT` of
@@ -192,7 +197,8 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   and handed to `OrmModule.forRoot` of `libs/database`, so only that lib may import
   `@nestjs/typeorm`; `TypeOrmModule.forFeature` would add repository tokens that nothing injects.
   `libs/app` takes `TypeOrmModuleOptions` from it as well, for the type of the entities it hands to
-  `OrmModule`.
+  `OrmModule`. The entity list is the category `acme-app:app:entities`: it alone in `app/` reaches
+  the core and app entities, and it takes the same type from `@nestjs/typeorm`.
 - **One file sets an app up.** `app/setup/app-setup.module.ts` is the category `acme-app:app:setup`:
   it may import `@acme-libs/app`, `@acme-libs/credentials`, the base libs, the files of its own
   `app/` and `@nestjs/common`. `AppModule` reaches only that file, the indexes of the features,
@@ -202,14 +208,17 @@ Code lives with its only caller (see `024-code-placement.md`), so the edges foll
   `cache`, `database`, `http`, `local-storage`, `observability` and `queue`, and `@nestjs/core` for
   `APP_PIPE` and `APP_FILTER`; `bootstrap/` takes `observability`, `openapi`, `@nestjs/config` and
   `nestjs-pino` to start the app (see `012-app-bootstrap.md`).
-- **A module root binds no token.** An adapter carries its binding in a static `provider` (see
+- **A module root binds no token.** An adapter carries its binding in a static `PROVIDER` (see
   `031-static-provider.md`), and a config value is bound in `infrastructure/config` (see
   `030-config-values.md`), so the module root of a feature, a processor, a core, common or global
   module may reach neither its own `outbound` nor `@acme-libs/config`. Only `infrastructure/config`,
-  `app/setup/config` and the observability lib import the config lib.
+  `app/setup/config` and the observability lib import the config lib. `infrastructure/config` and
+  `core/queues` also take `@nestjs/common`, for the types they answer: `FactoryProvider` and
+  `DynamicModule`.
 - **A global module has the layers of a feature.** `application/` sees its own outbound, the base
   libs and `@nestjs/common`; `outbound/` sees itself and the base libs; the module root sees the
-  application.
+  application. Its barrel `global/<module>/index.ts` exports only the Nest module of `shell/`, and
+  `global/index.ts` exports the barrels, as a common module and `common/modules/index.ts` do.
 - **A global common-adapter reaches any contract of its app and its own outbound.** It implements a
   port of its module's outbound with the port of a common module, which is named after that module,
   not after the global module, so the namesake rule of `appContracts` would refuse it.
@@ -226,10 +235,6 @@ A policy allows a layer other layers, libs and packages, never a list of the nam
 Which decorator or type a layer takes from a package it may import is the choice of the code: a core
 service may implement `OnModuleInit`, a processor may throw `UnrecoverableError`, a queue adapter
 may pass `JobsOptions`. A list of names would turn each of them into an edit of the lint.
-
-One policy still names imports: `queue.mjs` keeps the processor in `shell/` to the `*_QUEUE` names
-of its own `outbound`, so that a port reaches it only through a use case. The specifier is a pattern
-of the naming of `029-naming.md`, not a list of exports.
 
 ### The layers of a lib
 

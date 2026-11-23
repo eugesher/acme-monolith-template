@@ -9,7 +9,7 @@ import {
 
 @Injectable()
 export class ProductStockCoreTransactionAdapter implements IProductStockCoreTransactionPort {
-  public static readonly provider: ClassProvider<IProductStockCoreTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockCoreTransactionPort> = {
     provide: PRODUCT_STOCK_CORE_TRANSACTION_PORT,
     useClass: ProductStockCoreTransactionAdapter,
   };

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { NoteGetOneModel } from '../../domain';
 import { NoteAccessService } from '../services/note-access.service';
-import type { INoteGetOneCommand, INoteView } from '../interfaces';
+import type { INoteGetOneCommand, INoteView } from '../types';
 
 @Injectable()
 export class NoteGetOneUseCase {

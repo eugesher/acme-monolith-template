@@ -1,7 +1,7 @@
 import type {
   IProductStockPostSubtractArchiveCommand,
   IProductStockPostSubtractArchiveView,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductStockPostSubtractArchivePort {
   archive(

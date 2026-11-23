@@ -3,7 +3,7 @@ import type {
   IAuthCustomerRegisterLoggerPayload,
   IAuthCustomerRegisterReconstitute,
   IAuthCustomerRegisterSnapshot,
-} from '../interfaces';
+} from '../types';
 
 export class AuthCustomerRegisterModel {
   private constructor(

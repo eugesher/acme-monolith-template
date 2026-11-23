@@ -1,28 +1,33 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
-import type { Queue } from 'bullmq';
+import { Injectable, type ClassProvider } from '@nestjs/common';
+import type { JobsOptions, Queue } from 'bullmq';
 
-import { LEDGER_RECORD_QUEUE } from '@acme-core/contracts/ledger';
-import { PRODUCT_STOCK_POST_SUBTRACT_QUEUE } from '@acme-core/contracts/product-stock';
+import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 import type { Maybe, Nullable } from '@acme-libs/toolkit';
 
-import type {
-  IQueueRegistryFailedJobsView,
-  IQueueRegistryFailedJobView,
-  IQueueRegistryFindFailedJobsCommand,
-  IQueueRegistryJobCommand,
-  IQueueRegistryJobCountsView,
-  IQueueRegistryPort,
+import {
+  QUEUE_REGISTRY_PORT,
+  type IQueueRegistryFailedJobsView,
+  type IQueueRegistryFailedJobView,
+  type IQueueRegistryFindFailedJobsCommand,
+  type IQueueRegistryJobCommand,
+  type IQueueRegistryJobCountsView,
+  type IQueueRegistryPort,
 } from '../../outbound';
 
 @Injectable()
 export class QueueRegistryAdapter implements IQueueRegistryPort {
+  public static readonly PROVIDER: ClassProvider<IQueueRegistryPort> = {
+    provide: QUEUE_REGISTRY_PORT,
+    useClass: QueueRegistryAdapter,
+  };
+
   private readonly queues: Map<string, Queue>;
 
   constructor(
-    @InjectQueue(LEDGER_RECORD_QUEUE)
+    @InjectQueue(LedgerQueue.NAME)
     ledgerRecordQueue: Queue,
-    @InjectQueue(PRODUCT_STOCK_POST_SUBTRACT_QUEUE)
+    @InjectQueue(ProductStockPostSubtractQueue.NAME)
     postSubtractQueue: Queue,
   ) {
     this.queues = new Map(
@@ -95,8 +100,9 @@ export class QueueRegistryAdapter implements IQueueRegistryPort {
   private static toFailedJob(
     job: Awaited<ReturnType<Queue['getFailed']>>[number],
   ): IQueueRegistryFailedJobView {
-    const { id, name, opts, attemptsMade, failedReason, stacktrace, timestamp } = job;
-    const { processedOn, finishedOn } = job;
+    const { id, name, opts, attemptsMade, failedReason, timestamp, processedOn, finishedOn } = job;
+    const { attempts } = opts as Required<Pick<JobsOptions, 'attempts'>>;
+    const { stacktrace } = job as { stacktrace: string[] };
     const data: unknown = job.data;
     const createdAt = new Date(timestamp).toISOString();
     const processedAt = QueueRegistryAdapter.toInstant(processedOn);
@@ -106,10 +112,10 @@ export class QueueRegistryAdapter implements IQueueRegistryPort {
       id: String(id),
       name,
       data,
-      attempts: opts.attempts ?? 1,
+      attempts,
       attemptsMade,
       failedReason,
-      stacktrace: stacktrace ?? [],
+      stacktrace,
       createdAt,
       processedAt,
       failedAt,

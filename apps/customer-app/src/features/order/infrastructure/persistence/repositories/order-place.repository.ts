@@ -15,7 +15,7 @@ export class OrderPlaceRepository
   extends OrderPersistenceHost
   implements IOrderPlaceRepositoryPort
 {
-  public static readonly provider: ClassProvider<IOrderPlaceRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderPlaceRepositoryPort> = {
     provide: ORDER_PLACE_REPOSITORY_PORT,
     useClass: OrderPlaceRepository,
   };

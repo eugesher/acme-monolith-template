@@ -14,7 +14,7 @@ export class ProductStockAddRepository
   extends ProductStockPersistenceHost
   implements IProductStockAddRepositoryPort
 {
-  public static readonly provider: ClassProvider<IProductStockAddRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductStockAddRepositoryPort> = {
     provide: PRODUCT_STOCK_ADD_REPOSITORY_PORT,
     useClass: ProductStockAddRepository,
   };

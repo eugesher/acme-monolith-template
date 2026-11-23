@@ -1,4 +1,4 @@
-import type { IOrderGetManyQuery, IOrderGetManyRecord } from '../interfaces';
+import type { IOrderGetManyQuery, IOrderGetManyRecord } from '../types';
 
 export interface IOrderGetManyRepositoryPort {
   list(query: IOrderGetManyQuery): Promise<IOrderGetManyRecord>;

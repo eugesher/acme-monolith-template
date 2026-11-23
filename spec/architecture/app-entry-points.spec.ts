@@ -275,14 +275,14 @@ describe('app entry points', () => {
   it('a feature lib adapter MAY import the health lib contracts by their alias', async () => {
     await expect({
       file: 'apps/customer-app/src/features/health/infrastructure/lib-adapters/__fixture__.ts',
-      code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
+      code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
     }).toPassArchitectureLint();
   });
 
   it('a feature presentation may NOT import the health lib contracts', async () => {
     await expect({
       file: 'apps/customer-app/src/features/health/shell/__fixture__.ts',
-      code: 'import { HEALTH_PORT } from "@acme-libs/contracts/health";',
+      code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
     }).toBreakRule('boundaries/dependencies');
   });
 
@@ -313,34 +313,29 @@ describe('app entry points', () => {
 
   it.each([
     'apps/processor-app/src/processors/ledger-append/shell/ledger-append.processor.ts',
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
-    'core/queues/src/ledger/ledger-queue.module.ts',
     'apps/staff-app/test/context/app-e2e.context.ts',
     'apps/customer-app/test/context/app-e2e.context.ts',
-  ])('%s MAY import the ledger record contract of the core ledger', async (file) => {
+  ])('%s MAY import the ledger record payload of the core ledger', async (file) => {
     await expect({
       file,
-      code: 'import { LEDGER_RECORD_QUEUE } from "@acme-core/contracts/__ledger-fixture__";',
+      code: 'import type { ILedgerRecordProcessorPayload } from "@acme-core/contracts/__ledger-fixture__";',
     }).toPassArchitectureLint();
   });
 
-  it.each([
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.adapter.ts',
-    'core/queues/src/product-stock-post-subtract/product-stock-post-subtract-queue.module.ts',
-  ])('%s MAY import the queue contract of the core product stock', async (file) => {
+  it('a processor MAY import the post-subtract payload of the core product stock', async () => {
     await expect({
-      file,
-      code: 'import { PRODUCT_STOCK_POST_SUBTRACT_QUEUE } from "@acme-core/contracts/__product-stock-fixture__";',
+      file: 'apps/processor-app/src/processors/product-stock-post-subtract/shell/product-stock-post-subtract.processor.ts',
+      code: 'import type { IProductStockPostSubtractPayload } from "@acme-core/contracts/__product-stock-fixture__";',
     }).toPassArchitectureLint();
   });
 
   it.each([
     'apps/processor-app/src/processors/ledger-append/shell/ledger-append.module.ts',
-    'apps/staff-app/src/features/queue/infrastructure/queue/queue-registry.module.ts',
+    'apps/staff-app/src/features/queue/shell/queue.module.ts',
   ])('%s MAY register the ledger record queue through the core queues', async (file) => {
     await expect({
       file,
-      code: 'import { LedgerQueueModule } from "@acme-core/queues";',
+      code: 'import { LedgerQueue } from "@acme-core/queues";',
     }).toPassArchitectureLint();
   });
 

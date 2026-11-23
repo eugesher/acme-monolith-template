@@ -155,8 +155,8 @@ const seed = async (runner: QueryRunner, files: ISeedFile[]): Promise<void> => {
   }
 };
 
-const env = readEnv();
-const files = readSeedFiles();
+const env: ISeedEnv = readEnv();
+const files: ISeedFile[] = readSeedFiles();
 const dataSource = new DataSource({
   type: 'mysql',
   host: env.DATABASE_HOST,
@@ -169,7 +169,7 @@ const dataSource = new DataSource({
 
 await dataSource.initialize();
 
-const runner = dataSource.createQueryRunner();
+const runner: QueryRunner = dataSource.createQueryRunner();
 
 try {
   await seed(runner, files);

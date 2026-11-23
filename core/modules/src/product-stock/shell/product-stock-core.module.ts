@@ -1,5 +1,6 @@
 import { Module, type ClassProvider } from '@nestjs/common';
 
+import { ProductStockPostSubtractQueue } from '@acme-core/queues';
 import {
   PRODUCT_STOCK_CORE_PORT,
   type IProductStockCorePort,
@@ -11,13 +12,13 @@ import {
   ProductStockCoreConfigRedisCommandTimeoutMsProvider,
   ProductStockCoreLockRepository,
   ProductStockCoreMoveRepository,
-  ProductStockCorePostSubtractQueueModule,
+  ProductStockCorePostSubtractQueueAdapter,
   ProductStockCoreTransactionAdapter,
 } from '../infrastructure';
 import { ProductStockCoreFacade } from './product-stock-core.facade';
 
 @Module({
-  imports: [ProductStockCorePostSubtractQueueModule],
+  imports: [ProductStockPostSubtractQueue.register()],
   exports: [PRODUCT_STOCK_CORE_PORT],
   providers: [
     {
@@ -26,9 +27,10 @@ import { ProductStockCoreFacade } from './product-stock-core.facade';
     } satisfies ClassProvider<IProductStockCorePort>,
     ProductStockCoreLockUseCase,
     ProductStockCoreMoveUseCase,
-    ProductStockCoreLockRepository.provider,
-    ProductStockCoreMoveRepository.provider,
-    ProductStockCoreTransactionAdapter.provider,
+    ProductStockCoreLockRepository.PROVIDER,
+    ProductStockCoreMoveRepository.PROVIDER,
+    ProductStockCorePostSubtractQueueAdapter.PROVIDER,
+    ProductStockCoreTransactionAdapter.PROVIDER,
     ProductStockCoreConfigRedisCommandTimeoutMsProvider,
     ProductStockCoreConfigEnqueueRetryAttemptsProvider,
   ],

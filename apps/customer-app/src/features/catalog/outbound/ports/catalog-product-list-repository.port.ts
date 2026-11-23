@@ -1,4 +1,4 @@
-import type { ICatalogProductListQuery, ICatalogProductListRecord } from '../interfaces';
+import type { ICatalogProductListQuery, ICatalogProductListRecord } from '../types';
 
 export interface ICatalogProductListRepositoryPort {
   list(query: ICatalogProductListQuery): Promise<ICatalogProductListRecord>;

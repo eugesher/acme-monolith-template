@@ -1,5 +1,5 @@
 import { TagAggregate } from '../aggregates/tag.aggregate';
-import type { ITagDeleteLoggerPayload, ITagReconstitute } from '../interfaces';
+import type { ITagDeleteLoggerPayload, ITagReconstitute } from '../types';
 
 export class TagDeleteModel extends TagAggregate {
   public static reconstitute(this: void, record: ITagReconstitute): TagDeleteModel {

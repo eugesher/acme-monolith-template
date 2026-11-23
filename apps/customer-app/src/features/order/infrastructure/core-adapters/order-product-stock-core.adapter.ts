@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 export class OrderProductStockCoreAdapter implements IOrderProductStockPort {
-  public static readonly provider: ClassProvider<IOrderProductStockPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderProductStockPort> = {
     provide: ORDER_PRODUCT_STOCK_PORT,
     useClass: OrderProductStockCoreAdapter,
   };

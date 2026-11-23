@@ -20,7 +20,7 @@ import {
 
 @Injectable()
 export class ProductTagCommonAdapter implements IProductTagPort {
-  public static readonly provider: ClassProvider<IProductTagPort> = {
+  public static readonly PROVIDER: ClassProvider<IProductTagPort> = {
     provide: PRODUCT_TAG_PORT,
     useClass: ProductTagCommonAdapter,
   };

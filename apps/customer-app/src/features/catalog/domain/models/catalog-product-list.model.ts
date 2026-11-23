@@ -1,4 +1,4 @@
-import type { ICatalogProductListReconstitute, ICatalogProductListSnapshot } from '../interfaces';
+import type { ICatalogProductListReconstitute, ICatalogProductListSnapshot } from '../types';
 
 export class CatalogProductListModel {
   private constructor(

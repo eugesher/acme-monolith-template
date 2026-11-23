@@ -3,26 +3,38 @@
 All three apps connect BullMQ the same way, so the connection lives in a lib:
 `libs/queue/src/bull/bull-setup.module.ts`.
 
-| Method                          | Called by                                    | What it returns                                                         |
-| ------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------- |
-| `BullSetupModule.forRoot()`     | `AppSetupBaseModule` of `libs/app`           | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
-| `BullSetupModule.registerQueue` | `core/queues`, the module of a queue adapter | `BullModule.registerQueue({ name })`                                    |
+| Method                          | Called by                               | What it returns                                                         |
+| ------------------------------- | --------------------------------------- | ----------------------------------------------------------------------- |
+| `BullSetupModule.forRoot()`     | `AppSetupBaseModule` of `libs/app`      | `BullModule.forRootAsync`: the connection to Redis, prefix, job options |
+| `BullSetupModule.registerQueue` | `core/queues`, `queues/` of a processor | `BullModule.registerQueue({ name })`                                    |
 
 ```ts
-export const LedgerQueueModule = BullSetupModule.registerQueue(LEDGER_RECORD_QUEUE);
+export class LedgerQueue {
+  public static readonly NAME = 'ledger-record';
+
+  public static register(): DynamicModule {
+    return BullSetupModule.registerQueue(LedgerQueue.NAME);
+  }
+}
 ```
 
-**A queue is registered by the module of the adapter that injects it.** Each queue adapter of
-`infrastructure/queue` has a module next to it that registers its queue and exports its port (see
-`031-static-provider.md`): `LedgerCoreQueueModule`, `ProductStockCorePostSubtractQueueModule`,
-`QueueRegistryModule` and `IdempotencyPurgeScheduleQueueModule`.
+**A queue is registered by the module root that binds its adapter.** A queue adapter of
+`infrastructure/queue` carries its binding in a static `PROVIDER` (see `031-static-provider.md`),
+and the module root imports the registration next to it: `LedgerCoreModule`,
+`ProductStockCoreModule` and `QueueModule` of staff-app mount registrations of `@acme-core/queues`,
+`IdempotencyPurgeModule` the one of its `queues/`. Registering the queue and binding the adapter sit
+in one list, so they cannot drift apart.
 
-**A queue that several modules use is registered once, in `core/queues`.** `LedgerQueueModule` and
-`ProductStockPostSubtractQueueModule` of `@acme-core/queues` serve the core queue adapters, the
-failed jobs of staff-app (see `041-failed-jobs.md`) and the ledger processor, which has no adapter
-and mounts the registration in its module root. A queue of one module is registered by the module of
-its adapter with `BullSetupModule.registerQueue`, and its name lives in the `outbound/queues` of
-that module, as `idempotency-purge` of processor-app does (see `009-scheduled-processor.md`).
+**A queue is a class with its name and its registration.** `NAME` is what BullMQ sees and what
+`@Processor`, `@InjectQueue` and `queue.add` take; `register()` hands it to
+`BullSetupModule.registerQueue` for a module root to import. A queue that several modules use lives
+in `core/queues/src/definitions`, one flat file per queue, `<module>.queue.ts`: `LedgerQueue` and
+`ProductStockPostSubtractQueue` serve the core queue adapters, the failed jobs of staff-app (see
+`041-failed-jobs.md`), the processors and the e2e code. A queue of one processor lives in
+`queues/definitions` of the processor, as `IdempotencyPurgeQueue` of processor-app does (see
+`009-scheduled-processor.md`). The type of a job stays a contract: the payload of a core queue in
+`@acme-core/contracts`, since `ILedgerCoreEnqueueCommand` is built from it, the payload of a queue
+of one processor in its `queues/types`.
 
 **A setup class, not a module.** `BullSetupModule` has no `@Module`: it is a class of static methods
 that return the modules of `@nestjs/bullmq`, and the options are built in the private static
@@ -62,7 +74,7 @@ worker takes the connection and the prefix of its queue.
 | ---------------------------------- | --------------- |
 | `AppSetupBaseModule` of `libs/app` | `forRoot()`     |
 | `core/queues`                      | `registerQueue` |
-| the module of a queue adapter      | `registerQueue` |
+| `queues/` of a processor           | `registerQueue` |
 
 No other layer imports `libs/queue`, and none of the importers above imports `@nestjs/bullmq`: the
 package is left to the lib, to the queue adapters of `infrastructure/queue` and to the processors in

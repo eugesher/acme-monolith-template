@@ -5,7 +5,7 @@ import type {
   IQueueRegistryFindFailedJobsCommand,
   IQueueRegistryJobCommand,
   IQueueRegistryJobCountsView,
-} from '../interfaces';
+} from '../types';
 
 export interface IQueueRegistryPort {
   has(queueName: string): boolean;

@@ -17,7 +17,7 @@ export class TagCommonReplaceRepository
   extends TagCommonPersistenceHost
   implements ITagCommonReplaceRepositoryPort
 {
-  public static readonly provider: ClassProvider<ITagCommonReplaceRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<ITagCommonReplaceRepositoryPort> = {
     provide: TAG_COMMON_REPLACE_REPOSITORY_PORT,
     useClass: TagCommonReplaceRepository,
   };

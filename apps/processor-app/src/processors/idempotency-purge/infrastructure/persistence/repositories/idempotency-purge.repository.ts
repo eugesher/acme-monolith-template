@@ -14,7 +14,7 @@ export class IdempotencyPurgeRepository
   extends IdempotencyPurgePersistenceHost
   implements IIdempotencyPurgeRepositoryPort
 {
-  public static readonly provider: ClassProvider<IIdempotencyPurgeRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IIdempotencyPurgeRepositoryPort> = {
     provide: IDEMPOTENCY_PURGE_REPOSITORY_PORT,
     useClass: IdempotencyPurgeRepository,
   };

@@ -17,10 +17,10 @@ import { AuthController } from './auth.controller';
   providers: [
     AuthLoginUseCase,
     AuthRegisterUseCase,
-    AuthLoginRepository.provider,
-    AuthRegisterRepository.provider,
-    AuthCredentialsLibAdapter.provider,
-    AuthLedgerCoreAdapter.provider,
+    AuthLoginRepository.PROVIDER,
+    AuthRegisterRepository.PROVIDER,
+    AuthCredentialsLibAdapter.PROVIDER,
+    AuthLedgerCoreAdapter.PROVIDER,
   ],
 })
 export class AuthModule {}

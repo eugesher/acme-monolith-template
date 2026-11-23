@@ -1,5 +1,3 @@
-export * from './interfaces';
-
 export * from './ports/note-access-repository.port';
 export * from './ports/note-create-repository.port';
 export * from './ports/note-delete-repository.port';
@@ -10,3 +8,5 @@ export * from './ports/note-resolve-repository.port';
 export * from './ports/note-transaction.port';
 
 export * from './tokens/note-occ-retry-attempts.token';
+
+export * from './types';

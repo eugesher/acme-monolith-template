@@ -1,9 +1,5 @@
 import { TagAggregate } from '../aggregates/tag.aggregate';
-import type {
-  ITagReconstitute,
-  ITagRenameLoggerPayload,
-  ITagRenameUpdatePayload,
-} from '../interfaces';
+import type { ITagReconstitute, ITagRenameLoggerPayload, ITagRenameUpdatePayload } from '../types';
 
 export class TagRenameModel extends TagAggregate {
   public get name(): string {

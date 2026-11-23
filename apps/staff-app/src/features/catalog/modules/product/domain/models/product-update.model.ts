@@ -1,9 +1,5 @@
 import { ProductAggregate } from '../aggregates/product.aggregate';
-import type {
-  IProductReconstitute,
-  IProductUpdate,
-  IProductUpdateLoggerPayload,
-} from '../interfaces';
+import type { IProductReconstitute, IProductUpdate, IProductUpdateLoggerPayload } from '../types';
 
 export class ProductUpdateModel extends ProductAggregate {
   public static reconstitute(this: void, record: IProductReconstitute): ProductUpdateModel {

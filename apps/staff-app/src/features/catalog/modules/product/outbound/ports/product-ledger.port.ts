@@ -1,7 +1,7 @@
 import type {
   IProductLedgerRecordCreatedCommand,
   IProductLedgerRecordPublishedCommand,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductLedgerPort {
   recordCreated(command: IProductLedgerRecordCreatedCommand): Promise<void>;

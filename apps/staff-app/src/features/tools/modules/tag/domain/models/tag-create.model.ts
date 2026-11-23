@@ -4,7 +4,7 @@ import type {
   ITagCreateCandidateInit,
   ITagCreateLoggerPayload,
   ITagReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class TagCreateModel extends TagAggregate {
   public static initCandidate(proposal: ITagCreateCandidateInit): ITagCreateCandidate {

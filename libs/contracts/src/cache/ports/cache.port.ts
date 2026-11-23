@@ -1,6 +1,6 @@
 import type { Maybe } from '@acme-libs/toolkit';
 
-import type { ICacheWrapCommand } from '../interfaces';
+import type { ICacheWrapCommand } from '../types';
 
 export interface ICachePort {
   handleGet<T>(key: string): Promise<Maybe<T>>;

@@ -20,7 +20,7 @@ import {
 
 @Injectable()
 export class OrderTagCommonAdapter implements IOrderTagPort {
-  public static readonly provider: ClassProvider<IOrderTagPort> = {
+  public static readonly PROVIDER: ClassProvider<IOrderTagPort> = {
     provide: ORDER_TAG_PORT,
     useClass: OrderTagCommonAdapter,
   };

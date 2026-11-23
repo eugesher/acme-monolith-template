@@ -3,7 +3,7 @@ import type { Nullable } from '@acme-libs/toolkit';
 import type {
   IRoleReassignPermissionsRolePermissionInsertQuery,
   IRoleReassignPermissionsRoleRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface IRoleReassignPermissionsRepositoryPort {
   findRole(id: string): Promise<Nullable<IRoleReassignPermissionsRoleRecord>>;

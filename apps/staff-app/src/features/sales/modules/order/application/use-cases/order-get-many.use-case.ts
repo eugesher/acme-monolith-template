@@ -9,7 +9,7 @@ import {
   type IOrderGetManyRepositoryPort,
   type IOrderTagPort,
 } from '../../outbound';
-import type { IOrderGetManyCommand, IOrderGetManyView } from '../interfaces';
+import type { IOrderGetManyCommand, IOrderGetManyView } from '../types';
 
 @Injectable()
 export class OrderGetManyUseCase {

@@ -1,3 +1,5 @@
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
+
 import {
   Customer,
   IdempotencyKey,
@@ -7,4 +9,11 @@ import {
   ProductStock,
 } from '@acme-core/entities';
 
-export const entities = [Customer, IdempotencyKey, Order, OrderProduct, Product, ProductStock];
+export const entities: TypeOrmModuleOptions['entities'] = [
+  Customer,
+  IdempotencyKey,
+  Order,
+  OrderProduct,
+  Product,
+  ProductStock,
+];

@@ -4,7 +4,7 @@ import { PaginationHelper, type IPage } from '@acme-libs/toolkit';
 
 import { NoteGetManyModel, NoteSubjectInvalidException } from '../../domain';
 import { NOTE_GET_MANY_REPOSITORY_PORT, type INoteGetManyRepositoryPort } from '../../outbound';
-import type { INoteGetManyCommand, INoteView } from '../interfaces';
+import type { INoteGetManyCommand, INoteView } from '../types';
 
 @Injectable()
 export class NoteGetManyUseCase {

@@ -1,4 +1,4 @@
-import type { IIdempotencyCoreCompleteQuery } from '../interfaces';
+import type { IIdempotencyCoreCompleteQuery } from '../types';
 
 export interface IIdempotencyCoreCompleteRepositoryPort {
   complete(query: IIdempotencyCoreCompleteQuery): Promise<void>;

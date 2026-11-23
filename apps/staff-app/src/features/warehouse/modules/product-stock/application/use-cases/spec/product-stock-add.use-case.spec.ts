@@ -191,7 +191,7 @@ describe('ProductStockAddUseCase', () => {
       expect(idempotency.release).not.toHaveBeenCalled();
     });
 
-    it('refuses an unknown product with PRODUCT_NOT_FOUND and releases the key', async () => {
+    it('refuses an unknown product with PRODUCT_STOCK_PRODUCT_NOT_FOUND and releases the key', async () => {
       repository.findById.mockResolvedValue(null);
 
       await expect(
@@ -202,7 +202,7 @@ describe('ProductStockAddUseCase', () => {
           idempotencyKey: 'key-1',
         }),
       ).rejects.toMatchObject({
-        code: 'PRODUCT_NOT_FOUND',
+        code: 'PRODUCT_STOCK_PRODUCT_NOT_FOUND',
         message: 'Product 999 was not found',
       });
       expect(movement.add).not.toHaveBeenCalled();

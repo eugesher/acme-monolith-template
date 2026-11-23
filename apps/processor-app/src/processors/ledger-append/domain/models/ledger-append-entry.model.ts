@@ -8,7 +8,7 @@ import type {
   ILedgerAppendEntryCandidate,
   ILedgerAppendEntryCandidateInit,
   ILedgerAppendEntryLoggerPayload,
-} from '../interfaces';
+} from '../types';
 
 export class LedgerAppendEntryModel {
   public static initCandidate(

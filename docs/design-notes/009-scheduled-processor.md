@@ -6,15 +6,16 @@
 repository of its own (see `024-code-placement.md`). It is a processor: a job of the
 `idempotency-purge` queue enters it, and a job scheduler of BullMQ adds that job every five minutes.
 
-| Layer                        | What it holds                                                                                                                                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shell`                      | `IdempotencyPurgeModule`; `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                                                      |
-| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                                                                                        |
-| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                                                                                      |
-| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN`, `IDEMPOTENCY_PURGE_QUEUE` |
-| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`, `IdempotencyPurgeScheduleQueueModule`                                                                                                                                       |
-| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                                                                                        |
-| `infrastructure/config`      | `IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider`, `IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider`                                                                                               |
+| Layer                        | What it holds                                                                                                                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shell`                      | `IdempotencyPurgeModule`; `IdempotencyPurgeProcessor`: `onApplicationBootstrap` registers the schedule, `process` runs a purge                                                           |
+| `application`                | `IdempotencyPurgeScheduleUseCase`, `IdempotencyPurgeUseCase`                                                                                                                             |
+| `domain`                     | `IdempotencyPurgeHelper.expiryCutoff`, `IdempotencyPurgeHelper.inFlightCutoff`                                                                                                           |
+| `outbound`                   | `IDEMPOTENCY_PURGE_SCHEDULE_PORT`, `IDEMPOTENCY_PURGE_REPOSITORY_PORT`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`, `IDEMPOTENCY_PURGE_IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES_TOKEN` |
+| `queues`                     | `IdempotencyPurgeQueue`: `NAME` and `register()`; `IIdempotencyPurgeQueuePayload`                                                                                                        |
+| `infrastructure/queue`       | `IdempotencyPurgeScheduleQueueAdapter`                                                                                                                                                   |
+| `infrastructure/persistence` | `IdempotencyPurgeRepository`                                                                                                                                                             |
+| `infrastructure/config`      | `IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider`, `IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider`                                                                    |
 
 The processor owns both TTLs: its `infrastructure/config` binds `IDEMPOTENCY_KEY_TTL_HOURS` and
 `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` to their tokens (see `030-config-values.md`). The core module
@@ -77,16 +78,18 @@ application.
 
 ## Wiring
 
-The queue name `IDEMPOTENCY_PURGE_QUEUE` and the type of its job data, `IIdempotencyPurgePayload`,
-live in `outbound/queues/idempotency-purge.queue.ts`: no other module writes or reads the queue. The
-job carries no data, so the type is `Record<string, never>` and an add with any field does not
-compile. `IdempotencyPurgeScheduleQueueModule` registers the queue, binds
-`IdempotencyPurgeScheduleQueueAdapter` to `IDEMPOTENCY_PURGE_SCHEDULE_PORT` and exports the port,
-and `IdempotencyPurgeModule` imports it. The processor takes the name from `outbound` for
-`@Processor(IDEMPOTENCY_PURGE_QUEUE)`: lint lets the processor in `shell` take only a `*_QUEUE` name
-from its outbound, not a port (see `016-lint-allowlists.md`). The e2e context reaches the queue by
-the literal `'idempotency-purge'`, the name BullMQ sees. processor-app mounts
-`IdempotencyPurgeModule` through `@acme-processor/processors`.
+The queue lives in `queues/` of the module, next to its layers: no other module writes or reads it.
+`IdempotencyPurgeQueue` of `queues/definitions` holds its name, `NAME`, and its registration,
+`register()`, which hands the name to `BullSetupModule.registerQueue`. The type of its job data,
+`IIdempotencyPurgeQueuePayload` of `queues/types`, is `Record<string, never>`: the job carries no
+data, and an add with any field does not compile. `IdempotencyPurgeModule` imports
+`IdempotencyPurgeQueue.register()` and binds `IdempotencyPurgeScheduleQueueAdapter.PROVIDER` to
+`IDEMPOTENCY_PURGE_SCHEDULE_PORT` (see `031-static-provider.md`); the processor takes
+`IdempotencyPurgeQueue.NAME` for `@Processor`, and the adapter for `@InjectQueue` and the id of its
+scheduler. Lint lets `shell/` and `infrastructure/queue` reach `queues/`, and no other layer (see
+`016-lint-allowlists.md`). The e2e context reaches the queue by the literal `'idempotency-purge'`,
+the name BullMQ sees. processor-app mounts `IdempotencyPurgeModule` through
+`@acme-processor/processors`.
 
 **The start of the app is an entry.** `IdempotencyPurgeProcessor` implements
 `OnApplicationBootstrap`. No layer imports `@nestjs/schedule`.

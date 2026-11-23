@@ -18,7 +18,7 @@ export class UserRegisterRepository
   extends UserPersistenceHost
   implements IUserRegisterRepositoryPort
 {
-  public static readonly provider: ClassProvider<IUserRegisterRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IUserRegisterRepositoryPort> = {
     provide: USER_REGISTER_REPOSITORY_PORT,
     useClass: UserRegisterRepository,
   };

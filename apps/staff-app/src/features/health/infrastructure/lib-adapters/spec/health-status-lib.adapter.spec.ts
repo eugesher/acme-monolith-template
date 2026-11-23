@@ -3,12 +3,12 @@ import {
   HealthLivenessStatusEnum,
   HealthReadinessStatusEnum,
 } from '@acme-libs/kernel';
-import type { IHealthPort } from '@acme-libs/contracts/health';
+import type { IHealthLibPort } from '@acme-libs/contracts/health';
 
 import { HealthStatusLibAdapter } from '../health-status-lib.adapter';
 
 describe('HealthStatusLibAdapter', () => {
-  let health: jest.Mocked<IHealthPort>;
+  let health: jest.Mocked<IHealthLibPort>;
   let adapter: HealthStatusLibAdapter;
 
   beforeEach(() => {

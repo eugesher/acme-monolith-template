@@ -12,10 +12,11 @@ two apps meet in one Redis.
 | `POST /queues/:queueName/jobs/failed/:jobId/retry` | `queue:retry`  | returns the job to the queue                      |
 | `DELETE /queues/:queueName/jobs/failed/:jobId`     | `queue:delete` | removes the job                                   |
 
-**A queue is read, not processed.** `QueueRegistryModule` next to the adapter mounts
-`LedgerQueueModule` and `ProductStockPostSubtractQueueModule` of `@acme-core/queues` (see
-`032-queue-lib.md`), and `QueueRegistryAdapter` injects them. A BullMQ queue without a worker reads
-and moves jobs and runs none, so staff-app takes no job from processor-app.
+**A queue is read, not processed.** `QueueModule` mounts `LedgerQueue.register()` and
+`ProductStockPostSubtractQueue.register()` of `@acme-core/queues` next to
+`QueueRegistryAdapter.PROVIDER` (see `032-queue-lib.md`), and the adapter injects both queues. A
+BullMQ queue without a worker reads and moves jobs and runs none, so staff-app takes no job from
+processor-app.
 
 **A pause belongs to the queue, not to a job.** BullMQ keeps the jobs of a paused queue waiting and
 marks the queue, so each queue answers `paused` from `isPaused()` and the counts of five states from
@@ -26,8 +27,11 @@ the answer.
 **A failed job answers what the staff acts on, not the job of BullMQ.** `QueueRegistryAdapter` maps
 each job to the view of its port: the id as a string, the name, the `data`, `attempts` and
 `attemptsMade`, the `failedReason` and the `stacktrace`, and the instants `createdAt`, `processedAt`
-and `failedAt` as ISO strings in UTC, `null` when BullMQ has none. The options, the progress and the
-return value of BullMQ stay in the adapter, so an upgrade of BullMQ does not change the response.
+and `failedAt` as ISO strings in UTC, `null` when BullMQ has none. `attempts` and `stacktrace` are
+mapped as BullMQ loads the job, without a fallback: `Job` gives a job `attempts: 0` when its options
+have none, and `getFailed` restores the stacktrace as an array (see `008-queue-processor.md`). The
+options, the progress and the return value of BullMQ stay in the adapter, so an upgrade of BullMQ
+does not change the response.
 
 An unknown queue or job answers 404, a job that is not failed 409. A retried job keeps its
 `attemptsMade`, so its next failure sends it straight back to the failed set: a retry is one more

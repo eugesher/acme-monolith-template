@@ -4,7 +4,7 @@ import { PaginationHelper } from '@acme-libs/toolkit';
 
 import { OrderGetManyModel } from '../../domain';
 import { ORDER_GET_MANY_REPOSITORY_PORT, type IOrderGetManyRepositoryPort } from '../../outbound';
-import type { IOrderGetManyCommand, IOrderGetManyView } from '../interfaces';
+import type { IOrderGetManyCommand, IOrderGetManyView } from '../types';
 
 @Injectable()
 export class OrderGetManyUseCase {

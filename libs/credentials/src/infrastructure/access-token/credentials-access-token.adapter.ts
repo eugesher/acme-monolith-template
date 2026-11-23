@@ -11,7 +11,7 @@ import { CREDENTIALS_ACCESS_TOKEN_PORT, type ICredentialsAccessTokenPort } from 
 
 @Injectable()
 export class CredentialsAccessTokenAdapter implements ICredentialsAccessTokenPort {
-  public static readonly provider: ClassProvider<ICredentialsAccessTokenPort> = {
+  public static readonly PROVIDER: ClassProvider<ICredentialsAccessTokenPort> = {
     provide: CREDENTIALS_ACCESS_TOKEN_PORT,
     useClass: CredentialsAccessTokenAdapter,
   };

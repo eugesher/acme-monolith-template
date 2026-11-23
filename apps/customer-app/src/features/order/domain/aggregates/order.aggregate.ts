@@ -1,6 +1,6 @@
 import { Entity } from '@acme-libs/domain';
 
-import type { IOrderProductSnapshot, IOrderSnapshot } from '../interfaces';
+import type { IOrderProductSnapshot, IOrderSnapshot } from '../types';
 
 export abstract class OrderAggregate extends Entity {
   protected constructor(

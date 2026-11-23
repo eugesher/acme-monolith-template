@@ -11,7 +11,7 @@ import { AuthPersistenceHost } from '../host/auth-persistence.host';
 
 @Injectable()
 export class AuthLoginRepository extends AuthPersistenceHost implements IAuthLoginRepositoryPort {
-  public static readonly provider: ClassProvider<IAuthLoginRepositoryPort> = {
+  public static readonly PROVIDER: ClassProvider<IAuthLoginRepositoryPort> = {
     provide: AUTH_LOGIN_REPOSITORY_PORT,
     useClass: AuthLoginRepository,
   };

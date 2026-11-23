@@ -4,7 +4,7 @@ import type {
   IProductStockIdempotencyOutcomeView,
   IProductStockIdempotencyReleaseCommand,
   IProductStockIdempotencyReplayView,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductStockIdempotencyPort {
   claim<T>(

@@ -9,7 +9,7 @@ import {
   type IRoleCreateRepositoryPort,
   type IRoleTransactionPort,
 } from '../../outbound';
-import type { IRoleCreateCommand, IRoleView } from '../interfaces';
+import type { IRoleCreateCommand, IRoleView } from '../types';
 
 @Injectable()
 export class RoleCreateUseCase {

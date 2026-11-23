@@ -6,7 +6,7 @@ import { USER_TRANSACTION_PORT, type IUserTransactionPort } from '../../../outbo
 
 @Injectable()
 export class UserTransactionAdapter implements IUserTransactionPort {
-  public static readonly provider: ClassProvider<IUserTransactionPort> = {
+  public static readonly PROVIDER: ClassProvider<IUserTransactionPort> = {
     provide: USER_TRANSACTION_PORT,
     useClass: UserTransactionAdapter,
   };

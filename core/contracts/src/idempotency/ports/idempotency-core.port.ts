@@ -3,7 +3,7 @@ import type {
   IIdempotencyCoreClaimView,
   IIdempotencyCoreCompleteCommand,
   IIdempotencyCoreReleaseCommand,
-} from '../interfaces';
+} from '../types';
 
 export interface IIdempotencyCorePort {
   handleClaim(command: IIdempotencyCoreClaimCommand): Promise<IIdempotencyCoreClaimView>;

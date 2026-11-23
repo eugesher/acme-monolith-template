@@ -1,4 +1,4 @@
-import type { ITagGetManyReconstitute, ITagGetManySnapshot } from '../interfaces';
+import type { ITagGetManyReconstitute, ITagGetManySnapshot } from '../types';
 
 export class TagGetManyModel {
   private constructor(
