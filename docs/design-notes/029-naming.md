@@ -20,8 +20,8 @@ A name says who or where; the action lives in the method or in the port.
 | binding of an infrastructure class | `public static readonly provider: ClassProvider<I…Port>`; a queue adapter is bound by its module (`031-static-provider.md`) | `OrderIdempotencyCoreAdapter.provider`                     |
 | provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                                                           | `ProductConfigOccRetryAttemptsProvider`                    |
 | type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                                                      | `replay-retry.options.ts`, `utility.type.ts`               |
-| params of a helper method          | `I<Subject><Action>`, `interfaces/params/<subject>-<action>.interface.ts`                                                   | `IPageWindowClamp`, `IPageBuild`                           |
-| snapshot of a helper method        | `I<Subject>`, `interfaces/snapshots/<subject>.interface.ts`                                                                 | `IPageWindow`, `IPage`                                     |
+| params of a helper method          | `I<Subject><Action>`, `types/params/<subject>-<action>.interface.ts`                                                        | `IPageWindowClamp`, `IPageBuild`                           |
+| snapshot of a helper method        | `I<Subject>`, `types/snapshots/<subject>.interface.ts`                                                                      | `IPageWindow`, `IPage`                                     |
 
 **A module with one port names it after the module.** The port, its token and its facade carry the
 name of the module and its layer (`Core`, `Common`) and nothing else, so a consumer finds the facade
@@ -56,10 +56,17 @@ codes in `domain/errors`: `exceptions/` holds the classes and their `base/`, `co
 `039-api-surface.md`), so the folder says `errors`, while the files keep the word of the code they
 hold, `Exception`. The identity domains have no `codes/`, since their codes are
 `IdentityExceptionCodeEnum`. From outside the folder an import goes through its barrel, as it does
-for `interfaces/`: `lint/syntax/barrel-bypass.selectors.mjs` refuses a path into `codes/` or
-`exceptions/` of `errors/` and into any subfolder of `interfaces/`. A folder of interfaces without
-subfolders, as in `libs/auth`, has no barrel, so a file path to it stays, and so does a path into
+for `types/`: `lint/syntax/barrel-bypass.selectors.mjs` refuses a path into `codes/` or
+`exceptions/` of `errors/` and into any subfolder of `types/`. A folder of types without subfolders,
+as in `libs/config/src/provider`, has no barrel, so a file path to it stays, and so does a path into
 `libs/http/src/errors`, which holds the error body of the HTTP lib, not the exceptions of a domain.
+
+**A layer keeps its types in `types/`.** The interfaces lie in a subfolder per role, `commands/`,
+`queries/`, `records/`, `views/`, `params/` or `snapshots/`, and the enums of the same layer in
+`types/enums/`, so the barrel of `types/` exports both and a caller imports an outcome and the
+record that carries it from one path. An enum folder with no interfaces beside it stays on its own,
+as `libs/http/src/throttle/enums`. `libs/auth` sorts its two types the same way, the request a guard
+reads in `types/requests/` and its metadata keys in `types/enums/`.
 
 **A queue adapter is named by where it sends.** The adapter is transport to a target, so a target
 with a compound name keeps it whole: `ProductStockCorePostSubtractQueueAdapter` sends to the
@@ -73,12 +80,12 @@ implements `IOrderLedgerPort`, `ORDER_LEDGER_PORT`, in
 
 **The commands of a service live in one file named after the service.** A service of
 `application/services` takes its commands from
-`application/interfaces/commands/<context>-<service>.command.ts`, next to
+`application/types/commands/<context>-<service>.command.ts`, next to
 `<context>-<service>.service.ts`. Each command is named after the service and the method that takes
-it, `I<Context><Service><Method>Command`. A port follows the same rule in `outbound/interfaces`:
+it, `I<Context><Service><Method>Command`. A port follows the same rule in `outbound/types`:
 `IProductLedgerRecordCreatedCommand` for `recordCreated` and `IProductLedgerRecordPublishedCommand`
-for `recordPublished` share `outbound/interfaces/commands/product-ledger.command.ts`. A use case
-keeps one command file of its own, `<context>-<verb>.command.ts`.
+for `recordPublished` share `outbound/types/commands/product-ledger.command.ts`. A use case keeps
+one command file of its own, `<context>-<verb>.command.ts`.
 
 **A config token is the module, the property and `_TOKEN`.** A token that carries a value read with
 `ConfigValueProvider.provide` takes the prefix of its module, the name of the configuration property
@@ -105,8 +112,8 @@ suffix of its syntax, `.interface.ts` or `.type.ts` (`hosted-repository.interfac
 `utility.type.ts`).
 
 **A helper method takes one params object and answers a snapshot.** The types of the method live in
-`interfaces/params` and `interfaces/snapshots` next to the helper, as those of `PaginationHelper` in
-`libs/toolkit/src/pagination/interfaces`. The folder names the role, so both files end with
+`types/params` and `types/snapshots` next to the helper, as those of `PaginationHelper` in
+`libs/toolkit/src/pagination/types`. The folder names the role, so both files end with
 `.interface.ts`.
 
 - One params interface per public method. The argument takes the name of what it holds, and `params`
@@ -124,7 +131,7 @@ suffix of its syntax, `.interface.ts` or `.type.ts` (`hosted-repository.interfac
   snapshot.
 - Snapshots leave the lib through its index, because callers keep and pass them on (`IPage<T>` in
   the views of the lists, `IPageWindow` in `CatalogProductListUseCase`). Params leave only through
-  the barrel of `interfaces`: callers pass literals.
+  the barrel of `types`: callers pass literals.
 
 A layered lib keeps `commands` and `views` for the input and output of a use case or a port: a
 params interface is to a helper what a command is to a use case, a snapshot what a view is. A domain

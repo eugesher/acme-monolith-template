@@ -8,7 +8,7 @@ import {
   NoteVersionInvalidException,
   NoteVersionMismatchException,
 } from '../errors';
-import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../interfaces';
+import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../types';
 
 export abstract class NoteAggregate extends VersionedEntity {
   protected body: string;

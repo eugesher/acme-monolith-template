@@ -13,9 +13,8 @@ const bypasses = [
   },
   {
     source:
-      '/^\\.\\.?\\x2F(\\.\\.\\x2F)*(errors\\x2F(codes|exceptions)|interfaces\\x2F[^\\x2F]+)\\x2F./',
-    message:
-      "imports from outside errors/ and interfaces/ go through the folder's barrel (index.ts)",
+      '/^\\.\\.?\\x2F(\\.\\.\\x2F)*(errors\\x2F(codes|exceptions)|types\\x2F[^\\x2F]+)\\x2F./',
+    message: "imports from outside errors/ and types/ go through the folder's barrel (index.ts)",
   },
 ];
 

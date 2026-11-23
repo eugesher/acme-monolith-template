@@ -1,6 +1,6 @@
 import type { Nullable } from '@acme-libs/toolkit';
 
-import type { IAuthCommonFindSubjectCommand, IAuthCommonSubjectView } from '../interfaces';
+import type { IAuthCommonFindSubjectCommand, IAuthCommonSubjectView } from '../types';
 
 export interface IAuthCommonPort {
   handleFindSubject(

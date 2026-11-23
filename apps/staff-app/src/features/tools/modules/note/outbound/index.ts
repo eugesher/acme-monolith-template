@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/note-access-repository.port';
 export * from './ports/note-create-repository.port';

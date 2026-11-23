@@ -1,4 +1,4 @@
-import type { INoteEditRevisionInsertQuery, INoteEditUpdateQuery } from '../interfaces';
+import type { INoteEditRevisionInsertQuery, INoteEditUpdateQuery } from '../types';
 
 export interface INoteEditRepositoryPort {
   update(query: INoteEditUpdateQuery): Promise<boolean>;

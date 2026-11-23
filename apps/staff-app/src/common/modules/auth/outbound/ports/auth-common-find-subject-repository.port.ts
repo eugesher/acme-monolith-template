@@ -1,6 +1,6 @@
 import type { Nullable } from '@acme-libs/toolkit';
 
-import type { IAuthCommonFindSubjectStaffUserRecord } from '../interfaces';
+import type { IAuthCommonFindSubjectStaffUserRecord } from '../types';
 
 export interface IAuthCommonFindSubjectRepositoryPort {
   findActiveById(id: string): Promise<Nullable<IAuthCommonFindSubjectStaffUserRecord>>;

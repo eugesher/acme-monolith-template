@@ -2,7 +2,7 @@ export * from './errors';
 
 export * from './aggregates/product.aggregate';
 
-export * from './interfaces';
+export * from './types';
 
 export * from './models/product-create.model';
 export * from './models/product-get-many.model';

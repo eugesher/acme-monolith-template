@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/product-stock-post-subtract-archive.port';
 export * from './ports/product-stock-post-subtract-on-hand.port';

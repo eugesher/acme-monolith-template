@@ -4,7 +4,7 @@ import type {
   IProductTagFindView,
   IProductTagReplaceCommand,
   IProductTagReplaceView,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductTagPort {
   find(command: IProductTagFindCommand): Promise<IProductTagFindView[]>;

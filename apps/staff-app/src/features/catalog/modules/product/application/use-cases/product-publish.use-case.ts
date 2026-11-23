@@ -9,7 +9,7 @@ import {
   type IProductLedgerPort,
 } from '../../outbound';
 import { ProductWriteService } from '../services/product-write.service';
-import type { IProductPublishCommand, IProductView } from '../interfaces';
+import type { IProductPublishCommand, IProductView } from '../types';
 
 @Injectable()
 export class ProductPublishUseCase {

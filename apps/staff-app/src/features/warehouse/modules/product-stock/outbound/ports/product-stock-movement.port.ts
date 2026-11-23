@@ -2,7 +2,7 @@ import type {
   IProductStockMovementAddCommand,
   IProductStockMovementAddView,
   IProductStockMovementLockCommand,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductStockMovementPort {
   lock(command: IProductStockMovementLockCommand): Promise<void>;

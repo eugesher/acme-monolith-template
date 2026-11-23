@@ -1,6 +1,6 @@
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
-import type { IProductGetManyReconstitute, IProductGetManySnapshot } from '../interfaces';
+import type { IProductGetManyReconstitute, IProductGetManySnapshot } from '../types';
 
 export class ProductGetManyModel {
   private constructor(

@@ -1,4 +1,4 @@
-import type { IOrderGetManyReconstitute, IOrderGetManySnapshot } from '../interfaces';
+import type { IOrderGetManyReconstitute, IOrderGetManySnapshot } from '../types';
 
 export class OrderGetManyModel {
   private constructor(

@@ -4,7 +4,7 @@ import type {
   ITagCommonReplaceSubjectTagRecord,
   ITagCommonReplaceTagRecord,
   ITagCommonReplaceUnlinkQuery,
-} from '../interfaces';
+} from '../types';
 
 export interface ITagCommonReplaceRepositoryPort {
   lockTags(tagIds: string[]): Promise<ITagCommonReplaceTagRecord[]>;

@@ -1,4 +1,4 @@
-import type { INoteGetManyReconstitute, INoteGetManySnapshot } from '../interfaces';
+import type { INoteGetManyReconstitute, INoteGetManySnapshot } from '../types';
 
 export class NoteGetManyModel {
   private constructor(

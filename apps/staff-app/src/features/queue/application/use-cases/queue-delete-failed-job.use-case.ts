@@ -3,7 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { QUEUE_REGISTRY_PORT, type IQueueRegistryPort } from '../../outbound';
 import { QueueFailedJobService } from '../services/queue-failed-job.service';
-import type { IQueueDeleteFailedJobCommand } from '../interfaces';
+import type { IQueueDeleteFailedJobCommand } from '../types';
 
 @Injectable()
 export class QueueDeleteFailedJobUseCase {

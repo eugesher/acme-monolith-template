@@ -5,7 +5,7 @@ import type {
   IProductCoreArchiveLedgerPayload,
   IProductCoreArchiveReconstitute,
   IProductCoreArchiveUpdatePayload,
-} from '../interfaces';
+} from '../types';
 
 export class ProductCoreArchiveModel extends VersionedEntity {
   public get isArchived(): boolean {

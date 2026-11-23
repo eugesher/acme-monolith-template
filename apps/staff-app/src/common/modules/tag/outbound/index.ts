@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/tag-common-find-repository.port';
 export * from './ports/tag-common-find-subject-ids-repository.port';

@@ -12,7 +12,7 @@ import {
   type IProductStatusPort,
 } from '../../outbound';
 import { ProductAccessService } from '../services/product-access.service';
-import type { IProductArchiveCommand, IProductView } from '../interfaces';
+import type { IProductArchiveCommand, IProductView } from '../types';
 
 @Injectable()
 export class ProductArchiveUseCase {

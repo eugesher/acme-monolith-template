@@ -5,7 +5,7 @@ import type {
   IRoleCandidateInsertPayload,
   IRoleCandidateRolePermission,
   IRoleCreateReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class RoleCandidateModel {
   private constructor(

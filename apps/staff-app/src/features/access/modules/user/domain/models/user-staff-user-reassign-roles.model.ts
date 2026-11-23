@@ -5,7 +5,7 @@ import type {
   IUserStaffUserReassignRolesSnapshot,
   IUserStaffUserRole,
   IUserStaffUserStoredRole,
-} from '../interfaces';
+} from '../types';
 
 export class UserStaffUserReassignRolesModel {
   private constructor(

@@ -1,7 +1,7 @@
 import type {
   IProductStockCoreOnHandReconstitute,
   IProductStockCoreOnHandSnapshot,
-} from '../interfaces';
+} from '../types';
 
 export class ProductStockCoreOnHandModel {
   private constructor(public readonly stock: readonly IProductStockCoreOnHandSnapshot[]) {}

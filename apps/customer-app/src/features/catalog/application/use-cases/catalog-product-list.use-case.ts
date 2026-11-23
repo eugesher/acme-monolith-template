@@ -10,7 +10,7 @@ import {
   type ICatalogCachePort,
   type ICatalogProductListRepositoryPort,
 } from '../../outbound';
-import type { ICatalogProductListCommand, ICatalogProductListView } from '../interfaces';
+import type { ICatalogProductListCommand, ICatalogProductListView } from '../types';
 
 @Injectable()
 export class CatalogProductListUseCase {

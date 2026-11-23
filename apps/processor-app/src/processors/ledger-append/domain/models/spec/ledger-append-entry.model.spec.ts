@@ -1,5 +1,5 @@
 import { LedgerAppendEntryModel } from '../ledger-append-entry.model';
-import type { ILedgerAppendEntryCandidate } from '../../interfaces';
+import type { ILedgerAppendEntryCandidate } from '../../types';
 
 describe('LedgerAppendEntryModel', () => {
   describe('initCandidate', () => {

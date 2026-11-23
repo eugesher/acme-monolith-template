@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/cache-store.port';
 export * from './ports/cache-tracer.port';

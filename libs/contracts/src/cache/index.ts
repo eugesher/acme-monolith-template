@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './keys/cache-keys';
 

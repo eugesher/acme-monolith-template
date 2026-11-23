@@ -15,7 +15,7 @@ import {
   type IAuthLedgerPort,
   type IAuthRegisterRepositoryPort,
 } from '../../outbound';
-import type { IAuthRegisterCommand, IAuthRegisterView } from '../interfaces';
+import type { IAuthRegisterCommand, IAuthRegisterView } from '../types';
 
 @Injectable()
 export class AuthRegisterUseCase {

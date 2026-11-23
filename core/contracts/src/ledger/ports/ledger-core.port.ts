@@ -1,4 +1,4 @@
-import type { ILedgerCoreEnqueueCommand } from '../interfaces';
+import type { ILedgerCoreEnqueueCommand } from '../types';
 
 export interface ILedgerCorePort {
   handleEnqueue(command: ILedgerCoreEnqueueCommand): Promise<void>;

@@ -2,7 +2,7 @@ import type {
   IRoleCreateRolePermissionInsertQuery,
   IRoleCreateStaffRoleInsertQuery,
   IRoleCreateStaffRoleInsertRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface IRoleCreateRepositoryPort {
   insertRole(query: IRoleCreateStaffRoleInsertQuery): Promise<IRoleCreateStaffRoleInsertRecord>;

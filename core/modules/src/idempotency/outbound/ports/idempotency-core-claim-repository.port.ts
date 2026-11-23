@@ -1,11 +1,11 @@
 import type { Nullable } from '@acme-libs/toolkit';
 
-import type { IdempotencyCoreClaimInsertOutcomeEnum } from '../enums/idempotency-core-claim-insert-outcome.enum';
 import type {
+  IdempotencyCoreClaimInsertOutcomeEnum,
   IIdempotencyCoreClaimFindQuery,
   IIdempotencyCoreClaimInsertQuery,
   IIdempotencyCoreClaimRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface IIdempotencyCoreClaimRepositoryPort {
   insert(query: IIdempotencyCoreClaimInsertQuery): Promise<IdempotencyCoreClaimInsertOutcomeEnum>;

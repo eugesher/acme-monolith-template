@@ -9,7 +9,7 @@ import type {
   IOrderCandidateInsertPayload,
   IOrderCandidateOrderProduct,
   IOrderCandidateStockQuantity,
-} from '../interfaces';
+} from '../types';
 
 export class OrderCandidateModel {
   public get distinctProductIds(): readonly string[] {

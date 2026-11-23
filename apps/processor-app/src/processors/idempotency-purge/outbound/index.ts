@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/idempotency-purge-repository.port';
 export * from './ports/idempotency-purge-schedule.port';

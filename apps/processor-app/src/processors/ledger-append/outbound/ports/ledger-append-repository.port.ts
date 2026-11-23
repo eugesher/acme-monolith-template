@@ -2,7 +2,7 @@ import type {
   ILedgerAppendEntryInsertQuery,
   ILedgerAppendEntryInsertRecord,
   ILedgerAppendEntryRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface ILedgerAppendRepositoryPort {
   insert(record: ILedgerAppendEntryInsertQuery): Promise<ILedgerAppendEntryInsertRecord>;

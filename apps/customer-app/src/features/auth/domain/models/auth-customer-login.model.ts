@@ -1,10 +1,7 @@
 import { UserStatusEnum } from '@acme-libs/kernel';
 
 import { AuthUserInactiveException } from '../errors';
-import type {
-  IAuthCustomerLoginLoggerPayload,
-  IAuthCustomerLoginReconstitute,
-} from '../interfaces';
+import type { IAuthCustomerLoginLoggerPayload, IAuthCustomerLoginReconstitute } from '../types';
 
 export class AuthCustomerLoginModel {
   private constructor(

@@ -2,7 +2,7 @@ import type {
   IProductCreateInsertQuery,
   IProductCreateInsertRecord,
   IProductCreateRecord,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductCreateRepositoryPort {
   insert(query: IProductCreateInsertQuery): Promise<IProductCreateInsertRecord>;

@@ -1,6 +1,6 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
-import type { IAuthCommonSubjectReconstitute, IAuthCommonSubjectSnapshot } from '../interfaces';
+import type { IAuthCommonSubjectReconstitute, IAuthCommonSubjectSnapshot } from '../types';
 
 export class AuthCommonSubjectModel {
   private constructor(

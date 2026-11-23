@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/auth-credentials.port';
 export * from './ports/auth-identity.port';

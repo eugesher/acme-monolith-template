@@ -8,7 +8,7 @@ import {
   libs,
   own,
   packages,
-  persistenceInterfaces,
+  persistenceTypes,
   to,
 } from './selectors.mjs';
 
@@ -19,7 +19,7 @@ const ownContracts = to('acme-core:contracts', own('module'));
 export const acmeCore = [
   from('acme-core:modules:domain', [layer('domain'), coreDomain, baseLibs()]),
   from('acme-core:modules:outbound', [layer('outbound'), ownContracts, baseLibs()]),
-  fromFile('acme-core:modules:outbound', persistenceInterfaces, [to('acme-core:entities')]),
+  fromFile('acme-core:modules:outbound', persistenceTypes, [to('acme-core:entities')]),
   from('acme-core:modules:application', [
     layer('domain'),
     layer('outbound'),

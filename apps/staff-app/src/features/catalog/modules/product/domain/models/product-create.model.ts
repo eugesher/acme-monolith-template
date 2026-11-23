@@ -7,7 +7,7 @@ import type {
   IProductCreateLedgerPayload,
   IProductCreateLoggerPayload,
   IProductReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class ProductCreateModel extends ProductAggregate {
   public static initCandidate(proposal: IProductCreateCandidateInit): IProductCreateCandidate {

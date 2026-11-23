@@ -5,7 +5,7 @@ import type {
   ITagCommonSubjectTagsReplaceReconstitute,
   ITagCommonSubjectTagsReplaceTag,
   ITagCommonSubjectTagsReplaceTagSnapshot,
-} from '../interfaces';
+} from '../types';
 
 export class TagCommonSubjectTagsReplaceModel {
   private constructor(

@@ -1,7 +1,7 @@
 import type {
   IIdempotencyCoreCompleteUpdatePayload,
   IIdempotencyCoreCompleteUpdatePayloadBuild,
-} from '../interfaces';
+} from '../types';
 
 export class IdempotencyCoreCompleteModel {
   public static toUpdatePayload(

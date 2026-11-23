@@ -7,7 +7,7 @@ import type {
   IIdempotencyCoreClaimLoggerPayload,
   IIdempotencyCoreClaimLoggerPayloadBuild,
   IIdempotencyCoreClaimReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class IdempotencyCoreClaimModel {
   private static readonly MAX_KEY_LENGTH = 128;

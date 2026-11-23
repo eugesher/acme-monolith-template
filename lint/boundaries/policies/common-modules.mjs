@@ -9,7 +9,7 @@ import {
   libContracts,
   own,
   packages,
-  persistenceInterfaces,
+  persistenceTypes,
   to,
 } from './selectors.mjs';
 
@@ -18,7 +18,7 @@ const layer = layerOf('acme-app:common:modules', ['app', 'module']);
 export const commonModules = [
   from('acme-app:common:modules:domain', [layer('domain'), coreDomain, baseLibs()]),
   from('acme-app:common:modules:outbound', [layer('outbound'), baseLibs()]),
-  fromFile('acme-app:common:modules:outbound', persistenceInterfaces, [
+  fromFile('acme-app:common:modules:outbound', persistenceTypes, [
     to('acme-core:entities'),
     to('acme-app:common:entities', own('app')),
   ]),

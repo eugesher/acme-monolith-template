@@ -2,7 +2,7 @@ import type {
   IOrderProductStockLockCommand,
   IOrderProductStockView,
   IOrderProductStockWithdrawCommand,
-} from '../interfaces';
+} from '../types';
 
 export interface IOrderProductStockPort {
   lock(command: IOrderProductStockLockCommand): Promise<IOrderProductStockView[]>;

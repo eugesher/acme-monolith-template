@@ -5,7 +5,7 @@ import type {
   IRoleReassignPermissionsLoggerPayload,
   IRoleReassignPermissionsReconstitute,
   IRoleReassignPermissionsRolePermission,
-} from '../interfaces';
+} from '../types';
 
 export class RoleReassignPermissionsModel extends RoleAggregate {
   public static reconstitute(

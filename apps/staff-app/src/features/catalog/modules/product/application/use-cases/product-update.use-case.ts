@@ -4,7 +4,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { ProductUpdateModel } from '../../domain';
 import { PRODUCT_CATALOG_CACHE_PORT, type IProductCatalogCachePort } from '../../outbound';
 import { ProductWriteService } from '../services/product-write.service';
-import type { IProductUpdateCommand, IProductView } from '../interfaces';
+import type { IProductUpdateCommand, IProductView } from '../types';
 
 @Injectable()
 export class ProductUpdateUseCase {

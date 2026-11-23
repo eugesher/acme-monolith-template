@@ -4,7 +4,7 @@ import { PaginationHelper, type IPage } from '@acme-libs/toolkit';
 
 import { TagGetManyModel } from '../../domain';
 import { TAG_GET_MANY_REPOSITORY_PORT, type ITagGetManyRepositoryPort } from '../../outbound';
-import type { ITagGetManyCommand, ITagView } from '../interfaces';
+import type { ITagGetManyCommand, ITagView } from '../types';
 
 @Injectable()
 export class TagGetManyUseCase {

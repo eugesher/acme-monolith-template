@@ -1,4 +1,4 @@
-import type { ICacheTracerSpanCommand } from '../interfaces';
+import type { ICacheTracerSpanCommand } from '../types';
 
 export interface ICacheTracerPort {
   span<T>(command: ICacheTracerSpanCommand<T>): Promise<T>;

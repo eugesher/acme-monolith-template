@@ -6,7 +6,7 @@ import type {
   IProductPublishLedgerPayload,
   IProductPublishLoggerPayload,
   IProductReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class ProductPublishModel extends ProductAggregate {
   public static reconstitute(this: void, record: IProductReconstitute): ProductPublishModel {

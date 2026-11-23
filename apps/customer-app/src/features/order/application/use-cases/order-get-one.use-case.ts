@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { OrderGetOneModel, OrderNotFoundException } from '../../domain';
 import { ORDER_GET_ONE_REPOSITORY_PORT, type IOrderGetOneRepositoryPort } from '../../outbound';
-import type { IOrderGetOneCommand, IOrderView } from '../interfaces';
+import type { IOrderGetOneCommand, IOrderView } from '../types';
 
 @Injectable()
 export class OrderGetOneUseCase {

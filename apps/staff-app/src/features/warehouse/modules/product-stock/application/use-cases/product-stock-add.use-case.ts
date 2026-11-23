@@ -24,7 +24,7 @@ import type {
   IProductStockAddCommand,
   IProductStockAddView,
   IProductStockAddWriteView,
-} from '../interfaces';
+} from '../types';
 
 @Injectable()
 export class ProductStockAddUseCase {

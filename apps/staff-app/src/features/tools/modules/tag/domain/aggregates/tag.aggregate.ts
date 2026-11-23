@@ -1,7 +1,7 @@
 import { Entity } from '@acme-libs/domain';
 
 import { TagNameInvalidException } from '../errors';
-import type { ITagSnapshot } from '../interfaces';
+import type { ITagSnapshot } from '../types';
 
 export abstract class TagAggregate extends Entity {
   private static readonly NAME_MAX_LENGTH = 64;

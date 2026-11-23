@@ -12,7 +12,7 @@ import type {
   IUserStaffUserRegisterReconstitute,
   IUserStaffUserRole,
   IUserStaffUserStoredRole,
-} from '../interfaces';
+} from '../types';
 
 export class UserStaffUserCandidateModel {
   public get distinctRoleIds(): readonly string[] {

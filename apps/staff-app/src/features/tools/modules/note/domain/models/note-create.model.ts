@@ -4,7 +4,7 @@ import type {
   INoteCreateCandidateInit,
   INoteCreateLoggerPayload,
   INoteReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class NoteCreateModel extends NoteAggregate {
   public static initCandidate(proposal: INoteCreateCandidateInit): INoteCreateCandidate {

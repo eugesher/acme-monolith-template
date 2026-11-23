@@ -1,6 +1,6 @@
 export * from './errors';
 
-export * from './interfaces';
+export * from './types';
 
 export * from './models/tag-create.model';
 export * from './models/tag-delete.model';

@@ -1,4 +1,4 @@
-import type { IIdempotencyPurgeScheduleRegisterCommand } from '../interfaces';
+import type { IIdempotencyPurgeScheduleRegisterCommand } from '../types';
 
 export interface IIdempotencyPurgeSchedulePort {
   register(command: IIdempotencyPurgeScheduleRegisterCommand): Promise<void>;

@@ -8,7 +8,7 @@ import {
   ProductVersionInvalidException,
   ProductVersionMismatchException,
 } from '../errors';
-import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../interfaces';
+import type { IProductReconstitute, IProductSnapshot, IProductUpdatePayload } from '../types';
 
 export abstract class ProductAggregate extends VersionedEntity {
   protected name: string;

@@ -8,7 +8,7 @@ import type {
   IProductStockAddLoggerPayloadBuild,
   IProductStockAddReconstitute,
   IProductStockOnHandSnapshot,
-} from '../interfaces';
+} from '../types';
 
 export class ProductStockAddModel extends Entity {
   private static readonly ADD_MAX_QUANTITY = 100_000;

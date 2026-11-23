@@ -4,7 +4,7 @@ import type {
   INoteEditRevisionInsertPayload,
   INoteEditRevisionInsertPayloadBuild,
   INoteReconstitute,
-} from '../interfaces';
+} from '../types';
 
 export class NoteEditModel extends NoteAggregate {
   private readonly bodyAsRead: string;

@@ -10,7 +10,7 @@ import {
   type IOrderTagPort,
   type IOrderTransactionPort,
 } from '../../outbound';
-import type { IOrderReplaceTagsCommand, IOrderTagsView } from '../interfaces';
+import type { IOrderReplaceTagsCommand, IOrderTagsView } from '../types';
 
 @Injectable()
 export class OrderReplaceTagsUseCase {

@@ -8,7 +8,7 @@ import {
   libs,
   own,
   packages,
-  persistenceInterfaces,
+  persistenceTypes,
   to,
 } from './selectors.mjs';
 
@@ -65,7 +65,7 @@ export const acmeApp = [
     to('acme-app:global:outbound', own('app', 'module')),
     baseLibs(),
   ]),
-  fromFile('acme-app:global:outbound', persistenceInterfaces, [
+  fromFile('acme-app:global:outbound', persistenceTypes, [
     to('acme-core:entities'),
     to('acme-app:common:entities', own('app')),
   ]),

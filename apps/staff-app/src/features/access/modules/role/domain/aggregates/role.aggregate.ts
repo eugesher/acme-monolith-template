@@ -1,7 +1,7 @@
 import { Entity } from '@acme-libs/domain';
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
-import type { IRoleSnapshot } from '../interfaces';
+import type { IRoleSnapshot } from '../types';
 
 export abstract class RoleAggregate extends Entity {
   protected constructor(

@@ -4,7 +4,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { TagDeleteModel } from '../../domain';
 import { TAG_DELETE_REPOSITORY_PORT, type ITagDeleteRepositoryPort } from '../../outbound';
 import { TagAccessService } from '../services/tag-access.service';
-import type { ITagDeleteCommand } from '../interfaces';
+import type { ITagDeleteCommand } from '../types';
 
 @Injectable()
 export class TagDeleteUseCase {

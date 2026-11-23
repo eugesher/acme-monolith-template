@@ -3,7 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { JobFailureHelper } from '@acme-libs/toolkit';
 
-import type { IProductStockPostSubtractReportFailureCommand } from '../interfaces';
+import type { IProductStockPostSubtractReportFailureCommand } from '../types';
 
 @Injectable()
 export class ProductStockPostSubtractReportFailureUseCase {

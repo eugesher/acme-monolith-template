@@ -4,7 +4,7 @@ import type {
   ITagCommonReplaceCommand,
   ITagCommonReplaceView,
   ITagCommonTagView,
-} from '../interfaces';
+} from '../types';
 
 export interface ITagCommonPort {
   handleFind(command: ITagCommonFindCommand): Promise<ITagCommonTagView[]>;

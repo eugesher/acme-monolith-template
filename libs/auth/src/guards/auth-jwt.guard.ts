@@ -10,8 +10,7 @@ import { Reflector } from '@nestjs/core';
 import { AUTH_USER_VALIDATOR_PORT, type IAuthUserValidatorPort } from '@acme-libs/contracts/auth';
 import type { Maybe } from '@acme-libs/toolkit';
 
-import { AuthMetadataKeyEnum } from '../enums/auth-metadata-key.enum';
-import type { IAuthRequest } from '../interfaces/auth-request.interface';
+import { AuthMetadataKeyEnum, type IAuthRequest } from '../types';
 
 @Injectable()
 export class AuthJwtGuard implements CanActivate {

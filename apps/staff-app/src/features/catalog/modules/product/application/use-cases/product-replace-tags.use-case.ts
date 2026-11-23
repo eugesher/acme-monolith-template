@@ -10,7 +10,7 @@ import {
   type IProductTagPort,
   type IProductTransactionPort,
 } from '../../outbound';
-import type { IProductReplaceTagsCommand, IProductTagsView } from '../interfaces';
+import type { IProductReplaceTagsCommand, IProductTagsView } from '../types';
 
 @Injectable()
 export class ProductReplaceTagsUseCase {

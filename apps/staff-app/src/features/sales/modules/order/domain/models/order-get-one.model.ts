@@ -2,7 +2,7 @@ import type {
   IOrderGetOneReconstitute,
   IOrderGetOneSnapshot,
   IOrderProductSnapshot,
-} from '../interfaces';
+} from '../types';
 
 export class OrderGetOneModel {
   private constructor(

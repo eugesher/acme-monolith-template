@@ -9,7 +9,7 @@ import {
   libs,
   own,
   packages,
-  persistenceInterfaces,
+  persistenceTypes,
   to,
 } from './selectors.mjs';
 
@@ -27,7 +27,7 @@ const areaPolicies = (area, sharedFacing) => {
     ]),
     from(`${prefix}:domain`, [layer('domain'), coreDomain, baseLibs()]),
     from(`${prefix}:outbound`, [layer('outbound'), baseLibs(), ...sharedFacing.outbound]),
-    fromFile(`${prefix}:outbound`, persistenceInterfaces, [
+    fromFile(`${prefix}:outbound`, persistenceTypes, [
       to('acme-core:entities'),
       to('acme-app:common:entities', own('app')),
     ]),

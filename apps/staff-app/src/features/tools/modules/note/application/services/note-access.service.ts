@@ -6,7 +6,7 @@ import {
   type INoteAccessRecord,
   type INoteAccessRepositoryPort,
 } from '../../outbound';
-import type { INoteAccessLoadOwnedCommand } from '../interfaces';
+import type { INoteAccessLoadOwnedCommand } from '../types';
 
 @Injectable()
 export class NoteAccessService {

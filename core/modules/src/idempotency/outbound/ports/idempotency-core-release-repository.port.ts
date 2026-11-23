@@ -1,4 +1,4 @@
-import type { IIdempotencyCoreReleaseQuery } from '../interfaces';
+import type { IIdempotencyCoreReleaseQuery } from '../types';
 
 export interface IIdempotencyCoreReleaseRepositoryPort {
   deleteInFlight(query: IIdempotencyCoreReleaseQuery): Promise<void>;

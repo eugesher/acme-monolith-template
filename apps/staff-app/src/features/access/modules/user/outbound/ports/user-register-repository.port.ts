@@ -3,7 +3,7 @@ import type {
   IUserRegisterStaffUserInsertQuery,
   IUserRegisterStaffUserInsertRecord,
   IUserRegisterStaffUserRoleInsertQuery,
-} from '../interfaces';
+} from '../types';
 
 export interface IUserRegisterRepositoryPort {
   insertUser(query: IUserRegisterStaffUserInsertQuery): Promise<IUserRegisterStaffUserInsertRecord>;

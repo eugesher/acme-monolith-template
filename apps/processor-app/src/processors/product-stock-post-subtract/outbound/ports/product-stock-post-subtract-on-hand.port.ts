@@ -1,7 +1,7 @@
 import type {
   IProductStockPostSubtractOnHandLockCommand,
   IProductStockPostSubtractOnHandView,
-} from '../interfaces';
+} from '../types';
 
 export interface IProductStockPostSubtractOnHandPort {
   lock(

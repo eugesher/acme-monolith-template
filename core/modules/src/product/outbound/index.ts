@@ -1,4 +1,4 @@
-export * from './interfaces';
+export * from './types';
 
 export * from './ports/product-core-archive-repository.port';
 export * from './ports/product-core-catalog-cache.port';

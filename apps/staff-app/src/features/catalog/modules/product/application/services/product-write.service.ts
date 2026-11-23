@@ -17,7 +17,7 @@ import {
 } from '../../outbound';
 import { ProductWriteConflictError } from '../errors/product-write-conflict.error';
 import { ProductAccessService } from './product-access.service';
-import type { IProductWriteCommand, IProductWriteView } from '../interfaces';
+import type { IProductWriteCommand, IProductWriteView } from '../types';
 
 @Injectable()
 export class ProductWriteService {

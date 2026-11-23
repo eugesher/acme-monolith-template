@@ -1,6 +1,6 @@
 export * from './errors';
 
-export * from './interfaces';
+export * from './types';
 
 export * from './models/role-candidate.model';
 export * from './models/role-create.model';

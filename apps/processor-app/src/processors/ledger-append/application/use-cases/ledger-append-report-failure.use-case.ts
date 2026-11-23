@@ -3,7 +3,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 
 import { JobFailureHelper } from '@acme-libs/toolkit';
 
-import type { ILedgerAppendReportFailureCommand } from '../interfaces';
+import type { ILedgerAppendReportFailureCommand } from '../types';
 
 @Injectable()
 export class LedgerAppendReportFailureUseCase {

@@ -4,7 +4,7 @@ import type {
   IOrderIdempotencyOutcomeView,
   IOrderIdempotencyReleaseCommand,
   IOrderIdempotencyReplayView,
-} from '../interfaces';
+} from '../types';
 
 export interface IOrderIdempotencyPort {
   claim<T>(

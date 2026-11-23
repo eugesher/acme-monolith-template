@@ -9,7 +9,7 @@ import {
   type IProductCreateRepositoryPort,
   type IProductLedgerPort,
 } from '../../outbound';
-import type { IProductCreateCommand, IProductView } from '../interfaces';
+import type { IProductCreateCommand, IProductView } from '../types';
 
 @Injectable()
 export class ProductCreateUseCase {

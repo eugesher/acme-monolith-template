@@ -4,7 +4,7 @@ import type {
   ICredentialsSignAccessTokenCommand,
   ICredentialsVerifyAccessTokenView,
   ICredentialsVerifyPasswordCommand,
-} from '../interfaces';
+} from '../types';
 
 export interface ICredentialsPort {
   handleSignAccessToken(command: ICredentialsSignAccessTokenCommand): Promise<string>;

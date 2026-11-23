@@ -1,6 +1,6 @@
 import type { PermissionCodeEnum } from '@acme-libs/kernel';
 
-import type { IRoleListReconstitute, IRoleListSnapshot } from '../interfaces';
+import type { IRoleListReconstitute, IRoleListSnapshot } from '../types';
 
 export class RoleListModel {
   private constructor(

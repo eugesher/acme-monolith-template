@@ -1,7 +1,7 @@
 import type { ConfigService } from '@nestjs/config';
 
 import { TlsHelper } from '../tls/tls.helper';
-import type { IRedisConnection, IRedisFailFastConnection } from './interfaces';
+import type { IRedisConnection, IRedisFailFastConnection } from './types';
 
 export class RedisConfigHelper {
   public static connection(config: ConfigService): IRedisConnection {

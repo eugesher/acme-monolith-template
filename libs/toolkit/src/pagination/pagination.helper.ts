@@ -1,4 +1,4 @@
-import type { IPage, IPageBuild, IPageWindow, IPageWindowClamp } from './interfaces';
+import type { IPage, IPageBuild, IPageWindow, IPageWindowClamp } from './types';
 
 export class PaginationHelper {
   public static readonly MAX_PAGE = 1000;

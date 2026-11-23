@@ -1,5 +1,5 @@
 import { NoteAggregate } from '../aggregates/note.aggregate';
-import type { INoteReconstitute } from '../interfaces';
+import type { INoteReconstitute } from '../types';
 
 export class NoteGetOneModel extends NoteAggregate {
   public static reconstitute(this: void, record: INoteReconstitute): NoteGetOneModel {

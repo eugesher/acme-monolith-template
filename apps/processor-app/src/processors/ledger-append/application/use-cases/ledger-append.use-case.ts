@@ -9,7 +9,7 @@ import {
   LedgerAppendEntryInsertOutcomeEnum,
   type ILedgerAppendRepositoryPort,
 } from '../../outbound';
-import type { ILedgerAppendCommand, ILedgerAppendOutcomeView } from '../interfaces';
+import type { ILedgerAppendCommand, ILedgerAppendOutcomeView } from '../types';
 
 @Injectable()
 export class LedgerAppendUseCase {

@@ -1,4 +1,4 @@
-import type { IAuthCredentialsVerifyPasswordCommand } from '../interfaces';
+import type { IAuthCredentialsVerifyPasswordCommand } from '../types';
 
 export interface IAuthCredentialsPort {
   issueAccessToken(userId: string): Promise<string>;

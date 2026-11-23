@@ -4,7 +4,7 @@ import type {
   IProductStockCoreMovementsInsertPayload,
   IProductStockCoreMovementsPostSubtractLoggerPayload,
   IProductStockCoreMovementsRow,
-} from '../interfaces';
+} from '../types';
 
 export class ProductStockCoreMovementsModel {
   public get distinctProductIds(): string[] {

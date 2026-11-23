@@ -8,7 +8,7 @@ import {
   type ITagRenameRepositoryPort,
 } from '../../outbound';
 import { TagAccessService } from '../services/tag-access.service';
-import type { ITagRenameCommand, ITagView } from '../interfaces';
+import type { ITagRenameCommand, ITagView } from '../types';
 
 @Injectable()
 export class TagRenameUseCase {

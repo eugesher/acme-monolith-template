@@ -51,14 +51,15 @@ requests would both pass the lookup, and the loser would hit the index as a 500.
 at once and expects one 201 and one 409.
 
 **The repository reports the duplicate, the use case decides.** A write that a unique index may
-refuse answers an outcome of its port, `<Port><Subject><Method>OutcomeEnum` in `outbound/enums`:
-`INSERTED` with the id, or `UPDATED`, or `DUPLICATE`. The repository wraps that one statement in
-`MysqlErrorHelper.catchDuplicateKey` (`libs/toolkit/src/database/mysql-error.helper.ts`), which
-answers `null` for a duplicate key and passes any other error through, so the application never sees
-an error of the driver, and a duplicate of a later statement of the same transaction stays an error
-instead of passing for a taken name. A use case throws its own exception for the outcome
-(`AuthEmailTakenException`, `TagNameTakenException`) or takes another branch (see
-`004-append-only-journal.md` and `006-idempotency-keys.md`).
+refuse answers an outcome of its port, `<Port><Subject><Method>OutcomeEnum` in
+`outbound/types/enums`: `INSERTED` with the id, or `UPDATED`, or `DUPLICATE`. The repository wraps
+that one statement in `MysqlErrorHelper.catchDuplicateKey`
+(`libs/toolkit/src/database/mysql-error.helper.ts`), which answers `null` for a duplicate key and
+passes any other error through, so the application never sees an error of the driver, and a
+duplicate of a later statement of the same transaction stays an error instead of passing for a taken
+name. A use case throws its own exception for the outcome (`AuthEmailTakenException`,
+`TagNameTakenException`) or takes another branch (see `004-append-only-journal.md` and
+`006-idempotency-keys.md`).
 
 ## The feature filter maps, the shared filter answers
 

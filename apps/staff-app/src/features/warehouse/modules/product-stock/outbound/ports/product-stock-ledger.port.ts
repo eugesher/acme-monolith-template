@@ -1,4 +1,4 @@
-import type { IProductStockLedgerRecordAddedCommand } from '../interfaces';
+import type { IProductStockLedgerRecordAddedCommand } from '../types';
 
 export interface IProductStockLedgerPort {
   recordAdded(command: IProductStockLedgerRecordAddedCommand): Promise<void>;
