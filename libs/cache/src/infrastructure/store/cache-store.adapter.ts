@@ -62,6 +62,10 @@ export class CacheStoreAdapter implements ICacheStorePort, OnApplicationShutdown
   }
 
   public async onApplicationShutdown(): Promise<void> {
+    if (this.redis.status === 'end') {
+      return;
+    }
+
     if (this.redis.status === 'ready') {
       await this.redis.quit();
 

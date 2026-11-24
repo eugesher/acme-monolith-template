@@ -154,5 +154,19 @@ describe('ThrottleRedisStorage', () => {
         disconnect: 1,
       });
     });
+
+    it('leaves an ended connection alone, as the second hook of the ThrottlerModule provider finds it', async () => {
+      redis.status = 'end';
+
+      await storage.onApplicationShutdown();
+
+      expect({
+        quit: redis.quit.mock.calls.length,
+        disconnect: redis.disconnect.mock.calls.length,
+      }).toEqual({
+        quit: 0,
+        disconnect: 0,
+      });
+    });
   });
 });

@@ -125,5 +125,14 @@ describe('CacheStoreAdapter', () => {
         expect(redis.quit).not.toHaveBeenCalled();
       },
     );
+
+    it('leaves an ended connection alone, so a second hook leaves no disconnect timer', async () => {
+      redis.status = 'end';
+
+      await store.onApplicationShutdown();
+
+      expect(redis.quit).not.toHaveBeenCalled();
+      expect(redis.disconnect).not.toHaveBeenCalled();
+    });
   });
 });

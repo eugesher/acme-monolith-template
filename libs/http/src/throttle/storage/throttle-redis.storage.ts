@@ -66,6 +66,10 @@ export class ThrottleRedisStorage implements ThrottlerStorage, OnApplicationShut
   }
 
   public async onApplicationShutdown(): Promise<void> {
+    if (this.redis.status === 'end') {
+      return;
+    }
+
     if (this.redis.status === 'ready') {
       await this.redis.quit();
 
