@@ -31,7 +31,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign up as a customer; log in afterwards for a token' })
   @ApiCreatedResponse({ type: AuthRegisterResponseDto })
   @ApiErrorResponses({
-    statuses: AuthHttpExceptionFilter.STATUS,
+    filterStatus: AuthHttpExceptionFilter.STATUS,
     codes: [
       IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
       IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK,
@@ -53,7 +53,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Exchange credentials for an access token' })
   @ApiOkResponse({ type: AuthAccessTokenResponseDto })
   @ApiErrorResponses({
-    statuses: AuthHttpExceptionFilter.STATUS,
+    filterStatus: AuthHttpExceptionFilter.STATUS,
     codes: [
       IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
       IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,

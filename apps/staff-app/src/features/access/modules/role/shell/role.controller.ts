@@ -37,7 +37,7 @@ export class RoleController {
   @ApiOperation({ summary: 'Create a role with its permissions' })
   @ApiCreatedResponse({ type: RoleResponseDto })
   @ApiErrorResponses({
-    statuses: RoleHttpExceptionFilter.STATUS,
+    filterStatus: RoleHttpExceptionFilter.STATUS,
     codes: [IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN],
   })
   public async handleCreate(@Body() body: RoleCreateRequestDto): Promise<RoleResponseDto> {
@@ -51,7 +51,7 @@ export class RoleController {
   @ApiOperation({ summary: 'Reassign the permission set of a role' })
   @ApiOkResponse({ type: RoleResponseDto })
   @ApiErrorResponses({
-    statuses: RoleHttpExceptionFilter.STATUS,
+    filterStatus: RoleHttpExceptionFilter.STATUS,
     codes: [IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND],
   })
   public async handleReassignPermissions(
