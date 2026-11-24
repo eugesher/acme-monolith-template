@@ -35,33 +35,24 @@ describe('LoggerSetupConfig', () => {
     expect(config.pinoHttp.transport).toBeUndefined();
   });
 
-  it('logs debug through pino-pretty in development', () => {
-    process.env.NODE_ENV = 'development';
-
-    const config = new LoggerSetupConfig(AppNameEnum.STAFF_APP);
-
-    expect(config.pinoHttp.level).toBe('debug');
-    expect(config.pinoHttp.transport).toEqual({
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        singleLine: false,
-        translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-        messageFormat: '[{app}] {if context}[{context}] {end}{msg}',
-        ignore: 'pid,hostname,app,context',
-      },
-    });
-  });
-
-  it.each(['test', undefined])(
-    'logs debug without pretty printing when NODE_ENV is %s',
+  it.each(['development', 'test', undefined])(
+    'logs debug through pino-pretty on one line when NODE_ENV is %s',
     (nodeEnv) => {
       process.env.NODE_ENV = nodeEnv;
 
       const config = new LoggerSetupConfig(AppNameEnum.STAFF_APP);
 
       expect(config.pinoHttp.level).toBe('debug');
-      expect(config.pinoHttp.transport).toBeUndefined();
+      expect(config.pinoHttp.transport).toEqual({
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          singleLine: true,
+          translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
+          messageFormat: '[{app}] {if context}[{context}] {end}{msg}',
+          ignore: 'pid,hostname,app,context',
+        },
+      });
     },
   );
 

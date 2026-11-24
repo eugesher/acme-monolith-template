@@ -8,10 +8,6 @@ export class EnvHelper {
     return process.env.NODE_ENV === 'production';
   }
 
-  public static isDevelopment(): boolean {
-    return process.env.NODE_ENV === 'development';
-  }
-
   public static appEnvFilePaths(app: string): string[] {
     const root = EnvHelper.findRoot(__dirname);
 

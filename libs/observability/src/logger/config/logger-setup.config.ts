@@ -43,20 +43,20 @@ export class LoggerSetupConfig implements Params {
       },
     };
 
-    this.pinoHttp = EnvHelper.isDevelopment()
-      ? {
+    this.pinoHttp = isProduction
+      ? baseOptions
+      : {
           ...baseOptions,
           transport: {
             target: 'pino-pretty',
             options: {
               colorize: true,
-              singleLine: false,
+              singleLine: true,
               translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
               messageFormat: '[{app}] {if context}[{context}] {end}{msg}',
               ignore: 'pid,hostname,app,context',
             },
           },
-        }
-      : baseOptions;
+        };
   }
 }

@@ -238,10 +238,10 @@ logger of the use case: `warn` for an attempt, `error` with a call to replay aft
 `libs/toolkit`, which the `PinoLogger` of a use case satisfies, so the toolkit needs no logging
 package.
 
-`LoggerSetupConfig` sends the logs through `pino-pretty` only when `NODE_ENV` is `development`.
-Production, the e2e runs with `NODE_ENV=test` and a process without `NODE_ENV` log JSON lines, so
-`pino-pretty`, a dev dependency, is never loaded outside a local start. Every line of Nest itself
-passes, including one line per module and route at start.
+`LoggerSetupConfig` sends the logs through `pino-pretty`, one colored line per entry, whenever
+`NODE_ENV` is not `production`: a local start, the e2e runs with `NODE_ENV=test` and a process
+without `NODE_ENV`. Production logs JSON lines, so `pino-pretty`, a dev dependency, is never loaded
+there. Every line of Nest itself passes, including one line per module and route at start.
 
 ## Entry points
 
