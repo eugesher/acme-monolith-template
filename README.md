@@ -86,6 +86,22 @@ To start one app, use `yarn start:dev:staff-app`, `yarn start:dev:customer-app` 
 yarn migration:run
 ```
 
+## Debug
+
+Start the three apps under the inspector in watch mode:
+
+```bash
+yarn start:debug
+```
+
+To start one, use `yarn start:debug:staff-app`, `yarn start:debug:customer-app` or
+`yarn start:debug:processor-app`. Each app listens on its own port: 9229 (`staff-app`), 9230
+(`customer-app`) and 9231 (`processor-app`). Attach a Node debugger to that port on `127.0.0.1`,
+such as `pwa-node` of `js-debug` with `request: "attach"`. The scripts set
+`RSPACK_SOURCE_MAPS=true`, so the build writes `dist/apps/<app>/main.js.map` with the absolute path
+of every source and breakpoints in the `.ts` files bind. Every other build, `yarn start:dev` and the
+image included, writes no map.
+
 ## Run the e2e tests
 
 Rebuild the infrastructure and run every suite one after another, with one report at the end. CI
