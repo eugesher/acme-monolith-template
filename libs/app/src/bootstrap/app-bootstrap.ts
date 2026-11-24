@@ -34,6 +34,6 @@ export class AppBootstrap {
 
     await this.app.listen(this.port);
 
-    this.logger.log(`${this.appName} is listening on port ${this.port}`);
+    this.logger.log(`${this.appName} is listening on port ${this.port}`, AppBootstrap.name);
   }
 }
