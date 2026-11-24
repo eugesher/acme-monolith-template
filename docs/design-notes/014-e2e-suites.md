@@ -143,9 +143,9 @@ its 400 reads, a request without the key on each route that requires `Idempotenc
 malformed `If-Match`.
 
 **A catalog case clears its own keys, not the database.** The queues live in the same Redis, under
-`acme:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters. `hooks()`
-deletes the `acme:catalog:*` keys before each case, and the cases list those keys only: BullMQ
-writes its own keys at any moment.
+`acme-e2e:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters.
+`hooks()` deletes the `acme:catalog:*` keys before each case, and the cases list those keys only:
+BullMQ writes its own keys at any moment.
 
 **staff-app and customer-app read the job, not the ledger.** Neither processes the queue, so their
 contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-record`

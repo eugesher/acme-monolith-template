@@ -30,6 +30,9 @@ export class ConfigSchema {
     REDIS_COMMAND_TIMEOUT_MS: Joi.number().integer().positive().required(),
   };
   public static readonly QUEUE: Joi.SchemaMap = {
+    QUEUE_PREFIX: Joi.string()
+      .pattern(/^[a-z0-9-]+(:[a-z0-9-]+)*$/)
+      .required(),
     ENQUEUE_RETRY_ATTEMPTS: Joi.number().integer().min(1).required(),
   };
   public static readonly CREDENTIALS: Joi.SchemaMap = {

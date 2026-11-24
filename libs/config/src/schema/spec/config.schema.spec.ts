@@ -27,6 +27,26 @@ describe('ConfigSchema', () => {
     });
   });
 
+  describe('QUEUE', () => {
+    it.each(['acme:queue', 'acme-e2e:queue'])('accepts the prefix %s', (prefix) => {
+      const { error } = Joi.object(ConfigSchema.QUEUE).validate({
+        QUEUE_PREFIX: prefix,
+        ENQUEUE_RETRY_ATTEMPTS: 3,
+      });
+
+      expect(error).toBeUndefined();
+    });
+
+    it.each(['', 'acme:', 'acme queue', 'Acme:Queue'])('refuses the prefix "%s"', (prefix) => {
+      const { error } = Joi.object(ConfigSchema.QUEUE).validate({
+        QUEUE_PREFIX: prefix,
+        ENQUEUE_RETRY_ATTEMPTS: 3,
+      });
+
+      expect(error?.message).toMatch(/^"QUEUE_PREFIX" /);
+    });
+  });
+
   describe('CREDENTIALS', () => {
     it('refuses an argon2 memory cost below eight KiB per lane', () => {
       const { error } = Joi.object(ConfigSchema.CREDENTIALS).validate({
