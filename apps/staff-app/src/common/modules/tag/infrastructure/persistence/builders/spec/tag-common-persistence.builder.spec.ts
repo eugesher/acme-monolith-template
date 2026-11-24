@@ -1,6 +1,6 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm';
 
-import { SubjectTag, Tag } from '@acme-staff/common/entities';
+import { Tag, TagSubject } from '@acme-staff/common/entities';
 
 import { TagCommonPersistenceBuilder } from '../tag-common-persistence.builder';
 
@@ -12,7 +12,7 @@ describe('TagCommonPersistenceBuilder', () => {
     dataSource = new DataSource({
       type: 'mysql',
       database: 'acme',
-      entities: [SubjectTag, Tag],
+      entities: [Tag, TagSubject],
     });
     jest.spyOn(dataSource.driver, 'connect').mockResolvedValue();
     jest.spyOn(dataSource.driver, 'afterConnect').mockResolvedValue();
@@ -32,7 +32,7 @@ describe('TagCommonPersistenceBuilder', () => {
       });
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Tag`.`id` AS `Tag_id`, `Tag`.`name` AS `Tag_name` FROM `tag` `Tag` INNER JOIN `subject_tag` `SubjectTag` ON `SubjectTag`.`tagId` = `Tag`.`id` WHERE `SubjectTag`.`subjectType` = ? AND `SubjectTag`.`subjectId` = ? ORDER BY `Tag_name` ASC',
+        'SELECT `Tag`.`id` AS `Tag_id`, `Tag`.`name` AS `Tag_name` FROM `tag` `Tag` INNER JOIN `tag_subject` `TagSubject` ON `TagSubject`.`tagId` = `Tag`.`id` WHERE `TagSubject`.`subjectType` = ? AND `TagSubject`.`subjectId` = ? ORDER BY `Tag_name` ASC',
         ['product', '100'],
       ]);
     });

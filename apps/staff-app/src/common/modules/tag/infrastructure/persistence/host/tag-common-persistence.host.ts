@@ -1,14 +1,14 @@
 import { Inject } from '@nestjs/common';
 
 import { ORM_PORT, type IHostedRepository, type IOrmPort } from '@acme-libs/contracts/database';
-import { SubjectTag, Tag } from '@acme-staff/common/entities';
+import { Tag, TagSubject } from '@acme-staff/common/entities';
 
-import { TagCommonPersistenceSubjectTagBuilder } from '../builders/tag-common-persistence-subject-tag.builder';
+import { TagCommonPersistenceTagSubjectBuilder } from '../builders/tag-common-persistence-tag-subject.builder';
 import { TagCommonPersistenceBuilder } from '../builders/tag-common-persistence.builder';
 
 export abstract class TagCommonPersistenceHost {
-  protected get subjectTagRepository(): IHostedRepository<SubjectTag> {
-    return this.orm.getRepository(SubjectTag);
+  protected get tagSubjectRepository(): IHostedRepository<TagSubject> {
+    return this.orm.getRepository(TagSubject);
   }
 
   protected get tagRepository(): IHostedRepository<Tag> {
@@ -24,9 +24,9 @@ export abstract class TagCommonPersistenceHost {
     return new TagCommonPersistenceBuilder(this.tagRepository.createQueryBuilder(Tag.name));
   }
 
-  protected createSubjectTagBuilder(): TagCommonPersistenceSubjectTagBuilder {
-    return new TagCommonPersistenceSubjectTagBuilder(
-      this.subjectTagRepository.createQueryBuilder(SubjectTag.name),
+  protected createTagSubjectBuilder(): TagCommonPersistenceTagSubjectBuilder {
+    return new TagCommonPersistenceTagSubjectBuilder(
+      this.tagSubjectRepository.createQueryBuilder(TagSubject.name),
     );
   }
 }

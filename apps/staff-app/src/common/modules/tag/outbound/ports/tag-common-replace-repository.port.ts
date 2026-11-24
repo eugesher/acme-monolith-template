@@ -1,14 +1,14 @@
 import type {
   ITagCommonReplaceFindLinkedQuery,
   ITagCommonReplaceLinkQuery,
-  ITagCommonReplaceSubjectTagRecord,
   ITagCommonReplaceTagRecord,
+  ITagCommonReplaceTagSubjectRecord,
   ITagCommonReplaceUnlinkQuery,
 } from '../types';
 
 export interface ITagCommonReplaceRepositoryPort {
   lockTags(tagIds: string[]): Promise<ITagCommonReplaceTagRecord[]>;
-  findLinked(query: ITagCommonReplaceFindLinkedQuery): Promise<ITagCommonReplaceSubjectTagRecord[]>;
+  findLinked(query: ITagCommonReplaceFindLinkedQuery): Promise<ITagCommonReplaceTagSubjectRecord[]>;
   link(query: ITagCommonReplaceLinkQuery): Promise<void>;
   unlink(query: ITagCommonReplaceUnlinkQuery): Promise<void>;
 }

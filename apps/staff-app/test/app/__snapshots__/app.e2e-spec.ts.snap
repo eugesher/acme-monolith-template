@@ -1179,7 +1179,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should an
 exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should link the tags of the body and answer them by name 1`] = `
 {
   "db": {
-    "subject_tag": [
+    "tag_subject": [
       {
         "subject_id": "103",
         "subject_type": "product",
@@ -1245,7 +1245,7 @@ exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should re
     "tags": [],
   },
   "db": {
-    "subject_tag": [],
+    "tag_subject": [],
   },
   "replaced": {
     "tags": [
@@ -1759,7 +1759,7 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should answer an un
 exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should link the tags of the body and answer them by name 1`] = `
 {
   "db": {
-    "subject_tag": [
+    "tag_subject": [
       {
         "subject_id": "601",
         "subject_type": "order",
@@ -1821,7 +1821,7 @@ exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should replace the 
     "tags": [],
   },
   "db": {
-    "subject_tag": [],
+    "tag_subject": [],
   },
   "replaced": {
     "tags": [

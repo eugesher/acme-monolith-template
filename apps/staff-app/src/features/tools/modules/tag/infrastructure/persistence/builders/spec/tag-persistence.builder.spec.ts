@@ -1,6 +1,6 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm';
 
-import { SubjectTag, Tag } from '@acme-staff/common/entities';
+import { Tag, TagSubject } from '@acme-staff/common/entities';
 
 import { TagPersistenceBuilder } from '../tag-persistence.builder';
 
@@ -12,7 +12,7 @@ describe('TagPersistenceBuilder', () => {
     dataSource = new DataSource({
       type: 'mysql',
       database: 'acme',
-      entities: [SubjectTag, Tag],
+      entities: [Tag, TagSubject],
     });
     jest.spyOn(dataSource.driver, 'connect').mockResolvedValue();
     jest.spyOn(dataSource.driver, 'afterConnect').mockResolvedValue();

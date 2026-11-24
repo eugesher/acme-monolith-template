@@ -1,17 +1,17 @@
 import { SelectQueryBuilder } from 'typeorm';
 
-import type { SubjectTag } from '@acme-staff/common/entities';
+import type { TagSubject } from '@acme-staff/common/entities';
 
 import type {
   ITagCommonFindSubjectIdsQuery,
   ITagCommonReplaceFindLinkedQuery,
 } from '../../../outbound';
 
-export class TagCommonPersistenceSubjectTagBuilder extends SelectQueryBuilder<SubjectTag> {
+export class TagCommonPersistenceTagSubjectBuilder extends SelectQueryBuilder<TagSubject> {
   public forList(query: ITagCommonFindSubjectIdsQuery): this {
     const { subjectType, tagId } = query;
 
-    this.select([`${this.alias}.id`, `${this.alias}.subjectId`])
+    this.select([`${this.alias}.tagId`, `${this.alias}.subjectType`, `${this.alias}.subjectId`])
       .where(`${this.alias}.tagId = :tagId`, { tagId })
       .andWhere(`${this.alias}.subjectType = :subjectType`, { subjectType });
 
@@ -21,7 +21,7 @@ export class TagCommonPersistenceSubjectTagBuilder extends SelectQueryBuilder<Su
   public forLinked(query: ITagCommonReplaceFindLinkedQuery): this {
     const { subjectType, subjectId } = query;
 
-    this.select([`${this.alias}.id`, `${this.alias}.tagId`])
+    this.select([`${this.alias}.tagId`, `${this.alias}.subjectType`, `${this.alias}.subjectId`])
       .where(`${this.alias}.subjectType = :subjectType`, { subjectType })
       .andWhere(`${this.alias}.subjectId = :subjectId`, { subjectId });
 

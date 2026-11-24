@@ -6,7 +6,7 @@ description: |-
   Expect: 200 OK, tag promo alone
   User: editor@example.com (token signed by scripts.py)
   Before: send this request with the body {"tagIds": ["300", "301"]}: 200 OK
-  After: SQL: DELETE FROM subject_tag WHERE subject_type = 'product' AND subject_id = 103
+  After: SQL: DELETE FROM tag_subject WHERE subject_type = 'product' AND subject_id = 103
   Note: the e2e then sends {"tagIds": []} and gets an empty list
 method: PUT
 url: $STAFF_APP_BASE_URL/catalog/products/103/tags

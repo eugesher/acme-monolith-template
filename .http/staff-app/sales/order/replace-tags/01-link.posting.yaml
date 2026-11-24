@@ -3,9 +3,9 @@ description: |-
   e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags
   it: should link the tags of the body and answer them by name
 
-  Expect: 200 OK, tags fragile and vip; two subject_tag rows of order 601
+  Expect: 200 OK, tags fragile and vip; two tag_subject rows of order 601
   User: editor@example.com (token signed by scripts.py)
-  After: SQL: DELETE FROM subject_tag WHERE subject_type = 'order' AND subject_id = 601
+  After: SQL: DELETE FROM tag_subject WHERE subject_type = 'order' AND subject_id = 601
 method: PUT
 url: $STAFF_APP_BASE_URL/sales/orders/601/tags
 body:

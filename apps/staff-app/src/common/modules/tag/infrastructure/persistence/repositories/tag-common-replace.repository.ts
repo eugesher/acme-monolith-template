@@ -6,8 +6,8 @@ import {
   type ITagCommonReplaceFindLinkedQuery,
   type ITagCommonReplaceLinkQuery,
   type ITagCommonReplaceRepositoryPort,
-  type ITagCommonReplaceSubjectTagRecord,
   type ITagCommonReplaceTagRecord,
+  type ITagCommonReplaceTagSubjectRecord,
   type ITagCommonReplaceUnlinkQuery,
 } from '../../../outbound';
 import { TagCommonPersistenceHost } from '../host/tag-common-persistence.host';
@@ -32,8 +32,8 @@ export class TagCommonReplaceRepository
 
   public async findLinked(
     query: ITagCommonReplaceFindLinkedQuery,
-  ): Promise<ITagCommonReplaceSubjectTagRecord[]> {
-    return await this.createSubjectTagBuilder().forLinked(query).getMany();
+  ): Promise<ITagCommonReplaceTagSubjectRecord[]> {
+    return await this.createTagSubjectBuilder().forLinked(query).getMany();
   }
 
   public async link(query: ITagCommonReplaceLinkQuery): Promise<void> {
@@ -43,9 +43,9 @@ export class TagCommonReplaceRepository
       return;
     }
 
-    const subjectTagRows = tagIds.map((tagId) => ({ subjectType, subjectId, tagId }));
+    const tagSubjectRows = tagIds.map((tagId) => ({ tagId, subjectType, subjectId }));
 
-    await this.subjectTagRepository.insert(subjectTagRows);
+    await this.tagSubjectRepository.insert(tagSubjectRows);
   }
 
   public async unlink(query: ITagCommonReplaceUnlinkQuery): Promise<void> {
@@ -55,6 +55,6 @@ export class TagCommonReplaceRepository
       return;
     }
 
-    await this.subjectTagRepository.delete({ subjectType, subjectId, tagId: In(tagIds) });
+    await this.tagSubjectRepository.delete({ tagId: In(tagIds), subjectType, subjectId });
   }
 }

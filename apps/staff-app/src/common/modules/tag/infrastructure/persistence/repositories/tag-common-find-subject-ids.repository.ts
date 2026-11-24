@@ -21,6 +21,6 @@ export class TagCommonFindSubjectIdsRepository
   public async list(
     query: ITagCommonFindSubjectIdsQuery,
   ): Promise<ITagCommonFindSubjectIdsRecord[]> {
-    return await this.createSubjectTagBuilder().forList(query).getMany();
+    return await this.createTagSubjectBuilder().forList(query).getMany();
   }
 }

@@ -6,5 +6,5 @@ export * from './staff/staff-role.entity';
 export * from './staff/staff-user-role.entity';
 export * from './staff/staff-user.entity';
 
-export * from './tag/subject-tag.entity';
+export * from './tag/tag-subject.entity';
 export * from './tag/tag.entity';
