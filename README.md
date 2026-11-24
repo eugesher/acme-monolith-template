@@ -55,17 +55,8 @@ Create the env files of the apps and the migrations:
 
 ```bash
 cp env/apps/staff-app/.env.example env/apps/staff-app/.env
-```
-
-```bash
 cp env/apps/customer-app/.env.example env/apps/customer-app/.env
-```
-
-```bash
 cp env/apps/processor-app/.env.example env/apps/processor-app/.env
-```
-
-```bash
 cp env/migrations/.env.example env/migrations/.env
 ```
 
