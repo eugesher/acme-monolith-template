@@ -1,6 +1,7 @@
 name: 03-foreign
 description: |-
-  e2e: Tools › Note › GET /api/tools/notes/:noteId › should hide the note of another staff user with 404
+  e2e: Tools › Note › GET /api/tools/notes/:noteId
+  it: should hide the note of another staff user with 404
 
   Expect: 404 Not Found, code NOTE_NOT_FOUND
   User: viewer@example.com (token signed by scripts.py)

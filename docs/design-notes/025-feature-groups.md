@@ -59,5 +59,5 @@ lists the modules of a group together.
   `apps/staff-app/test/features/<group>/modules/<module>.e2e.ts`, and `<group>/<group>.e2e.ts`
   mounts them: its `execute()` holds a `describe` per module, and `app.e2e-spec.ts` calls it inside
   the `describe` of the group (see `014-e2e-suites.md`).
-- The Posting requests sit in `.http/staff-app/<group>/<module>/<endpoint>/`, and the first line of
-  a description names the e2e test with the group in it.
+- The Posting requests sit in `.http/staff-app/<group>/<module>/<endpoint>/`, and the `e2e:` line of
+  a description starts with the group.

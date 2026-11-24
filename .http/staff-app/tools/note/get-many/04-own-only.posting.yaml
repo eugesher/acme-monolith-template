@@ -1,6 +1,7 @@
 name: 04-own-only
 description: |-
-  e2e: Tools › Note › GET /api/tools/notes › should list only the notes of the caller, with no permission needed
+  e2e: Tools › Note › GET /api/tools/notes
+  it: should list only the notes of the caller, with no permission needed
 
   Expect: 200 OK, an empty page: viewer holds no note permission and owns no note
   User: viewer@example.com (token signed by scripts.py)

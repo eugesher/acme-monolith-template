@@ -1,6 +1,7 @@
 name: 04-key-of-another-customer
 description: |-
-  e2e: Order › POST /api/orders › should place an order of another customer under the same key instead of refusing or replaying it
+  e2e: Order › POST /api/orders
+  it: should place an order of another customer under the same key instead of refusing or replaying it
 
   Expect: 201 Created, a new order of carol with two lines of product 100; two completed idempotency_key rows under the key, scopes customer:101 and customer:103; a ledger record order-placed
   User: carol@example.com (token signed by scripts.py)

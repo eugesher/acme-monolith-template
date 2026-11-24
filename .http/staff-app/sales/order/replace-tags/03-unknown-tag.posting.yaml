@@ -1,6 +1,7 @@
 name: 03-unknown-tag
 description: |-
-  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags › should refuse an unknown tag with 422 and keep the tags the order had
+  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags
+  it: should refuse an unknown tag with 422 and keep the tags the order had
 
   Expect: 422 Unprocessable Entity, code ORDER_TAG_NOT_FOUND, details.missingTagIds 998 and 999; order 600 keeps vip
   User: editor@example.com (token signed by scripts.py)

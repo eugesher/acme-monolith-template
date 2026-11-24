@@ -1,6 +1,7 @@
 name: 02-foreign
 description: |-
-  e2e: Tools › Note › DELETE /api/tools/notes/:noteId › should hide the note of another staff user with 404 and delete nothing
+  e2e: Tools › Note › DELETE /api/tools/notes/:noteId
+  it: should hide the note of another staff user with 404 and delete nothing
 
   Expect: 404 Not Found, code NOTE_NOT_FOUND; note 204 keeps deleted_at NULL
   User: viewer@example.com (token signed by scripts.py)

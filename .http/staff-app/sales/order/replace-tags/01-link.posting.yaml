@@ -1,6 +1,7 @@
 name: 01-link
 description: |-
-  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags › should link the tags of the body and answer them by name
+  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags
+  it: should link the tags of the body and answer them by name
 
   Expect: 200 OK, tags fragile and vip; two subject_tag rows of order 601
   User: editor@example.com (token signed by scripts.py)

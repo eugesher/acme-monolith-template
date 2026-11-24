@@ -1,6 +1,7 @@
 name: 01-create
 description: |-
-  e2e: Tools › Tag › POST /api/tools/tags › should create a tag with the trimmed name
+  e2e: Tools › Tag › POST /api/tools/tags
+  it: should create a tag with the trimmed name
 
   Expect: 201 Created, a tag named heavy
   User: editor@example.com (token signed by scripts.py)

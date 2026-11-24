@@ -1,6 +1,6 @@
 # HTTP requests
 
-Two [Posting](https://posting.sh) collections for checking the apps by hand, one per app:
+Three [Posting](https://posting.sh) collections for checking the apps by hand, one per app:
 
 ```bash
 posting --collection .http/staff-app --env .http/dev.env
@@ -10,27 +10,37 @@ posting --collection .http/staff-app --env .http/dev.env
 posting --collection .http/customer-app --env .http/dev.env
 ```
 
+```bash
+posting --collection .http/processor-app --env .http/dev.env
+```
+
 Script paths in the requests are relative to the collection root, so the root must be
-`.http/staff-app` or `.http/customer-app` itself.
+`.http/staff-app` or `.http/customer-app` itself. The requests of processor-app need no script.
 
 ## What is inside
 
-One request per e2e case of the app. The folder is the endpoint, the number in the file name is the
-order of the case in the e2e. The first line of a description is the full name of the e2e test, so
-the test can be found in `apps/<app>/test`, or in `libs/testing/src/e2e/health.e2e.ts` for the
-health cases every app shares.
+One request per e2e case of the app that goes through HTTP. The folder is the endpoint, the number
+in the file name is the order of the case in the e2e. A description starts with the case:
 
-Ten e2e cases have no request:
+- `e2e:` is the chain of `describe` around it;
+- `it:` is the first argument of its `it`, as written in the e2e, so a search for it finds the test
+  in `apps/<app>/test`, or in `libs/testing/src/e2e/health.e2e.ts` for the health cases every app
+  shares;
+- `Row:` is the row of the `it.each` table the request sends, the value of `%s` in the name.
 
-- the route table of staff-app and of customer-app reads the mounted routes and the access of each
-  from the controllers;
+These e2e cases have no request:
+
+- the route table of each app, and the DTOs of each route in staff-app and customer-app: the e2e
+  reads them from the controllers of the running app;
 - the schema check of staff-app compares the migrated database with the entities;
 - the ledger case of staff-app enqueues one record twice through `LEDGER_CORE_PORT` inside the app;
 - the `queue` cases of staff-app that page, retry and delete a failed job, and the one that retries
-  a delayed job: the e2e makes the job through BullMQ, and no route of an app makes one;
-- the auth limit of each app sends logins from one address until the limit is spent and one more
-  from another address; `auth/login/02-wrong-password` sent more than `THROTTLE_AUTH_LIMIT` times
-  within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.
+  a job that is not failed: the e2e makes the job through BullMQ, and no route of an app makes one;
+- the processors of processor-app and the scheduler of the purge: the e2e adds the jobs to the
+  queues and reads the database, and processor-app has no route but health;
+- the auth limit of staff-app and customer-app sends logins from one address until the limit is
+  spent and one more from another address; `auth/login/02-wrong-password` sent more than
+  `THROTTLE_AUTH_LIMIT` times within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.
 
 A case that sends more than one request has the file of the request it checks, and its `Before:` or
 `Note:` says what else the e2e sends:
@@ -56,7 +66,8 @@ A case that sends more than one request has the file of the request it checks, a
 ## Environment
 
 The requests expect staff-app and customer-app running against the e2e infrastructure with fresh
-seeds, and processor-app for the requests that read the ledger records the others enqueue:
+seeds, and processor-app for its own requests and for the requests that read the ledger records the
+others enqueue:
 
 ```bash
 yarn test:e2e:infra:reload

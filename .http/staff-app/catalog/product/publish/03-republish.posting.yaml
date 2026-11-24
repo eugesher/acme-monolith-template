@@ -1,6 +1,7 @@
 name: 03-republish
 description: |-
-  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish › should publish an archived product again under a ledger record of its new version
+  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish
+  it: should publish an archived product again under a ledger record of its new version
 
   Expect: 200 OK, product 105 active at version 3, a ledger record product-published:105:3 with correlation_id e2e00000-0000-4000-8000-000000000017
   User: editor@example.com (token signed by scripts.py)

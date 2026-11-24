@@ -1,6 +1,7 @@
 name: 02-replay
 description: |-
-  e2e: Order › POST /api/orders › should replay the same response for the same key and body without a second order
+  e2e: Order › POST /api/orders
+  it: should replay the same response for the same key and body without a second order
 
   Expect: 201 Created both times with the same body, one order of carol, one ledger record
   User: carol@example.com (token signed by scripts.py)

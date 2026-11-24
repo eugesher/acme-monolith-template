@@ -1,6 +1,7 @@
 name: 13-same-key-simultaneous
 description: |-
-  e2e: Order › POST /api/orders › should place one order for simultaneous requests under one key and replay or refuse the others
+  e2e: Order › POST /api/orders
+  it: should place one order for simultaneous requests under one key and replay or refuse the others
 
   Expect: 201 Created for the request that claims the key; each other one answers the same 201 or 409 Conflict IDEMPOTENT_REQUEST_IN_FLIGHT; one order is written
   User: carol@example.com (token signed by scripts.py)

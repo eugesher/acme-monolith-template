@@ -1,6 +1,7 @@
 name: 03-clear
 description: |-
-  e2e: Access › Role › PUT /api/access/roles/:roleId/permissions › should clear the permissions of the role for an empty list
+  e2e: Access › Role › PUT /api/access/roles/:roleId/permissions
+  it: should clear the permissions of the role for an empty list
 
   Expect: 200 OK, the viewer role without permissions and no row of role 3 in staff_role_permissions
   User: admin@example.com (token signed by scripts.py)

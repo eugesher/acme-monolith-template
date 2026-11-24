@@ -1,6 +1,7 @@
 name: 04-unknown
 description: |-
-  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId › should answer an unknown tag with 404
+  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId
+  it: should answer an unknown tag with 404
 
   Expect: 404 Not Found, code TAG_NOT_FOUND
   User: editor@example.com (token signed by scripts.py)

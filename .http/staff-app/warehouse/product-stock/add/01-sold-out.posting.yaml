@@ -1,6 +1,7 @@
 name: 01-sold-out
 description: |-
-  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should add the units to a sold-out product, record the key, queue the ledger record under the correlation id and keep the cached customer catalog
+  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
+  it: should add the units to a sold-out product, record the key, queue the ledger record under the correlation id and keep the cached customer catalog
 
   Expect: 200 OK, product 106 at 5 units; a +5 product_stock row, a completed idempotency_key row and a ledger entry product-restocked:<row id> with correlation_id e2e00000-0000-4000-8000-000000000013, the key acme:catalog:v1:page:1:limit:20 still cached
   User: editor@example.com (token signed by scripts.py)

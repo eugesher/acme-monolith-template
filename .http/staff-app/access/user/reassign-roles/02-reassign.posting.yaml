@@ -1,6 +1,7 @@
 name: 02-reassign
 description: |-
-  e2e: Access › User › PUT /api/access/users/:userId/roles › should reassign the roles and answer 200
+  e2e: Access › User › PUT /api/access/users/:userId/roles
+  it: should reassign the roles and answer 200
 
   Expect: 200 OK, role ids 2 and 3
   User: admin@example.com (token signed by scripts.py)

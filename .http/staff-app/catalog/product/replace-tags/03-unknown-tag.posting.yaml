@@ -1,6 +1,7 @@
 name: 03-unknown-tag
 description: |-
-  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags › should refuse an unknown tag with 422 and keep the tags the product had
+  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags
+  it: should refuse an unknown tag with 422 and keep the tags the product had
 
   Expect: 422 Unprocessable Entity, code PRODUCT_TAG_NOT_FOUND, details.missingTagIds 998 and 999; product 100 keeps fragile and promo
   User: editor@example.com (token signed by scripts.py)

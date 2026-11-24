@@ -1,6 +1,7 @@
 name: 01-register
 description: |-
-  e2e: Access › User › POST /api/access/users › should create a user who can log in at once
+  e2e: Access › User › POST /api/access/users
+  it: should create a user who can log in at once
 
   Expect: 201 Created, a user row with an argon2id hash and the viewer role; the new credentials log in with 200
   User: admin@example.com (token signed by scripts.py)

@@ -1,6 +1,7 @@
 name: 03-correlation
 description: |-
-  e2e: Ledger › GET /api/ledger › should list the entries of one correlation id
+  e2e: Ledger › GET /api/ledger
+  it: should list the entries of one correlation id
 
   Expect: 200 OK, entry 490 e2e-ledger:1 alone
   User: viewer@example.com (token signed by scripts.py)

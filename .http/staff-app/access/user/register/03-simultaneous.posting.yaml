@@ -1,6 +1,7 @@
 name: 03-simultaneous
 description: |-
-  e2e: Access › User › POST /api/access/users › should let one of two simultaneous registrations with one email through and refuse the other with 409
+  e2e: Access › User › POST /api/access/users
+  it: should let one of two simultaneous registrations with one email through and refuse the other with 409
 
   Expect: one 201 Created and one 409 Conflict with code AUTH_EMAIL_TAKEN, one user row race-viewer@example.com
   User: admin@example.com (token signed by scripts.py)

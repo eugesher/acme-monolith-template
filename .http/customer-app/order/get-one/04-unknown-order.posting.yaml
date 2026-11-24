@@ -1,6 +1,8 @@
 name: 04-unknown-order
 description: |-
-  e2e: Order › GET /api/orders/:orderId › should answer an unknown order with the same 404
+  e2e: Order › GET /api/orders/:orderId
+  it: should answer %s with the same 404
+  Row: an unknown order
 
   Expect: 404 Not Found, code ORDER_NOT_FOUND
   User: bob@example.com (token signed by scripts.py)

@@ -1,6 +1,7 @@
 name: 03-spaces
 description: |-
-  e2e: Tools › Tag › POST /api/tools/tags › should refuse a name of spaces with 400 from the domain
+  e2e: Tools › Tag › POST /api/tools/tags
+  it: should refuse a name of spaces with 400 from the domain
 
   Expect: 400 Bad Request, code TAG_NAME_INVALID
   User: editor@example.com (token signed by scripts.py)

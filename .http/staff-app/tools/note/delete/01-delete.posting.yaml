@@ -1,6 +1,7 @@
 name: 01-delete
 description: |-
-  e2e: Tools › Note › DELETE /api/tools/notes/:noteId › should soft-delete a note and hide it from every read
+  e2e: Tools › Note › DELETE /api/tools/notes/:noteId
+  it: should soft-delete a note and hide it from every read
 
   Expect: 204 No Content, note 200 gets deleted_at; GET of note 200 and of its revisions answers 404 NOTE_NOT_FOUND
   User: admin@example.com (token signed by scripts.py)

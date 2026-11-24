@@ -1,6 +1,7 @@
 name: 02-published
 description: |-
-  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish › should keep a published product as is and queue nothing
+  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish
+  it: should keep a published product as is and queue nothing
 
   Expect: 200 OK, product 100 unchanged at version 1, no ledger record
   User: editor@example.com (token signed by scripts.py)

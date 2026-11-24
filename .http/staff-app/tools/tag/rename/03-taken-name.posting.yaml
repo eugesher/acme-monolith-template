@@ -1,6 +1,7 @@
 name: 03-taken-name
 description: |-
-  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId › should refuse the name of another tag with 409
+  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId
+  it: should refuse the name of another tag with 409
 
   Expect: 409 Conflict, code TAG_NAME_TAKEN
   User: editor@example.com (token signed by scripts.py)

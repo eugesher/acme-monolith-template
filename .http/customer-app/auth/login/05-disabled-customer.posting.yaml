@@ -1,6 +1,7 @@
 name: 05-disabled-customer
 description: |-
-  e2e: Auth › POST /api/auth/login › should refuse a disabled customer with 403
+  e2e: Auth › POST /api/auth/login
+  it: should refuse a disabled customer with 403
 
   Expect: 403 Forbidden, code AUTH_USER_INACTIVE
 method: POST

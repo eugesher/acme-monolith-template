@@ -1,6 +1,7 @@
 name: 01-revisions
 description: |-
-  e2e: Tools › Note › GET /api/tools/notes/:noteId/revisions › should list the revisions of a note
+  e2e: Tools › Note › GET /api/tools/notes/:noteId/revisions
+  it: should list the revisions of a note
 
   Expect: 200 OK, revision 200 of note 202
   User: admin@example.com (token signed by scripts.py)

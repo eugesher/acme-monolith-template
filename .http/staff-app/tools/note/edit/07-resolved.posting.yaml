@@ -1,6 +1,7 @@
 name: 07-resolved
 description: |-
-  e2e: Tools › Note › PATCH /api/tools/notes/:noteId › should refuse to edit a resolved note with 409
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId
+  it: should refuse to edit a resolved note with 409
 
   Expect: 409 Conflict, code NOTE_RESOLVED
   User: admin@example.com (token signed by scripts.py)

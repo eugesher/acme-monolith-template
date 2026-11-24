@@ -1,6 +1,7 @@
 name: 01-resolve
 description: |-
-  e2e: Tools › Note › POST /api/tools/notes/:noteId/resolve › should resolve a note under a matching If-Match
+  e2e: Tools › Note › POST /api/tools/notes/:noteId/resolve
+  it: should resolve a note under a matching If-Match
 
   Expect: 200 OK, note 201 resolved at version 2
   User: admin@example.com (token signed by scripts.py)

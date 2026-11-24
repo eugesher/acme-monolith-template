@@ -1,6 +1,7 @@
 name: 01-quoted-if-match
 description: |-
-  e2e: Catalog › Product › PATCH /api/catalog/products/:productId › should update the name with a quoted If-Match, bump the version and drop the cached customer catalog
+  e2e: Catalog › Product › PATCH /api/catalog/products/:productId
+  it: should update the name with a quoted If-Match, bump the version and drop the cached customer catalog
 
   Expect: 200 OK, product 102 renamed at version 2; no acme:catalog:* key left
   User: editor@example.com (token signed by scripts.py)

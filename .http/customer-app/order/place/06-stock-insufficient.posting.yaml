@@ -1,6 +1,7 @@
 name: 06-stock-insufficient
 description: |-
-  e2e: Order › POST /api/orders › should refuse more units than in stock with 409 and the details, write nothing and release the key
+  e2e: Order › POST /api/orders
+  it: should refuse more units than in stock with 409 and the details, write nothing and release the key
 
   Expect: 409 Conflict, code ORDER_STOCK_INSUFFICIENT with details of product 106 (1 requested, 0 available), no order, no idempotency_key row
   User: ann@example.com (token signed by scripts.py)

@@ -1,6 +1,7 @@
 name: 01-rename
 description: |-
-  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId › should rename the tag
+  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId
+  it: should rename the tag
 
   Expect: 200 OK, tag 390 named winter
   User: editor@example.com (token signed by scripts.py)

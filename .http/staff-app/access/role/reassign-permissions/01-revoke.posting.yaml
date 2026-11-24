@@ -1,6 +1,7 @@
 name: 01-revoke
 description: |-
-  e2e: Access › Role › PUT /api/access/roles/:roleId/permissions › should reassign the permissions and refuse the same token at once
+  e2e: Access › Role › PUT /api/access/roles/:roleId/permissions
+  it: should reassign the permissions and refuse the same token at once
 
   Expect: 200 OK, viewer holds product:write instead of ledger:read; the same viewer token gets 200 from GET /ledger before and 403 after
   User: admin@example.com (token signed by scripts.py)

@@ -1,6 +1,7 @@
 name: 04-customer
 description: |-
-  e2e: Auth › GET /api/auth/me › should refuse the token of a customer signed with the secret of this app
+  e2e: Auth › GET /api/auth/me
+  it: should refuse the token of a customer signed with the secret of this app
 
   Expect: 401 Unauthorized
   User: customer ann@example.com (token signed by scripts.py)

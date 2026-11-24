@@ -1,6 +1,7 @@
 name: 01-link
 description: |-
-  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags › should link the tags of the body and answer them by name
+  e2e: Catalog › Product › PUT /api/catalog/products/:productId/tags
+  it: should link the tags of the body and answer them by name
 
   Expect: 200 OK, tags fragile and promo; two subject_tag rows of product 103
   User: editor@example.com (token signed by scripts.py)

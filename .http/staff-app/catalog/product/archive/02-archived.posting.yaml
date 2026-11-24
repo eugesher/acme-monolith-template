@@ -1,6 +1,7 @@
 name: 02-archived
 description: |-
-  e2e: Catalog › Product › POST /api/catalog/products/:productId/archive › should refuse to archive an archived product with 409
+  e2e: Catalog › Product › POST /api/catalog/products/:productId/archive
+  it: should refuse to archive an archived product with 409
 
   Expect: 409 Conflict, code PRODUCT_ALREADY_ARCHIVED, no ledger entry
   User: editor@example.com (token signed by scripts.py)

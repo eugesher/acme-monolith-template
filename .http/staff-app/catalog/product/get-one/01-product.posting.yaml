@@ -1,6 +1,7 @@
 name: 01-product
 description: |-
-  e2e: Catalog › Product › GET /api/catalog/products/:productId › should read a product
+  e2e: Catalog › Product › GET /api/catalog/products/:productId
+  it: should read a product
 
   Expect: 200 OK, product 102
   User: viewer@example.com (token signed by scripts.py)

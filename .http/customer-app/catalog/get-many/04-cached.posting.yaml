@@ -1,6 +1,7 @@
 name: 04-cached
 description: |-
-  e2e: Catalog › GET /api/products › should answer a cached page without reading the database
+  e2e: Catalog › GET /api/products
+  it: should answer a cached page without reading the database
 
   Expect: 200 OK, the cached page with product 999 alone
   User: bob@example.com (token signed by scripts.py)

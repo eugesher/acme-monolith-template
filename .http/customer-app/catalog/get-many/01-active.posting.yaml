@@ -1,6 +1,7 @@
 name: 01-active
 description: |-
-  e2e: Catalog › GET /api/products › should list every active product by id, whatever its stock
+  e2e: Catalog › GET /api/products
+  it: should list every active product by id, whatever its stock
 
   Expect: 200 OK, products 100, 103 and the sold-out 106, without quantities
   User: bob@example.com (token signed by scripts.py)

@@ -1,6 +1,7 @@
 name: 05-archived
 description: |-
-  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should restock an archived product and leave it archived
+  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
+  it: should restock an archived product and leave it archived
 
   Expect: 200 OK, product 105 at 9 units and still archived at version 2, a ProductRestocked ledger record
   User: editor@example.com (token signed by scripts.py)

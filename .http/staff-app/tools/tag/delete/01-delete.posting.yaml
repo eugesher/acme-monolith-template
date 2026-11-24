@@ -1,6 +1,7 @@
 name: 01-delete
 description: |-
-  e2e: Tools › Tag › DELETE /api/tools/tags/:tagId › should delete the tag and unlink it from every subject
+  e2e: Tools › Tag › DELETE /api/tools/tags/:tagId
+  it: should delete the tag and unlink it from every subject
 
   Expect: 204 No Content; tag 391 and its subject_tag rows of product 102 and order 601 are gone
   User: editor@example.com (token signed by scripts.py)

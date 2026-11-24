@@ -1,6 +1,7 @@
 name: 01-tags
 description: |-
-  e2e: Sales › Order › GET /api/sales/orders/:orderId/tags › should read the tags of the order, by name
+  e2e: Sales › Order › GET /api/sales/orders/:orderId/tags
+  it: should read the tags of the order, by name
 
   Expect: 200 OK, tag vip
   User: viewer@example.com (token signed by scripts.py)

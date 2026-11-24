@@ -1,6 +1,7 @@
 name: 03-rollback
 description: |-
-  e2e: Tools › Note › PATCH /api/tools/notes/:noteId › should roll the note back when the revision insert fails
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId
+  it: should roll the note back when the revision insert fails
 
   Expect: 409 Conflict, code CONFLICT, Resource already exists; note 203 stays at version 1 with its body
   User: admin@example.com (token signed by scripts.py)

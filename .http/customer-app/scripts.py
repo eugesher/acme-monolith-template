@@ -13,7 +13,7 @@ ANN_ID = "101"
 BOB_ID = "102"
 CAROL_ID = "103"
 DORA_ID = "104"
-STAFF_EDITOR_ID = "2"
+STAFF_ADMIN_ID = "1"
 
 
 def capture_login(response, posting) -> None:
@@ -38,7 +38,7 @@ def as_dora(posting) -> None:
 
 
 def as_staff_user(posting) -> None:
-    sign(posting, {"sub": STAFF_EDITOR_ID})
+    sign(posting, {"sub": STAFF_ADMIN_ID})
 
 
 def as_ann_for_staff_audience(posting) -> None:

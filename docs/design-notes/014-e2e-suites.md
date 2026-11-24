@@ -295,5 +295,5 @@ is what checks their shape. The same config adapts three test rules to the secti
 
 ## HTTP collection
 
-`.http/` holds a [Posting](https://posting.sh) collection per app with one request per e2e case. See
-`.http/README.md`.
+`.http/` holds a [Posting](https://posting.sh) collection per app with one request per e2e case that
+goes through HTTP, and names the `it` it repeats. See `.http/README.md`.

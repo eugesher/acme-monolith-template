@@ -1,6 +1,7 @@
 name: 02-deleted-product
 description: |-
-  e2e: Sales › Order › GET /api/sales/orders/:orderId › should read an order with a product deleted after the order
+  e2e: Sales › Order › GET /api/sales/orders/:orderId
+  it: should read an order with a product deleted after the order
 
   Expect: 200 OK, order 602 of customer ...0102 with the soft-deleted product 107
   User: viewer@example.com (token signed by scripts.py)

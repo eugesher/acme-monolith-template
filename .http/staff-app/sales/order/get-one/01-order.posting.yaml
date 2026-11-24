@@ -1,6 +1,7 @@
 name: 01-order
 description: |-
-  e2e: Sales › Order › GET /api/sales/orders/:orderId › should read the order of any customer with its products
+  e2e: Sales › Order › GET /api/sales/orders/:orderId
+  it: should read the order of any customer with its products
 
   Expect: 200 OK, order 600 of customer ...0101 with products 100 and 106
   User: viewer@example.com (token signed by scripts.py)

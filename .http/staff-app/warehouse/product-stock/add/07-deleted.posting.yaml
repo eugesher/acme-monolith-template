@@ -1,6 +1,8 @@
 name: 07-deleted
 description: |-
-  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should answer a deleted product with 404
+  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
+  it: should answer %s with 404
+  Row: a deleted product
 
   Expect: 404 Not Found, code PRODUCT_NOT_FOUND
   User: editor@example.com (token signed by scripts.py)

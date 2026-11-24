@@ -1,6 +1,7 @@
 name: 05-cors-preflight
 description: |-
-  e2e: Health › GET /api/health › should answer the preflight of an origin of HTTP_CORS_ORIGINS
+  e2e: Health › GET /api/health
+  it: should answer the preflight of an origin of HTTP_CORS_ORIGINS
 
   Expect: 204 No Content, access-control-allow-origin https://app.example.test, access-control-allow-methods GET,HEAD,PUT,PATCH,POST,DELETE, access-control-expose-headers x-correlation-id,Retry-After,Retry-After-auth
   Note: needs HTTP_CORS_ORIGINS=https://app.example.test in env/apps/customer-app/.env, as .env.test sets it

@@ -1,6 +1,7 @@
 name: 11-simultaneous
 description: |-
-  e2e: Order › POST /api/orders › should let one of two simultaneous orders for the last units through and refuse the other with 409
+  e2e: Order › POST /api/orders
+  it: should let one of two simultaneous orders for the last units through and refuse the other with 409
 
   Expect: one 201 Created and one 409 Conflict ORDER_STOCK_INSUFFICIENT; product 103 keeps 1 on hand
   User: carol@example.com (token signed by scripts.py)

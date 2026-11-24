@@ -1,6 +1,7 @@
 name: 06-foreign
 description: |-
-  e2e: Tools › Note › PATCH /api/tools/notes/:noteId › should hide the note of another staff user with 404 and write nothing
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId
+  it: should hide the note of another staff user with 404 and write nothing
 
   Expect: 404 Not Found, code NOTE_NOT_FOUND; note 204 and its revisions unchanged
   User: viewer@example.com (token signed by scripts.py)

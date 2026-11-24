@@ -1,6 +1,7 @@
 name: 02-missing
 description: |-
-  e2e: Tools › Note › GET /api/tools/notes/:noteId/revisions › should answer 404 for the revisions of a missing note
+  e2e: Tools › Note › GET /api/tools/notes/:noteId/revisions
+  it: should answer 404 for the revisions of a missing note
 
   Expect: 404 Not Found, code NOTE_NOT_FOUND
   User: admin@example.com (token signed by scripts.py)

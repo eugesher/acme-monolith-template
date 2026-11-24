@@ -1,6 +1,7 @@
 name: 01-tags
 description: |-
-  e2e: Catalog › Product › GET /api/catalog/products/:productId/tags › should read the tags of the product, by name
+  e2e: Catalog › Product › GET /api/catalog/products/:productId/tags
+  it: should read the tags of the product, by name
 
   Expect: 200 OK, tags fragile and promo
   User: viewer@example.com (token signed by scripts.py)

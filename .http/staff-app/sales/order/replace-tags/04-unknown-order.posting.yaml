@@ -1,6 +1,7 @@
 name: 04-unknown-order
 description: |-
-  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags › should answer an unknown order with 404
+  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags
+  it: should answer an unknown order with 404
 
   Expect: 404 Not Found, code ORDER_NOT_FOUND
   User: editor@example.com (token signed by scripts.py)

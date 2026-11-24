@@ -1,6 +1,7 @@
 name: 01-archive
 description: |-
-  e2e: Catalog › Product › POST /api/catalog/products/:productId/archive › should archive, queue one ledger record under the correlation id and drop the cached customer catalog
+  e2e: Catalog › Product › POST /api/catalog/products/:productId/archive
+  it: should archive, queue one ledger record under the correlation id and drop the cached customer catalog
 
   Expect: 200 OK, product 103 archived at version 2, one ledger record product-archived:103:2 with correlation_id e2e00000-0000-4000-8000-000000000015; no acme:catalog:* key left
   User: editor@example.com (token signed by scripts.py)

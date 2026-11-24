@@ -1,6 +1,7 @@
 name: 03-reused-key
 description: |-
-  e2e: Order › POST /api/orders › should refuse the same key with another body with 422
+  e2e: Order › POST /api/orders
+  it: should refuse the same key with another body with 422
 
   Expect: 422 Unprocessable Entity, code IDEMPOTENCY_KEY_REUSED, no second order
   User: ann@example.com (token signed by scripts.py)
