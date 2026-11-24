@@ -12,7 +12,7 @@ export class CreateIdempotencySchema1793170004000 implements MigrationInterface 
         response_body        TEXT         NULL,
         created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
         UNIQUE KEY uq_idempotency_scope_key (scope, idempotency_key),
-        KEY idx_idempotency_created_at (created_at)
+        INDEX idx_idempotency_created_at (created_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);
   }

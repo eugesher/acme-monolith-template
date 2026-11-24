@@ -19,7 +19,7 @@ export class CreateTagSchema1793170007000 implements MigrationInterface {
         subject_id   BIGINT UNSIGNED NOT NULL,
         created_at   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (tag_id, subject_type, subject_id),
-        KEY idx_tag_subject_subject (subject_type, subject_id),
+        INDEX idx_tag_subject_subject (subject_type, subject_id),
         CONSTRAINT fk_tag_subject_tag FOREIGN KEY (tag_id)
           REFERENCES tag (id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

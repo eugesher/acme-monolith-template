@@ -14,8 +14,8 @@ export class CreateLedgerSchema1793170005000 implements MigrationInterface {
         occurred_at    TIMESTAMP(3) NOT NULL,
         recorded_at    TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
         UNIQUE KEY uq_ledger_operation_key (operation_key),
-        KEY idx_ledger_subject (subject_type, subject_id),
-        KEY idx_ledger_correlation (correlation_id)
+        INDEX idx_ledger_subject (subject_type, subject_id),
+        INDEX idx_ledger_correlation (correlation_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);
   }

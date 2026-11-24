@@ -14,8 +14,8 @@ export class CreateNoteSchema1793170006000 implements MigrationInterface {
         created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         deleted_at   TIMESTAMP    NULL,
-        KEY idx_note_subject (subject_type, subject_id),
-        KEY idx_note_author (author_id)
+        INDEX idx_note_subject (subject_type, subject_id),
+        INDEX idx_note_author (author_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);
 
@@ -30,7 +30,7 @@ export class CreateNoteSchema1793170006000 implements MigrationInterface {
         correlation_id VARCHAR(64)  NOT NULL DEFAULT '',
         recorded_at    TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
         UNIQUE KEY uq_note_revision_version (note_id, note_version),
-        KEY idx_note_revision_correlation (correlation_id),
+        INDEX idx_note_revision_correlation (correlation_id),
         CONSTRAINT fk_note_revision_note FOREIGN KEY (note_id)
           REFERENCES note (id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -7,7 +7,7 @@ export class CreateOrderSchema1793170003000 implements MigrationInterface {
         id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         customer_id BIGINT UNSIGNED NOT NULL,
         created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        KEY idx_order_customer (customer_id, id),
+        INDEX idx_order_customer (customer_id, id),
         CONSTRAINT fk_order_customer FOREIGN KEY (customer_id) REFERENCES customer (id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);
@@ -17,8 +17,8 @@ export class CreateOrderSchema1793170003000 implements MigrationInterface {
         id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         order_id   BIGINT UNSIGNED NOT NULL,
         product_id BIGINT UNSIGNED NOT NULL,
-        KEY idx_order_product_order (order_id),
-        KEY idx_order_product_product (product_id),
+        INDEX idx_order_product_order (order_id),
+        INDEX idx_order_product_product (product_id),
         CONSTRAINT fk_order_product_order FOREIGN KEY (order_id) REFERENCES \`order\` (id),
         CONSTRAINT fk_order_product_product FOREIGN KEY (product_id) REFERENCES product (id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

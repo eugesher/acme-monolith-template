@@ -22,7 +22,7 @@ export class CreateProductSchema1793170002000 implements MigrationInterface {
         product_id BIGINT UNSIGNED NOT NULL,
         quantity   INT             NOT NULL,
         created_at TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        KEY idx_product_stock_product (product_id, quantity),
+        INDEX idx_product_stock_product (product_id, quantity),
         CONSTRAINT fk_product_stock_product FOREIGN KEY (product_id) REFERENCES product (id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);
