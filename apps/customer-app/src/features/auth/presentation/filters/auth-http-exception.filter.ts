@@ -15,5 +15,5 @@ export class AuthHttpExceptionFilter extends DomainHttpExceptionFilter<AuthBaseE
     [IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN]: HttpStatus.CONFLICT,
   };
 
-  protected override readonly status = AuthHttpExceptionFilter.STATUS;
+  protected readonly status = AuthHttpExceptionFilter.STATUS;
 }

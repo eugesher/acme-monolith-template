@@ -15,5 +15,5 @@ export class UserHttpExceptionFilter extends DomainHttpExceptionFilter<UserBaseE
     [IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND]: HttpStatus.UNPROCESSABLE_ENTITY,
   };
 
-  protected override readonly status = UserHttpExceptionFilter.STATUS;
+  protected readonly status = UserHttpExceptionFilter.STATUS;
 }

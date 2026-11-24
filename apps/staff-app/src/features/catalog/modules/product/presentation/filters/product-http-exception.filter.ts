@@ -18,5 +18,5 @@ export class ProductHttpExceptionFilter extends DomainHttpExceptionFilter<Produc
     [ProductExceptionCodeEnum.PRODUCT_VERSION_INVALID]: HttpStatus.INTERNAL_SERVER_ERROR,
   };
 
-  protected override readonly status = ProductHttpExceptionFilter.STATUS;
+  protected readonly status = ProductHttpExceptionFilter.STATUS;
 }

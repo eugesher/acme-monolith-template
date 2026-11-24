@@ -14,5 +14,5 @@ export class ProductStockHttpExceptionFilter extends DomainHttpExceptionFilter<P
       HttpStatus.UNPROCESSABLE_ENTITY,
   };
 
-  protected override readonly status = ProductStockHttpExceptionFilter.STATUS;
+  protected readonly status = ProductStockHttpExceptionFilter.STATUS;
 }

@@ -13,5 +13,5 @@ export class AuthHttpExceptionFilter extends DomainHttpExceptionFilter<AuthBaseE
     [IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND]: HttpStatus.NOT_FOUND,
   };
 
-  protected override readonly status = AuthHttpExceptionFilter.STATUS;
+  protected readonly status = AuthHttpExceptionFilter.STATUS;
 }
