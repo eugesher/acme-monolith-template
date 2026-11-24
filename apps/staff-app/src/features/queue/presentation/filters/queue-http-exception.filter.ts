@@ -12,5 +12,5 @@ export class QueueHttpExceptionFilter extends DomainHttpExceptionFilter<QueueBas
     [QueueExceptionCodeEnum.QUEUE_JOB_NOT_FAILED]: HttpStatus.CONFLICT,
   };
 
-  protected override readonly status = QueueHttpExceptionFilter.STATUS;
+  protected readonly status = QueueHttpExceptionFilter.STATUS;
 }

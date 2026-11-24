@@ -86,31 +86,34 @@ export const moduleKindViolationOf = ({
     return 'a submodule may not aggregate modules of its own';
   }
 
-  const rootFile = isAggregator ? moduleFile : INDEX;
-  const allowedFolders = isAggregator ? [SUBMODULES] : AREAS[area].layers;
+  const allowedFolders = isAggregator ? [SUBMODULES, SHELL] : AREAS[area].layers;
   const extras = [
     ...folders.filter((folder) => !allowedFolders.includes(folder)).map((folder) => `${folder}/`),
-    ...files.filter((file) => file !== rootFile),
+    ...files.filter((file) => file !== INDEX),
   ];
 
   if (extras.length > 0) {
     const kind = isAggregator
-      ? `an aggregator holds only ${SUBMODULES}/`
+      ? `an aggregator holds only ${SUBMODULES}/, ${SHELL}/`
       : 'a regular module holds only layer folders';
 
-    return `${kind} and ${rootFile}, found: ${extras.join(', ')}`;
+    return `${kind} and ${INDEX}, found: ${extras.join(', ')}`;
   }
 
-  if (!files.includes(rootFile)) {
-    return `has no ${rootFile}`;
-  }
-
-  if (isAggregator) {
-    return null;
+  if (!files.includes(INDEX)) {
+    return `has no ${INDEX}`;
   }
 
   if (!shellFiles.includes(moduleFile)) {
     return `has no ${SHELL}/${moduleFile}`;
+  }
+
+  if (isAggregator) {
+    const shellExtras = shellFiles.filter((file) => file !== moduleFile);
+
+    return shellExtras.length === 0
+      ? null
+      : `an aggregator holds only ${moduleFile} in ${SHELL}/, found: ${shellExtras.join(', ')}`;
   }
 
   return shellFiles.some((file) => file.endsWith(AREAS[area].suffix)) ? null : AREAS[area].missing;

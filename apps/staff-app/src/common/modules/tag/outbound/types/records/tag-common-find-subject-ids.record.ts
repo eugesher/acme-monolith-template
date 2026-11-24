@@ -1,3 +1,3 @@
-import type { SubjectTag } from '@acme-staff/common/entities';
+import type { TagSubject } from '@acme-staff/common/entities';
 
-export type ITagCommonFindSubjectIdsRecord = Pick<SubjectTag, 'subjectId'>;
+export type ITagCommonFindSubjectIdsRecord = Pick<TagSubject, 'subjectId'>;

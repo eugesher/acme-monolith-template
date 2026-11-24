@@ -1,6 +1,6 @@
 # HTTP requests
 
-Two [Posting](https://posting.sh) collections for checking the apps by hand, one per app:
+Three [Posting](https://posting.sh) collections for checking the apps by hand, one per app:
 
 ```bash
 posting --collection .http/staff-app --env .http/dev.env
@@ -10,53 +10,65 @@ posting --collection .http/staff-app --env .http/dev.env
 posting --collection .http/customer-app --env .http/dev.env
 ```
 
+```bash
+posting --collection .http/processor-app --env .http/dev.env
+```
+
 Script paths in the requests are relative to the collection root, so the root must be
-`.http/staff-app` or `.http/customer-app` itself.
+`.http/staff-app` or `.http/customer-app` itself. The requests of processor-app need no script.
 
 ## What is inside
 
-One request per e2e case of the app. The folder is the endpoint, the number in the file name is the
-order of the case in the e2e. The first line of a description is the full name of the e2e test, so
-the test can be found in `apps/<app>/test`, or in `libs/testing/src/e2e/health.e2e.ts` for the
-health cases every app shares.
+One request per e2e case of the app that goes through HTTP. The folder is the endpoint, the number
+in the file name is the order of the case in the e2e. A description starts with the case:
 
-Ten e2e cases have no request:
+- `e2e:` is the chain of `describe` around it;
+- `it:` is the first argument of its `it`, as written in the e2e, so a search for it finds the test
+  in `apps/<app>/test`, or in `libs/testing/src/e2e/health.e2e.ts` for the health cases every app
+  shares;
+- `Row:` is the row of the `it.each` table the request sends, the value of `%s` in the name.
 
-- the route table of staff-app and of customer-app reads the mounted routes and the access of each
-  from the controllers;
+These e2e cases have no request:
+
+- the route table of each app, and the DTOs of each route in staff-app and customer-app: the e2e
+  reads them from the controllers of the running app;
 - the schema check of staff-app compares the migrated database with the entities;
 - the ledger case of staff-app enqueues one record twice through `LEDGER_CORE_PORT` inside the app;
 - the `queue` cases of staff-app that page, retry and delete a failed job, and the one that retries
-  a delayed job: the e2e makes the job through BullMQ, and no route of an app makes one;
-- the auth limit of each app sends logins from one address until the limit is spent and one more
-  from another address; `auth/login/02-wrong-password` sent more than `THROTTLE_AUTH_LIMIT` times
-  within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.
+  a job that is not failed: the e2e makes the job through BullMQ, and no route of an app makes one;
+- the processors of processor-app and the scheduler of the purge: the e2e adds the jobs to the
+  queues and reads the database, and processor-app has no route but health;
+- the auth limit of staff-app and customer-app sends logins from one address until the limit is
+  spent and one more from another address; `auth/login/02-wrong-password` sent more than
+  `THROTTLE_AUTH_LIMIT` times within `THROTTLE_AUTH_TTL_MS` shows the 429 with `Retry-After-auth`.
 
 A case that sends more than one request has the file of the request it checks, and its `Before:` or
 `Note:` says what else the e2e sends:
 
 - the concurrent updates of a product send five requests at once,
-  `catalog/product/update/05-concurrent` sends one;
+  `staff-app/catalog/product/update/05-concurrent-without-if-match` sends one;
 - the replays of a restock and an order send the same request twice, as
   `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with
-  two keys, as `customer-app/order/place/11-simultaneous` says;
+  two keys, as `customer-app/order/place/11-simultaneous-last-units` says;
 - three simultaneous orders under one key send the same request three times at once, as
-  `customer-app/order/place/13-same-key-simultaneous` says;
+  `customer-app/order/place/13-simultaneous-same-key` says;
 - two simultaneous registrations with one email send the same request twice at once, in
-  `customer-app/auth/register/03-simultaneous` and `staff-app/access/user/register/03-simultaneous`;
+  `customer-app/auth/register/03-simultaneous-same-email` and
+  `staff-app/access/user/register/03-simultaneous-same-email`;
 - the sign-up of a customer goes on to log in and read `me` with the new credentials, as
-  `auth/register/01-register` says;
+  `customer-app/auth/register/01-success` says;
 - the soft delete of a note goes on to read the note and its revisions, as
-  `staff-app/tools/note/delete/01-delete` says;
+  `staff-app/tools/note/delete/01-success` says;
 - the replacement of the tags of an order or a product sets them, replaces them and clears them, as
-  `staff-app/sales/order/replace-tags/02-replace` and
-  `staff-app/catalog/product/replace-tags/02-replace` say.
+  `staff-app/sales/order/replace-tags/02-replace-and-clear` and
+  `staff-app/catalog/product/replace-tags/02-replace-and-clear` say.
 
 ## Environment
 
 The requests expect staff-app and customer-app running against the e2e infrastructure with fresh
-seeds, and processor-app for the requests that read the ledger records the others enqueue:
+seeds, and processor-app for its own requests and for the requests that read the ledger records the
+others enqueue:
 
 ```bash
 yarn test:e2e:infra:reload
@@ -97,8 +109,8 @@ also covers tokens that no login issues:
 - a token of a user of this app for the audience of the other app
   (`as_editor_for_customer_audience`, `as_ann_for_staff_audience`).
 
-`auth/login/01-editor` of staff-app and `auth/login/01-customer` of customer-app save the token they
-get into the variable `access_token`. The requests that send it say so in `Note:` or `User:`.
+`auth/login/01-success` of staff-app and of customer-app save the token they get into the variable
+`access_token`. The requests that send it say so in `Note:` or `User:`.
 
 ## Setup and cleanup
 

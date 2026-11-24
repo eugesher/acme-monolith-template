@@ -1,3 +1,3 @@
-import type { SubjectTag } from '@acme-staff/common/entities';
+import type { TagSubject } from '@acme-staff/common/entities';
 
-export type ITagCommonFindSubjectIdsQuery = Pick<SubjectTag, 'subjectType' | 'tagId'>;
+export type ITagCommonFindSubjectIdsQuery = Pick<TagSubject, 'subjectType' | 'tagId'>;

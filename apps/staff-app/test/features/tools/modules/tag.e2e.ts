@@ -167,7 +167,7 @@ export class TagE2E {
             "INSERT INTO tag (id, name, created_at, updated_at) VALUES (391, 'clearance', '2026-01-01 00:00:00', '2026-01-01 00:00:00')",
           );
           await this.ctx.dataSource.query(
-            "INSERT INTO subject_tag (id, subject_type, subject_id, tag_id, created_at) VALUES (491, 'product', 102, 391, '2026-01-01 00:00:00'), (492, 'order', 601, 391, '2026-01-01 00:00:00')",
+            "INSERT INTO tag_subject (tag_id, subject_type, subject_id, created_at) VALUES (391, 'product', 102, '2026-01-01 00:00:00'), (391, 'order', 601, '2026-01-01 00:00:00')",
           );
 
           await request(this.ctx.app.getHttpServer())
@@ -178,13 +178,13 @@ export class TagE2E {
           expect({
             db: {
               tag: await this.ctx.dataSource.query('SELECT * FROM tag WHERE id = 391'),
-              subject_tag: await this.ctx.dataSource.query(
-                'SELECT * FROM subject_tag WHERE tag_id = 391',
+              tag_subject: await this.ctx.dataSource.query(
+                'SELECT * FROM tag_subject WHERE tag_id = 391',
               ),
             },
-          }).toEqual({ db: { tag: [], subject_tag: [] } });
+          }).toEqual({ db: { tag: [], tag_subject: [] } });
         } finally {
-          await this.ctx.dataSource.query('DELETE FROM subject_tag WHERE id IN (491, 492)');
+          await this.ctx.dataSource.query('DELETE FROM tag_subject WHERE tag_id = 391');
           await this.ctx.dataSource.query('DELETE FROM tag WHERE id = 391');
         }
       });

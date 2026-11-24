@@ -31,7 +31,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Place an order for active products in stock (idempotent)' })
   @ApiCreatedResponse({ type: OrderResponseDto })
   @ApiErrorResponses({
-    statuses: OrderHttpExceptionFilter.STATUS,
+    filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [
       OrderExceptionCodeEnum.ORDER_EMPTY,
       OrderExceptionCodeEnum.ORDER_PRODUCT_NOT_FOUND,
@@ -68,7 +68,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Read one order of the caller with its products' })
   @ApiOkResponse({ type: OrderResponseDto })
   @ApiErrorResponses({
-    statuses: OrderHttpExceptionFilter.STATUS,
+    filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
   public async handleGetOne(

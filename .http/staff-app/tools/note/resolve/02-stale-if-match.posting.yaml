@@ -1,6 +1,7 @@
 name: 02-stale-if-match
 description: |-
-  e2e: Tools › Note › POST /api/tools/notes/:noteId/resolve › should refuse a stale If-Match with 412 and resolve nothing
+  e2e: Tools › Note › POST /api/tools/notes/:noteId/resolve
+  it: should refuse a stale If-Match with 412 and resolve nothing
 
   Expect: 412 Precondition Failed, code VERSION_MISMATCH, details.currentVersion 1; note 204 stays unresolved
   User: admin@example.com (token signed by scripts.py)

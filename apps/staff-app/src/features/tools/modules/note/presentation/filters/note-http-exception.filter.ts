@@ -16,5 +16,5 @@ export class NoteHttpExceptionFilter extends DomainHttpExceptionFilter<NoteBaseE
     [NoteExceptionCodeEnum.NOTE_VERSION_INVALID]: HttpStatus.INTERNAL_SERVER_ERROR,
   };
 
-  protected override readonly status = NoteHttpExceptionFilter.STATUS;
+  protected readonly status = NoteHttpExceptionFilter.STATUS;
 }

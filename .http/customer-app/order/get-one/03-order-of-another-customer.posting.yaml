@@ -1,6 +1,8 @@
 name: 03-order-of-another-customer
 description: |-
-  e2e: Order › GET /api/orders/:orderId › should answer the order of another customer with the same 404
+  e2e: Order › GET /api/orders/:orderId
+  it: should answer %s with the same 404
+  Row: the order of another customer
 
   Expect: 404 Not Found, code ORDER_NOT_FOUND
   User: bob@example.com (token signed by scripts.py)

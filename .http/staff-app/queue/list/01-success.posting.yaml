@@ -1,0 +1,14 @@
+name: 01-success
+description: |-
+  e2e: Queue › GET /api/queues
+  it: should list the queues with their job counts
+
+  Expect: 200 OK, ledger-record and product-stock-post-subtract, not paused, all five counts 0
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/queues
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

@@ -391,7 +391,7 @@ export class ProductE2E {
     describe('PUT /api/catalog/products/:productId/tags', () => {
       afterEach(async () => {
         await this.ctx.dataSource.query(
-          "DELETE FROM subject_tag WHERE subject_type = 'product' AND subject_id = 103",
+          "DELETE FROM tag_subject WHERE subject_type = 'product' AND subject_id = 103",
         );
       });
 
@@ -405,8 +405,8 @@ export class ProductE2E {
         const actual = {
           response: { body: response.body },
           db: {
-            subject_tag: await this.ctx.dataSource.query(
-              "SELECT subject_type, subject_id, tag_id FROM subject_tag WHERE subject_type = 'product' AND subject_id = 103 ORDER BY tag_id",
+            tag_subject: await this.ctx.dataSource.query(
+              "SELECT tag_id, subject_type, subject_id FROM tag_subject WHERE subject_type = 'product' AND subject_id = 103 ORDER BY tag_id",
             ),
           },
         };
@@ -436,8 +436,8 @@ export class ProductE2E {
           replaced: replaced.body,
           cleared: cleared.body,
           db: {
-            subject_tag: await this.ctx.dataSource.query(
-              "SELECT * FROM subject_tag WHERE subject_type = 'product' AND subject_id = 103",
+            tag_subject: await this.ctx.dataSource.query(
+              "SELECT * FROM tag_subject WHERE subject_type = 'product' AND subject_id = 103",
             ),
           },
         }).toMatchSnapshot();

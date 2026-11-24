@@ -19,6 +19,8 @@ export class CacheStoreAdapter implements ICacheStorePort, OnApplicationShutdown
 
   private static readonly SCAN_BATCH_SIZE = 100;
 
+  private shutdown: Maybe<Promise<void>>;
+
   constructor(
     @Inject(CACHE_REDIS_CLIENT_TOKEN)
     private readonly redis: Redis,
@@ -62,6 +64,16 @@ export class CacheStoreAdapter implements ICacheStorePort, OnApplicationShutdown
   }
 
   public async onApplicationShutdown(): Promise<void> {
+    this.shutdown ??= this.closeConnection();
+
+    await this.shutdown;
+  }
+
+  private async closeConnection(): Promise<void> {
+    if (this.redis.status === 'end') {
+      return;
+    }
+
     if (this.redis.status === 'ready') {
       await this.redis.quit();
 

@@ -1,6 +1,7 @@
 name: 05-without-roles
 description: |-
-  e2e: Access › User › POST /api/access/users › should create a user without roles for an empty list
+  e2e: Access › User › POST /api/access/users
+  it: should create a user without roles for an empty list
 
   Expect: 201 Created, a user row and no row in staff_user_roles
   User: admin@example.com (token signed by scripts.py)

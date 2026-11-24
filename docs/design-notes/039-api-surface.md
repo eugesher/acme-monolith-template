@@ -102,7 +102,7 @@ No request carries that version, so the filter answers 500, not 400.
 
 **Every status a route refuses with has a response.** `ApiReference.setup` declares
 `ErrorResponseDto` the `default` response of every operation.
-`@ApiErrorResponses({ statuses: <Filter>.STATUS, codes: [...] })` of `libs/http` adds a response for
-each status of the codes the route refuses with, its codes in the description, and a 400 names
+`@ApiErrorResponses({ filterStatus: <Filter>.STATUS, codes: [...] })` of `libs/http` adds a response
+for each status of the codes the route refuses with, its codes in the description, and a 400 names
 `VALIDATION_FAILED` before them. The statuses come from the public `STATUS` of the filter that
 answers them, so the document cannot drift from the answer.

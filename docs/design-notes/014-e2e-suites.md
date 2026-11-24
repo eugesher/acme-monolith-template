@@ -143,9 +143,9 @@ its 400 reads, a request without the key on each route that requires `Idempotenc
 malformed `If-Match`.
 
 **A catalog case clears its own keys, not the database.** The queues live in the same Redis, under
-`acme:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters. `hooks()`
-deletes the `acme:catalog:*` keys before each case, and the cases list those keys only: BullMQ
-writes its own keys at any moment.
+`acme-e2e:queue:*` (see `032-queue-lib.md`), so `FLUSHDB` would drop their jobs and counters.
+`hooks()` deletes the `acme:catalog:*` keys before each case, and the cases list those keys only:
+BullMQ writes its own keys at any moment.
 
 **staff-app and customer-app read the job, not the ledger.** Neither processes the queue, so their
 contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-record`
@@ -270,6 +270,15 @@ processor-app over HTTP, so the context creates its Nest application and calls `
 `listen`: its processors run and its schedule is registered, and it opens no port that would take
 the `PORT` of the API app.
 
+**Each app has its own data source, under one name.** A system suite prints the warning of
+`DataSourceNameRegistry` of `@nestjs/typeorm`: "A data source with the default name is already
+registered". The registry is one set for the process, and `TypeOrmModule.forRootAsync()` writes the
+name into it when the decorator of `AppModule` runs, so the import of the second `AppModule` finds
+`default` taken, before any app starts and so through the console logger of Nest, not pino. Nothing
+is overridden: each app has its own container from `Test.createTestingModule`, its own `DataSource`
+and its own pool, and TypeORM keeps no global registry of connections. A `name` per app would change
+the token of `DataSource` everywhere it is injected by class, and the warning is left as it is.
+
 **`test/system` is not plain node.** It compiles project code, so it has its own `tsconfig.json`
 over the root one and the lint category `repo:system`: it sees its own files, the `AppModule` of
 every app through its barrel `@acme-<app>/app`, the contracts of core, the libs `kernel`, `toolkit`,
@@ -295,5 +304,5 @@ is what checks their shape. The same config adapts three test rules to the secti
 
 ## HTTP collection
 
-`.http/` holds a [Posting](https://posting.sh) collection per app with one request per e2e case. See
-`.http/README.md`.
+`.http/` holds a [Posting](https://posting.sh) collection per app with one request per e2e case that
+goes through HTTP, and names the `it` it repeats. See `.http/README.md`.

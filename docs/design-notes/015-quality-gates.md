@@ -172,6 +172,17 @@ by keeping its result. Where a declared type is narrower than the runtime value,
 `as Maybe<…>`: an annotated `const` is narrowed back by its initializer, and
 `no-unnecessary-condition` would then flag the check.
 
+**`override` stands where the compiler asks for it.** `tsconfig.json` sets `noImplicitOverride`, so
+a member that replaces a concrete member of its base carries `override`: `catch` of
+`DomainHttpExceptionFilter`, `init` and `close` of the e2e contexts, the methods of
+`SnakeNamingStrategy`. The compiler asks for it too where an abstract class declares an abstract
+member of its base again, as the base exception of a module narrows `code` of `DomainException`
+(`public abstract override readonly code: <Context>ExceptionCodeEnum`). A concrete class that
+implements an abstract member writes no `override`: an exception sets `public readonly code`, a
+filter `protected readonly status`. It fulfils a contract, as a method of an interface does, and the
+compiler already refuses the class when the abstract member is renamed, so the word marks only a
+member whose base behavior is replaced.
+
 ## Test rules
 
 `lint/configs/specs.mjs` lays `eslint-plugin-jest`'s `flat/recommended` over every spec, e2e spec

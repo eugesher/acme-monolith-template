@@ -12,14 +12,16 @@ module.exports = (options, rspack) => {
   }
 
   const appName = match[1];
+  const sourceMaps = process.env.RSPACK_SOURCE_MAPS === 'true';
 
   return {
     ...options,
-    devtool: false,
+    devtool: sourceMaps ? 'source-map' : false,
     output: {
       path: path.resolve(__dirname, 'dist/apps', appName),
       filename: 'main.js',
       library: { type: 'commonjs2' },
+      devtoolModuleFilenameTemplate: '[absolute-resource-path]',
       clean: true,
     },
     resolve: {

@@ -8,12 +8,12 @@ import type { IApiErrorResponsesOptions } from './api-error-responses.options';
 export const ApiErrorResponses = <TCode extends string>(
   options: IApiErrorResponsesOptions<TCode>,
 ): MethodDecorator & ClassDecorator => {
-  const { statuses, codes } = options;
-  const answeredStatuses = codes.map((code) => statuses[code]);
+  const { filterStatus, codes } = options;
+  const answeredStatuses = codes.map((code) => filterStatus[code]);
   const distinctStatuses = [...new Set(answeredStatuses)];
 
   const responses = distinctStatuses.map((status) => {
-    const statusCodes = codes.filter((code) => statuses[code] === status);
+    const statusCodes = codes.filter((code) => filterStatus[code] === status);
     const describedCodes =
       status === HttpStatus.BAD_REQUEST ? [StrictValidationPipe.CODE, ...statusCodes] : statusCodes;
     const description = describedCodes.join(', ');

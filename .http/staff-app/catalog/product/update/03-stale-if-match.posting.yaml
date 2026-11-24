@@ -1,6 +1,7 @@
 name: 03-stale-if-match
 description: |-
-  e2e: Catalog › Product › PATCH /api/catalog/products/:productId › should refuse a stale If-Match with 412 and the current version
+  e2e: Catalog › Product › PATCH /api/catalog/products/:productId
+  it: should refuse a stale If-Match with 412 and the current version
 
   Expect: 412 Precondition Failed, code VERSION_MISMATCH, details.currentVersion 1
   User: editor@example.com (token signed by scripts.py)

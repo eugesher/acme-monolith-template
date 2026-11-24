@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Customer } from '../customer-identity/customer.entity';
+import { Customer } from '../customer/customer.entity';
 import { OrderProduct } from './order-product.entity';
 
 @Entity({ name: 'order' })

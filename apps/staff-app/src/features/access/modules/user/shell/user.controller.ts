@@ -29,7 +29,7 @@ export class UserController {
   @ApiOperation({ summary: 'Create a principal' })
   @ApiCreatedResponse({ type: UserResponseDto })
   @ApiErrorResponses({
-    statuses: UserHttpExceptionFilter.STATUS,
+    filterStatus: UserHttpExceptionFilter.STATUS,
     codes: [
       IdentityExceptionCodeEnum.AUTH_EMAIL_INVALID,
       IdentityExceptionCodeEnum.AUTH_PASSWORD_TOO_WEAK,
@@ -48,7 +48,7 @@ export class UserController {
   @ApiOperation({ summary: 'Reassign the roles of a principal' })
   @ApiOkResponse({ type: UserRolesResponseDto })
   @ApiErrorResponses({
-    statuses: UserHttpExceptionFilter.STATUS,
+    filterStatus: UserHttpExceptionFilter.STATUS,
     codes: [
       IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND,
       IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,

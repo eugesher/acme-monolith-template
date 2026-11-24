@@ -58,10 +58,14 @@ of its own (see `022-enqueue-after-commit.md`). The job options are the private 
 to `ledger-record` and to `product-stock-post-subtract`; options read from the environment of each
 app would let their jobs retry differently, while the code of the lib is the same in every app.
 
-**The keys of every queue start with `acme:queue`.** The private constant `PREFIX` replaces the
-default `bull` of BullMQ, so the queues sit in the namespace of the template next to the keys of the
-cache (`acme:catalog:*`, see `020-cross-app-cache-invalidation.md`), apart from any other user of
-`bull` in the same Redis, such as Bull, whose keys have other structures.
+**The keys of every queue start with `QUEUE_PREFIX`.** It replaces the default `bull` of BullMQ:
+`acme:queue` in `.env.example` puts the queues in the namespace of the template next to the keys of
+the cache (`acme:catalog:*`, see `020-cross-app-cache-invalidation.md`), apart from any other user
+of `bull` in the same Redis, such as Bull, whose keys have other structures. The e2e suites set
+`acme-e2e:queue` in `.env.test`: a local run and the e2e share one Redis, and a worker of a local
+`processor-app` would otherwise take the jobs of a suite. Unlike the job options, the prefix comes
+from the environment, since it tells environments apart, not apps: every app of one environment sets
+the same value, or a producer and its worker meet on different keys and the jobs wait unseen.
 
 **`registerQueue` takes the name alone.** `@nestjs/bullmq` merges the root options and the queue
 options shallowly, so a queue with `defaultJobOptions` of its own would replace the root ones as a

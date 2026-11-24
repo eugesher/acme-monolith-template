@@ -1,6 +1,7 @@
 name: 04-missing-revision-table
 description: |-
-  e2e: Tools › Note › PATCH /api/tools/notes/:noteId › should answer 500 and roll the note back when the revision table is missing
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId
+  it: should answer 500 and roll the note back when the revision table is missing
 
   Expect: 500 Internal Server Error, code INTERNAL_SERVER_ERROR; note 203 stays at version 1 with its body
   User: admin@example.com (token signed by scripts.py)

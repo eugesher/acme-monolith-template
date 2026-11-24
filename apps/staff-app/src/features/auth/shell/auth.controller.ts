@@ -30,7 +30,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Exchange staff credentials for an access token' })
   @ApiOkResponse({ type: AuthAccessTokenResponseDto })
   @ApiErrorResponses({
-    statuses: AuthHttpExceptionFilter.STATUS,
+    filterStatus: AuthHttpExceptionFilter.STATUS,
     codes: [
       IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
       IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
@@ -46,7 +46,7 @@ export class AuthController {
   @ApiOperation({ summary: 'The authenticated staff user and the roles they hold' })
   @ApiOkResponse({ type: AuthMeResponseDto })
   @ApiErrorResponses({
-    statuses: AuthHttpExceptionFilter.STATUS,
+    filterStatus: AuthHttpExceptionFilter.STATUS,
     codes: [IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND],
   })
   public async handleMe(@CurrentUser() user: IAuthCurrentUserView): Promise<AuthMeResponseDto> {

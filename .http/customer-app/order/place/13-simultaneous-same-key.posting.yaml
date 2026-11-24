@@ -1,0 +1,28 @@
+name: 13-simultaneous-same-key
+description: |-
+  e2e: Order › POST /api/orders
+  it: should place one order for simultaneous requests under one key and replay or refuse the others
+
+  Expect: 201 Created for the request that claims the key; each other one answers the same 201 or 409 Conflict IDEMPOTENT_REQUEST_IN_FLIGHT; one order is written
+  User: carol@example.com (token signed by scripts.py)
+  Note: the e2e sends it three times at once
+method: POST
+url: $CUSTOMER_APP_BASE_URL/orders
+body:
+  content: |-
+    {
+      "productIds": [
+        "100"
+      ]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Idempotency-Key
+    value: e2e-order-same-key-race
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_carol

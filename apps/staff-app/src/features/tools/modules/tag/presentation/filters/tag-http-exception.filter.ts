@@ -12,5 +12,5 @@ export class TagHttpExceptionFilter extends DomainHttpExceptionFilter<TagBaseExc
     [TagExceptionCodeEnum.TAG_NAME_TAKEN]: HttpStatus.CONFLICT,
   };
 
-  protected override readonly status = TagHttpExceptionFilter.STATUS;
+  protected readonly status = TagHttpExceptionFilter.STATUS;
 }

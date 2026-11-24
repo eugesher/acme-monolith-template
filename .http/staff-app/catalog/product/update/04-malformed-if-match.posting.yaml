@@ -1,6 +1,7 @@
 name: 04-malformed-if-match
 description: |-
-  e2e: Catalog › Product › PATCH /api/catalog/products/:productId › should refuse a malformed If-Match with 400
+  e2e: Catalog › Product › PATCH /api/catalog/products/:productId
+  it: should refuse a malformed If-Match with 400
 
   Expect: 400 Bad Request, code IF_MATCH_INVALID
   User: editor@example.com (token signed by scripts.py)

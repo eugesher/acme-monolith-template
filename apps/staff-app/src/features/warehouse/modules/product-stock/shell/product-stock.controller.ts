@@ -28,7 +28,7 @@ export class ProductStockController {
   @ApiOperation({ summary: 'Add units to the stock of a product (idempotent)' })
   @ApiOkResponse({ type: ProductStockResponseDto })
   @ApiErrorResponses({
-    statuses: ProductStockHttpExceptionFilter.STATUS,
+    filterStatus: ProductStockHttpExceptionFilter.STATUS,
     codes: [
       ProductStockExceptionCodeEnum.PRODUCT_STOCK_QUANTITY_INVALID,
       ProductStockExceptionCodeEnum.PRODUCT_STOCK_PRODUCT_NOT_FOUND,

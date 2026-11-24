@@ -35,33 +35,24 @@ describe('LoggerSetupConfig', () => {
     expect(config.pinoHttp.transport).toBeUndefined();
   });
 
-  it('logs debug through pino-pretty in development', () => {
-    process.env.NODE_ENV = 'development';
-
-    const config = new LoggerSetupConfig(AppNameEnum.STAFF_APP);
-
-    expect(config.pinoHttp.level).toBe('debug');
-    expect(config.pinoHttp.transport).toEqual({
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        singleLine: false,
-        translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-        messageFormat: '[{app}] {if context}[{context}] {end}{msg}',
-        ignore: 'pid,hostname,app,context',
-      },
-    });
-  });
-
-  it.each(['test', undefined])(
-    'logs debug without pretty printing when NODE_ENV is %s',
+  it.each(['development', 'test', undefined])(
+    'logs debug through pino-pretty on one line when NODE_ENV is %s',
     (nodeEnv) => {
       process.env.NODE_ENV = nodeEnv;
 
       const config = new LoggerSetupConfig(AppNameEnum.STAFF_APP);
 
       expect(config.pinoHttp.level).toBe('debug');
-      expect(config.pinoHttp.transport).toBeUndefined();
+      expect(config.pinoHttp.transport).toEqual({
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          singleLine: true,
+          translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
+          messageFormat: '[{app}] {if context}[{context}] {end}{msg}',
+          ignore: 'pid,hostname,app,context',
+        },
+      });
     },
   );
 
@@ -140,6 +131,34 @@ describe('LoggerSetupConfig', () => {
     expect(config.pinoHttp.redact).toEqual({
       paths: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
       remove: true,
+    });
+  });
+
+  describe('request line', () => {
+    let config: LoggerSetupConfig;
+
+    beforeEach(() => {
+      config = new LoggerSetupConfig(AppNameEnum.STAFF_APP);
+    });
+
+    it('names the method, the path, the status and the duration of a completed request', () => {
+      const message = config.pinoHttp.customSuccessMessage?.(
+        { method: 'GET', url: '/api/health' } as never,
+        { statusCode: 200 } as never,
+        3,
+      );
+
+      expect(message).toBe('GET /api/health 200 3ms');
+    });
+
+    it('names the method, the path, the status and the error of a failed request', () => {
+      const message = config.pinoHttp.customErrorMessage?.(
+        { method: 'POST', url: '/api/orders' } as never,
+        { statusCode: 500 } as never,
+        new Error('failed with status code 500'),
+      );
+
+      expect(message).toBe('POST /api/orders 500 failed: failed with status code 500');
     });
   });
 

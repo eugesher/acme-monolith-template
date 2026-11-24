@@ -5,7 +5,6 @@ import type { DynamicModule } from '@nestjs/common';
 import { RedisConfigHelper } from '@acme-libs/config';
 
 export class BullSetupModule {
-  private static readonly PREFIX = 'acme:queue';
   private static readonly DEFAULT_JOB_OPTIONS: BullRootModuleOptions['defaultJobOptions'] = {
     attempts: 3,
     backoff: { type: 'exponential', delay: 1000 },
@@ -28,7 +27,7 @@ export class BullSetupModule {
 
     return {
       connection,
-      prefix: BullSetupModule.PREFIX,
+      prefix: config.getOrThrow<string>('QUEUE_PREFIX'),
       defaultJobOptions: BullSetupModule.DEFAULT_JOB_OPTIONS,
     };
   }

@@ -1,6 +1,7 @@
 name: 02-same-body
 description: |-
-  e2e: Tools › Note › PATCH /api/tools/notes/:noteId › should write nothing for an edit to the current body
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId
+  it: should write nothing for an edit to the current body
 
   Expect: 200 OK, note 204 stays at version 1, no revision
   User: admin@example.com (token signed by scripts.py)

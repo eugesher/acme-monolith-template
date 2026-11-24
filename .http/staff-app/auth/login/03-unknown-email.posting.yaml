@@ -1,6 +1,8 @@
 name: 03-unknown-email
 description: |-
-  e2e: Auth › POST /api/auth/login › should refuse an unknown email with the same 401
+  e2e: Auth › POST /api/auth/login
+  it: should refuse %s with the same 401
+  Row: an unknown email
 
   Expect: 401 Unauthorized, code AUTH_INVALID_CREDENTIALS
 method: POST

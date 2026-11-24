@@ -1,6 +1,7 @@
 name: 04-unknown
 description: |-
-  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish › should answer 404 for an unknown product
+  e2e: Catalog › Product › POST /api/catalog/products/:productId/publish
+  it: should answer 404 for an unknown product
 
   Expect: 404 Not Found, code PRODUCT_NOT_FOUND
   User: editor@example.com (token signed by scripts.py)

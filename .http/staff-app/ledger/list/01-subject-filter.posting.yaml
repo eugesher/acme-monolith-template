@@ -1,0 +1,19 @@
+name: 01-subject-filter
+description: |-
+  e2e: Ledger › GET /api/ledger
+  it: should list the entries of one subject
+
+  Expect: 200 OK, entry 400 product-created:100
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/ledger
+params:
+  - name: subjectType
+    value: product
+  - name: subjectId
+    value: '100'
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

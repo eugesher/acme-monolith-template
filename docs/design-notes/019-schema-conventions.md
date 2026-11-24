@@ -7,13 +7,14 @@ of `core/entities/src/order` and `core/entities/src/product`.
 **Every surrogate key is `BIGINT UNSIGNED`.** A surrogate primary key is
 `BIGINT UNSIGNED AUTO_INCREMENT` (`@PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })`),
 and every column that references one has the same type, so a join never casts. A link table has a
-composite key of its columns: `staff_user_roles (user_id, role_id)` and
+composite key of its columns: `staff_user_roles (user_id, role_id)`,
 `staff_role_permissions (role_id, code)`, where `code` is a `VARCHAR(64)` holding a value of
-`PermissionCodeEnum`. The driver returns a `bigint` as a string, so an id is a `string` in
-TypeScript, and the bases of `libs/domain` take `string` for their id by default. The database
-issues the id on insert: the domain answers a candidate row without an id
-(`AuthCustomerCandidateModel.toInsertPayload()` answers `IAuthCustomerCandidateInsertPayload`), and
-the repository returns the issued id (`AuthRegisterRepository.insert`).
+`PermissionCodeEnum`, and `tag_subject (tag_id, subject_type, subject_id)`. The driver returns a
+`bigint` as a string, so an id is a `string` in TypeScript, and the bases of `libs/domain` take
+`string` for their id by default. The database issues the id on insert: the domain answers a
+candidate row without an id (`AuthCustomerCandidateModel.toInsertPayload()` answers
+`IAuthCustomerCandidateInsertPayload`), and the repository returns the issued id
+(`AuthRegisterRepository.insert`).
 
 **A quantity is a sum of signed movements.** `product_stock` stores one row per movement, and the
 value is `SUM(quantity)` over the rows of a key. No column holds the current value, so no update can

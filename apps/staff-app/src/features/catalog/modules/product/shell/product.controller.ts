@@ -61,7 +61,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Create a product' })
   @ApiCreatedResponse({ type: ProductResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [
       ProductExceptionCodeEnum.PRODUCT_SKU_INVALID,
       ProductExceptionCodeEnum.PRODUCT_NAME_INVALID,
@@ -91,7 +91,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Read one catalog product' })
   @ApiOkResponse({ type: ProductResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [ProductExceptionCodeEnum.PRODUCT_NOT_FOUND],
   })
   public async handleGetOne(@Param() params: ProductIdParamDto): Promise<ProductResponseDto> {
@@ -106,7 +106,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Update the fields of a product (optimistic concurrency)' })
   @ApiOkResponse({ type: ProductResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [
       ProductExceptionCodeEnum.PRODUCT_NAME_INVALID,
       ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
@@ -134,7 +134,7 @@ export class ProductController {
   })
   @ApiOkResponse({ type: ProductResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [
       ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
       ProductExceptionCodeEnum.PRODUCT_VERSION_CONFLICT,
@@ -157,7 +157,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Archive a product (optimistic concurrency)' })
   @ApiOkResponse({ type: ProductResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [
       ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
       ProductExceptionCodeEnum.PRODUCT_ALREADY_ARCHIVED,
@@ -178,7 +178,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Read the tags of a product, by name' })
   @ApiOkResponse({ type: ProductTagsResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [ProductExceptionCodeEnum.PRODUCT_NOT_FOUND],
   })
   public async handleGetTags(@Param() params: ProductIdParamDto): Promise<ProductTagsResponseDto> {
@@ -192,7 +192,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Replace the tags of a product' })
   @ApiOkResponse({ type: ProductTagsResponseDto })
   @ApiErrorResponses({
-    statuses: ProductHttpExceptionFilter.STATUS,
+    filterStatus: ProductHttpExceptionFilter.STATUS,
     codes: [
       ProductExceptionCodeEnum.PRODUCT_NOT_FOUND,
       ProductExceptionCodeEnum.PRODUCT_TAG_NOT_FOUND,

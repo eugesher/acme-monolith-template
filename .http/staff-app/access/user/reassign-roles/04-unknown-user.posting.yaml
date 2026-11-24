@@ -1,6 +1,7 @@
 name: 04-unknown-user
 description: |-
-  e2e: Access › User › PUT /api/access/users/:userId/roles › should answer 404 for an unknown user
+  e2e: Access › User › PUT /api/access/users/:userId/roles
+  it: should answer 404 for an unknown user
 
   Expect: 404 Not Found, code AUTH_USER_NOT_FOUND
   User: admin@example.com (token signed by scripts.py)

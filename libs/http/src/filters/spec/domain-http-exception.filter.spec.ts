@@ -26,7 +26,7 @@ describe('DomainHttpExceptionFilter', () => {
 
   @Catch(ItemVersionMismatchException)
   class ItemHttpExceptionFilter extends DomainHttpExceptionFilter<ItemVersionMismatchException> {
-    protected override readonly status = { VERSION_MISMATCH: HttpStatus.CONFLICT };
+    protected readonly status = { VERSION_MISMATCH: HttpStatus.CONFLICT };
   }
 
   let catchSpy: jest.SpyInstance<void, [unknown, ArgumentsHost]>;

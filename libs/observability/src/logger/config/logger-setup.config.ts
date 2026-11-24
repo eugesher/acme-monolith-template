@@ -37,26 +37,30 @@ export class LoggerSetupConfig implements Params {
 
         return res.statusCode >= 400 ? 'warn' : 'info';
       },
+      customSuccessMessage: (req, res, responseTime) =>
+        `${req.method} ${req.url} ${res.statusCode} ${responseTime}ms`,
+      customErrorMessage: (req, res, error) =>
+        `${req.method} ${req.url} ${res.statusCode} failed: ${error.message}`,
       redact: {
         paths: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
         remove: true,
       },
     };
 
-    this.pinoHttp = EnvHelper.isDevelopment()
-      ? {
+    this.pinoHttp = isProduction
+      ? baseOptions
+      : {
           ...baseOptions,
           transport: {
             target: 'pino-pretty',
             options: {
               colorize: true,
-              singleLine: false,
+              singleLine: true,
               translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
               messageFormat: '[{app}] {if context}[{context}] {end}{msg}',
               ignore: 'pid,hostname,app,context',
             },
           },
-        }
-      : baseOptions;
+        };
   }
 }

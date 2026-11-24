@@ -1,0 +1,7 @@
+name: 01-success
+description: |-
+  e2e: Health › GET /api/health/ready
+  it: should report readiness of the database and the cache
+
+  Expect: 200 OK, status ready, database and cache ok
+url: $PROCESSOR_APP_BASE_URL/health/ready

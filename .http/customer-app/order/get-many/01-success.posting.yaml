@@ -1,0 +1,14 @@
+name: 01-success
+description: |-
+  e2e: Order › GET /api/orders
+  it: should list only the orders of the caller, newest first, without their products
+
+  Expect: 200 OK, orders 602 and 601, total 2
+  User: bob@example.com (token signed by scripts.py)
+url: $CUSTOMER_APP_BASE_URL/orders
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_bob

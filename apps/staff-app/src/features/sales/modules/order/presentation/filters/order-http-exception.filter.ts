@@ -11,5 +11,5 @@ export class OrderHttpExceptionFilter extends DomainHttpExceptionFilter<OrderBas
     [OrderExceptionCodeEnum.ORDER_TAG_NOT_FOUND]: HttpStatus.UNPROCESSABLE_ENTITY,
   };
 
-  protected override readonly status = OrderHttpExceptionFilter.STATUS;
+  protected readonly status = OrderHttpExceptionFilter.STATUS;
 }

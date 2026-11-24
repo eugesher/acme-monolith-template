@@ -1,0 +1,14 @@
+name: 05-malformed-id
+description: |-
+  e2e: Order › GET /api/orders/:orderId
+  it: should refuse an order id that is not a number with 400 from validation
+
+  Expect: 400 Bad Request, code VALIDATION_FAILED, orderId must be a positive integer
+  User: bob@example.com (token signed by scripts.py)
+url: $CUSTOMER_APP_BASE_URL/orders/latest
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_bob

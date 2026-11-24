@@ -12,5 +12,5 @@ export class RoleHttpExceptionFilter extends DomainHttpExceptionFilter<RoleBaseE
     [IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN]: HttpStatus.CONFLICT,
   };
 
-  protected override readonly status = RoleHttpExceptionFilter.STATUS;
+  protected readonly status = RoleHttpExceptionFilter.STATUS;
 }

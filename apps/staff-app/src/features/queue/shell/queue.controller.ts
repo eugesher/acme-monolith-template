@@ -56,7 +56,7 @@ export class QueueController {
   @ApiOperation({ summary: 'Browse the failed jobs of a queue, newest first' })
   @ApiOkResponse({ type: QueueFailedJobPageResponseDto })
   @ApiErrorResponses({
-    statuses: QueueHttpExceptionFilter.STATUS,
+    filterStatus: QueueHttpExceptionFilter.STATUS,
     codes: [QueueExceptionCodeEnum.QUEUE_NOT_FOUND],
   })
   public async handleListFailedJobs(
@@ -75,7 +75,7 @@ export class QueueController {
   @ApiOperation({ summary: 'Return a failed job to the queue' })
   @ApiNoContentResponse()
   @ApiErrorResponses({
-    statuses: QueueHttpExceptionFilter.STATUS,
+    filterStatus: QueueHttpExceptionFilter.STATUS,
     codes: [
       QueueExceptionCodeEnum.QUEUE_NOT_FOUND,
       QueueExceptionCodeEnum.QUEUE_JOB_NOT_FOUND,
@@ -98,7 +98,7 @@ export class QueueController {
   @ApiOperation({ summary: 'Delete a failed job' })
   @ApiNoContentResponse()
   @ApiErrorResponses({
-    statuses: QueueHttpExceptionFilter.STATUS,
+    filterStatus: QueueHttpExceptionFilter.STATUS,
     codes: [
       QueueExceptionCodeEnum.QUEUE_NOT_FOUND,
       QueueExceptionCodeEnum.QUEUE_JOB_NOT_FOUND,

@@ -56,7 +56,7 @@ export class TagController {
   @ApiOperation({ summary: 'Create a tag' })
   @ApiCreatedResponse({ type: TagResponseDto })
   @ApiErrorResponses({
-    statuses: TagHttpExceptionFilter.STATUS,
+    filterStatus: TagHttpExceptionFilter.STATUS,
     codes: [TagExceptionCodeEnum.TAG_NAME_INVALID, TagExceptionCodeEnum.TAG_NAME_TAKEN],
   })
   public async handleCreate(@Body() body: TagCreateRequestDto): Promise<TagResponseDto> {
@@ -80,7 +80,7 @@ export class TagController {
   @ApiOperation({ summary: 'Rename a tag' })
   @ApiOkResponse({ type: TagResponseDto })
   @ApiErrorResponses({
-    statuses: TagHttpExceptionFilter.STATUS,
+    filterStatus: TagHttpExceptionFilter.STATUS,
     codes: [
       TagExceptionCodeEnum.TAG_NAME_INVALID,
       TagExceptionCodeEnum.TAG_NOT_FOUND,
@@ -103,7 +103,7 @@ export class TagController {
   @ApiOperation({ summary: 'Delete a tag and unlink it from every subject' })
   @ApiNoContentResponse()
   @ApiErrorResponses({
-    statuses: TagHttpExceptionFilter.STATUS,
+    filterStatus: TagHttpExceptionFilter.STATUS,
     codes: [TagExceptionCodeEnum.TAG_NOT_FOUND],
   })
   public async handleDelete(@Param() params: TagIdParamDto): Promise<void> {

@@ -7,9 +7,9 @@ module of the template: two modules of staff-app call the same facade methods, s
 | Part                             | Where                                           | Who calls it                     |
 | -------------------------------- | ----------------------------------------------- | -------------------------------- |
 | the dictionary, `tag`            | `apps/staff-app/src/features/tools/modules/tag` | `/tools/tags`                    |
-| the links, `subject_tag`         | `apps/staff-app/src/common/modules/tag`         | staff `product`, staff `order`   |
+| the links, `tag_subject`         | `apps/staff-app/src/common/modules/tag`         | staff `product`, staff `order`   |
 | the contract of the links        | `apps/staff-app/src/contracts/tag`              | the common-adapters of callers   |
-| the entities `Tag`, `SubjectTag` | `apps/staff-app/src/common/entities/tag`        | both modules, each its own model |
+| the entities `Tag`, `TagSubject` | `apps/staff-app/src/common/entities/tag`        | both modules, each its own model |
 
 ## Routes
 
@@ -29,11 +29,12 @@ module of the template: two modules of staff-app call the same facade methods, s
 ## Schema
 
 `tag` holds the name under `uq_tag_name`. The collation is case-insensitive, so `Fragile` and
-`fragile` are one name. `subject_tag` links a subject to a tag by `tagId`: `subject_type` names the
-caller (`TagCommonSubjectTypeEnum`), `subject_id` is its key, and a rename touches no link.
-`uq_subject_tag_subject_tag (subject_type, subject_id, tag_id)` keeps a link single, and
-`idx_subject_tag_tag (tag_id, subject_type, subject_id)` serves both the foreign key and the filter.
-No foreign key points at the subject, since the table serves several; the caller checks the subject.
+`fragile` are one name. `tag_subject` links a tag to a subject by `tagId`: `subject_type` names the
+caller (`TagCommonSubjectTypeEnum`), `subject_id` is its key, and a rename touches no link. The
+primary key `(tag_id, subject_type, subject_id)` keeps a link single and serves both the foreign key
+and the filter, and `idx_tag_subject_subject (subject_type, subject_id)` serves the tags of a
+subject. A link has no id of its own: nothing points at it, and its columns name it. No foreign key
+points at the subject, since the table serves several; the caller checks the subject.
 
 ## Two modules over one table
 
@@ -64,7 +65,7 @@ instead of breaking the foreign key of a new link.
 ## The filter
 
 `?tagId=` asks the facade for the subject ids that carry the tag, then lists its own table with
-`WHERE id IN (...)`. No repository of `product` or `order` joins `subject_tag`: that table belongs
+`WHERE id IN (...)`. No repository of `product` or `order` joins `tag_subject`: that table belongs
 to the common module, and the lint forbids reaching it. A tag no subject carries answers an empty
 page without a query. The id list grows with the tagged subjects; a catalog where one tag marks tens
 of thousands of rows needs a paged lookup instead.

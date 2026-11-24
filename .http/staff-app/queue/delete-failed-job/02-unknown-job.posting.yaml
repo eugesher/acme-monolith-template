@@ -1,6 +1,7 @@
 name: 02-unknown-job
 description: |-
-  e2e: Queue › DELETE /api/queues/:queueName/jobs/failed/:jobId › should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND
+  e2e: Queue › DELETE /api/queues/:queueName/jobs/failed/:jobId
+  it: should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND
 
   Expect: 404 Not Found, code QUEUE_JOB_NOT_FOUND
   User: admin@example.com (token signed by scripts.py)

@@ -50,7 +50,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Read one order with its products' })
   @ApiOkResponse({ type: OrderResponseDto })
   @ApiErrorResponses({
-    statuses: OrderHttpExceptionFilter.STATUS,
+    filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
   public async handleGetOne(@Param() params: OrderIdParamDto): Promise<OrderResponseDto> {
@@ -64,7 +64,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Read the tags of an order, by name' })
   @ApiOkResponse({ type: OrderTagsResponseDto })
   @ApiErrorResponses({
-    statuses: OrderHttpExceptionFilter.STATUS,
+    filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
   public async handleGetTags(@Param() params: OrderIdParamDto): Promise<OrderTagsResponseDto> {
@@ -78,7 +78,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Replace the tags of an order' })
   @ApiOkResponse({ type: OrderTagsResponseDto })
   @ApiErrorResponses({
-    statuses: OrderHttpExceptionFilter.STATUS,
+    filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND, OrderExceptionCodeEnum.ORDER_TAG_NOT_FOUND],
   })
   public async handleReplaceTags(

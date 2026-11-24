@@ -61,7 +61,7 @@ describe('AppBootstrap', () => {
         ['enableShutdownHooks'],
         ['ApiReference.setup', app, 'staff-app'],
         ['listen', 3000],
-        ['log', 'staff-app is listening on port 3000'],
+        ['log', 'staff-app is listening on port 3000', 'AppBootstrap'],
       ]);
     });
 

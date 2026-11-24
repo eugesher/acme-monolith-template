@@ -1,6 +1,7 @@
 name: 02-taken-name
 description: |-
-  e2e: Tools › Tag › POST /api/tools/tags › should refuse a name that differs from a taken one only in case with 409
+  e2e: Tools › Tag › POST /api/tools/tags
+  it: should refuse a name that differs from a taken one only in case with 409
 
   Expect: 409 Conflict, code TAG_NAME_TAKEN
   User: editor@example.com (token signed by scripts.py)

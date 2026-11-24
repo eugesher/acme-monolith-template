@@ -1,6 +1,7 @@
 name: 08-without-key
 description: |-
-  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add › should refuse a restock without a key with 400
+  e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
+  it: should refuse a restock without a key with 400
 
   Expect: 400 Bad Request, code IDEMPOTENCY_KEY_REQUIRED
   User: editor@example.com (token signed by scripts.py)

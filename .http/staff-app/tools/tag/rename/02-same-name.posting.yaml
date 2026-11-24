@@ -1,6 +1,7 @@
 name: 02-same-name
 description: |-
-  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId › should answer the tag as it is when the name does not change
+  e2e: Tools › Tag › PATCH /api/tools/tags/:tagId
+  it: should answer the tag as it is when the name does not change
 
   Expect: 200 OK, tag 390 still named seasonal
   User: editor@example.com (token signed by scripts.py)
