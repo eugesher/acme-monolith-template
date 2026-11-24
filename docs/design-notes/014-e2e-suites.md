@@ -270,6 +270,15 @@ processor-app over HTTP, so the context creates its Nest application and calls `
 `listen`: its processors run and its schedule is registered, and it opens no port that would take
 the `PORT` of the API app.
 
+**Each app has its own data source, under one name.** A system suite prints the warning of
+`DataSourceNameRegistry` of `@nestjs/typeorm`: "A data source with the default name is already
+registered". The registry is one set for the process, and `TypeOrmModule.forRootAsync()` writes the
+name into it when the decorator of `AppModule` runs, so the import of the second `AppModule` finds
+`default` taken, before any app starts and so through the console logger of Nest, not pino. Nothing
+is overridden: each app has its own container from `Test.createTestingModule`, its own `DataSource`
+and its own pool, and TypeORM keeps no global registry of connections. A `name` per app would change
+the token of `DataSource` everywhere it is injected by class, and the warning is left as it is.
+
 **`test/system` is not plain node.** It compiles project code, so it has its own `tsconfig.json`
 over the root one and the lint category `repo:system`: it sees its own files, the `AppModule` of
 every app through its barrel `@acme-<app>/app`, the contracts of core, the libs `kernel`, `toolkit`,
