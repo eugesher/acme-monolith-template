@@ -19,7 +19,8 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       'apps/__processors-fixture__/src/processors/purge/index.ts',
       'apps/__processors-fixture__/src/processors/purge/shell/purge.module.ts',
       'apps/__processors-fixture__/src/processors/purge/application/index.ts',
-      'apps/__processors-fixture__/src/processors/digest/digest.module.ts',
+      'apps/__processors-fixture__/src/processors/digest/index.ts',
+      'apps/__processors-fixture__/src/processors/digest/shell/digest.module.ts',
       'apps/__processors-fixture__/src/processors/digest/modules/index.ts',
       'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/index.ts',
       'apps/__processors-fixture__/src/processors/digest/modules/digest-daily/shell/digest-daily.module.ts',
@@ -399,8 +400,8 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   describe('nested processors (<module>/modules/<submodule>)', () => {
     it('the aggregator root MAY mount its submodules through modules/index.ts', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/processors/digest/__fixture__.ts',
-        code: 'import { x } from "./modules";',
+        file: 'apps/__processors-fixture__/src/processors/digest/shell/__fixture__.module.ts',
+        code: 'import { x } from "../modules";',
       }).toPassArchitectureLint();
     });
 

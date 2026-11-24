@@ -116,16 +116,13 @@ const areaPolicies = (area, sharedFacing) => {
       layer('infrastructure'),
       ...(sharedFacing.queues ? [layer('queues')] : []),
       layer('shell'),
+      layer('modules:index'),
       to('acme-app:common:shared:index', own('app')),
       to('acme-app:common:modules:index', own('app')),
       to('acme-core:modules:index'),
       ...sharedFacing.module,
     ]),
-    from(`${prefix}:module`, [
-      layer('shell:module'),
-      layer('modules:index'),
-      packages('@nestjs/common'),
-    ]),
+    from(`${prefix}:module`, [layer('shell:module')]),
   ];
 };
 

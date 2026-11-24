@@ -90,13 +90,13 @@ follows the same rules a feature does.
 Nest module and the processor of a processor, sit in `shell/`, and the root of the module holds only
 `index.ts`, which re-exports the Nest module. Lint gives the two kinds of file of `shell/` the
 rights they had before the move: `shell/*.module.ts` (`<area>:shell:module`) mounts and binds, and
-sees the application, the infrastructure, the controller or processor next to it, and the shared and
-module barrels; the rest of `shell/` (`<area>:shell`) is the controller or processor with its spec,
-and sees the domain, the application, the `presentation` of a feature and the HTTP or queue
-packages. A module root binds, so it does not see `presentation`; a DTO is the input of a
-controller, so `presentation` does not see the application. The root barrel sees only the Nest
-module in `shell/` and, in a parent feature, `modules/index.ts`: a parent keeps its Nest module at
-its root, next to `modules/` (see `025-feature-groups.md`).
+sees the application, the infrastructure, the controller or processor next to it, the shared and
+module barrels and, in a parent feature, `modules/index.ts`; the rest of `shell/` (`<area>:shell`)
+is the controller or processor with its spec, and sees the domain, the application, the
+`presentation` of a feature and the HTTP or queue packages. A module root binds, so it does not see
+`presentation`; a DTO is the input of a controller, so `presentation` does not see the application.
+The root barrel sees only the Nest module in `shell/`, in a parent feature too: a parent keeps its
+Nest module in `shell/`, next to `modules/` (see `025-feature-groups.md`).
 
 `infrastructure/queue` of a processor may inject a queue to manage its jobs, as the idempotency
 processor upserts its job scheduler (see `009-scheduled-processor.md`). The module root that binds
