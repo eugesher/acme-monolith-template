@@ -1,4 +1,4 @@
-export * from './customer-identity/customer.entity';
+export * from './customer/customer.entity';
 
 export * from './idempotency/idempotency-key.entity';
 

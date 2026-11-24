@@ -78,4 +78,4 @@ signs the staff in: its `auth` feature checks the password and signs the token b
 
 Tables of one module share a prefix, and indexes and foreign keys repeat the table name, so a
 constraint error in a log points at the module at once. A prefix also avoids reserved words such as
-`user`. Examples: the entities of `apps/staff-app/src/common/entities/identity/`.
+`user`. Examples: the entities of `apps/staff-app/src/common/entities/staff/`.
