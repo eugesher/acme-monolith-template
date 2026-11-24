@@ -5,7 +5,7 @@ and `processor-app` (port 3002).
 
 ## Prerequisites
 
-- Node 26
+- Node 26.13 or later
 - Docker with Compose
 
 ```bash
@@ -22,10 +22,10 @@ yarn install
 ## Environment files
 
 One infrastructure serves a local run, the migrations and the e2e suites; only the config files
-differ. Each `.env.example` in `env/` holds everything needed to connect to that infrastructure and
-run the system; a local run uses gitignored copies of them, and the `.env.test` files are in the
-repository. There are no default values: a missing or invalid variable stops the process with a
-validation error.
+differ. Each `.env.example` in `env/apps/` and `env/migrations/` holds everything needed to connect
+to that infrastructure and run the system; a local run uses gitignored copies of them, and the
+`.env.test` files are in the repository. There are no default values: a missing or invalid variable
+stops the process with a validation error.
 
 | File                       | Read by                                               |
 | -------------------------- | ----------------------------------------------------- |
@@ -143,26 +143,28 @@ cp env/migrations/.env.example env/migrations/.env
 
 Replace these values in the three app files:
 
-| Variable                      | Value                                                                                             |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`                    | `production`                                                                                      |
-| `API_USE_API_REFERENCE`       | `false`                                                                                           |
-| `DATABASE_HOST`               | `mysql`                                                                                           |
-| `DATABASE_PORT`               | `3306`                                                                                            |
-| `DATABASE_USER`               | `acme`                                                                                            |
-| `DATABASE_PASSWORD`           | the value of `MYSQL_PASSWORD`                                                                     |
-| `REDIS_HOST`                  | `redis`                                                                                           |
-| `REDIS_PORT`                  | `6379`                                                                                            |
-| `REDIS_PASSWORD`              | the value of `REDIS_SERVER_PASSWORD`                                                              |
-| `JWT_SECRET`                  | 32 characters or more: one secret for `staff-app` and `processor-app`, another for `customer-app` |
-| `OTEL_SDK_DISABLED`           | `false`                                                                                           |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://otel-collector:4318`                                                                      |
-| `OTEL_RESOURCE_ATTRIBUTES`    | `deployment.environment=production`                                                               |
+| Variable                      | Value                                                                                                 |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                    | `production`                                                                                          |
+| `API_USE_API_REFERENCE`       | `false`                                                                                               |
+| `DATABASE_HOST`               | `mysql`                                                                                               |
+| `DATABASE_PORT`               | `3306`                                                                                                |
+| `DATABASE_USER`               | `acme`                                                                                                |
+| `DATABASE_PASSWORD`           | the value of `MYSQL_PASSWORD`                                                                         |
+| `REDIS_HOST`                  | `redis`                                                                                               |
+| `REDIS_PORT`                  | `6379`                                                                                                |
+| `REDIS_PASSWORD`              | the value of `REDIS_SERVER_PASSWORD`                                                                  |
+| `JWT_SECRET`                  | 32 characters or more, a different secret in `staff-app` and `customer-app`; `processor-app` has none |
+| `OTEL_SDK_DISABLED`           | `false`                                                                                               |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://otel-collector:4318`                                                                          |
+| `OTEL_RESOURCE_ATTRIBUTES`    | `deployment.environment=production`                                                                   |
 
 For a managed MySQL or Redis that requires TLS, mount the file of its certificate authority into the
 containers and set its path in `DATABASE_SSL_CA` or `REDIS_TLS_CA`, also in `env/migrations/.env`
-for the database. Give the apps a MySQL user with `SELECT`, `INSERT`, `UPDATE` and `DELETE` on the
-database, and `env/migrations/.env` a user that may change the schema:
+for the database. The `acme` user of the compose file has every privilege on `acme_db`. To narrow
+the apps to `SELECT`, `INSERT`, `UPDATE` and `DELETE`, create a user for them, set it in
+`DATABASE_USER` and `DATABASE_PASSWORD` of the three app files, and keep `acme` in
+`env/migrations/.env`, which changes the schema:
 
 ```sql
 CREATE USER 'acme_app'@'%' IDENTIFIED BY '<password>';
