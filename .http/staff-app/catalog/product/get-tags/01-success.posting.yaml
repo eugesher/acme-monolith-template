@@ -1,0 +1,14 @@
+name: 01-success
+description: |-
+  e2e: Catalog › Product › GET /api/catalog/products/:productId/tags
+  it: should read the tags of the product, by name
+
+  Expect: 200 OK, tags fragile and promo
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/catalog/products/100/tags
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

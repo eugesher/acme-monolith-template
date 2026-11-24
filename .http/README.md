@@ -46,22 +46,23 @@ A case that sends more than one request has the file of the request it checks, a
 `Note:` says what else the e2e sends:
 
 - the concurrent updates of a product send five requests at once,
-  `catalog/product/update/05-concurrent` sends one;
+  `staff-app/catalog/product/update/05-concurrent-without-if-match` sends one;
 - the replays of a restock and an order send the same request twice, as
   `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with
-  two keys, as `customer-app/order/place/11-simultaneous` says;
+  two keys, as `customer-app/order/place/11-simultaneous-last-units` says;
 - three simultaneous orders under one key send the same request three times at once, as
-  `customer-app/order/place/13-same-key-simultaneous` says;
+  `customer-app/order/place/13-simultaneous-same-key` says;
 - two simultaneous registrations with one email send the same request twice at once, in
-  `customer-app/auth/register/03-simultaneous` and `staff-app/access/user/register/03-simultaneous`;
+  `customer-app/auth/register/03-simultaneous-same-email` and
+  `staff-app/access/user/register/03-simultaneous-same-email`;
 - the sign-up of a customer goes on to log in and read `me` with the new credentials, as
-  `auth/register/01-register` says;
+  `customer-app/auth/register/01-success` says;
 - the soft delete of a note goes on to read the note and its revisions, as
-  `staff-app/tools/note/delete/01-delete` says;
+  `staff-app/tools/note/delete/01-success` says;
 - the replacement of the tags of an order or a product sets them, replaces them and clears them, as
-  `staff-app/sales/order/replace-tags/02-replace` and
-  `staff-app/catalog/product/replace-tags/02-replace` say.
+  `staff-app/sales/order/replace-tags/02-replace-and-clear` and
+  `staff-app/catalog/product/replace-tags/02-replace-and-clear` say.
 
 ## Environment
 
@@ -108,8 +109,8 @@ also covers tokens that no login issues:
 - a token of a user of this app for the audience of the other app
   (`as_editor_for_customer_audience`, `as_ann_for_staff_audience`).
 
-`auth/login/01-editor` of staff-app and `auth/login/01-customer` of customer-app save the token they
-get into the variable `access_token`. The requests that send it say so in `Note:` or `User:`.
+`auth/login/01-success` of staff-app and of customer-app save the token they get into the variable
+`access_token`. The requests that send it say so in `Note:` or `User:`.
 
 ## Setup and cleanup
 

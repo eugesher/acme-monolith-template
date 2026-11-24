@@ -1,0 +1,19 @@
+name: 03-correlation-filter
+description: |-
+  e2e: Ledger › GET /api/ledger
+  it: should list the entries of one correlation id
+
+  Expect: 200 OK, entry 490 e2e-ledger:1 alone
+  User: viewer@example.com (token signed by scripts.py)
+  Before: SQL: INSERT INTO ledger_entry (id, operation_key, subject_type, subject_id, action, payload, correlation_id, occurred_at, recorded_at) VALUES (490, 'e2e-ledger:1', 'product', '101', 'ProductCreated', '{}', 'e2e00000-0000-4000-8000-000000000026', '2026-01-07 08:00:00.000', '2026-01-07 08:00:00.000')
+  After: SQL: DELETE FROM ledger_entry WHERE id = 490
+url: $STAFF_APP_BASE_URL/ledger
+params:
+  - name: correlationId
+    value: e2e00000-0000-4000-8000-000000000026
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

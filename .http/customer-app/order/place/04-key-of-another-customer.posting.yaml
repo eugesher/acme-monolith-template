@@ -5,7 +5,7 @@ description: |-
 
   Expect: 201 Created, a new order of carol with two lines of product 100; two completed idempotency_key rows under the key, scopes customer:101 and customer:103; a ledger record order-placed
   User: carol@example.com (token signed by scripts.py)
-  Note: send place/01-place first
+  Note: send place/01-success first
 method: POST
 url: $CUSTOMER_APP_BASE_URL/orders
 body:

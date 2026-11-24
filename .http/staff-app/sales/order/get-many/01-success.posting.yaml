@@ -1,0 +1,14 @@
+name: 01-success
+description: |-
+  e2e: Sales › Order › GET /api/sales/orders
+  it: should list the orders of every customer, newest first
+
+  Expect: 200 OK, orders 602, 601 and 600 of two customers
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/sales/orders
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer
