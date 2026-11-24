@@ -37,6 +37,10 @@ export class LoggerSetupConfig implements Params {
 
         return res.statusCode >= 400 ? 'warn' : 'info';
       },
+      customSuccessMessage: (req, res, responseTime) =>
+        `${req.method} ${req.url} ${res.statusCode} ${responseTime}ms`,
+      customErrorMessage: (req, res, error) =>
+        `${req.method} ${req.url} ${res.statusCode} failed: ${error.message}`,
       redact: {
         paths: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
         remove: true,

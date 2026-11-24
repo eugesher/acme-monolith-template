@@ -134,6 +134,34 @@ describe('LoggerSetupConfig', () => {
     });
   });
 
+  describe('request line', () => {
+    let config: LoggerSetupConfig;
+
+    beforeEach(() => {
+      config = new LoggerSetupConfig(AppNameEnum.STAFF_APP);
+    });
+
+    it('names the method, the path, the status and the duration of a completed request', () => {
+      const message = config.pinoHttp.customSuccessMessage?.(
+        { method: 'GET', url: '/api/health' } as never,
+        { statusCode: 200 } as never,
+        3,
+      );
+
+      expect(message).toBe('GET /api/health 200 3ms');
+    });
+
+    it('names the method, the path, the status and the error of a failed request', () => {
+      const message = config.pinoHttp.customErrorMessage?.(
+        { method: 'POST', url: '/api/orders' } as never,
+        { statusCode: 500 } as never,
+        new Error('failed with status code 500'),
+      );
+
+      expect(message).toBe('POST /api/orders 500 failed: failed with status code 500');
+    });
+  });
+
   describe('customLogLevel', () => {
     let config: LoggerSetupConfig;
 
