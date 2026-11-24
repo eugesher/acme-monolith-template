@@ -5,6 +5,7 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import type { ThrottlerStorage } from '@nestjs/throttler';
 
 import { RedisConfigHelper } from '@acme-libs/config';
+import type { Maybe } from '@acme-libs/toolkit';
 
 @Injectable()
 export class ThrottleRedisStorage implements ThrottlerStorage, OnApplicationShutdown {
@@ -15,6 +16,7 @@ export class ThrottleRedisStorage implements ThrottlerStorage, OnApplicationShut
     "return { hits, redis.call('PTTL', KEYS[1]) }",
   ].join('\n');
 
+  private shutdown: Maybe<Promise<void>>;
   private readonly redis: Redis;
 
   constructor(
@@ -66,6 +68,12 @@ export class ThrottleRedisStorage implements ThrottlerStorage, OnApplicationShut
   }
 
   public async onApplicationShutdown(): Promise<void> {
+    this.shutdown ??= this.closeConnection();
+
+    await this.shutdown;
+  }
+
+  private async closeConnection(): Promise<void> {
     if (this.redis.status === 'end') {
       return;
     }

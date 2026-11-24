@@ -155,7 +155,19 @@ describe('ThrottleRedisStorage', () => {
       });
     });
 
-    it('leaves an ended connection alone, as the second hook of the ThrottlerModule provider finds it', async () => {
+    it('quits once when the provider of ThrottlerModule calls the hook again before the socket closes', async () => {
+      await Promise.all([storage.onApplicationShutdown(), storage.onApplicationShutdown()]);
+
+      expect({
+        quit: redis.quit.mock.calls.length,
+        disconnect: redis.disconnect.mock.calls.length,
+      }).toEqual({
+        quit: 1,
+        disconnect: 0,
+      });
+    });
+
+    it('leaves an ended connection alone', async () => {
       redis.status = 'end';
 
       await storage.onApplicationShutdown();

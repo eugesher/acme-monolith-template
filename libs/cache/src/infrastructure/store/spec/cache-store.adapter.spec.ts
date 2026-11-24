@@ -126,7 +126,14 @@ describe('CacheStoreAdapter', () => {
       },
     );
 
-    it('leaves an ended connection alone, so a second hook leaves no disconnect timer', async () => {
+    it('quits once when the hook is called again before the socket closes', async () => {
+      await Promise.all([store.onApplicationShutdown(), store.onApplicationShutdown()]);
+
+      expect(redis.quit).toHaveBeenCalledTimes(1);
+      expect(redis.disconnect).not.toHaveBeenCalled();
+    });
+
+    it('leaves an ended connection alone, so it leaves no disconnect timer', async () => {
       redis.status = 'end';
 
       await store.onApplicationShutdown();
