@@ -34,7 +34,7 @@ export class LedgerCoreAppendEnqueueUseCase {
     const ledgerRecord = { ...command, correlationId };
     const context = { subjectType, subjectId, operationKey };
 
-    await ReplayRetryHelper.retryThenLogForReplay(() => this.enqueueOne(ledgerRecord), {
+    await ReplayRetryHelper.run(() => this.enqueueOne(ledgerRecord), {
       maxAttempts: this.enqueueRetryAttempts,
       logger: this.logger,
       correlationId,

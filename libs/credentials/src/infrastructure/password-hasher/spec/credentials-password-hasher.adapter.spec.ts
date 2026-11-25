@@ -1,3 +1,4 @@
+import { ServiceUnavailableException } from '@nestjs/common';
 import { verify } from 'argon2';
 import type { ConfigService } from '@nestjs/config';
 import type * as Argon2 from 'argon2';
@@ -26,6 +27,10 @@ describe('CredentialsPasswordHasherAdapter', () => {
     } as unknown as ConfigService;
 
     adapter = new CredentialsPasswordHasherAdapter(config);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('hash', () => {
@@ -86,6 +91,34 @@ describe('CredentialsPasswordHasherAdapter', () => {
       });
 
       expect(valid).toBe(false);
+    });
+
+    it('answers 503 to a call that waits for a free slot longer than AUTH_ARGON2_QUEUE_TIMEOUT_MS', async () => {
+      jest.useFakeTimers({ doNotFake: ['nextTick', 'queueMicrotask', 'setImmediate'] });
+
+      let finishHeld: (valid: boolean) => void = () => undefined;
+
+      jest.mocked(verify).mockReturnValueOnce(
+        new Promise<boolean>((resolve) => {
+          finishHeld = resolve;
+        }),
+      );
+
+      const held = adapter.verify({ passwordHash: 'held-hash', password: 'correct-horse-battery' });
+      const queued = adapter.verify({
+        passwordHash: 'queued-hash',
+        password: 'correct-horse-battery',
+      });
+
+      jest.advanceTimersByTime(1000);
+
+      await expect(queued).rejects.toEqual(
+        new ServiceUnavailableException('Too many password checks at once, retry later'),
+      );
+
+      finishHeld(true);
+
+      await expect(held).resolves.toBe(true);
     });
   });
 });

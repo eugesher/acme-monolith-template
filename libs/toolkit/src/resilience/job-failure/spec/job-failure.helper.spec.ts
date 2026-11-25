@@ -1,5 +1,5 @@
 import { JobFailureHelper } from '../job-failure.helper';
-import type { IHelperLogger } from '../../types/helper-logger.interface';
+import type { IHelperLogger } from '../../../types/helper-logger.interface';
 
 describe('JobFailureHelper', () => {
   describe('report', () => {

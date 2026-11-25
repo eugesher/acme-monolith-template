@@ -1,7 +1,8 @@
-import { Injectable, type ClassProvider } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException, type ClassProvider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash, verify } from 'argon2';
 
+import { Semaphore } from '@acme-libs/toolkit';
 import type { ICredentialsVerifyPasswordCommand } from '@acme-libs/contracts/credentials';
 
 import {
@@ -9,7 +10,6 @@ import {
   type ICredentialsPasswordHasherPort,
 } from '../../outbound';
 import { CredentialsPasswordHasherOptions } from './credentials-password-hasher.options';
-import { CredentialsPasswordHasherSemaphore } from './credentials-password-hasher.semaphore';
 
 @Injectable()
 export class CredentialsPasswordHasherAdapter implements ICredentialsPasswordHasherPort {
@@ -21,12 +21,17 @@ export class CredentialsPasswordHasherAdapter implements ICredentialsPasswordHas
   private static readonly DUMMY_PASSWORD = 'dummy-password-of-an-unknown-user';
 
   private readonly options: CredentialsPasswordHasherOptions;
-  private readonly semaphore: CredentialsPasswordHasherSemaphore;
+  private readonly semaphore: Semaphore;
   private readonly dummyHash: Promise<string>;
 
   constructor(config: ConfigService) {
     this.options = new CredentialsPasswordHasherOptions(config);
-    this.semaphore = new CredentialsPasswordHasherSemaphore(config);
+    this.semaphore = new Semaphore({
+      maxConcurrency: config.getOrThrow<number>('AUTH_ARGON2_MAX_CONCURRENCY'),
+      queueTimeoutMs: config.getOrThrow<number>('AUTH_ARGON2_QUEUE_TIMEOUT_MS'),
+      onQueueTimeout: () =>
+        new ServiceUnavailableException('Too many password checks at once, retry later'),
+    });
     this.dummyHash = hash(CredentialsPasswordHasherAdapter.DUMMY_PASSWORD, this.options);
   }
 

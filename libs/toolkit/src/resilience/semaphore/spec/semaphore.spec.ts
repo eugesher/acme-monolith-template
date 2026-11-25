@@ -1,23 +1,16 @@
-import { ServiceUnavailableException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { Semaphore } from '../semaphore';
 
-import { CredentialsPasswordHasherSemaphore } from '../credentials-password-hasher.semaphore';
-
-describe('CredentialsPasswordHasherSemaphore', () => {
-  let semaphore: CredentialsPasswordHasherSemaphore;
+describe('Semaphore', () => {
+  let semaphore: Semaphore;
 
   beforeEach(() => {
     jest.useFakeTimers();
 
-    const values: Record<string, number> = {
-      AUTH_ARGON2_MAX_CONCURRENCY: 1,
-      AUTH_ARGON2_QUEUE_TIMEOUT_MS: 1000,
-    };
-    const config = {
-      getOrThrow: jest.fn((key: string) => values[key]),
-    } as unknown as ConfigService;
-
-    semaphore = new CredentialsPasswordHasherSemaphore(config);
+    semaphore = new Semaphore({
+      maxConcurrency: 1,
+      queueTimeoutMs: 1000,
+      onQueueTimeout: () => new Error('Too many tasks at once'),
+    });
   });
 
   afterEach(() => {
@@ -30,7 +23,7 @@ describe('CredentialsPasswordHasherSemaphore', () => {
     expect(result).toBe('hashed');
   });
 
-  it('holds a task beyond AUTH_ARGON2_MAX_CONCURRENCY until a running one settles', async () => {
+  it('holds a task beyond maxConcurrency until a running one settles', async () => {
     let finishFirst: (value: string) => void = () => undefined;
     const second = jest.fn(() => Promise.resolve('second'));
     const first = semaphore.run(
@@ -52,13 +45,13 @@ describe('CredentialsPasswordHasherSemaphore', () => {
   });
 
   it('frees the slot of a task that throws', async () => {
-    const failed = semaphore.run(() => Promise.reject(new Error('argon2 failed')));
+    const failed = semaphore.run(() => Promise.reject(new Error('task failed')));
 
-    await expect(failed).rejects.toThrow('argon2 failed');
+    await expect(failed).rejects.toThrow('task failed');
     await expect(semaphore.run(() => Promise.resolve('next'))).resolves.toBe('next');
   });
 
-  it('answers 503 to a task that waits longer than AUTH_ARGON2_QUEUE_TIMEOUT_MS and drops it from the queue', async () => {
+  it('rejects with the error of onQueueTimeout a task that waits longer than queueTimeoutMs and drops it from the queue', async () => {
     let finishFirst: (value: string) => void = () => undefined;
     const late = jest.fn(() => Promise.resolve('late'));
     const first = semaphore.run(
@@ -71,9 +64,7 @@ describe('CredentialsPasswordHasherSemaphore', () => {
 
     jest.advanceTimersByTime(1000);
 
-    await expect(timedOut).rejects.toEqual(
-      new ServiceUnavailableException('Too many password checks at once, retry later'),
-    );
+    await expect(timedOut).rejects.toEqual(new Error('Too many tasks at once'));
 
     finishFirst('first');
 

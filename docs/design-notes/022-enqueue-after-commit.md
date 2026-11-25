@@ -28,18 +28,19 @@ there (`ProductStockAddUseCase`, `OrderPlaceUseCase`).
 **An enqueue has a deadline.** A queue of BullMQ keeps the defaults of ioredis for the producer, so
 while Redis is down the command waits in the offline queue of its client and `add` never settles.
 The adapter races `add` against the `timeoutMs` of the command through `DeadlineHelper.race`
-(`libs/toolkit/src/resilience/deadline.helper.ts`), which rejects with the message of the adapter
-when the deadline passes and clears its timer either way; the caller reads the timeout from
+(`libs/toolkit/src/resilience/deadline/deadline.helper.ts`), which rejects with the message of the
+adapter when the deadline passes and clears its timer either way; the caller reads the timeout from
 `REDIS_COMMAND_TIMEOUT_MS`. The health probes of `libs/health` race their checks the same way.
 
 **The write stays committed.** The caller retries the enqueue through `ReplayRetryHelper`
-(`libs/toolkit/src/resilience/replay-retry.helper.ts`) `ENQUEUE_RETRY_ATTEMPTS` times, and then logs
-the job at `error` for a replay. Both producers, the core ledger and the core product-stock, read
-that one variable: they retry the same `add` against the same Redis, so one budget fits both, and
-each binds it to a token of its own. The variable counts the attempts of `add` only; the attempts of
-the job in the processor are the constant of `BullSetupModule`. The race does not cancel `add`: a
-timed-out command stays in the offline queue of the client and may still reach Redis once it is
-back, so the log says the record may be absent, and a processor must tolerate a duplicate job.
+(`libs/toolkit/src/resilience/replay-retry/replay-retry.helper.ts`) `ENQUEUE_RETRY_ATTEMPTS` times,
+and then logs the job at `error` for a replay. Both producers, the core ledger and the core
+product-stock, read that one variable: they retry the same `add` against the same Redis, so one
+budget fits both, and each binds it to a token of its own. The variable counts the attempts of `add`
+only; the attempts of the job in the processor are the constant of `BullSetupModule`. The race does
+not cancel `add`: a timed-out command stays in the offline queue of the client and may still reach
+Redis once it is back, so the log says the record may be absent, and a processor must tolerate a
+duplicate job.
 
 **A ledger job is deduplicated by its operation key.** `LedgerCoreQueueAdapter` adds the job with
 `deduplication: { id: operationKey }`, and BullMQ adds no job while one with that id waits, runs or

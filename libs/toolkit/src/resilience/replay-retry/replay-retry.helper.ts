@@ -1,7 +1,7 @@
 import type { IReplayRetryOptions } from './replay-retry.options';
 
 export class ReplayRetryHelper {
-  public static async retryThenLogForReplay(
+  public static async run(
     operation: () => Promise<unknown>,
     options: IReplayRetryOptions,
   ): Promise<void> {

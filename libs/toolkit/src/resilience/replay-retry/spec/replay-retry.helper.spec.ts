@@ -1,8 +1,8 @@
 import { ReplayRetryHelper } from '../replay-retry.helper';
-import type { IHelperLogger } from '../../types/helper-logger.interface';
+import type { IHelperLogger } from '../../../types/helper-logger.interface';
 
 describe('ReplayRetryHelper', () => {
-  describe('retryThenLogForReplay', () => {
+  describe('run', () => {
     let logger: jest.Mocked<IHelperLogger>;
 
     beforeEach(() => {
@@ -12,7 +12,7 @@ describe('ReplayRetryHelper', () => {
     it('returns on the first success without logging', async () => {
       const operation = jest.fn().mockResolvedValue(undefined);
 
-      await ReplayRetryHelper.retryThenLogForReplay(operation, {
+      await ReplayRetryHelper.run(operation, {
         maxAttempts: 3,
         logger,
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
@@ -34,7 +34,7 @@ describe('ReplayRetryHelper', () => {
         .mockRejectedValueOnce(failure)
         .mockResolvedValue(undefined);
 
-      await ReplayRetryHelper.retryThenLogForReplay(operation, {
+      await ReplayRetryHelper.run(operation, {
         maxAttempts: 3,
         logger,
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',
@@ -71,7 +71,7 @@ describe('ReplayRetryHelper', () => {
       const failure = new Error('ledger down');
       const operation = jest.fn().mockRejectedValue(failure);
 
-      const run = ReplayRetryHelper.retryThenLogForReplay(operation, {
+      const run = ReplayRetryHelper.run(operation, {
         maxAttempts: 2,
         logger,
         correlationId: 'c0ffee00-0000-4000-8000-000000000001',

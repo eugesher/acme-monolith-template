@@ -88,7 +88,7 @@ export class ProductStockCoreMoveUseCase {
   ): Promise<void> {
     const { correlationId } = command;
 
-    await ReplayRetryHelper.retryThenLogForReplay(() => this.postSubtract.enqueue(command), {
+    await ReplayRetryHelper.run(() => this.postSubtract.enqueue(command), {
       maxAttempts: this.postSubtractRetryAttempts,
       logger: this.logger,
       correlationId,

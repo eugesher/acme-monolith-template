@@ -1,4 +1,4 @@
-import type { IHelperLogger } from '../types/helper-logger.interface';
+import type { IHelperLogger } from '../../types/helper-logger.interface';
 
 export interface IJobFailureOptions {
   logger: IHelperLogger;

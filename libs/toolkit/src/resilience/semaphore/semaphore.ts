@@ -1,16 +1,10 @@
-import { ServiceUnavailableException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import type { ISemaphoreOptions } from './semaphore.options';
 
-export class CredentialsPasswordHasherSemaphore {
+export class Semaphore {
   private active = 0;
-  private readonly maxConcurrency: number;
-  private readonly queueTimeoutMs: number;
   private readonly waiting: (() => void)[] = [];
 
-  constructor(config: ConfigService) {
-    this.maxConcurrency = config.getOrThrow<number>('AUTH_ARGON2_MAX_CONCURRENCY');
-    this.queueTimeoutMs = config.getOrThrow<number>('AUTH_ARGON2_QUEUE_TIMEOUT_MS');
-  }
+  constructor(private readonly options: ISemaphoreOptions) {}
 
   public async run<T>(task: () => Promise<T>): Promise<T> {
     await this.acquire();
@@ -23,7 +17,9 @@ export class CredentialsPasswordHasherSemaphore {
   }
 
   private async acquire(): Promise<void> {
-    if (this.active < this.maxConcurrency) {
+    const { maxConcurrency, queueTimeoutMs, onQueueTimeout } = this.options;
+
+    if (this.active < maxConcurrency) {
       this.active++;
 
       return;
@@ -36,8 +32,8 @@ export class CredentialsPasswordHasherSemaphore {
       };
       const timer = setTimeout(() => {
         this.waiting.splice(this.waiting.indexOf(grant), 1);
-        reject(new ServiceUnavailableException('Too many password checks at once, retry later'));
-      }, this.queueTimeoutMs);
+        reject(onQueueTimeout());
+      }, queueTimeoutMs);
 
       this.waiting.push(grant);
     });
