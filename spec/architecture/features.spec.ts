@@ -6,7 +6,7 @@ describe('features', () => {
 
   beforeAll(() => {
     scaffold = Scaffold.create([
-      'apps/__features-fixture__/src/contracts/ledger-record/index.ts',
+      'apps/__features-fixture__/src/contracts/ledger-append/index.ts',
       'apps/__features-fixture__/src/features/index.ts',
       'apps/__features-fixture__/src/features/product/index.ts',
       'apps/__features-fixture__/src/features/product/shell/product.module.ts',
@@ -297,7 +297,7 @@ describe('features', () => {
           'import { InjectQueue } from "@nestjs/bullmq";',
           'import { Injectable } from "@nestjs/common";',
           'import type { Queue } from "bullmq";',
-          'import { x } from "../../../../contracts/ledger-record";',
+          'import { x } from "../../../../contracts/ledger-append";',
         ].join('\n'),
       }).toPassArchitectureLint();
     });
@@ -305,14 +305,14 @@ describe('features', () => {
     it('the module root MAY register a queue through the core queues, next to the binding of its adapter', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.module.ts',
-        code: 'import { LedgerQueue } from "@acme-core/queues";',
+        code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 
     it('infrastructure/queue MAY take the name of a core queue for InjectQueue', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
-        code: 'import { LedgerQueue } from "@acme-core/queues";',
+        code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 
@@ -335,7 +335,7 @@ describe('features', () => {
       async (folder) => {
         await expect({
           file: `apps/__features-fixture__/src/features/product/${folder}/__fixture__.ts`,
-          code: 'import { x } from "../../../../contracts/ledger-record";',
+          code: 'import { x } from "../../../../contracts/ledger-append";',
         }).toBreakRule('boundaries/dependencies');
       },
     );
@@ -343,7 +343,7 @@ describe('features', () => {
     it('infrastructure/common-adapters MAY reach app contracts with the DI decorators', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/common-adapters/__fixture__.ts',
-        code: 'import { Inject, Injectable } from "@nestjs/common";\nimport { x } from "../../../../contracts/ledger-record";',
+        code: 'import { Inject, Injectable } from "@nestjs/common";\nimport { x } from "../../../../contracts/ledger-append";',
       }).toPassArchitectureLint();
     });
 
@@ -391,7 +391,7 @@ describe('features', () => {
     it('infrastructure/lib-adapters may NOT reach app contracts — only common-adapters and queue do', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/lib-adapters/__fixture__.ts',
-        code: 'import { x } from "../../../../contracts/ledger-record";',
+        code: 'import { x } from "../../../../contracts/ledger-append";',
       }).toBreakRule('boundaries/dependencies');
     });
 

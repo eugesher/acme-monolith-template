@@ -1,9 +1,9 @@
 import {
-  LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
+  LEDGER_CORE_APPEND_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
   LEDGER_CORE_REDIS_COMMAND_TIMEOUT_MS_TOKEN,
 } from '../../../outbound';
 import {
-  LedgerCoreConfigEnqueueRetryAttemptsProvider,
+  LedgerCoreConfigAppendEnqueueRetryAttemptsProvider,
   LedgerCoreConfigRedisCommandTimeoutMsProvider,
 } from '../ledger-core-config.provider';
 
@@ -26,12 +26,12 @@ describe('ledger lib config providers', () => {
     });
   });
 
-  describe('LedgerCoreConfigEnqueueRetryAttemptsProvider', () => {
+  describe('LedgerCoreConfigAppendEnqueueRetryAttemptsProvider', () => {
     it('provides ENQUEUE_RETRY_ATTEMPTS under the token of the core ledger', () => {
-      const value = LedgerCoreConfigEnqueueRetryAttemptsProvider.useFactory({ getOrThrow });
+      const value = LedgerCoreConfigAppendEnqueueRetryAttemptsProvider.useFactory({ getOrThrow });
 
-      expect(LedgerCoreConfigEnqueueRetryAttemptsProvider.provide).toBe(
-        LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
+      expect(LedgerCoreConfigAppendEnqueueRetryAttemptsProvider.provide).toBe(
+        LEDGER_CORE_APPEND_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
       );
       expect(value).toBe(7);
       expect(getOrThrow).toHaveBeenCalledWith('ENQUEUE_RETRY_ATTEMPTS');

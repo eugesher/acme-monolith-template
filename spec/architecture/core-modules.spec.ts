@@ -358,7 +358,7 @@ describe('core modules', () => {
     it('a queue adapter MAY take the name of its queue from the core queues', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/infrastructure/queue/__fixture__.ts',
-        code: 'import { LedgerQueue } from "@acme-core/queues";',
+        code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 
@@ -372,7 +372,7 @@ describe('core modules', () => {
     it('the module root MAY register a queue through the core queues, next to the binding of its adapter', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-        code: 'import { LedgerQueue } from "@acme-core/queues";',
+        code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 

@@ -2,7 +2,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, type ClassProvider } from '@nestjs/common';
 import type { JobsOptions, Queue } from 'bullmq';
 
-import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
+import { LedgerAppendQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 import type { Maybe, Nullable } from '@acme-libs/toolkit';
 
 import {
@@ -25,13 +25,13 @@ export class QueueRegistryAdapter implements IQueueRegistryPort {
   private readonly queues: Map<string, Queue>;
 
   constructor(
-    @InjectQueue(LedgerQueue.NAME)
-    ledgerRecordQueue: Queue,
+    @InjectQueue(LedgerAppendQueue.NAME)
+    ledgerAppendQueue: Queue,
     @InjectQueue(ProductStockPostSubtractQueue.NAME)
     postSubtractQueue: Queue,
   ) {
     this.queues = new Map(
-      [ledgerRecordQueue, postSubtractQueue].map((queue) => [queue.name, queue]),
+      [ledgerAppendQueue, postSubtractQueue].map((queue) => [queue.name, queue]),
     );
   }
 

@@ -189,7 +189,7 @@ describe('App', () => {
 
   describe('Ledger', () => {
     ledgerE2E.handleList();
-    ledgerE2E.handleEnqueue();
+    ledgerE2E.handleAppendEnqueue();
   });
 
   describe('Queue', () => {

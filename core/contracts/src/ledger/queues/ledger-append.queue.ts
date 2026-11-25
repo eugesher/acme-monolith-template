@@ -1,4 +1,4 @@
-export interface ILedgerRecordProcessorPayload {
+export interface ILedgerAppendProcessorPayload {
   operationKey: string;
   subjectType: string;
   subjectId: string;

@@ -1,7 +1,7 @@
-import type { IOrderLedgerRecordPlacedCommand } from '../types';
+import type { IOrderLedgerAppendPlacedCommand } from '../types';
 
 export interface IOrderLedgerPort {
-  recordPlaced(command: IOrderLedgerRecordPlacedCommand): Promise<void>;
+  appendPlaced(command: IOrderLedgerAppendPlacedCommand): Promise<void>;
 }
 
 export const ORDER_LEDGER_PORT = Symbol('ORDER_LEDGER_PORT');

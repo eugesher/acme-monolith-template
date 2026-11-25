@@ -5,9 +5,9 @@ import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/led
 
 import {
   PRODUCT_LEDGER_PORT,
+  type IProductLedgerAppendCreatedCommand,
+  type IProductLedgerAppendPublishedCommand,
   type IProductLedgerPort,
-  type IProductLedgerRecordCreatedCommand,
-  type IProductLedgerRecordPublishedCommand,
 } from '../../outbound';
 
 @Injectable()
@@ -22,10 +22,10 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
     private readonly ledger: ILedgerCorePort,
   ) {}
 
-  public async recordCreated(command: IProductLedgerRecordCreatedCommand): Promise<void> {
+  public async appendCreated(command: IProductLedgerAppendCreatedCommand): Promise<void> {
     const { subjectId, occurredAt, payload } = command;
 
-    await this.ledger.handleEnqueue({
+    await this.ledger.handleAppendEnqueue({
       operationKey: `product-created:${subjectId}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,
@@ -35,10 +35,10 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
     });
   }
 
-  public async recordPublished(command: IProductLedgerRecordPublishedCommand): Promise<void> {
+  public async appendPublished(command: IProductLedgerAppendPublishedCommand): Promise<void> {
     const { subjectId, version, occurredAt, payload } = command;
 
-    await this.ledger.handleEnqueue({
+    await this.ledger.handleAppendEnqueue({
       operationKey: `product-published:${subjectId}:${version}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,

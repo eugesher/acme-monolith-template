@@ -8,20 +8,20 @@ describe('ProductLedgerCoreAdapter', () => {
   let adapter: ProductLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleEnqueue: jest.fn() };
-    ledger.handleEnqueue.mockResolvedValue(undefined);
+    ledger = { handleAppendEnqueue: jest.fn() };
+    ledger.handleAppendEnqueue.mockResolvedValue(undefined);
     adapter = new ProductLedgerCoreAdapter(ledger);
   });
 
-  describe('recordCreated', () => {
+  describe('appendCreated', () => {
     it('enqueues a creation under the stored id', async () => {
-      await adapter.recordCreated({
+      await adapter.appendCreated({
         subjectId: '12',
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', name: 'Lamp' },
       });
 
-      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
         subjectType: 'product',
         subjectId: '12',
@@ -32,16 +32,16 @@ describe('ProductLedgerCoreAdapter', () => {
     });
   });
 
-  describe('recordPublished', () => {
+  describe('appendPublished', () => {
     it('enqueues a publication under its new version at the time of the update', async () => {
-      await adapter.recordPublished({
+      await adapter.appendPublished({
         subjectId: '12',
         version: 6,
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', previousStatus: ProductStatusEnum.DRAFT },
       });
 
-      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-published:12:6',
         subjectType: 'product',
         subjectId: '12',

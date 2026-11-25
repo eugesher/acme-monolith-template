@@ -68,7 +68,7 @@ export class ProductStockAddUseCase {
     const writeResult = await this.write(command);
     const { stockOnHand, productStockId, productStockLedgerPayload } = writeResult;
 
-    await this.ledger.recordAdded(productStockLedgerPayload);
+    await this.ledger.appendAdded(productStockLedgerPayload);
 
     const addLoggerPayload = ProductStockAddModel.toLoggerPayload({
       productStockId,

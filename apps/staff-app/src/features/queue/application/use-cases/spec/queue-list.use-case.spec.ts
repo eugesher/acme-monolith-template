@@ -21,7 +21,7 @@ describe('QueueListUseCase', () => {
     it('answers the queues with their job counts', async () => {
       registry.listJobCounts.mockResolvedValue([
         {
-          name: 'ledger-record',
+          name: 'ledger-append',
           paused: false,
           jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1 },
         },
@@ -31,7 +31,7 @@ describe('QueueListUseCase', () => {
 
       expect(queues).toEqual([
         {
-          name: 'ledger-record',
+          name: 'ledger-append',
           paused: false,
           jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1 },
         },

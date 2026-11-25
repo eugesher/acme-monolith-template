@@ -5,8 +5,8 @@ import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/led
 
 import {
   AUTH_LEDGER_PORT,
+  type IAuthLedgerAppendRegisteredCommand,
   type IAuthLedgerPort,
-  type IAuthLedgerRecordRegisteredCommand,
 } from '../../outbound';
 
 @Injectable()
@@ -21,10 +21,10 @@ export class AuthLedgerCoreAdapter implements IAuthLedgerPort {
     private readonly ledger: ILedgerCorePort,
   ) {}
 
-  public async recordRegistered(command: IAuthLedgerRecordRegisteredCommand): Promise<void> {
+  public async appendRegistered(command: IAuthLedgerAppendRegisteredCommand): Promise<void> {
     const { subjectId, occurredAt } = command;
 
-    await this.ledger.handleEnqueue({
+    await this.ledger.handleAppendEnqueue({
       operationKey: `customer-registered:${subjectId}`,
       subjectType: LedgerSubjectTypeEnum.CUSTOMER,
       subjectId,

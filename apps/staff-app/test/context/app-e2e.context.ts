@@ -5,15 +5,15 @@ import type { Redis } from 'ioredis';
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
-import { LedgerQueue } from '@acme-core/queues';
+import { LedgerAppendQueue } from '@acme-core/queues';
 import { AppModule } from '@acme-staff/app';
 import type { Maybe } from '@acme-libs/toolkit';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 interface IAppE2EState {
   redis: Redis;
-  ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
-  failingWorker: Worker<ILedgerRecordProcessorPayload>;
+  ledgerAppendQueue: Queue<ILedgerAppendProcessorPayload>;
+  failingWorker: Worker<ILedgerAppendProcessorPayload>;
   adminToken: string;
   editorToken: string;
   viewerToken: string;
@@ -24,8 +24,8 @@ export class AppE2EContext extends AuthE2EContext {
     return this.started.redis;
   }
 
-  public get ledgerRecordQueue(): Queue<ILedgerRecordProcessorPayload> {
-    return this.started.ledgerRecordQueue;
+  public get ledgerAppendQueue(): Queue<ILedgerAppendProcessorPayload> {
+    return this.started.ledgerAppendQueue;
   }
 
   public get adminToken(): string {
@@ -58,11 +58,11 @@ export class AppE2EContext extends AuthE2EContext {
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
-    const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LedgerQueue.NAME),
+    const ledgerAppendQueue = this.moduleFixture.get<Queue<ILedgerAppendProcessorPayload>>(
+      getQueueToken(LedgerAppendQueue.NAME),
     );
-    const { connection, prefix } = ledgerRecordQueue.opts;
-    const failingWorker = new Worker<ILedgerRecordProcessorPayload>(LedgerQueue.NAME, null, {
+    const { connection, prefix } = ledgerAppendQueue.opts;
+    const failingWorker = new Worker<ILedgerAppendProcessorPayload>(LedgerAppendQueue.NAME, null, {
       connection,
       prefix,
     });
@@ -70,7 +70,7 @@ export class AppE2EContext extends AuthE2EContext {
     const editorToken = this.jwt.sign({ sub: '2' });
     const viewerToken = this.jwt.sign({ sub: '3' });
 
-    this.state = { redis, ledgerRecordQueue, failingWorker, adminToken, editorToken, viewerToken };
+    this.state = { redis, ledgerAppendQueue, failingWorker, adminToken, editorToken, viewerToken };
   }
 
   public override async close(): Promise<void> {
@@ -78,23 +78,23 @@ export class AppE2EContext extends AuthE2EContext {
     await super.close();
   }
 
-  public async takeLedgerRecords(): Promise<ILedgerRecordProcessorPayload[]> {
-    const jobs = await this.ledgerRecordQueue.getWaiting();
+  public async takeLedgerRecords(): Promise<ILedgerAppendProcessorPayload[]> {
+    const jobs = await this.ledgerAppendQueue.getWaiting();
 
-    await this.ledgerRecordQueue.drain();
+    await this.ledgerAppendQueue.drain();
 
     return jobs.map((job) => job.data);
   }
 
   public async failLedgerRecord(
-    record: ILedgerRecordProcessorPayload,
-  ): Promise<Job<ILedgerRecordProcessorPayload>> {
-    const added = await this.ledgerRecordQueue.add(LedgerQueue.NAME, record, { attempts: 1 });
+    record: ILedgerAppendProcessorPayload,
+  ): Promise<Job<ILedgerAppendProcessorPayload>> {
+    const added = await this.ledgerAppendQueue.add(LedgerAppendQueue.NAME, record, { attempts: 1 });
     const token = 'e2e-failing-worker';
     const job = await this.started.failingWorker.getNextJob(token);
 
     if (job.id !== added.id) {
-      throw new Error(`Job ${added.id} of queue ${LedgerQueue.NAME} is not the next to fail`);
+      throw new Error(`Job ${added.id} of queue ${LedgerAppendQueue.NAME} is not the next to fail`);
     }
 
     await job.moveToFailed(new Error('The e2e case failed the record'), token);

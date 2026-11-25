@@ -57,7 +57,7 @@ export class AuthRegisterUseCase {
 
     this.logger.info(customerLoggerPayload, 'Customer registered');
 
-    await this.ledger.recordRegistered(customerLedgerPayload);
+    await this.ledger.appendRegistered(customerLedgerPayload);
 
     return customer.toSnapshot();
   }

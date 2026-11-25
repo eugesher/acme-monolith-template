@@ -65,7 +65,7 @@ export class OrderPlaceUseCase {
     const orderLedgerPayload = order.toLedgerPayload();
     const orderLoggerPayload = order.toLoggerPayload();
 
-    await this.ledger.recordPlaced(orderLedgerPayload);
+    await this.ledger.appendPlaced(orderLedgerPayload);
 
     this.logger.info(orderLoggerPayload, 'Order placed');
 

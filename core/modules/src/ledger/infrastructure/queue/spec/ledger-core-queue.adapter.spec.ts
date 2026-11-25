@@ -1,6 +1,6 @@
 import type { Queue } from 'bullmq';
 
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 import { LedgerCoreQueueAdapter } from '../ledger-core-queue.adapter';
 
@@ -12,7 +12,7 @@ describe('LedgerCoreQueueAdapter', () => {
     add = jest.fn().mockResolvedValue({ id: '1' });
     adapter = new LedgerCoreQueueAdapter({
       add,
-    } as unknown as Queue<ILedgerRecordProcessorPayload>);
+    } as unknown as Queue<ILedgerAppendProcessorPayload>);
   });
 
   afterEach(() => {
@@ -36,7 +36,7 @@ describe('LedgerCoreQueueAdapter', () => {
 
       expect(add).toHaveBeenCalledTimes(1);
       expect(add).toHaveBeenCalledWith(
-        'ledger-record',
+        'ledger-append',
         {
           operationKey: 'item-opened:7',
           subjectType: 'item',

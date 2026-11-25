@@ -3,21 +3,21 @@ import type { Queue } from 'bullmq';
 
 import { AppNameEnum } from '@acme-libs/kernel';
 import { E2EContext } from '@acme-libs/testing';
-import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
+import { LedgerAppendQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 import { AppModule } from '@acme-processor/app';
 import type { Maybe } from '@acme-libs/toolkit';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
 interface IAppE2EState {
-  ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
+  ledgerAppendQueue: Queue<ILedgerAppendProcessorPayload>;
   postSubtractQueue: Queue<IProductStockPostSubtractPayload>;
   purgeQueue: Queue;
 }
 
 export class AppE2EContext extends E2EContext {
-  public get ledgerRecordQueue(): Queue<ILedgerRecordProcessorPayload> {
-    return this.started.ledgerRecordQueue;
+  public get ledgerAppendQueue(): Queue<ILedgerAppendProcessorPayload> {
+    return this.started.ledgerAppendQueue;
   }
 
   public get postSubtractQueue(): Queue<IProductStockPostSubtractPayload> {
@@ -48,15 +48,15 @@ export class AppE2EContext extends E2EContext {
   public override async init(): Promise<void> {
     await super.init();
 
-    const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LedgerQueue.NAME),
+    const ledgerAppendQueue = this.moduleFixture.get<Queue<ILedgerAppendProcessorPayload>>(
+      getQueueToken(LedgerAppendQueue.NAME),
     );
     const postSubtractQueue = this.moduleFixture.get<Queue<IProductStockPostSubtractPayload>>(
       getQueueToken(ProductStockPostSubtractQueue.NAME),
     );
     const purgeQueue = this.moduleFixture.get<Queue>(getQueueToken('idempotency-purge'));
 
-    this.state = { ledgerRecordQueue, postSubtractQueue, purgeQueue };
+    this.state = { ledgerAppendQueue, postSubtractQueue, purgeQueue };
   }
 
   public async waitFor(description: string, settled: () => Promise<boolean>): Promise<void> {
@@ -71,9 +71,9 @@ export class AppE2EContext extends E2EContext {
     throw new Error(`Timed out waiting for ${description}`);
   }
 
-  public async waitForLedgerRecordQueue(): Promise<void> {
-    await this.waitFor(`the ${LedgerQueue.NAME} queue to drain`, async () => {
-      const counts = await this.ledgerRecordQueue.getJobCounts();
+  public async waitForLedgerAppendQueue(): Promise<void> {
+    await this.waitFor(`the ${LedgerAppendQueue.NAME} queue to drain`, async () => {
+      const counts = await this.ledgerAppendQueue.getJobCounts();
 
       return counts.waiting + counts.active + counts.delayed === 0;
     });

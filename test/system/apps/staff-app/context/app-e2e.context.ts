@@ -4,22 +4,22 @@ import type { Queue } from 'bullmq';
 
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { AuthE2EContext } from '@acme-libs/testing';
-import { LedgerQueue } from '@acme-core/queues';
+import { LedgerAppendQueue } from '@acme-core/queues';
 import { AppModule as ProcessorAppModule } from '@acme-processor/app';
 import { AppModule } from '@acme-staff/app';
 import type { Maybe } from '@acme-libs/toolkit';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 interface IAppE2EState {
   processor: INestApplication;
-  ledgerRecordQueue: Queue<ILedgerRecordProcessorPayload>;
+  ledgerAppendQueue: Queue<ILedgerAppendProcessorPayload>;
   adminToken: string;
   editorToken: string;
 }
 
 export class AppE2EContext extends AuthE2EContext {
-  public get ledgerRecordQueue(): Queue<ILedgerRecordProcessorPayload> {
-    return this.started.ledgerRecordQueue;
+  public get ledgerAppendQueue(): Queue<ILedgerAppendProcessorPayload> {
+    return this.started.ledgerAppendQueue;
   }
 
   public get adminToken(): string {
@@ -54,13 +54,13 @@ export class AppE2EContext extends AuthE2EContext {
     await processor.init();
     await super.init();
 
-    const ledgerRecordQueue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LedgerQueue.NAME),
+    const ledgerAppendQueue = this.moduleFixture.get<Queue<ILedgerAppendProcessorPayload>>(
+      getQueueToken(LedgerAppendQueue.NAME),
     );
     const adminToken = this.jwt.sign({ sub: '1' });
     const editorToken = this.jwt.sign({ sub: '2' });
 
-    this.state = { processor, ledgerRecordQueue, adminToken, editorToken };
+    this.state = { processor, ledgerAppendQueue, adminToken, editorToken };
   }
 
   public override async close(): Promise<void> {

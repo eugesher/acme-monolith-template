@@ -1,7 +1,7 @@
-import type { IProductCoreLedgerRecordArchivedCommand } from '../types';
+import type { IProductCoreLedgerAppendArchivedCommand } from '../types';
 
 export interface IProductCoreLedgerPort {
-  recordArchived(command: IProductCoreLedgerRecordArchivedCommand): Promise<void>;
+  appendArchived(command: IProductCoreLedgerAppendArchivedCommand): Promise<void>;
 }
 
 export const PRODUCT_CORE_LEDGER_PORT = Symbol('PRODUCT_CORE_LEDGER_PORT');

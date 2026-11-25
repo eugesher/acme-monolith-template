@@ -75,7 +75,7 @@ changed model knows reaches the use case through the answer: `ProductPublishMode
 the status the product left, or nothing for a product that was already active. The stored model
 answers the record, `product.toLedgerPayload(previousStatus)`, with its new version and the
 `updatedAt` the database gave the update, and the use case records nothing when the answer is empty.
-`IProductLedgerPort.recordPublished` adds the operation key and the action and enqueues the record
-on the `ledger-record` queue (see `022-enqueue-after-commit.md` and `004-append-only-journal.md`).
+`IProductLedgerPort.appendPublished` adds the operation key and the action and enqueues the record
+on the `ledger-append` queue (see `022-enqueue-after-commit.md` and `004-append-only-journal.md`).
 The models record no domain events: each fact has one reader, the ledger, and the use case calls it
 directly.

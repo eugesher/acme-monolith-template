@@ -66,7 +66,7 @@ Some edges are part of the documented shape of the template and have a `MAY` cas
 - a feature queue adapter and a processor that reach app contracts: a queue between the modules of
   one app keeps its contract in the app, while a queue written by more than one app keeps it in core
   or in the lib that writes it, `product-stock-post-subtract` in
-  `@acme-core/contracts/product-stock` and `ledger-record` in `@acme-core/contracts/ledger`;
+  `@acme-core/contracts/product-stock` and `ledger-append` in `@acme-core/contracts/ledger`;
 - the core-adapters and common-adapters of a common module, and a common module root that mounts a
   core module, another common module or a shared barrel;
 - the core-adapters of a core module, and a core module root that mounts another core module;
@@ -118,7 +118,7 @@ its domain.
 
 **Outbound does not see the domain.** A port speaks types of its own: a command lists the fields its
 adapter reads, and the use case hands it what the model answers, which fits by shape
-(`IOrderProductStockWithdrawCommand.movements`, `IProductLedgerRecordPublishedCommand.payload`). A
+(`IOrderProductStockWithdrawCommand.movements`, `IProductLedgerAppendPublishedCommand.payload`). A
 domain type in a command would let infrastructure, which may not import the domain, hold domain
 objects and call their methods. The features, core modules and common modules specs each refuse the
 edge.

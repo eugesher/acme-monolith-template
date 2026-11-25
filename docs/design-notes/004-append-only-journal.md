@@ -5,7 +5,7 @@ one processor appends.
 
 | Part         | Example                                                                                                           |
 | ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| job payload  | `core/contracts/src/ledger/queues/ledger-record.queue.ts`                                                         |
+| job payload  | `core/contracts/src/ledger/queues/ledger-append.queue.ts`                                                         |
 | a producer   | `apps/staff-app/src/features/catalog/modules/product/infrastructure/core-adapters/product-ledger-core.adapter.ts` |
 | the appender | `apps/processor-app/src/processors/ledger-append` (see `008-queue-processor.md`)                                  |
 | a reader     | `apps/staff-app/src/features/ledger` (see `005-page-window.md`)                                                   |

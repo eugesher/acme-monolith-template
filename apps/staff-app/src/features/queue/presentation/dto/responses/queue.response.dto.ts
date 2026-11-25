@@ -20,7 +20,7 @@ class QueueResponseJobCountsDto {
 }
 
 export class QueueResponseDto {
-  @ApiResponseProperty({ example: QueueNameEnum.LEDGER_RECORD })
+  @ApiResponseProperty({ example: QueueNameEnum.LEDGER_APPEND_QUEUE })
   public name: string;
 
   @ApiResponseProperty({ example: false })

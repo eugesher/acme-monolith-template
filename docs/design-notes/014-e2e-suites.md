@@ -148,7 +148,7 @@ malformed `If-Match`.
 BullMQ writes its own keys at any moment.
 
 **staff-app and customer-app read the job, not the ledger.** Neither processes the queue, so their
-contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-record`
+contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-append`
 queue and drains the queue, as `takeRootWarnings()` takes the warnings. A case that enqueues takes
 the jobs, so the next case starts from an empty queue.
 
@@ -166,7 +166,7 @@ returned record reaches the ledger is a seam of two apps, so it is a case of the
 staff-app.
 
 **processor-app waits for its queues.** Its cases add jobs to the queues themselves and read the
-tables. `waitForLedgerRecordQueue()` polls `getJobCounts()` every 100 ms until no job is waiting,
+tables. `waitForLedgerAppendQueue()` polls `getJobCounts()` every 100 ms until no job is waiting,
 active or delayed, and throws after 100 polls; the jobs run in the e2e process, so a drained queue
 means the rows are written. A purge case adds a job to the `idempotency-purge` queue, as the job
 scheduler does every five minutes, and `waitFor(description, settled)` polls the rows until the

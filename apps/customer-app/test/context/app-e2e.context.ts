@@ -5,10 +5,10 @@ import type { Redis } from 'ioredis';
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
-import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
+import { LedgerAppendQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 import { AppModule } from '@acme-customer/app';
 import type { Maybe } from '@acme-libs/toolkit';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
 interface IAppE2EState {
@@ -60,9 +60,9 @@ export class AppE2EContext extends AuthE2EContext {
     this.state = { redis, annToken, bobToken, carolToken };
   }
 
-  public async takeLedgerRecords(): Promise<ILedgerRecordProcessorPayload[]> {
-    const queue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LedgerQueue.NAME),
+  public async takeLedgerRecords(): Promise<ILedgerAppendProcessorPayload[]> {
+    const queue = this.moduleFixture.get<Queue<ILedgerAppendProcessorPayload>>(
+      getQueueToken(LedgerAppendQueue.NAME),
     );
     const jobs = await queue.getWaiting();
 

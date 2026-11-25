@@ -7,21 +7,21 @@ describe('ProductStockLedgerCoreAdapter', () => {
   let adapter: ProductStockLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleEnqueue: jest.fn() };
-    ledger.handleEnqueue.mockResolvedValue(undefined);
+    ledger = { handleAppendEnqueue: jest.fn() };
+    ledger.handleAppendEnqueue.mockResolvedValue(undefined);
     adapter = new ProductStockLedgerCoreAdapter(ledger);
   });
 
-  describe('recordAdded', () => {
+  describe('appendAdded', () => {
     it('enqueues a restock under the stock row at the time of the row', async () => {
-      await adapter.recordAdded({
+      await adapter.appendAdded({
         productStockId: '700',
         subjectId: '12',
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
 
-      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-restocked:700',
         subjectType: 'product',
         subjectId: '12',

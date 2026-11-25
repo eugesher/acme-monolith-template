@@ -900,7 +900,7 @@ exports[`App Catalog Product POST /api/catalog/products should create a draft an
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductCreated",
       "correlationId": "e2e00000-0000-4000-8000-000000000014",
@@ -967,7 +967,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/archive shoul
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductArchived",
       "correlationId": "e2e00000-0000-4000-8000-000000000015",
@@ -1010,7 +1010,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/archive shoul
       },
     ],
   },
-  "ledger_record_queue": [],
+  "ledger_append_queue": [],
   "response": {
     "body": {
       "code": "PRODUCT_ALREADY_ARCHIVED",
@@ -1050,7 +1050,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
       },
     ],
   },
-  "ledger_record_queue": [],
+  "ledger_append_queue": [],
   "response": {
     "body": {
       "createdAt": "2026-01-01T00:00:00.000Z",
@@ -1083,7 +1083,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductPublished",
       "correlationId": "e2e00000-0000-4000-8000-000000000016",
@@ -1126,7 +1126,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductPublished",
       "correlationId": "e2e00000-0000-4000-8000-000000000017",
@@ -1397,7 +1397,7 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refus
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
       "details": null,
-      "message": "Job 999999 was not found in queue ledger-record",
+      "message": "Job 999999 was not found in queue ledger-append",
       "statusCode": 404,
     },
   },
@@ -1416,7 +1416,7 @@ exports[`App Queue GET /api/queues should list the queues with their job counts 
           "failed": 0,
           "waiting": 0,
         },
-        "name": "ledger-record",
+        "name": "ledger-append",
         "paused": false,
       },
       {
@@ -1457,7 +1457,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
           "failedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "failedReason": "The e2e case failed the record",
           "id": StringMatching /\\^\\\\d\\+\\$/,
-          "name": "ledger-record",
+          "name": "ledger-append",
           "processedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "stacktrace": [
             Any<String>,
@@ -1492,7 +1492,7 @@ exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should r
     "body": {
       "code": "QUEUE_JOB_NOT_FAILED",
       "details": null,
-      "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-record is delayed, not failed\\$/,
+      "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-append is delayed, not failed\\$/,
       "statusCode": 409,
     },
   },
@@ -1505,7 +1505,7 @@ exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should r
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
       "details": null,
-      "message": "Job 999999 was not found in queue ledger-record",
+      "message": "Job 999999 was not found in queue ledger-append",
       "statusCode": 404,
     },
   },
@@ -2691,7 +2691,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductRestocked",
       "correlationId": "e2e00000-0000-4000-8000-000000000013",
@@ -2849,7 +2849,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     "ProductRestocked",
   ],
   "response": {

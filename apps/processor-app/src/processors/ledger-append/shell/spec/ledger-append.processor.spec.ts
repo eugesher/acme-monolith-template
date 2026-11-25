@@ -1,7 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 import { LedgerAppendProcessor } from '../ledger-append.processor';
 import type { LedgerAppendReportFailureUseCase, LedgerAppendUseCase } from '../../application';
@@ -42,7 +42,7 @@ describe('LedgerAppendProcessor', () => {
           occurredAt: '2026-01-05T08:00:00.000Z',
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
         },
-      } as unknown as Job<ILedgerRecordProcessorPayload>);
+      } as unknown as Job<ILedgerAppendProcessorPayload>);
 
       expect(append.execute).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
@@ -68,7 +68,7 @@ describe('LedgerAppendProcessor', () => {
           occurredAt: '2026-01-05T08:00:00.000Z',
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
         },
-      } as unknown as Job<ILedgerRecordProcessorPayload>);
+      } as unknown as Job<ILedgerAppendProcessorPayload>);
 
       await expect(handling).rejects.toThrow('deadlock');
     });
@@ -89,7 +89,7 @@ describe('LedgerAppendProcessor', () => {
           },
           attemptsMade: 2,
           opts: { attempts: 3 },
-        } as unknown as Job<ILedgerRecordProcessorPayload>,
+        } as unknown as Job<ILedgerAppendProcessorPayload>,
         new Error('deadlock'),
       );
 

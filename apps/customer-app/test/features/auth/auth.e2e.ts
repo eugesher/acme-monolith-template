@@ -41,7 +41,7 @@ export class AuthE2E {
               ['eve@example.com'],
             ),
           },
-          ledger_record_queue: records.filter((record) => record.subjectId === response.body.id),
+          ledger_append_queue: records.filter((record) => record.subjectId === response.body.id),
         };
 
         expect(actual).toMatchSnapshot({
@@ -56,7 +56,7 @@ export class AuthE2E {
               },
             ],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: expect.any(String),
               subjectId: expect.any(String),
@@ -69,7 +69,7 @@ export class AuthE2E {
           db: {
             customer: [{ id: response.body.id }],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: `customer-registered:${response.body.id}`,
               subjectId: response.body.id,

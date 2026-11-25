@@ -56,9 +56,9 @@ describe('ProductCoreArchiveUseCase', () => {
 
       return Promise.resolve();
     });
-    ledger = { recordArchived: jest.fn() };
-    ledger.recordArchived.mockImplementation(() => {
-      calls.push('recordArchived');
+    ledger = { appendArchived: jest.fn() };
+    ledger.appendArchived.mockImplementation(() => {
+      calls.push('appendArchived');
 
       return Promise.resolve();
     });
@@ -106,10 +106,10 @@ describe('ProductCoreArchiveUseCase', () => {
         'findOne',
         'commit',
         'invalidate',
-        'recordArchived',
+        'appendArchived',
       ]);
       expect(repository.findOne).toHaveBeenCalledWith('12');
-      expect(ledger.recordArchived).toHaveBeenCalledWith({
+      expect(ledger.appendArchived).toHaveBeenCalledWith({
         subjectId: '12',
         version: 4,
         occurredAt: '2026-01-05T08:00:00.000Z',

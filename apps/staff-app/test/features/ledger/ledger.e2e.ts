@@ -56,8 +56,8 @@ export class LedgerE2E {
     });
   }
 
-  public handleEnqueue(): void {
-    describe('LEDGER_CORE_PORT handleEnqueue', () => {
+  public handleAppendEnqueue(): void {
+    describe('LEDGER_CORE_PORT handleAppendEnqueue', () => {
       it('should keep one job for a record enqueued twice under the same operation key', async () => {
         const ledger = this.ctx.moduleFixture.get<ILedgerCorePort>(LEDGER_CORE_PORT);
         const record = {
@@ -70,8 +70,8 @@ export class LedgerE2E {
         };
 
         await CorrelationContextHelper.run('e2e00000-0000-4000-8000-000000000019', async () => {
-          await ledger.handleEnqueue(record);
-          await ledger.handleEnqueue(record);
+          await ledger.handleAppendEnqueue(record);
+          await ledger.handleAppendEnqueue(record);
         });
 
         const records = await this.ctx.takeLedgerRecords();

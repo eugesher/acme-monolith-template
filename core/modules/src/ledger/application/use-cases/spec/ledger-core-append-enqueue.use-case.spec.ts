@@ -2,19 +2,19 @@ import { LedgerActionEnum, LedgerSubjectTypeEnum } from '@acme-libs/kernel';
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { LedgerCoreEnqueueUseCase } from '../ledger-core-enqueue.use-case';
+import { LedgerCoreAppendEnqueueUseCase } from '../ledger-core-append-enqueue.use-case';
 import type { ILedgerCoreQueuePort } from '../../../outbound';
 
-describe('LedgerCoreEnqueueUseCase', () => {
+describe('LedgerCoreAppendEnqueueUseCase', () => {
   let queue: jest.Mocked<ILedgerCoreQueuePort>;
   let logger: PinoLoggerMock;
-  let useCase: LedgerCoreEnqueueUseCase;
+  let useCase: LedgerCoreAppendEnqueueUseCase;
 
   beforeEach(() => {
     queue = { add: jest.fn() };
     queue.add.mockResolvedValue();
     logger = makePinoLoggerMock();
-    useCase = new LedgerCoreEnqueueUseCase(queue, 2, 500, logger);
+    useCase = new LedgerCoreAppendEnqueueUseCase(queue, 2, 500, logger);
   });
 
   describe('execute', () => {

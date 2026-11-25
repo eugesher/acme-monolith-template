@@ -161,7 +161,7 @@ exports[`App Auth POST /api/auth/register should create a customer who logs in a
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "CustomerRegistered",
       "correlationId": "e2e00000-0000-4000-8000-000000000002",
@@ -543,7 +543,7 @@ exports[`App Order POST /api/orders should place an order of another customer un
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     "OrderPlaced",
   ],
   "response": {
@@ -623,7 +623,7 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "OrderPlaced",
       "correlationId": "e2e00000-0000-4000-8000-000000000003",
@@ -824,7 +824,7 @@ exports[`App Order POST /api/orders should replay the same response for the same
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     "OrderPlaced",
   ],
 }

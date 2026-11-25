@@ -6,7 +6,7 @@ scheduled. staff-app and customer-app enqueue, and staff-app serves the staff th
 
 | Processor                     | Entered by                                          | What it does                                                                      |
 | ----------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `ledger-append`               | a job of the `ledger-record` queue                  | appends the record (see `008-queue-processor.md`)                                 |
+| `ledger-append`               | a job of the `ledger-append` queue                  | appends the record (see `008-queue-processor.md`)                                 |
 | `idempotency-purge`           | a job of the `idempotency-purge` queue, every 5 min | deletes the expired and stuck idempotency keys (see `009-scheduled-processor.md`) |
 | `product-stock-post-subtract` | a job of the `product-stock-post-subtract` queue    | a transaction over two core modules (see below)                                   |
 

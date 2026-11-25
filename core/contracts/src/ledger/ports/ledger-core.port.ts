@@ -1,7 +1,7 @@
-import type { ILedgerCoreEnqueueCommand } from '../types';
+import type { ILedgerCoreAppendEnqueueCommand } from '../types';
 
 export interface ILedgerCorePort {
-  handleEnqueue(command: ILedgerCoreEnqueueCommand): Promise<void>;
+  handleAppendEnqueue(command: ILedgerCoreAppendEnqueueCommand): Promise<void>;
 }
 
 export const LEDGER_CORE_PORT = Symbol('LEDGER_CORE_PORT');

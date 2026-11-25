@@ -5,8 +5,8 @@ import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/led
 
 import {
   PRODUCT_CORE_LEDGER_PORT,
+  type IProductCoreLedgerAppendArchivedCommand,
   type IProductCoreLedgerPort,
-  type IProductCoreLedgerRecordArchivedCommand,
 } from '../../outbound';
 
 @Injectable()
@@ -21,10 +21,10 @@ export class ProductCoreLedgerCoreAdapter implements IProductCoreLedgerPort {
     private readonly ledger: ILedgerCorePort,
   ) {}
 
-  public async recordArchived(command: IProductCoreLedgerRecordArchivedCommand): Promise<void> {
+  public async appendArchived(command: IProductCoreLedgerAppendArchivedCommand): Promise<void> {
     const { subjectId, version, occurredAt, payload } = command;
 
-    await this.ledger.handleEnqueue({
+    await this.ledger.handleAppendEnqueue({
       operationKey: `product-archived:${subjectId}:${version}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,

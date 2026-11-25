@@ -38,7 +38,7 @@ export class ProductStockE2E {
               ['e2e-restock-key'],
             ),
           },
-          ledger_record_queue: records,
+          ledger_append_queue: records,
           cache: { keys: await this.ctx.redis.keys('acme:catalog:*') },
         };
 
@@ -53,11 +53,11 @@ export class ProductStockE2E {
               },
             ],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             { operationKey: expect.any(String), occurredAt: expect.any(String) },
           ],
         });
-        expect(actual.ledger_record_queue[0].operationKey).toBe(
+        expect(actual.ledger_append_queue[0].operationKey).toBe(
           `product-restocked:${actual.db.product_stock[2].id}`,
         );
         expect(JSON.parse(actual.db.idempotency_key[0].response_body)).toEqual(response.body);
@@ -151,7 +151,7 @@ export class ProductStockE2E {
               'SELECT quantity FROM product_stock WHERE product_id = 105 ORDER BY id',
             ),
           },
-          ledger_record_queue: records.map((record) => record.action),
+          ledger_append_queue: records.map((record) => record.action),
         }).toMatchSnapshot();
       });
 

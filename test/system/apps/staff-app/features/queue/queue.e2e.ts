@@ -13,8 +13,8 @@ export class QueueE2E {
   public handleRetryFailedJob(): void {
     describe('POST /api/queues/:queueName/jobs/failed/:jobId/retry', () => {
       it('should return a failed record to the queue and append it once its cause is gone', async () => {
-        const job = await this.ctx.ledgerRecordQueue.add(
-          'ledger-record',
+        const job = await this.ctx.ledgerAppendQueue.add(
+          'ledger-append',
           {
             operationKey: 'e2e-system-queue:1',
             subjectType: 'p'.repeat(65),
@@ -34,7 +34,7 @@ export class QueueE2E {
         await job.updateData({ ...job.data, subjectType: 'product' });
 
         await request(this.ctx.app.getHttpServer())
-          .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
+          .post(`/api/queues/ledger-append/jobs/failed/${job.id}/retry`)
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NO_CONTENT);
 
@@ -48,7 +48,7 @@ export class QueueE2E {
 
         expect({
           db: { ledger_entry: ledgerEntries },
-          failed: await this.ctx.ledgerRecordQueue.getFailedCount(),
+          failed: await this.ctx.ledgerAppendQueue.getFailedCount(),
         }).toMatchSnapshot({
           db: { ledger_entry: [{ id: expect.any(String), recorded_at: expect.any(Date) }] },
         });

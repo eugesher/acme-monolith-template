@@ -84,7 +84,7 @@ export class ProductCoreArchiveUseCase {
     const archiveLedgerPayload = archivedProduct.toLedgerPayload(previousStatus);
 
     this.transaction.afterCommit(() => this.catalogCache.invalidate());
-    this.transaction.afterCommit(() => this.ledger.recordArchived(archiveLedgerPayload));
+    this.transaction.afterCommit(() => this.ledger.appendArchived(archiveLedgerPayload));
 
     return {
       outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED,

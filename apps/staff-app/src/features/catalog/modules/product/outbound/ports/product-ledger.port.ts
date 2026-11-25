@@ -1,11 +1,11 @@
 import type {
-  IProductLedgerRecordCreatedCommand,
-  IProductLedgerRecordPublishedCommand,
+  IProductLedgerAppendCreatedCommand,
+  IProductLedgerAppendPublishedCommand,
 } from '../types';
 
 export interface IProductLedgerPort {
-  recordCreated(command: IProductLedgerRecordCreatedCommand): Promise<void>;
-  recordPublished(command: IProductLedgerRecordPublishedCommand): Promise<void>;
+  appendCreated(command: IProductLedgerAppendCreatedCommand): Promise<void>;
+  appendPublished(command: IProductLedgerAppendPublishedCommand): Promise<void>;
 }
 
 export const PRODUCT_LEDGER_PORT = Symbol('PRODUCT_LEDGER_PORT');

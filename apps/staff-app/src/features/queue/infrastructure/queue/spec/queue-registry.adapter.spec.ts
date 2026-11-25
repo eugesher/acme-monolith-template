@@ -11,7 +11,7 @@ describe('QueueRegistryAdapter', () => {
 
   beforeEach(() => {
     ledgerQueue = {
-      name: 'ledger-record',
+      name: 'ledger-append',
       getJobCounts: jest.fn(),
       isPaused: jest.fn(),
       getFailed: jest.fn(),
@@ -31,7 +31,7 @@ describe('QueueRegistryAdapter', () => {
 
   describe('has', () => {
     it('knows the injected queues by their names only', () => {
-      expect(adapter.has('ledger-record')).toBe(true);
+      expect(adapter.has('ledger-append')).toBe(true);
       expect(adapter.has('product-stock-post-subtract')).toBe(true);
       expect(adapter.has('unknown')).toBe(false);
     });
@@ -61,7 +61,7 @@ describe('QueueRegistryAdapter', () => {
 
       expect(queues).toEqual([
         {
-          name: 'ledger-record',
+          name: 'ledger-append',
           paused: false,
           jobCounts: { active: 0, completed: 0, failed: 2, delayed: 0, waiting: 1 },
         },
@@ -86,7 +86,7 @@ describe('QueueRegistryAdapter', () => {
       ledgerQueue.getFailed.mockResolvedValue([
         {
           id: '7',
-          name: 'ledger-record',
+          name: 'ledger-append',
           data: { operationKey: 'product-created:12' },
           opts: { attempts: 3 },
           attemptsMade: 3,
@@ -98,7 +98,7 @@ describe('QueueRegistryAdapter', () => {
         },
         {
           id: '8',
-          name: 'ledger-record',
+          name: 'ledger-append',
           data: {},
           opts: { attempts: 0 },
           attemptsMade: 0,
@@ -112,7 +112,7 @@ describe('QueueRegistryAdapter', () => {
       ledgerQueue.getFailedCount.mockResolvedValue(21);
 
       const failed = await adapter.findFailedJobs({
-        queueName: 'ledger-record',
+        queueName: 'ledger-append',
         offset: 20,
         limit: 20,
       });
@@ -121,7 +121,7 @@ describe('QueueRegistryAdapter', () => {
         [
           {
             id: '7',
-            name: 'ledger-record',
+            name: 'ledger-append',
             data: { operationKey: 'product-created:12' },
             attempts: 3,
             attemptsMade: 3,
@@ -133,7 +133,7 @@ describe('QueueRegistryAdapter', () => {
           },
           {
             id: '8',
-            name: 'ledger-record',
+            name: 'ledger-append',
             data: {},
             attempts: 0,
             attemptsMade: 0,
@@ -162,7 +162,7 @@ describe('QueueRegistryAdapter', () => {
         getState: jest.fn().mockResolvedValue('failed'),
       } as never);
 
-      const state = await adapter.findJobState({ queueName: 'ledger-record', jobId: '7' });
+      const state = await adapter.findJobState({ queueName: 'ledger-append', jobId: '7' });
 
       expect(state).toBe('failed');
       expect(ledgerQueue.getJob).toHaveBeenCalledWith('7');
@@ -171,7 +171,7 @@ describe('QueueRegistryAdapter', () => {
     it('answers null for a job the queue does not hold', async () => {
       ledgerQueue.getJob.mockResolvedValue(undefined);
 
-      const state = await adapter.findJobState({ queueName: 'ledger-record', jobId: '7' });
+      const state = await adapter.findJobState({ queueName: 'ledger-append', jobId: '7' });
 
       expect(state).toBeNull();
     });
@@ -183,7 +183,7 @@ describe('QueueRegistryAdapter', () => {
 
       ledgerQueue.getJob.mockResolvedValue({ retry } as never);
 
-      await adapter.retryJob({ queueName: 'ledger-record', jobId: '7' });
+      await adapter.retryJob({ queueName: 'ledger-append', jobId: '7' });
 
       expect(retry).toHaveBeenCalledTimes(1);
     });
@@ -192,7 +192,7 @@ describe('QueueRegistryAdapter', () => {
       ledgerQueue.getJob.mockResolvedValue(undefined);
 
       await expect(
-        adapter.retryJob({ queueName: 'ledger-record', jobId: '7' }),
+        adapter.retryJob({ queueName: 'ledger-append', jobId: '7' }),
       ).resolves.toBeUndefined();
     });
   });
@@ -206,7 +206,7 @@ describe('QueueRegistryAdapter', () => {
         data: { record: { subjectId: '5' } },
       } as never);
 
-      const data = await adapter.removeJob({ queueName: 'ledger-record', jobId: '7' });
+      const data = await adapter.removeJob({ queueName: 'ledger-append', jobId: '7' });
 
       expect(remove).toHaveBeenCalledTimes(1);
       expect(data).toEqual({ record: { subjectId: '5' } });
@@ -216,7 +216,7 @@ describe('QueueRegistryAdapter', () => {
       ledgerQueue.getJob.mockResolvedValue(undefined);
 
       await expect(
-        adapter.removeJob({ queueName: 'ledger-record', jobId: '7' }),
+        adapter.removeJob({ queueName: 'ledger-append', jobId: '7' }),
       ).resolves.toBeUndefined();
     });
   });

@@ -4,33 +4,33 @@ import { InjectPinoLogger, type PinoLogger } from 'nestjs-pino';
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { ReplayRetryHelper } from '@acme-libs/toolkit';
 import type {
-  ILedgerCoreEnqueueCommand,
-  ILedgerRecordProcessorPayload,
+  ILedgerAppendProcessorPayload,
+  ILedgerCoreAppendEnqueueCommand,
 } from '@acme-core/contracts/ledger';
 
 import {
-  LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
+  LEDGER_CORE_APPEND_ENQUEUE_RETRY_ATTEMPTS_TOKEN,
   LEDGER_CORE_QUEUE_PORT,
   LEDGER_CORE_REDIS_COMMAND_TIMEOUT_MS_TOKEN,
   type ILedgerCoreQueuePort,
 } from '../../outbound';
 
 @Injectable()
-export class LedgerCoreEnqueueUseCase {
+export class LedgerCoreAppendEnqueueUseCase {
   constructor(
     @Inject(LEDGER_CORE_QUEUE_PORT)
     private readonly queue: ILedgerCoreQueuePort,
-    @Inject(LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN)
+    @Inject(LEDGER_CORE_APPEND_ENQUEUE_RETRY_ATTEMPTS_TOKEN)
     private readonly enqueueRetryAttempts: number,
     @Inject(LEDGER_CORE_REDIS_COMMAND_TIMEOUT_MS_TOKEN)
     private readonly timeoutMs: number,
-    @InjectPinoLogger(LedgerCoreEnqueueUseCase.name)
+    @InjectPinoLogger(LedgerCoreAppendEnqueueUseCase.name)
     private readonly logger: PinoLogger,
   ) {}
 
-  public async execute(command: ILedgerCoreEnqueueCommand): Promise<void> {
+  public async execute(command: ILedgerCoreAppendEnqueueCommand): Promise<void> {
     const { operationKey, subjectType, subjectId } = command;
-    const correlationId = CorrelationContextHelper.current(LedgerCoreEnqueueUseCase.name);
+    const correlationId = CorrelationContextHelper.current(LedgerCoreAppendEnqueueUseCase.name);
     const ledgerRecord = { ...command, correlationId };
     const context = { subjectType, subjectId, operationKey };
 
@@ -45,7 +45,7 @@ export class LedgerCoreEnqueueUseCase {
     });
   }
 
-  private async enqueueOne(record: ILedgerRecordProcessorPayload): Promise<void> {
+  private async enqueueOne(record: ILedgerAppendProcessorPayload): Promise<void> {
     const { operationKey, subjectType, subjectId } = record;
 
     await this.queue.add({ record, timeoutMs: this.timeoutMs });

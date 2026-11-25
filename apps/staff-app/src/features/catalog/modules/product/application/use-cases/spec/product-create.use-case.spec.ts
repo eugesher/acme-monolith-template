@@ -29,8 +29,8 @@ describe('ProductCreateUseCase', () => {
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });
-    ledger = { recordCreated: jest.fn(), recordPublished: jest.fn() };
-    ledger.recordCreated.mockResolvedValue(undefined);
+    ledger = { appendCreated: jest.fn(), appendPublished: jest.fn() };
+    ledger.appendCreated.mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
     useCase = new ProductCreateUseCase(repository, ledger, logger);
   });
@@ -60,13 +60,13 @@ describe('ProductCreateUseCase', () => {
     it('enqueues the creation record under the stored id and logs it', async () => {
       await useCase.execute({ sku: 'SKU-0001', name: 'Lamp' });
 
-      expect(ledger.recordCreated).toHaveBeenCalledWith({
+      expect(ledger.appendCreated).toHaveBeenCalledWith({
         subjectId: '12',
         occurredAt: '2026-01-01T00:00:00.000Z',
         payload: { sku: 'SKU-0001', name: 'Lamp' },
       });
       expect(repository.findInserted.mock.invocationCallOrder[0]).toBeLessThan(
-        ledger.recordCreated.mock.invocationCallOrder[0],
+        ledger.appendCreated.mock.invocationCallOrder[0],
       );
       expect(logger.info).toHaveBeenCalledWith({ id: '12', sku: 'SKU-0001' }, 'Product created');
     });
@@ -79,7 +79,7 @@ describe('ProductCreateUseCase', () => {
         message: 'Product sku SKU-0001 is already registered',
       });
       expect(repository.findInserted).not.toHaveBeenCalled();
-      expect(ledger.recordCreated).not.toHaveBeenCalled();
+      expect(ledger.appendCreated).not.toHaveBeenCalled();
     });
   });
 });

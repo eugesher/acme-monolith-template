@@ -96,7 +96,7 @@ export class ProductE2E {
               [lastId],
             ),
           },
-          ledger_record_queue: records.filter((record) => record.subjectId === response.body.id),
+          ledger_append_queue: records.filter((record) => record.subjectId === response.body.id),
         };
 
         expect(actual).toMatchSnapshot({
@@ -116,7 +116,7 @@ export class ProductE2E {
               },
             ],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: expect.any(String),
               subjectId: expect.any(String),
@@ -126,7 +126,7 @@ export class ProductE2E {
         });
         expect(actual).toMatchObject({
           db: { product: [{ id: response.body.id }] },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: `product-created:${response.body.id}`,
               subjectId: response.body.id,
@@ -256,12 +256,12 @@ export class ProductE2E {
           db: {
             product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 103'),
           },
-          ledger_record_queue: records,
+          ledger_append_queue: records,
           cache: { keys: await this.ctx.redis.keys('acme:catalog:*') },
         }).toMatchSnapshot({
           response: { body: { updatedAt: expect.any(String) } },
           db: { product: [{ updated_at: expect.any(Date) }] },
-          ledger_record_queue: [{ occurredAt: expect.any(String) }],
+          ledger_append_queue: [{ occurredAt: expect.any(String) }],
         });
       });
 
@@ -276,7 +276,7 @@ export class ProductE2E {
           db: {
             product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 105'),
           },
-          ledger_record_queue: await this.ctx.takeLedgerRecords(),
+          ledger_append_queue: await this.ctx.takeLedgerRecords(),
         }).toMatchSnapshot();
       });
     });
@@ -301,12 +301,12 @@ export class ProductE2E {
           db: {
             product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 101'),
           },
-          ledger_record_queue: records,
+          ledger_append_queue: records,
           cache: { keys: await this.ctx.redis.keys('acme:catalog:*') },
         }).toMatchSnapshot({
           response: { body: { updatedAt: expect.any(String) } },
           db: { product: [{ updated_at: expect.any(Date) }] },
-          ledger_record_queue: [{ occurredAt: expect.any(String) }],
+          ledger_append_queue: [{ occurredAt: expect.any(String) }],
         });
       });
 
@@ -321,7 +321,7 @@ export class ProductE2E {
           db: {
             product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 100'),
           },
-          ledger_record_queue: await this.ctx.takeLedgerRecords(),
+          ledger_append_queue: await this.ctx.takeLedgerRecords(),
         }).toMatchSnapshot();
       });
 
@@ -337,11 +337,11 @@ export class ProductE2E {
           db: {
             product: await this.ctx.dataSource.query('SELECT * FROM product WHERE id = 105'),
           },
-          ledger_record_queue: await this.ctx.takeLedgerRecords(),
+          ledger_append_queue: await this.ctx.takeLedgerRecords(),
         }).toMatchSnapshot({
           response: { body: { updatedAt: expect.any(String) } },
           db: { product: [{ updated_at: expect.any(Date) }] },
-          ledger_record_queue: [{ occurredAt: expect.any(String) }],
+          ledger_append_queue: [{ occurredAt: expect.any(String) }],
         });
       });
 

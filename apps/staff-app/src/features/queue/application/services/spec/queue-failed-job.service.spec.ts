@@ -21,11 +21,11 @@ describe('QueueFailedJobService', () => {
 
   describe('ensure', () => {
     it('passes a failed job of a known queue', async () => {
-      await service.ensure({ queueName: 'ledger-record', jobId: '7' });
+      await service.ensure({ queueName: 'ledger-append', jobId: '7' });
 
-      expect(registry.has).toHaveBeenCalledWith('ledger-record');
+      expect(registry.has).toHaveBeenCalledWith('ledger-append');
       expect(registry.findJobState).toHaveBeenCalledWith({
-        queueName: 'ledger-record',
+        queueName: 'ledger-append',
         jobId: '7',
       });
     });
@@ -44,10 +44,10 @@ describe('QueueFailedJobService', () => {
       registry.findJobState.mockResolvedValue(null);
 
       await expect(
-        service.ensure({ queueName: 'ledger-record', jobId: '7' }),
+        service.ensure({ queueName: 'ledger-append', jobId: '7' }),
       ).rejects.toMatchObject({
         code: 'QUEUE_JOB_NOT_FOUND',
-        message: 'Job 7 was not found in queue ledger-record',
+        message: 'Job 7 was not found in queue ledger-append',
       });
     });
 
@@ -55,10 +55,10 @@ describe('QueueFailedJobService', () => {
       registry.findJobState.mockResolvedValue('waiting');
 
       await expect(
-        service.ensure({ queueName: 'ledger-record', jobId: '7' }),
+        service.ensure({ queueName: 'ledger-append', jobId: '7' }),
       ).rejects.toMatchObject({
         code: 'QUEUE_JOB_NOT_FAILED',
-        message: 'Job 7 of queue ledger-record is waiting, not failed',
+        message: 'Job 7 of queue ledger-append is waiting, not failed',
       });
     });
   });

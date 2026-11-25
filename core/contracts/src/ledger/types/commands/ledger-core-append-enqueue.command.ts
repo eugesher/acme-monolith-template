@@ -1,9 +1,9 @@
 import type { LedgerActionEnum, LedgerSubjectTypeEnum } from '@acme-libs/kernel';
 
-import type { ILedgerRecordProcessorPayload } from '../../queues/ledger-record.queue';
+import type { ILedgerAppendProcessorPayload } from '../../queues/ledger-append.queue';
 
-export type ILedgerCoreEnqueueCommand = Omit<
-  ILedgerRecordProcessorPayload,
+export type ILedgerCoreAppendEnqueueCommand = Omit<
+  ILedgerAppendProcessorPayload,
   'action' | 'correlationId' | 'subjectType'
 > & {
   subjectType: LedgerSubjectTypeEnum;

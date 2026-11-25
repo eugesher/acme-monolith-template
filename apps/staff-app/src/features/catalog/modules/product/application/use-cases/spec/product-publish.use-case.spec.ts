@@ -27,8 +27,8 @@ describe('ProductPublishUseCase', () => {
       }),
       answer: ProductStatusEnum.DRAFT,
     });
-    ledger = { recordCreated: jest.fn(), recordPublished: jest.fn() };
-    ledger.recordPublished.mockResolvedValue(undefined);
+    ledger = { appendCreated: jest.fn(), appendPublished: jest.fn() };
+    ledger.appendPublished.mockResolvedValue(undefined);
     catalogCache = { invalidate: jest.fn() };
     catalogCache.invalidate.mockResolvedValue(undefined);
     logger = makePinoLoggerMock();
@@ -49,7 +49,7 @@ describe('ProductPublishUseCase', () => {
         ProductPublishModel.reconstitute,
         expect.any(Function),
       );
-      expect(ledger.recordPublished).toHaveBeenCalledWith({
+      expect(ledger.appendPublished).toHaveBeenCalledWith({
         subjectId: '12',
         version: 2,
         occurredAt: '2026-01-03T00:00:00.000Z',
@@ -83,7 +83,7 @@ describe('ProductPublishUseCase', () => {
 
       await useCase.execute({ productId: '12', expectedVersion: 2 });
 
-      expect(ledger.recordPublished).not.toHaveBeenCalled();
+      expect(ledger.appendPublished).not.toHaveBeenCalled();
     });
 
     it('invalidates the customer catalog after the write and before the ledger', async () => {
@@ -94,7 +94,7 @@ describe('ProductPublishUseCase', () => {
         catalogCache.invalidate.mock.invocationCallOrder[0],
       );
       expect(catalogCache.invalidate.mock.invocationCallOrder[0]).toBeLessThan(
-        ledger.recordPublished.mock.invocationCallOrder[0],
+        ledger.appendPublished.mock.invocationCallOrder[0],
       );
     });
 
@@ -105,7 +105,7 @@ describe('ProductPublishUseCase', () => {
         useCase.execute({ productId: '12', expectedVersion: undefined }),
       ).rejects.toThrow('PRODUCT_ALREADY_ARCHIVED');
       expect(catalogCache.invalidate).not.toHaveBeenCalled();
-      expect(ledger.recordPublished).not.toHaveBeenCalled();
+      expect(ledger.appendPublished).not.toHaveBeenCalled();
     });
 
     it('stops at a failed invalidation before the ledger', async () => {
@@ -114,7 +114,7 @@ describe('ProductPublishUseCase', () => {
       await expect(
         useCase.execute({ productId: '12', expectedVersion: undefined }),
       ).rejects.toThrow('redis is down');
-      expect(ledger.recordPublished).not.toHaveBeenCalled();
+      expect(ledger.appendPublished).not.toHaveBeenCalled();
     });
 
     it('hands the write service a change that publishes the product and answers the status it left', async () => {

@@ -16,7 +16,7 @@ export class ProductStockE2E {
         });
 
         await this.ctx.waitForPostSubtractQueue();
-        await this.ctx.waitForLedgerRecordQueue();
+        await this.ctx.waitForLedgerAppendQueue();
 
         expect({
           db: {
@@ -38,7 +38,7 @@ export class ProductStockE2E {
         });
 
         await this.ctx.waitForPostSubtractQueue();
-        await this.ctx.waitForLedgerRecordQueue();
+        await this.ctx.waitForLedgerAppendQueue();
 
         expect({
           db: {
@@ -60,7 +60,7 @@ export class ProductStockE2E {
         });
 
         await this.ctx.waitForPostSubtractQueue();
-        await this.ctx.waitForLedgerRecordQueue();
+        await this.ctx.waitForLedgerAppendQueue();
 
         expect({
           db: {

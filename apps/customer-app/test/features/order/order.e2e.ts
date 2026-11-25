@@ -45,7 +45,7 @@ export class OrderE2E {
               ['e2e-order-place-key'],
             ),
           },
-          ledger_record_queue: records.filter((record) => record.subjectId === response.body.id),
+          ledger_append_queue: records.filter((record) => record.subjectId === response.body.id),
           product_stock_post_subtract_queue: postSubtractJobs,
         };
 
@@ -83,7 +83,7 @@ export class OrderE2E {
               },
             ],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: expect.any(String),
               subjectId: expect.any(String),
@@ -106,7 +106,7 @@ export class OrderE2E {
               { order_product_id: response.body.orderProducts[1].id },
             ],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: `order-placed:${response.body.id}`,
               subjectId: response.body.id,
@@ -141,7 +141,7 @@ export class OrderE2E {
               ['103'],
             ),
           },
-          ledger_record_queue: records.map((record) => record.action),
+          ledger_append_queue: records.map((record) => record.action),
         }).toMatchSnapshot();
       });
 
@@ -197,7 +197,7 @@ export class OrderE2E {
               ['e2e-order-place-key'],
             ),
           },
-          ledger_record_queue: records.map((record) => record.action),
+          ledger_append_queue: records.map((record) => record.action),
         }).toMatchSnapshot({
           response: {
             body: {

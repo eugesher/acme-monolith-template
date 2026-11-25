@@ -51,13 +51,13 @@ ran out of attempts is replayed through `/queues` (see `041-failed-jobs.md`). Th
 queue has no such key, and its processor writes nothing on a replay.
 
 **The ledger is a core module with a facade.** `LedgerCoreModule` (`core/modules/src/ledger`)
-exposes `LEDGER_CORE_PORT` with one method, `handleEnqueue`. `LedgerCoreEnqueueUseCase` reads the
-retry attempts and the timeout from the configuration, adds the correlation id of the context to the
-record, retries and logs under the subject and the operation key; `LedgerCoreQueueAdapter` holds the
-race, the fields of the job and its id.
+exposes `LEDGER_CORE_PORT` with one method, `handleAppendEnqueue`. `LedgerCoreAppendEnqueueUseCase`
+reads the retry attempts and the timeout from the configuration, adds the correlation id of the
+context to the record, retries and logs under the subject and the operation key;
+`LedgerCoreQueueAdapter` holds the race, the fields of the job and its id.
 
 **A module records through its core-adapter.** A module declares `<MODULE>_LEDGER_PORT` with the
-facts it records, such as `recordPlaced`, and implements it in
+facts it records, such as `appendPlaced`, and implements it in
 `infrastructure/core-adapters/<module>-ledger-core.adapter.ts`. The model answers the subject and
 the payload of the record (`OrderPlaceModel.toLedgerPayload()`, see `038-domain-models.md`); the
 adapter adds the operation key, the type of the subject and the action, leaves out the correlation
@@ -67,10 +67,10 @@ asks the model for the payload and passes it through the command of the port.
 
 **The facts of the ledger are a closed list.** The type of the subject and the action are values of
 `LedgerSubjectTypeEnum` and `LedgerActionEnum` in `@acme-libs/kernel`, and
-`ILedgerCoreEnqueueCommand` takes nothing else, so every fact a module may record is listed in one
-place. The job keeps them as strings: `ILedgerRecordProcessorPayload` describes what the processor
-reads from Redis, where a record of another subject type can sit, as the failing job of the
-processor e2e does (see `014-e2e-suites.md`).
+`ILedgerCoreAppendEnqueueCommand` takes nothing else, so every fact a module may record is listed in
+one place. The job keeps them as strings: `ILedgerAppendProcessorPayload` describes what the
+processor reads from Redis, where a record of another subject type can sit, as the failing job of
+the processor e2e does (see `014-e2e-suites.md`).
 
 ## Where the queue is declared
 
