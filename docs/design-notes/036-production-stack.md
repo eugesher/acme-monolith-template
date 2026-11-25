@@ -6,7 +6,7 @@ infrastructure of a local run and of the e2e suites is in `013-e2e-infrastructur
 
 | Service                                      | Published on                       |
 | -------------------------------------------- | ---------------------------------- |
-| `customer-app`, `staff-app`, `processor-app` | ports 3000, 3001, 3002             |
+| `staff-app`, `customer-app`, `processor-app` | ports 3000, 3001, 3002             |
 | `mysql`                                      | `127.0.0.1:3306`                   |
 | `redis`                                      | `127.0.0.1:6379`                   |
 | `jaeger`                                     | `127.0.0.1:16686`                  |

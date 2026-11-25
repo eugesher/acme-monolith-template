@@ -194,7 +194,7 @@ second address is still served. A repeated run finds that address blocked alread
 asserts only the last call, so it passes either way.
 
 **An app under test listens on a port of its own.** The context starts the app as `main.ts` does,
-`listen` included, so `PORT` of `.env.test` is 3100, 3101 and 3102 for customer-app, staff-app and
+`listen` included, so `PORT` of `.env.test` is 3100, 3101 and 3102 for staff-app, customer-app and
 processor-app, next to the 3000, 3001 and 3002 of `.env.example`: a suite runs while the app runs
 locally.
 
