@@ -97,7 +97,7 @@ export class ProductWriteService {
     productId: string,
     reconstitute: (record: IProductReconstitute) => TProduct,
   ): Promise<TProduct> {
-    const productRecord = await this.repository.findById(productId);
+    const productRecord = await this.repository.findOne(productId);
 
     if (!productRecord) {
       throw new ProductNotFoundException(productId);

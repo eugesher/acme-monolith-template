@@ -6,8 +6,8 @@ describe('ProductStockCoreLockUseCase', () => {
   let useCase: ProductStockCoreLockUseCase;
 
   beforeEach(() => {
-    repository = { lockProducts: jest.fn(), sumStock: jest.fn() };
-    repository.lockProducts.mockResolvedValue([{ id: '100' }, { id: '103' }]);
+    repository = { lockMany: jest.fn(), sumStock: jest.fn() };
+    repository.lockMany.mockResolvedValue([{ id: '100' }, { id: '103' }]);
     repository.sumStock.mockResolvedValue([{ productId: '100', quantity: 8 }]);
     useCase = new ProductStockCoreLockUseCase(repository);
   });
@@ -16,9 +16,9 @@ describe('ProductStockCoreLockUseCase', () => {
     it('locks the products first and sums the stock of the locked ones', async () => {
       const onHand = await useCase.execute({ productIds: ['103', '100', '999'] });
 
-      expect(repository.lockProducts).toHaveBeenCalledWith(['103', '100', '999']);
+      expect(repository.lockMany).toHaveBeenCalledWith(['103', '100', '999']);
       expect(repository.sumStock).toHaveBeenCalledWith(['100', '103']);
-      expect(repository.lockProducts.mock.invocationCallOrder[0]).toBeLessThan(
+      expect(repository.lockMany.mock.invocationCallOrder[0]).toBeLessThan(
         repository.sumStock.mock.invocationCallOrder[0],
       );
       expect(onHand).toEqual([

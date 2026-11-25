@@ -1,6 +1,6 @@
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
 
-import { NoteEditModel, type INoteReconstitute } from '../../../domain';
+import { NoteUpdateModel, type INoteReconstitute } from '../../../domain';
 import { NoteWriteService } from '../note-write.service';
 import type { NoteAccessService } from '../note-access.service';
 
@@ -54,17 +54,19 @@ describe('NoteWriteService', () => {
     it('saves the change against the version as read and answers the stored note with the answer of the change', async () => {
       const written = await service.write(
         { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
-        NoteEditModel.reconstitute,
-        (note) => note.edit('Supplier confirmed'),
+        NoteUpdateModel.reconstitute,
+        (note) => note.update('Supplier confirmed'),
         save,
       );
 
-      const [[saveCommand]] = save.mock.calls as [[{ note: NoteEditModel; versionAsRead: number }]];
+      const [[saveCommand]] = save.mock.calls as [
+        [{ note: NoteUpdateModel; versionAsRead: number }],
+      ];
 
       expect(accessService.loadOwned).toHaveBeenNthCalledWith(
         1,
         { noteId: '7', authorId: 'admin-1' },
-        NoteEditModel.reconstitute,
+        NoteUpdateModel.reconstitute,
       );
       expect(saveCommand.versionAsRead).toBe(3);
       expect(saveCommand.note.toSnapshot()).toMatchObject({
@@ -74,7 +76,7 @@ describe('NoteWriteService', () => {
       expect(accessService.loadOwned).toHaveBeenNthCalledWith(
         2,
         { noteId: '7', authorId: 'admin-1' },
-        NoteEditModel.reconstitute,
+        NoteUpdateModel.reconstitute,
       );
       expect(written.note.toSnapshot().updatedAt).toBe('2026-01-03T00:00:00.000Z');
       expect(written.answer).toBe(true);
@@ -84,8 +86,8 @@ describe('NoteWriteService', () => {
     it('saves nothing when the change leaves the version as read', async () => {
       const written = await service.write(
         { noteId: '7', authorId: 'admin-1', expectedVersion: 3 },
-        NoteEditModel.reconstitute,
-        (note) => note.edit('Check the supplier'),
+        NoteUpdateModel.reconstitute,
+        (note) => note.update('Check the supplier'),
         save,
       );
 
@@ -100,8 +102,8 @@ describe('NoteWriteService', () => {
 
       const written = await service.write(
         { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
-        NoteEditModel.reconstitute,
-        (note) => note.edit('Supplier called back'),
+        NoteUpdateModel.reconstitute,
+        (note) => note.update('Supplier called back'),
         save,
       );
 
@@ -120,8 +122,8 @@ describe('NoteWriteService', () => {
       await expect(
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
-          NoteEditModel.reconstitute,
-          (note) => note.edit('Supplier called back'),
+          NoteUpdateModel.reconstitute,
+          (note) => note.update('Supplier called back'),
           save,
         ),
       ).rejects.toMatchObject({
@@ -142,8 +144,8 @@ describe('NoteWriteService', () => {
       await expect(
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: 3 },
-          NoteEditModel.reconstitute,
-          (note) => note.edit('Supplier called back'),
+          NoteUpdateModel.reconstitute,
+          (note) => note.update('Supplier called back'),
           save,
         ),
       ).rejects.toMatchObject({
@@ -160,7 +162,7 @@ describe('NoteWriteService', () => {
       await expect(
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: 2 },
-          NoteEditModel.reconstitute,
+          NoteUpdateModel.reconstitute,
           mutate,
           save,
         ),
@@ -173,8 +175,8 @@ describe('NoteWriteService', () => {
       await expect(
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
-          NoteEditModel.reconstitute,
-          (note) => note.edit('   '),
+          NoteUpdateModel.reconstitute,
+          (note) => note.update('   '),
           save,
         ),
       ).rejects.toMatchObject({ code: 'NOTE_BODY_INVALID' });

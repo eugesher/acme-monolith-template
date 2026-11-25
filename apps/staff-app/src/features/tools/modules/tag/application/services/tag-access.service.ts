@@ -20,7 +20,7 @@ export class TagAccessService {
     reconstitute: (record: ITagAccessRecord) => TTag,
   ): Promise<TTag> {
     const { tagId } = command;
-    const tagRecord = await this.repository.findById(tagId);
+    const tagRecord = await this.repository.findOne(tagId);
 
     if (!tagRecord) {
       throw new TagNotFoundException(tagId);

@@ -18,7 +18,7 @@ export class ToolsE2E {
       this.noteE2E.handleGetOne();
       this.noteE2E.handleGetRevisions();
       this.noteE2E.handleCreate();
-      this.noteE2E.handleEdit();
+      this.noteE2E.handleUpdate();
       this.noteE2E.handleResolve();
       this.noteE2E.handleDelete();
     });
@@ -26,7 +26,7 @@ export class ToolsE2E {
     describe('Tag', () => {
       this.tagE2E.handleGetMany();
       this.tagE2E.handleCreate();
-      this.tagE2E.handleRename();
+      this.tagE2E.handleUpdate();
       this.tagE2E.handleDelete();
     });
   }

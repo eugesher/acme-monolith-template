@@ -54,7 +54,7 @@ one `describe` per feature and calls the methods of the feature class inside it:
 ```ts
 describe('Note', () => {
   noteE2E.handleGetMany();
-  noteE2E.handleEdit();
+  noteE2E.handleUpdate();
 });
 ```
 
@@ -234,7 +234,7 @@ keeps a call only when the logger it was called on is the root itself, by `mock.
   `id: expect.any(String)`, and a check after it compares the id with the response and with
   `MAX(id)`. A literal auto-increment id never enters a snapshot.
 - **A case that needs a state the seeds lack makes it and undoes it in `finally`**, as the rollback
-  of a note edit inserts the revision that breaks the edit and deletes it afterwards.
+  of a note update inserts the revision that breaks the update and deletes it afterwards.
 - **A case that writes sends a fixed `x-correlation-id`** when the correlation id lands in a row, so
   the row is literal in the snapshot. The id is a UUID, `e2e00000-0000-4000-8000-…` with a number
   per case, and the seeds use `5eed0000-0000-4000-8000-000000000001`: any other value is replaced.

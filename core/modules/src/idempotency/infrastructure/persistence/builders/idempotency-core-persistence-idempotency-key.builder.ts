@@ -2,10 +2,10 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import type { IdempotencyKey } from '@acme-core/entities';
 
-import type { IIdempotencyCoreClaimFindQuery } from '../../../outbound';
+import type { IIdempotencyCoreClaimFindByKeyQuery } from '../../../outbound';
 
 export class IdempotencyCorePersistenceIdempotencyKeyBuilder extends SelectQueryBuilder<IdempotencyKey> {
-  public forByKey(query: IIdempotencyCoreClaimFindQuery): this {
+  public forKey(query: IIdempotencyCoreClaimFindByKeyQuery): this {
     const { scope, key } = query;
 
     this.select([

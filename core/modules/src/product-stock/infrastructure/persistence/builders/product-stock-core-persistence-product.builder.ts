@@ -3,7 +3,7 @@ import { SelectQueryBuilder } from 'typeorm';
 import type { Product } from '@acme-core/entities';
 
 export class ProductStockCorePersistenceProductBuilder extends SelectQueryBuilder<Product> {
-  public forLockProducts(productIds: readonly string[]): this {
+  public forLockMany(productIds: readonly string[]): this {
     this.select([`${this.alias}.id`])
       .where(`${this.alias}.id IN (:...productIds)`, { productIds })
       .orderBy(`${this.alias}.id`, 'ASC')

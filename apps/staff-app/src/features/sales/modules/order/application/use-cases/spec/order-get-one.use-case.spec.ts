@@ -6,8 +6,8 @@ describe('OrderGetOneUseCase', () => {
   let useCase: OrderGetOneUseCase;
 
   beforeEach(() => {
-    repository = { findById: jest.fn() };
-    repository.findById.mockResolvedValue({
+    repository = { findOne: jest.fn() };
+    repository.findOne.mockResolvedValue({
       id: '600',
       customerId: 'customer-1',
       createdAt: new Date('2026-01-03T00:00:00.000Z'),
@@ -20,7 +20,7 @@ describe('OrderGetOneUseCase', () => {
     it('returns the order of any customer with its products', async () => {
       const view = await useCase.execute({ orderId: '600' });
 
-      expect(repository.findById).toHaveBeenCalledWith('600');
+      expect(repository.findOne).toHaveBeenCalledWith('600');
       expect(view).toEqual({
         id: '600',
         customerId: 'customer-1',
@@ -30,7 +30,7 @@ describe('OrderGetOneUseCase', () => {
     });
 
     it('refuses a missing order with ORDER_NOT_FOUND', async () => {
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(useCase.execute({ orderId: '999' })).rejects.toMatchObject({
         code: 'ORDER_NOT_FOUND',

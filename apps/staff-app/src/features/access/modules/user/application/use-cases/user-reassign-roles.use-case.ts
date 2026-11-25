@@ -30,7 +30,7 @@ export class UserReassignRolesUseCase {
     }
 
     const userRoles = UserStaffUserReassignRolesModel.create({ userId, roleIds });
-    const storedRoles = await this.repository.findRoles(roleIds);
+    const storedRoles = await this.repository.findMany(roleIds);
 
     userRoles.assertRoles(storedRoles);
 

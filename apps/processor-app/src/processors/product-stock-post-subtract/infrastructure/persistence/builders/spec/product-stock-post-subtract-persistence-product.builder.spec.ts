@@ -24,12 +24,11 @@ describe('ProductStockPostSubtractPersistenceProductBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forActive', () => {
+  describe('forActiveMany', () => {
     it('selects the ids of the active products among the given ones in id order', () => {
-      const builder = new ProductStockPostSubtractPersistenceProductBuilder(baseBuilder).forActive([
-        '100',
-        '101',
-      ]);
+      const builder = new ProductStockPostSubtractPersistenceProductBuilder(
+        baseBuilder,
+      ).forActiveMany(['100', '101']);
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE `Product`.`id` IN (?, ?) AND `Product`.`status` = ? ORDER BY `Product_id` ASC',

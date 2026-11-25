@@ -4,7 +4,7 @@ import { UserStatusEnum } from '@acme-libs/kernel';
 import type { Customer } from '@acme-core/entities';
 
 export class AuthGlobalPersistenceCustomerBuilder extends SelectQueryBuilder<Customer> {
-  public forActiveById(id: string): this {
+  public forActiveOne(id: string): this {
     this.select([`${this.alias}.id`, `${this.alias}.email`])
       .where(`${this.alias}.id = :id`, { id })
       .andWhere(`${this.alias}.status = :status`, { status: UserStatusEnum.ACTIVE });

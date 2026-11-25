@@ -37,12 +37,12 @@ export class UserRegisterRepository
     return { outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED, id: userId };
   }
 
-  public async findRoles(ids: readonly string[]): Promise<IUserRegisterStaffRoleRecord[]> {
+  public async findMany(ids: readonly string[]): Promise<IUserRegisterStaffRoleRecord[]> {
     if (ids.length === 0) {
       return [];
     }
 
-    return await this.createStaffRoleBuilder().forByIds(ids).getMany();
+    return await this.createStaffRoleBuilder().forMany(ids).getMany();
   }
 
   public async insertUserRoles(queries: IUserRegisterStaffUserRoleInsertQuery[]): Promise<void> {

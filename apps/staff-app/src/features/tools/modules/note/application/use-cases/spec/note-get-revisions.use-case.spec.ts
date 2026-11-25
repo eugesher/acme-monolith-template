@@ -10,8 +10,8 @@ describe('NoteGetRevisionsUseCase', () => {
   beforeEach(() => {
     accessService = { assertOwned: jest.fn() };
     accessService.assertOwned.mockResolvedValue(undefined);
-    repository = { listForNote: jest.fn() };
-    repository.listForNote.mockResolvedValue([
+    repository = { list: jest.fn() };
+    repository.list.mockResolvedValue([
       [
         {
           id: '11',
@@ -37,7 +37,7 @@ describe('NoteGetRevisionsUseCase', () => {
       const page = await useCase.execute({ noteId: '7', authorId: 'admin-1', page: 2, limit: 5 });
 
       expect(accessService.assertOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
-      expect(repository.listForNote).toHaveBeenCalledWith({ limit: 5, offset: 5, noteId: '7' });
+      expect(repository.list).toHaveBeenCalledWith({ limit: 5, offset: 5, noteId: '7' });
       expect(page).toEqual({
         page: 2,
         limit: 5,
@@ -65,7 +65,7 @@ describe('NoteGetRevisionsUseCase', () => {
       await expect(
         useCase.execute({ noteId: '7', authorId: 'admin-1', page: undefined, limit: undefined }),
       ).rejects.toThrow('Note 7 was not found');
-      expect(repository.listForNote).not.toHaveBeenCalled();
+      expect(repository.list).not.toHaveBeenCalled();
     });
   });
 });

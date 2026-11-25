@@ -19,7 +19,7 @@ export class ProductStockAddRepository
     useClass: ProductStockAddRepository,
   };
 
-  public async findById(productId: string): Promise<Nullable<IProductStockAddProductRecord>> {
-    return await this.createProductBuilder().forById(productId).getOne();
+  public async findOne(productId: string): Promise<Nullable<IProductStockAddProductRecord>> {
+    return await this.createProductBuilder().forOne(productId).getOne();
   }
 }

@@ -23,9 +23,9 @@ describe('ProductStockAddUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { findById: jest.fn() };
-    repository.findById.mockImplementation(() => {
-      calls.push('findById');
+    repository = { findOne: jest.fn() };
+    repository.findOne.mockImplementation(() => {
+      calls.push('findOne');
 
       return Promise.resolve({ id: '12', sku: 'SKU-0001' });
     });
@@ -102,7 +102,7 @@ describe('ProductStockAddUseCase', () => {
         body: { productId: '12', quantity: 5 },
       });
       expect(movement.lock).toHaveBeenCalledWith({ productId: '12' });
-      expect(repository.findById).toHaveBeenCalledWith('12');
+      expect(repository.findOne).toHaveBeenCalledWith('12');
       expect(movement.add).toHaveBeenCalledWith({ productId: '12', quantity: 5 });
       expect(view).toEqual({ productId: '12', quantity: 15 });
       expect(idempotency.complete).toHaveBeenCalledWith({
@@ -114,7 +114,7 @@ describe('ProductStockAddUseCase', () => {
         'claim',
         'begin',
         'lock',
-        'findById',
+        'findOne',
         'add',
         'complete',
         'commit',
@@ -192,7 +192,7 @@ describe('ProductStockAddUseCase', () => {
     });
 
     it('refuses an unknown product with PRODUCT_STOCK_PRODUCT_NOT_FOUND and releases the key', async () => {
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(
         useCase.execute({

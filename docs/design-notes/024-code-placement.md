@@ -30,7 +30,7 @@ Everything else sits with its only caller, for example:
 | the delete of expired idempotency keys               | `apps/processor-app/src/processors/idempotency-purge` |
 | the password check and the token of a customer login | `apps/customer-app/src/features/auth`                 |
 | the password check and the token of a staff login    | `apps/staff-app/src/features/auth`                    |
-| the create, list, rename and delete of tags          | `apps/staff-app/src/features/tools/modules/tag`       |
+| the create, list, update and delete of tags          | `apps/staff-app/src/features/tools/modules/tag`       |
 
 ## Why per method
 

@@ -5,7 +5,7 @@ import type { Product } from '@acme-core/entities';
 import type { IProductGetManyListQuery } from '../../../outbound';
 
 export class ProductPersistenceBuilder extends SelectQueryBuilder<Product> {
-  public forById(productId: string): this {
+  public forOne(productId: string): this {
     this.selectProduct().whereId(productId);
 
     return this;
@@ -25,7 +25,7 @@ export class ProductPersistenceBuilder extends SelectQueryBuilder<Product> {
     return this;
   }
 
-  public forLockById(productId: string): this {
+  public forLockOne(productId: string): this {
     this.select([`${this.alias}.id`])
       .whereId(productId)
       .setLock('pessimistic_write');

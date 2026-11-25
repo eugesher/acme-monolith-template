@@ -16,7 +16,7 @@ export class TagAccessRepository extends TagPersistenceHost implements ITagAcces
     useClass: TagAccessRepository,
   };
 
-  public async findById(tagId: string): Promise<Nullable<ITagAccessRecord>> {
-    return await this.createTagBuilder().forById(tagId).getOne();
+  public async findOne(tagId: string): Promise<Nullable<ITagAccessRecord>> {
+    return await this.createTagBuilder().forOne(tagId).getOne();
   }
 }

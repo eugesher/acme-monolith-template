@@ -24,12 +24,12 @@ export class UserReassignRolesRepository
     return await this.staffUserRepository.existsBy({ id });
   }
 
-  public async findRoles(ids: readonly string[]): Promise<IUserReassignRolesStaffRoleRecord[]> {
+  public async findMany(ids: readonly string[]): Promise<IUserReassignRolesStaffRoleRecord[]> {
     if (ids.length === 0) {
       return [];
     }
 
-    return await this.createStaffRoleBuilder().forByIds(ids).getMany();
+    return await this.createStaffRoleBuilder().forMany(ids).getMany();
   }
 
   public async deleteUserRolesExcept(

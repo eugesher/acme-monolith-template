@@ -48,7 +48,7 @@ export class ProductCoreArchiveUseCase {
 
   private async archive(command: IProductCoreArchiveCommand): Promise<IProductCoreArchiveView> {
     const { productId, expectedVersion } = command;
-    const productRecord = await this.repository.lockById(productId);
+    const productRecord = await this.repository.lockOne(productId);
 
     if (!productRecord) {
       return { outcome: ProductCoreArchiveOutcomeEnum.NOT_FOUND, currentVersion: undefined };
@@ -79,7 +79,7 @@ export class ProductCoreArchiveUseCase {
 
     await this.repository.update(productUpdatePayload);
 
-    const archivedRecord = await this.repository.findById(productId);
+    const archivedRecord = await this.repository.findOne(productId);
     const archivedProduct = ProductCoreArchiveModel.reconstitute(archivedRecord);
     const archiveLedgerPayload = archivedProduct.toLedgerPayload(previousStatus);
 

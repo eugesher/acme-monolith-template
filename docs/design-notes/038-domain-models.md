@@ -13,7 +13,7 @@ what the model answers.
 | ---------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
 | the response           | `toSnapshot()`                                                 | `ProductGetOneModel.toSnapshot()`                  |
 | a row to insert        | `toInsertPayload()`, `create<Children>(id)` for its child rows | `RoleCandidateModel.createRolePermissions(roleId)` |
-| a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteEditModel.toUpdatePayload(versionAsRead)`     |
+| a row to update        | `toUpdatePayload(versionAsRead)`                               | `NoteUpdateModel.toUpdatePayload(versionAsRead)`   |
 | a record of the ledger | `toLedgerPayload()`                                            | `ProductCreateModel.toLedgerPayload()`             |
 | a line of the log      | `toLoggerPayload()`                                            | `NoteResolveModel.toLoggerPayload()`               |
 
@@ -25,7 +25,7 @@ the hosted repository answers the `createdAt` that TypeORM reads back into `gene
 `034-orm-lib.md`; `AuthRegisterRepository.insert`, core `ProductStockCoreMoveRepository.insertMany`,
 whose rows core `handleMove` answers). A row that was updated gives its `updatedAt` from a read
 after the update: the product write service reads the product again, and the core archive reads it
-with `findById`. No adapter stamps the time itself.
+with `findOne`. No adapter stamps the time itself.
 
 **Without an instance, a static method answers.** An idempotency key has only its scope and key, so
 `IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` names the fields of the log line. A
@@ -51,7 +51,7 @@ from others stays out (`units`, `onHand`, `nameAsRead`): the message carries the
 
 **Two values of one type travel in one object.** Positional strings swap without an error, so
 `IdempotencyCoreReleaseModel.toLoggerPayload({ scope, key })` and
-`NoteEditModel.toRevisionInsertPayload({ bodyBefore, editorId, correlationId })` take one object,
+`NoteUpdateModel.toRevisionInsertPayload({ bodyBefore, editorId, correlationId })` take one object,
 `I<Model><Answer>Build` of `types/data`: `IIdempotencyCoreReleaseLoggerPayloadBuild`.
 
 **What stays in the use case.**
@@ -80,7 +80,7 @@ what a method of a model takes, one object per method, and `snapshots/` every sh
 |                           | `I<Model>CandidateInit`                          | the data a new row is checked against, `Model.initCandidate(proposal)`                                                                                                                           |
 |                           | `I<Model><Action>`                               | the edits an operation takes, `IProductUpdate` for `ProductUpdateModel.update(changes)`                                                                                                          |
 |                           | `I<Model>Create`                                 | the request a candidate model is created from, `OrderCandidateModel.create(proposal)`                                                                                                            |
-|                           | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteEditRevisionInsertPayloadBuild`                                                                                                          |
+|                           | `I<Model><Answer>Build`                          | the values a `to…` method builds its answer from, `INoteUpdateRevisionInsertPayloadBuild`                                                                                                        |
 | `domain/types/snapshots/` | `I<Model>Candidate`                              | the row `initCandidate` answers for an insert                                                                                                                                                    |
 |                           | `I<Model>Snapshot`                               | the state a model answers with `toSnapshot()`                                                                                                                                                    |
 |                           | `I<Model>InsertPayload`, `I<Model>UpdatePayload` | the row to write, `IRoleCandidateInsertPayload`, `INoteUpdatePayload`; `Query` stays the kind of an outbound interface                                                                           |
@@ -183,7 +183,7 @@ version with `isValidVersion` and refuses with an exception of its module,
 
 **A shared service takes the model of the caller.** The access and write services of an entity serve
 several use cases, so the caller passes the static `reconstitute` of its model and gets that model
-back: `accessService.load({ tagId }, TagRenameModel.reconstitute)`,
+back: `accessService.load({ tagId }, TagUpdateModel.reconstitute)`,
 `writeService.write(command, ProductPublishModel.reconstitute, (product) => product.publish())`.
 `reconstitute` declares `this: void`, as it names its class rather than `this`, and the write
 service bounds the model by the aggregate, whose `version` and `toUpdatePayload` it needs. A use
@@ -191,8 +191,8 @@ case that only checks the entity exists asks for no model: `NoteAccessService.as
 `ProductAccessService.assertExists`. The write service hands back what `mutate` answers next to the
 stored model: `ProductPublishModel.publish()` answers the status the product left, and the stored
 model answers `toLedgerPayload(previousStatus)` with its new version and `updatedAt`;
-`NoteEditModel.edit(body)` answers whether the body changed, and the model remembers the body it was
-read with for `toRevisionInsertPayload` (see `007-optimistic-concurrency.md`).
+`NoteUpdateModel.update(body)` answers whether the body changed, and the model remembers the body it
+was read with for `toRevisionInsertPayload` (see `007-optimistic-concurrency.md`).
 
 **Use cases that share no state have models without an aggregate.** The login reads the hash and the
 status of a customer, the registration answers its id and email, so `AuthCustomerLoginModel` and
@@ -231,7 +231,7 @@ that only its class changes, and a field cannot share its name with an accessor,
 the name of its getter with a leading `_`: `Entity._id` behind `id`, `VersionedEntity._version`
 behind `version`, `ProductCoreArchiveModel._status` behind `status`,
 `OrderCandidateModel._distinctProductIds` behind `distinctProductIds`. `TagAggregate` holds `_name`
-because `TagRenameModel` reads it through `get name()`, and a subclass cannot turn a field of its
+because `TagUpdateModel` reads it through `get name()`, and a subclass cannot turn a field of its
 base into an accessor. A field without a getter keeps the plain name, as `name` and `status` of
 `ProductAggregate` and `body` and `resolved` of `NoteAggregate`.
 

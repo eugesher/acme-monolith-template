@@ -21,7 +21,7 @@ export class RoleReassignPermissionsRepository
   };
 
   public async findRole(id: string): Promise<Nullable<IRoleReassignPermissionsRoleRecord>> {
-    return await this.createStaffRoleBuilder().forById(id).getOne();
+    return await this.createStaffRoleBuilder().forOne(id).getOne();
   }
 
   public async deleteRolePermissions(roleId: string): Promise<void> {

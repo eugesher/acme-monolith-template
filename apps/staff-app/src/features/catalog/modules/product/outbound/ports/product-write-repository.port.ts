@@ -3,7 +3,7 @@ import type { Nullable } from '@acme-libs/toolkit';
 import type { IProductWriteRecord, IProductWriteUpdateQuery } from '../types';
 
 export interface IProductWriteRepositoryPort {
-  findById(productId: string): Promise<Nullable<IProductWriteRecord>>;
+  findOne(productId: string): Promise<Nullable<IProductWriteRecord>>;
   update(query: IProductWriteUpdateQuery): Promise<boolean>;
 }
 

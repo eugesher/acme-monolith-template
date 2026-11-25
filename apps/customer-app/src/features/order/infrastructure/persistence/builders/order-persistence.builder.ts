@@ -2,13 +2,13 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import { OrderProduct, Product, type Order } from '@acme-core/entities';
 
-import type { IOrderGetManyQuery, IOrderGetOneQuery } from '../../../outbound';
+import type { IOrderGetManyListQuery, IOrderGetOneFindOwnedQuery } from '../../../outbound';
 
 export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
   private readonly orderProductAlias = OrderProduct.name;
   private readonly productAlias = Product.name;
 
-  public forList(query: IOrderGetManyQuery): this {
+  public forList(query: IOrderGetManyListQuery): this {
     const { limit, offset, customerId } = query;
 
     this.selectOrder()
@@ -20,7 +20,7 @@ export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
     return this;
   }
 
-  public forOwned(query: IOrderGetOneQuery): this {
+  public forOwned(query: IOrderGetOneFindOwnedQuery): this {
     const { orderId, customerId } = query;
 
     this.selectOrder()

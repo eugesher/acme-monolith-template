@@ -24,9 +24,9 @@ describe('ProductStockCorePersistenceProductBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forLockProducts', () => {
+  describe('forLockMany', () => {
     it('selects the given products in id order under an exclusive lock', () => {
-      const builder = new ProductStockCorePersistenceProductBuilder(baseBuilder).forLockProducts([
+      const builder = new ProductStockCorePersistenceProductBuilder(baseBuilder).forLockMany([
         '100',
         '101',
       ]);

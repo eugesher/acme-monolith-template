@@ -8,8 +8,8 @@ describe('TagCommonFindUseCase', () => {
   let useCase: TagCommonFindUseCase;
 
   beforeEach(() => {
-    repository = { list: jest.fn() };
-    repository.list.mockResolvedValue([
+    repository = { findBySubject: jest.fn() };
+    repository.findBySubject.mockResolvedValue([
       { id: '300', name: 'fragile' },
       { id: '301', name: 'promo' },
     ]);
@@ -23,7 +23,10 @@ describe('TagCommonFindUseCase', () => {
         subjectId: '100',
       });
 
-      expect(repository.list).toHaveBeenCalledWith({ subjectType: 'product', subjectId: '100' });
+      expect(repository.findBySubject).toHaveBeenCalledWith({
+        subjectType: 'product',
+        subjectId: '100',
+      });
       expect(tags).toEqual([
         { id: '300', name: 'fragile' },
         { id: '301', name: 'promo' },

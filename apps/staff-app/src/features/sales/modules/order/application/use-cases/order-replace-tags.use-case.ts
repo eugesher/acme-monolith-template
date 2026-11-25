@@ -26,7 +26,7 @@ export class OrderReplaceTagsUseCase {
   public async execute(command: IOrderReplaceTagsCommand): Promise<IOrderTagsView> {
     return await this.transaction.run(async () => {
       const { orderId, tagIds } = command;
-      const order = await this.repository.lockById(orderId);
+      const order = await this.repository.lockOne(orderId);
 
       if (!order) {
         throw new OrderNotFoundException(orderId);

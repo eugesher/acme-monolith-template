@@ -24,9 +24,9 @@ describe('TagCommonPersistenceTagSubjectBuilder', () => {
     baseBuilder = dataSource.getRepository(TagSubject).createQueryBuilder(TagSubject.name);
   });
 
-  describe('forList', () => {
+  describe('forTag', () => {
     it('selects the subjects of the type that carry the tag', () => {
-      const builder = new TagCommonPersistenceTagSubjectBuilder(baseBuilder).forList({
+      const builder = new TagCommonPersistenceTagSubjectBuilder(baseBuilder).forTag({
         subjectType: 'product',
         tagId: '300',
       });

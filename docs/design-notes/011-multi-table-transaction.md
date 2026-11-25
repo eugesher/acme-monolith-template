@@ -3,17 +3,17 @@
 One use case writes two tables in one transaction through one repository port, with optimistic
 concurrency on the first.
 
-| Part          | Example                                                                                                          |
-| ------------- | ---------------------------------------------------------------------------------------------------------------- |
-| use case      | `apps/staff-app/src/features/tools/modules/note/application/use-cases/note-edit.use-case.ts`                     |
-| port          | `apps/staff-app/src/features/tools/modules/note/outbound/ports/note-edit-repository.port.ts`                     |
-| repository    | `apps/staff-app/src/features/tools/modules/note/infrastructure/persistence/repositories/note-edit.repository.ts` |
-| write service | `apps/staff-app/src/features/tools/modules/note/application/services/note-write.service.ts`                      |
+| Part          | Example                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| use case      | `apps/staff-app/src/features/tools/modules/note/application/use-cases/note-update.use-case.ts`                     |
+| port          | `apps/staff-app/src/features/tools/modules/note/outbound/ports/note-update-repository.port.ts`                     |
+| repository    | `apps/staff-app/src/features/tools/modules/note/infrastructure/persistence/repositories/note-update.repository.ts` |
+| write service | `apps/staff-app/src/features/tools/modules/note/application/services/note-write.service.ts`                        |
 
 ```ts
-interface INoteEditRepositoryPort {
-  update(query: INoteEditUpdateQuery): Promise<boolean>;
-  appendRevision(query: INoteEditRevisionInsertQuery): Promise<void>;
+interface INoteUpdateRepositoryPort {
+  update(query: INoteUpdateQuery): Promise<boolean>;
+  appendRevision(query: INoteUpdateAppendRevisionQuery): Promise<void>;
 }
 ```
 
@@ -54,13 +54,13 @@ reveals that another row exists. Every query takes the caller as a required filt
 
 ## Shared update through a base repository
 
-The edit and resolve repositories share `update` through
+The update and resolve repositories share `update` through
 `apps/staff-app/src/features/tools/modules/note/infrastructure/persistence/repositories/base/note-base.repository.ts`;
-the product module shares `findById` the same way.
+the product module shares `findOne` the same way.
 
 **The base speaks for every port it serves.** Each port keeps its own types, so a shared method
 takes the union of their queries and answers the intersection of their records:
-`update(query: INoteEditUpdateQuery | INoteResolveUpdateQuery)`,
-`findById(): Promise<Nullable<IProductAccessRecord & IProductWriteRecord>>`, and the lock and the
-sum of core `ProductStockCoreBaseRepository` for the lock and move ports. No port lends its name to
-the other.
+`update(query: INoteUpdateQuery | INoteResolveUpdateQuery)`,
+`findOne(): Promise<Nullable<IProductAccessRecord & IProductWriteRecord>>`, and the lock and the sum
+of core `ProductStockCoreBaseRepository` for the lock and move ports. No port lends its name to the
+other.

@@ -17,6 +17,6 @@ export class AuthLoginRepository extends AuthPersistenceHost implements IAuthLog
   };
 
   public async findByEmail(email: string): Promise<Nullable<IAuthLoginCustomerRecord>> {
-    return await this.createCustomerBuilder().forByEmail(email).getOne();
+    return await this.createCustomerBuilder().forEmail(email).getOne();
   }
 }

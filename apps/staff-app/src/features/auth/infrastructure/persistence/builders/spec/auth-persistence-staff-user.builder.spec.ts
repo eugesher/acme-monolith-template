@@ -29,9 +29,9 @@ describe('AuthPersistenceStaffUserBuilder', () => {
     baseBuilder = dataSource.getRepository(StaffUser).createQueryBuilder(StaffUser.name);
   });
 
-  describe('forByEmail', () => {
+  describe('forEmail', () => {
     it('selects the credentials and status of the user with the email', () => {
-      const builder = new AuthPersistenceStaffUserBuilder(baseBuilder).forByEmail(
+      const builder = new AuthPersistenceStaffUserBuilder(baseBuilder).forEmail(
         'admin@example.com',
       );
 

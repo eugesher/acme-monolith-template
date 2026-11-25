@@ -8,9 +8,9 @@ coverage thresholds and the lint of tests.
 | Part                      | Example                                                                                                                     |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | use case in a transaction | `apps/staff-app/src/features/warehouse/modules/product-stock/application/use-cases/spec/product-stock-add.use-case.spec.ts` |
-| model                     | `apps/staff-app/src/features/tools/modules/tag/domain/models/spec/tag-rename.model.spec.ts`                                 |
+| model                     | `apps/staff-app/src/features/tools/modules/tag/domain/models/spec/tag-update.model.spec.ts`                                 |
 | processor                 | `apps/processor-app/src/processors/ledger-append/shell/spec/ledger-append.processor.spec.ts`                                |
-| request DTO               | `apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/spec/tag-rename.request.dto.spec.ts`               |
+| request DTO               | `apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/spec/tag-update.request.dto.spec.ts`               |
 | query builder             | `apps/staff-app/src/features/tools/modules/tag/infrastructure/persistence/builders/spec/tag-persistence.builder.spec.ts`    |
 | module                    | `libs/cache/src/shell/spec/cache.module.spec.ts`                                                                            |
 | logger mock               | `libs/testing/src/observability/pino-logger.mock.ts`                                                                        |
@@ -67,7 +67,7 @@ a test that turned them on.
 | the logger                                                                           | `makePinoLoggerMock()` of `libs/testing`, passed as is                                   |
 | a driver or a framework object (Redis, a BullMQ queue, a span, an execution context) | a partial fake with a cast                                                               |
 
-**A mock is configured through its typed member**: `repository.findById.mockResolvedValue(record)`.
+**A mock is configured through its typed member**: `repository.findOne.mockResolvedValue(record)`.
 The type of the port checks the fixture there, so a view that lost a field or an enum value written
 as a string fails `yarn typecheck`. A chained `jest.fn().mockResolvedValue(record)` is a `Mock<any>`
 and checks nothing; it stays for a callback handed to the subject, such as the work of a

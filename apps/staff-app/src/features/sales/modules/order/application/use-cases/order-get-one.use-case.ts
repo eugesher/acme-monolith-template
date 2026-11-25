@@ -13,7 +13,7 @@ export class OrderGetOneUseCase {
 
   public async execute(command: IOrderGetOneCommand): Promise<IOrderGetOneView> {
     const { orderId } = command;
-    const orderRecord = await this.repository.findById(orderId);
+    const orderRecord = await this.repository.findOne(orderId);
 
     if (!orderRecord) {
       throw new OrderNotFoundException(orderId);

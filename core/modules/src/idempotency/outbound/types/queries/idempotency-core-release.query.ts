@@ -1,4 +1,4 @@
-export interface IIdempotencyCoreReleaseQuery {
+export interface IIdempotencyCoreReleaseDeleteInFlightQuery {
   scope: string;
   key: string;
 }

@@ -2,7 +2,7 @@ import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   NOTE_GET_REVISIONS_REPOSITORY_PORT,
-  type INoteGetRevisionsListForNoteQuery,
+  type INoteGetRevisionsListQuery,
   type INoteGetRevisionsRecord,
   type INoteGetRevisionsRepositoryPort,
 } from '../../../outbound';
@@ -18,9 +18,7 @@ export class NoteGetRevisionsRepository
     useClass: NoteGetRevisionsRepository,
   };
 
-  public async listForNote(
-    query: INoteGetRevisionsListForNoteQuery,
-  ): Promise<INoteGetRevisionsRecord> {
-    return await this.createNoteRevisionBuilder().forListForNote(query).getManyAndCount();
+  public async list(query: INoteGetRevisionsListQuery): Promise<INoteGetRevisionsRecord> {
+    return await this.createNoteRevisionBuilder().forList(query).getManyAndCount();
   }
 }

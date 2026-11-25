@@ -159,7 +159,7 @@ export class NoteE2E {
     });
   }
 
-  public handleEdit(): void {
+  public handleUpdate(): void {
     describe('PATCH /api/tools/notes/:noteId', () => {
       it('should rewrite the body under a matching If-Match and record a revision under the correlation id', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query(
@@ -194,11 +194,11 @@ export class NoteE2E {
         expect(Number(actual.db.note_revision[0].id)).toBeGreaterThan(Number(lastId));
       });
 
-      it('should write nothing for an edit to the current body', async () => {
+      it('should write nothing for an update to the current body', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/tools/notes/204')
           .auth(this.ctx.adminToken, { type: 'bearer' })
-          .send({ body: 'Edited with the same body.' })
+          .send({ body: 'Updated with the same body.' })
           .expect(HttpStatus.OK);
 
         expect({
@@ -222,7 +222,7 @@ export class NoteE2E {
           const response = await request(this.ctx.app.getHttpServer())
             .patch('/api/tools/notes/203')
             .auth(this.ctx.adminToken, { type: 'bearer' })
-            .send({ body: 'This edit is rolled back.' })
+            .send({ body: 'This update is rolled back.' })
             .expect(HttpStatus.CONFLICT);
 
           expect({
@@ -246,7 +246,7 @@ export class NoteE2E {
           const response = await request(this.ctx.app.getHttpServer())
             .patch('/api/tools/notes/203')
             .auth(this.ctx.adminToken, { type: 'bearer' })
-            .send({ body: 'This edit fails on the revision.' })
+            .send({ body: 'This update fails on the revision.' })
             .expect(HttpStatus.INTERNAL_SERVER_ERROR);
 
           expect({
@@ -263,7 +263,7 @@ export class NoteE2E {
           .patch('/api/tools/notes/204')
           .set('If-Match', '7')
           .auth(this.ctx.adminToken, { type: 'bearer' })
-          .send({ body: 'Edited over a stale version.' })
+          .send({ body: 'Updated over a stale version.' })
           .expect(HttpStatus.PRECONDITION_FAILED);
 
         expect({
@@ -295,7 +295,7 @@ export class NoteE2E {
         }).toMatchSnapshot();
       });
 
-      it('should refuse to edit a resolved note with 409', async () => {
+      it('should refuse to update a resolved note with 409', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/tools/notes/202')
           .auth(this.ctx.adminToken, { type: 'bearer' })

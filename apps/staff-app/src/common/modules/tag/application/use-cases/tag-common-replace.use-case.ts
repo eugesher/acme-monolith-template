@@ -46,7 +46,7 @@ export class TagCommonReplaceUseCase {
 
   private async replace(command: ITagCommonReplaceCommand): Promise<ITagCommonReplaceView> {
     const { subjectType, subjectId, tagIds } = command;
-    const tags = await this.repository.lockTags(tagIds);
+    const tags = await this.repository.lockMany(tagIds);
     const missingTagIds = TagCommonSubjectTagsReplaceModel.missingTagIds(tagIds, tags);
 
     if (missingTagIds.length > 0) {

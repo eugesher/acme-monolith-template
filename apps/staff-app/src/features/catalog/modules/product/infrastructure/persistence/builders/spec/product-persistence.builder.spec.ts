@@ -24,9 +24,9 @@ describe('ProductPersistenceBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forById', () => {
+  describe('forOne', () => {
     it('selects the product by id', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder).forById('100');
+      const builder = new ProductPersistenceBuilder(baseBuilder).forOne('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`name` AS `Product_name`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`createdAt` AS `Product_createdAt`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE `Product`.`id` = ?',
@@ -63,9 +63,9 @@ describe('ProductPersistenceBuilder', () => {
     });
   });
 
-  describe('forLockById', () => {
+  describe('forLockOne', () => {
     it('selects the id of the product under an exclusive lock', () => {
-      const builder = new ProductPersistenceBuilder(baseBuilder).forLockById('100');
+      const builder = new ProductPersistenceBuilder(baseBuilder).forLockOne('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE `Product`.`id` = ? FOR UPDATE',

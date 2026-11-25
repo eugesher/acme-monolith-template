@@ -19,7 +19,7 @@ export class ProductReplaceTagsRepository
     useClass: ProductReplaceTagsRepository,
   };
 
-  public async lockById(productId: string): Promise<Nullable<IProductReplaceTagsRecord>> {
-    return await this.createProductBuilder().forLockById(productId).getOne();
+  public async lockOne(productId: string): Promise<Nullable<IProductReplaceTagsRecord>> {
+    return await this.createProductBuilder().forLockOne(productId).getOne();
   }
 }

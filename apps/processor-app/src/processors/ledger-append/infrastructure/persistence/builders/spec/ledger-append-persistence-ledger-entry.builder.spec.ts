@@ -24,9 +24,9 @@ describe('LedgerAppendPersistenceLedgerEntryBuilder', () => {
     baseBuilder = dataSource.getRepository(LedgerEntry).createQueryBuilder(LedgerEntry.name);
   });
 
-  describe('forByOperationKey', () => {
+  describe('forOperationKey', () => {
     it('selects the id of the entry with the operation key', () => {
-      const builder = new LedgerAppendPersistenceLedgerEntryBuilder(baseBuilder).forByOperationKey(
+      const builder = new LedgerAppendPersistenceLedgerEntryBuilder(baseBuilder).forOperationKey(
         'op-1',
       );
 

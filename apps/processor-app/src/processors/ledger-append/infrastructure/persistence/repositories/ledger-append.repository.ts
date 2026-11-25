@@ -40,6 +40,6 @@ export class LedgerAppendRepository
   }
 
   public async findByOperationKey(operationKey: string): Promise<ILedgerAppendEntryRecord> {
-    return await this.createLedgerEntryBuilder().forByOperationKey(operationKey).getOneOrFail();
+    return await this.createLedgerEntryBuilder().forOperationKey(operationKey).getOneOrFail();
   }
 }

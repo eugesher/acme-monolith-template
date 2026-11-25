@@ -25,7 +25,7 @@ Every attempt:
 **The note takes the save from the use case.**
 `NoteWriteService.write(command, reconstitute, mutate, save)` runs the same attempt, and
 `save({ note, versionAsRead })` answers whether the row was updated: the resolve updates one row,
-the edit updates the note and appends its revision in one transaction (see
+the update writes the note and appends its revision in one transaction (see
 `011-multi-table-transaction.md`). A product is always saved by one update, so its write service
 makes it itself.
 
@@ -65,7 +65,7 @@ an unconditional write: a weak tag `W/"3"`, a sign, and the forms `Number` would
 or `12.0`. So is a number beyond the safe integers of JavaScript, which no stored version reaches.
 The ids of the path and the body are checked as strictly, and the decorator and its helper live in
 `libs/http` next to `IdempotencyKey` (see `039-api-surface.md`). The update, publish and archive of
-a product and the edit and resolve of a note read it.
+a product and the update and resolve of a note read it.
 
 ## The change answers the ledger
 

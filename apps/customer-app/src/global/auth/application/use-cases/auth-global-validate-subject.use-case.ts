@@ -29,6 +29,6 @@ export class AuthGlobalValidateSubjectUseCase {
       return null;
     }
 
-    return await this.repository.findActiveById(customerId);
+    return await this.repository.findActiveOne(customerId);
   }
 }

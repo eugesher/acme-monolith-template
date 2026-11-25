@@ -13,7 +13,7 @@ export class AuthCommonPersistenceStaffUserBuilder extends SelectQueryBuilder<St
   private readonly staffRoleAlias = StaffRole.name;
   private readonly staffRolePermissionAlias = StaffRolePermission.name;
 
-  public forActiveById(id: string): this {
+  public forActiveOne(id: string): this {
     this.select([`${this.alias}.id`, `${this.alias}.email`])
       .leftJoin(`${this.alias}.userRoles`, this.staffUserRoleAlias)
       .addSelect([`${this.staffUserRoleAlias}.userId`, `${this.staffUserRoleAlias}.roleId`])

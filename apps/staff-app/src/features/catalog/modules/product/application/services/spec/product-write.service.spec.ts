@@ -28,8 +28,8 @@ describe('ProductWriteService', () => {
           }),
         ),
     );
-    repository = { findById: jest.fn(), update: jest.fn() };
-    repository.findById.mockResolvedValue({
+    repository = { findOne: jest.fn(), update: jest.fn() };
+    repository.findOne.mockResolvedValue({
       id: '12',
       sku: 'SKU-0001',
       name: 'Desk lamp',
@@ -70,7 +70,7 @@ describe('ProductWriteService', () => {
         status: 'active',
         version: 4,
       });
-      expect(repository.findById).toHaveBeenCalledWith('12');
+      expect(repository.findOne).toHaveBeenCalledWith('12');
       expect(written.product.toSnapshot().updatedAt).toBe('2026-01-03T00:00:00.000Z');
       expect(written.answer).toEqual({ id: '12', version: 4 });
       expect(logger.info).not.toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe('ProductWriteService', () => {
       );
 
       expect(repository.update).not.toHaveBeenCalled();
-      expect(repository.findById).not.toHaveBeenCalled();
+      expect(repository.findOne).not.toHaveBeenCalled();
       expect(written.product.version).toBe(3);
       expect(written.answer).toBeUndefined();
     });
@@ -175,7 +175,7 @@ describe('ProductWriteService', () => {
       ['after a saved change', true],
     ])('refuses with PRODUCT_NOT_FOUND when the product vanished %s', async (_case, updated) => {
       repository.update.mockResolvedValue(updated);
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(
         service.write(

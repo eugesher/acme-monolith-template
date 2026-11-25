@@ -24,13 +24,13 @@ describe('OrderPlaceUseCase', () => {
   beforeEach(() => {
     calls = [];
     repository = {
-      findActiveProducts: jest.fn(),
+      findActiveMany: jest.fn(),
       insertOrder: jest.fn(),
       insertOrderProducts: jest.fn(),
       findPlaced: jest.fn(),
     };
-    repository.findActiveProducts.mockImplementation(() => {
-      calls.push('findActiveProducts');
+    repository.findActiveMany.mockImplementation(() => {
+      calls.push('findActiveMany');
 
       return Promise.resolve([{ id: '100' }, { id: '103' }]);
     });
@@ -129,7 +129,7 @@ describe('OrderPlaceUseCase', () => {
         body: { productIds: ['100', '103', '100'] },
       });
       expect(productStock.lock).toHaveBeenCalledWith({ productIds: ['100', '103'] });
-      expect(repository.findActiveProducts).toHaveBeenCalledWith(['100', '103']);
+      expect(repository.findActiveMany).toHaveBeenCalledWith(['100', '103']);
       expect(repository.insertOrder).toHaveBeenCalledWith({ customerId: 'customer-1' });
       expect(repository.insertOrderProducts).toHaveBeenCalledWith([
         { orderId: '610', productId: '100' },
@@ -162,7 +162,7 @@ describe('OrderPlaceUseCase', () => {
         'claim',
         'begin',
         'lock',
-        'findActiveProducts',
+        'findActiveMany',
         'insertOrder',
         'insertOrderProducts',
         'findPlaced',
@@ -266,7 +266,7 @@ describe('OrderPlaceUseCase', () => {
         code: 'ORDER_STOCK_INSUFFICIENT',
         message: 'Product 103 has 3 in stock, 4 requested',
       });
-      expect(calls).toEqual(['claim', 'begin', 'lock', 'findActiveProducts', 'release']);
+      expect(calls).toEqual(['claim', 'begin', 'lock', 'findActiveMany', 'release']);
       expect(idempotency.release).toHaveBeenCalledWith({ customerId: 'customer-1', key: 'key-1' });
     });
 

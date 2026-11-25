@@ -98,7 +98,7 @@ export class ProductStockAddUseCase {
 
     await this.movement.lock({ productId });
 
-    const productRecord = await this.repository.findById(productId);
+    const productRecord = await this.repository.findOne(productId);
 
     if (!productRecord) {
       throw new ProductStockProductNotFoundException(productId);

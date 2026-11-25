@@ -24,9 +24,9 @@ describe('AuthGlobalPersistenceCustomerBuilder', () => {
     baseBuilder = dataSource.getRepository(Customer).createQueryBuilder(Customer.name);
   });
 
-  describe('forActiveById', () => {
+  describe('forActiveOne', () => {
     it('selects the id and email of the active customer', () => {
-      const builder = new AuthGlobalPersistenceCustomerBuilder(baseBuilder).forActiveById('1');
+      const builder = new AuthGlobalPersistenceCustomerBuilder(baseBuilder).forActiveOne('1');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Customer`.`id` AS `Customer_id`, `Customer`.`email` AS `Customer_email` FROM `customer` `Customer` WHERE `Customer`.`id` = ? AND `Customer`.`status` = ?',

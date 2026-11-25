@@ -22,12 +22,12 @@ export class TagCommonReplaceRepository
     useClass: TagCommonReplaceRepository,
   };
 
-  public async lockTags(tagIds: string[]): Promise<ITagCommonReplaceTagRecord[]> {
+  public async lockMany(tagIds: string[]): Promise<ITagCommonReplaceTagRecord[]> {
     if (tagIds.length === 0) {
       return [];
     }
 
-    return await this.createTagBuilder().forLockTags(tagIds).getMany();
+    return await this.createTagBuilder().forLockMany(tagIds).getMany();
   }
 
   public async findLinked(

@@ -24,9 +24,9 @@ describe('ProductStockPersistenceProductBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forById', () => {
+  describe('forOne', () => {
     it('selects the id and sku of the product', () => {
-      const builder = new ProductStockPersistenceProductBuilder(baseBuilder).forById('100');
+      const builder = new ProductStockPersistenceProductBuilder(baseBuilder).forOne('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku` FROM `product` `Product` WHERE `Product`.`id` = ?',

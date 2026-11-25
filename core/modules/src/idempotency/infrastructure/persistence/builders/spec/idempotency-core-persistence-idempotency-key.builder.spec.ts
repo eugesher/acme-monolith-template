@@ -24,9 +24,9 @@ describe('IdempotencyCorePersistenceIdempotencyKeyBuilder', () => {
     baseBuilder = dataSource.getRepository(IdempotencyKey).createQueryBuilder(IdempotencyKey.name);
   });
 
-  describe('forByKey', () => {
+  describe('forKey', () => {
     it('selects the fingerprint, status and stored response of the key in the scope', () => {
-      const builder = new IdempotencyCorePersistenceIdempotencyKeyBuilder(baseBuilder).forByKey({
+      const builder = new IdempotencyCorePersistenceIdempotencyKeyBuilder(baseBuilder).forKey({
         scope: 'customer:101',
         key: 'key-1',
       });

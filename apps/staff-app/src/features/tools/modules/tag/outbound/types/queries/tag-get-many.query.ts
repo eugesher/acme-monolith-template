@@ -1,4 +1,4 @@
-export interface ITagGetManyQuery {
+export interface ITagGetManyListQuery {
   limit: number;
   offset: number;
 }

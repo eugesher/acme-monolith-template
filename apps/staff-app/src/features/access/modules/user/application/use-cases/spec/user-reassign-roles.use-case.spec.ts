@@ -15,7 +15,7 @@ describe('UserReassignRolesUseCase', () => {
     calls = [];
     repository = {
       existsUser: jest.fn(),
-      findRoles: jest.fn(),
+      findMany: jest.fn(),
       deleteUserRolesExcept: jest.fn(),
       insertUserRolesIgnore: jest.fn(),
     };
@@ -24,8 +24,8 @@ describe('UserReassignRolesUseCase', () => {
 
       return Promise.resolve(true);
     });
-    repository.findRoles.mockImplementation(() => {
-      calls.push('findRoles');
+    repository.findMany.mockImplementation(() => {
+      calls.push('findMany');
 
       return Promise.resolve([{ id: '2' }, { id: '3' }]);
     });
@@ -67,7 +67,7 @@ describe('UserReassignRolesUseCase', () => {
     ]);
     expect(calls).toEqual([
       'existsUser',
-      'findRoles',
+      'findMany',
       'begin',
       'deleteUserRolesExcept',
       'insertUserRolesIgnore',
@@ -97,7 +97,7 @@ describe('UserReassignRolesUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
       message: 'Role 99 was not found',
     });
-    expect(calls).toEqual(['existsUser', 'findRoles']);
+    expect(calls).toEqual(['existsUser', 'findMany']);
   });
 
   it('clears the roles with an empty list', async () => {

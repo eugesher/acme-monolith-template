@@ -22,7 +22,7 @@ export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
     return this;
   }
 
-  public forById(orderId: string): this {
+  public forOne(orderId: string): this {
     this.selectOrder()
       .leftJoin(`${this.alias}.orderProducts`, this.orderProductAlias)
       .addSelect([`${this.orderProductAlias}.id`])
@@ -44,7 +44,7 @@ export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
     return this;
   }
 
-  public forLockById(orderId: string): this {
+  public forLockOne(orderId: string): this {
     this.select([`${this.alias}.id`])
       .whereId(orderId)
       .setLock('pessimistic_write');

@@ -59,7 +59,7 @@ export class UserRegisterUseCase {
     }
 
     const { id } = insertResult;
-    const storedRoles = await this.repository.findRoles(candidate.distinctRoleIds);
+    const storedRoles = await this.repository.findMany(candidate.distinctRoleIds);
 
     candidate.assertRoles(storedRoles);
 

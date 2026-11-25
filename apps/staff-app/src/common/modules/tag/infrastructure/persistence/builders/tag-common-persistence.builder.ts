@@ -2,12 +2,12 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import { TagSubject, type Tag } from '@acme-staff/common/entities';
 
-import type { ITagCommonFindQuery } from '../../../outbound';
+import type { ITagCommonFindBySubjectQuery } from '../../../outbound';
 
 export class TagCommonPersistenceBuilder extends SelectQueryBuilder<Tag> {
   private readonly tagSubjectAlias = TagSubject.name;
 
-  public forList(query: ITagCommonFindQuery): this {
+  public forSubject(query: ITagCommonFindBySubjectQuery): this {
     const { subjectType, subjectId } = query;
 
     this.selectTag()
@@ -23,7 +23,7 @@ export class TagCommonPersistenceBuilder extends SelectQueryBuilder<Tag> {
     return this;
   }
 
-  public forLockTags(tagIds: string[]): this {
+  public forLockMany(tagIds: string[]): this {
     this.selectTag()
       .where(`${this.alias}.id IN (:...tagIds)`, { tagIds })
       .orderBy(`${this.alias}.name`, 'ASC')
