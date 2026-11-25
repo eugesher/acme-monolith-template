@@ -3,6 +3,7 @@ import { BadRequestException, HttpStatus } from '@nestjs/common';
 import type { Maybe } from '@acme-libs/toolkit';
 
 export class IfMatchHelper {
+  public static readonly HEADER = 'If-Match';
   public static readonly INVALID_CODE = 'IF_MATCH_INVALID';
 
   private static readonly QUOTED = /^"(.*)"$/;

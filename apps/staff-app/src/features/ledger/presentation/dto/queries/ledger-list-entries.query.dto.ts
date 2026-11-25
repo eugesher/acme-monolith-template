@@ -2,9 +2,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 import { PageQueryDto } from '@acme-libs/http';
+import { LedgerSubjectTypeEnum } from '@acme-libs/kernel';
 
 export class LedgerListEntriesQueryDto extends PageQueryDto {
-  @ApiPropertyOptional({ example: 'product' })
+  @ApiPropertyOptional({ example: LedgerSubjectTypeEnum.PRODUCT })
   @IsOptional()
   @IsString()
   @MaxLength(64)

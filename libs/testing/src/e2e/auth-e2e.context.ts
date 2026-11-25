@@ -3,7 +3,12 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import type { Type } from '@nestjs/common';
 
-import { AuthTokenAlgorithmEnum, type AppNameEnum, type AuthAudienceEnum } from '@acme-libs/kernel';
+import {
+  AuthMetadataKeyEnum,
+  AuthTokenAlgorithmEnum,
+  type AppNameEnum,
+  type AuthAudienceEnum,
+} from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
 import { E2EContext } from './e2e.context';
@@ -16,9 +21,6 @@ export class AuthE2EContext extends E2EContext {
 
     return this.signer;
   }
-
-  private static readonly PUBLIC_METADATA = 'auth:public';
-  private static readonly PERMISSION_METADATA = 'auth:permission';
 
   private signer: Maybe<JwtService>;
 
@@ -45,11 +47,11 @@ export class AuthE2EContext extends E2EContext {
 
     return this.routes().map(({ route, targets }) => {
       const isPublic = reflector.getAllAndOverride<Maybe<boolean>>(
-        AuthE2EContext.PUBLIC_METADATA,
+        AuthMetadataKeyEnum.PUBLIC,
         targets,
       );
       const permission = reflector.getAllAndOverride<Maybe<string>>(
-        AuthE2EContext.PERMISSION_METADATA,
+        AuthMetadataKeyEnum.PERMISSION,
         targets,
       );
 

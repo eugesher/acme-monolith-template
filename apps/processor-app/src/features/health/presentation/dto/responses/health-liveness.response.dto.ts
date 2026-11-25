@@ -1,5 +1,6 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+import { AppNameEnum } from '@acme-libs/kernel';
 import { HealthLivenessStatusEnum } from '@acme-libs/kernel';
 
 export class HealthLivenessResponseDto {
@@ -9,7 +10,7 @@ export class HealthLivenessResponseDto {
   })
   public status: HealthLivenessStatusEnum;
 
-  @ApiResponseProperty({ example: 'processor-app' })
+  @ApiResponseProperty({ example: AppNameEnum.PROCESSOR_APP })
   public app: string;
 
   @ApiResponseProperty({ example: 128 })

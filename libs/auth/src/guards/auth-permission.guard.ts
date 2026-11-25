@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import type { PermissionCodeEnum } from '@acme-libs/kernel';
+import { AuthMetadataKeyEnum, type PermissionCodeEnum } from '@acme-libs/kernel';
 import type { Maybe } from '@acme-libs/toolkit';
 
-import { AuthMetadataKeyEnum, type IAuthRequest } from '../types';
+import type { IAuthRequest } from '../types';
 
 @Injectable()
 export class AuthPermissionGuard implements CanActivate {

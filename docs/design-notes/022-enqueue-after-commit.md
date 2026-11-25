@@ -66,7 +66,7 @@ the application has no ledger service. Infrastructure may not import the domain,
 asks the model for the payload and passes it through the command of the port.
 
 **The facts of the ledger are a closed list.** The type of the subject and the action are values of
-`LedgerCoreSubjectTypeEnum` and `LedgerCoreActionEnum` in `@acme-core/contracts/ledger`, and
+`LedgerSubjectTypeEnum` and `LedgerActionEnum` in `@acme-libs/kernel`, and
 `ILedgerCoreEnqueueCommand` takes nothing else, so every fact a module may record is listed in one
 place. The job keeps them as strings: `ILedgerRecordProcessorPayload` describes what the processor
 reads from Redis, where a record of another subject type can sit, as the failing job of the

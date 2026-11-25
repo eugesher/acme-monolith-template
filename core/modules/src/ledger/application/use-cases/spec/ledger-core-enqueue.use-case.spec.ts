@@ -1,6 +1,6 @@
+import { LedgerActionEnum, LedgerSubjectTypeEnum } from '@acme-libs/kernel';
 import { CorrelationContextHelper } from '@acme-libs/observability';
 import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
-import { LedgerCoreActionEnum, LedgerCoreSubjectTypeEnum } from '@acme-core/contracts/ledger';
 
 import { LedgerCoreEnqueueUseCase } from '../ledger-core-enqueue.use-case';
 import type { ILedgerCoreQueuePort } from '../../../outbound';
@@ -22,9 +22,9 @@ describe('LedgerCoreEnqueueUseCase', () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
           operationKey: 'product-created:7',
-          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
+          subjectType: LedgerSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: LedgerCoreActionEnum.PRODUCT_CREATED,
+          action: LedgerActionEnum.PRODUCT_CREATED,
           payload: { name: 'Lamp' },
           occurredAt: '2026-01-05T08:00:00.000Z',
         }),
@@ -34,9 +34,9 @@ describe('LedgerCoreEnqueueUseCase', () => {
       expect(queue.add).toHaveBeenCalledWith({
         record: {
           operationKey: 'product-created:7',
-          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
+          subjectType: LedgerSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: LedgerCoreActionEnum.PRODUCT_CREATED,
+          action: LedgerActionEnum.PRODUCT_CREATED,
           payload: { name: 'Lamp' },
           occurredAt: '2026-01-05T08:00:00.000Z',
           correlationId: 'c0ffee00-0000-4000-8000-000000000001',
@@ -55,9 +55,9 @@ describe('LedgerCoreEnqueueUseCase', () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
           operationKey: 'product-created:7',
-          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
+          subjectType: LedgerSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: LedgerCoreActionEnum.PRODUCT_CREATED,
+          action: LedgerActionEnum.PRODUCT_CREATED,
           payload: {},
           occurredAt: '2026-01-05T08:00:00.000Z',
         }),
@@ -84,9 +84,9 @@ describe('LedgerCoreEnqueueUseCase', () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         useCase.execute({
           operationKey: 'product-created:7',
-          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
+          subjectType: LedgerSubjectTypeEnum.PRODUCT,
           subjectId: '7',
-          action: LedgerCoreActionEnum.PRODUCT_CREATED,
+          action: LedgerActionEnum.PRODUCT_CREATED,
           payload: {},
           occurredAt: '2026-01-05T08:00:00.000Z',
         }),

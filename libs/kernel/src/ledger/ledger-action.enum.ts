@@ -1,4 +1,4 @@
-export enum LedgerCoreActionEnum {
+export enum LedgerActionEnum {
   CUSTOMER_REGISTERED = 'CustomerRegistered',
   ORDER_PLACED = 'OrderPlaced',
   PRODUCT_ARCHIVED = 'ProductArchived',

@@ -10,6 +10,6 @@ export const IfMatch = createParamDecorator(
       .switchToHttp()
       .getRequest<{ headers: Record<string, Maybe<string | string[]>> }>();
 
-    return IfMatchHelper.parse(headers['if-match']);
+    return IfMatchHelper.parse(headers[IfMatchHelper.HEADER.toLowerCase()]);
   },
 );

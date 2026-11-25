@@ -1,5 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
+import { QueueNameEnum } from '@acme-libs/kernel';
+
 class QueueResponseJobCountsDto {
   @ApiResponseProperty({ example: 0 })
   public active: number;
@@ -18,7 +20,7 @@ class QueueResponseJobCountsDto {
 }
 
 export class QueueResponseDto {
-  @ApiResponseProperty({ example: 'ledger-record' })
+  @ApiResponseProperty({ example: QueueNameEnum.LEDGER_RECORD })
   public name: string;
 
   @ApiResponseProperty({ example: false })
