@@ -16,16 +16,16 @@ export class CredentialsAccessTokenAdapter implements ICredentialsAccessTokenPor
     useClass: CredentialsAccessTokenAdapter,
   };
 
-  constructor(private readonly jwt: JwtService) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   public async sign(command: ICredentialsSignAccessTokenCommand): Promise<string> {
     const { sub } = command;
 
-    return await this.jwt.signAsync({ sub });
+    return await this.jwtService.signAsync({ sub });
   }
 
   public async verify(token: string): Promise<Nullable<ICredentialsVerifyAccessTokenView>> {
-    const claims = await this.jwt
+    const claims = await this.jwtService
       .verifyAsync<ICredentialsVerifyAccessTokenView>(token)
       .catch(() => null);
 

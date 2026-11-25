@@ -16,24 +16,24 @@ interface IAppE2EState {
 
 export class AppE2EContext extends AuthE2EContext {
   public get redis(): Redis {
-    return this.started.redis;
+    return this.appE2EState.redis;
   }
 
   public get annToken(): string {
-    return this.started.annToken;
+    return this.appE2EState.annToken;
   }
 
   private static readonly POLL_INTERVAL_MS = 500;
   private static readonly POLL_ATTEMPTS = 30;
 
-  private state: Maybe<IAppE2EState>;
+  private _appE2EState: Maybe<IAppE2EState>;
 
-  private get started(): IAppE2EState {
-    if (!this.state) {
+  private get appE2EState(): IAppE2EState {
+    if (!this._appE2EState) {
       throw new Error('AppE2EContext is read before init(): use it inside it() and hooks');
     }
 
-    return this.state;
+    return this._appE2EState;
   }
 
   constructor() {
@@ -48,13 +48,13 @@ export class AppE2EContext extends AuthE2EContext {
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
-    const annToken = this.jwt.sign({ sub: '101' });
+    const annToken = this.jwtService.sign({ sub: '101' });
 
-    this.state = { processor, redis, annToken };
+    this._appE2EState = { processor, redis, annToken };
   }
 
   public override async close(): Promise<void> {
-    await this.started.processor.close();
+    await this.appE2EState.processor.close();
     await super.close();
   }
 

@@ -48,7 +48,7 @@ export class TagController {
     private readonly create: TagCreateUseCase,
     private readonly getMany: TagGetManyUseCase,
     private readonly update: TagUpdateUseCase,
-    private readonly remove: TagDeleteUseCase,
+    private readonly del: TagDeleteUseCase,
   ) {}
 
   @Post()
@@ -109,6 +109,6 @@ export class TagController {
   public async handleDelete(@Param() params: TagIdParamDto): Promise<void> {
     const { tagId } = params;
 
-    await this.remove.execute({ tagId });
+    await this.del.execute({ tagId });
   }
 }

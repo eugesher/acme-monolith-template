@@ -100,8 +100,8 @@ leaves the keys of the queues alone. When a description checks cache keys, delet
 Every request with authorization calls a function of `<collection>/scripts.py` in `setup`
 (`as_admin`, `as_editor` and `as_viewer` for staff, `as_bob` and `as_dora` for customers, and so
 on). The function signs an HS256 token of a seeded user (`sub`, `aud`, `iat`) with `JWT_SECRET` from
-`env/apps/<app>/.env` and puts it into the variable `token`, as `ctx.jwt.sign` does in the e2e. This
-also covers tokens that no login issues:
+`env/apps/<app>/.env` and puts it into the variable `token`, as `ctx.jwtService.sign` does in the
+e2e. This also covers tokens that no login issues:
 
 - the token of a disabled user (`as_disabled`, `as_dora`);
 - a token with forged role claims (`as_viewer_forged_claims`);

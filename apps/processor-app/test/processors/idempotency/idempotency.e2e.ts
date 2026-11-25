@@ -10,7 +10,7 @@ export class IdempotencyE2E {
   public onApplicationBootstrap(): void {
     describe('start of the app', () => {
       it('should register one job scheduler of the purge every five minutes', async () => {
-        const schedulers = await this.ctx.purgeQueue.getJobSchedulers();
+        const schedulers = await this.ctx.idempotencyPurgeQueue.getJobSchedulers();
 
         expect(schedulers.map(({ key, pattern }) => ({ key, pattern }))).toEqual([
           { key: 'idempotency-purge', pattern: '*/5 * * * *' },
@@ -28,7 +28,7 @@ export class IdempotencyE2E {
                   ('customer:101', 'e2e-purge-fresh', REPEAT('b', 64), 'completed', NULL, CURRENT_TIMESTAMP)`,
         );
 
-        await this.ctx.purgeQueue.add('idempotency-purge', {});
+        await this.ctx.idempotencyPurgeQueue.add('idempotency-purge', {});
 
         await this.ctx.waitFor('the expired key to be purged', async () => {
           const [{ expired }] = await this.ctx.dataSource.query(
@@ -57,7 +57,7 @@ export class IdempotencyE2E {
                   ('customer:101', 'e2e-stuck-fresh', REPEAT('e', 64), 'in_flight', NULL, CURRENT_TIMESTAMP)`,
         );
 
-        await this.ctx.purgeQueue.add('idempotency-purge', {});
+        await this.ctx.idempotencyPurgeQueue.add('idempotency-purge', {});
 
         await this.ctx.waitFor('the stuck in-flight key to be purged', async () => {
           const [{ stuck }] = await this.ctx.dataSource.query(

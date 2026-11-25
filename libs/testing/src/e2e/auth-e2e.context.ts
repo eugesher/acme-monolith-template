@@ -14,15 +14,15 @@ import type { Maybe } from '@acme-libs/toolkit';
 import { E2EContext } from './e2e.context';
 
 export class AuthE2EContext extends E2EContext {
-  public get jwt(): JwtService {
-    if (!this.signer) {
+  public get jwtService(): JwtService {
+    if (!this._jwtService) {
       throw new Error('The e2e context is read before init(): use it inside it() and hooks');
     }
 
-    return this.signer;
+    return this._jwtService;
   }
 
-  private signer: Maybe<JwtService>;
+  private _jwtService: Maybe<JwtService>;
 
   constructor(
     appModule: Type<unknown>,
@@ -39,7 +39,10 @@ export class AuthE2EContext extends E2EContext {
     const secret = config.getOrThrow<string>('JWT_SECRET');
     const algorithm = AuthTokenAlgorithmEnum.HS256;
 
-    this.signer = new JwtService({ secret, signOptions: { algorithm, audience: this.audience } });
+    this._jwtService = new JwtService({
+      secret,
+      signOptions: { algorithm, audience: this.audience },
+    });
   }
 
   public routeAccess(): [string, string][] {

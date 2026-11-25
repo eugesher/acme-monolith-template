@@ -28,10 +28,10 @@ export class QueueRegistryAdapter implements IQueueRegistryPort {
     @InjectQueue(LedgerAppendQueue.NAME)
     ledgerAppendQueue: Queue,
     @InjectQueue(ProductStockPostSubtractQueue.NAME)
-    postSubtractQueue: Queue,
+    productStockPostSubtractQueue: Queue,
   ) {
     this.queues = new Map(
-      [ledgerAppendQueue, postSubtractQueue].map((queue) => [queue.name, queue]),
+      [ledgerAppendQueue, productStockPostSubtractQueue].map((queue) => [queue.name, queue]),
     );
   }
 

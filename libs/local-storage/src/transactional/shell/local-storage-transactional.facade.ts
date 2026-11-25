@@ -10,15 +10,15 @@ import {
 @Injectable()
 export class LocalStorageTransactionalFacade implements ITransactionPort {
   constructor(
-    private readonly runInTransaction: LocalStorageTransactionalRunUseCase,
-    private readonly addAfterCommitHook: LocalStorageTransactionalAfterCommitUseCase,
+    private readonly runCase: LocalStorageTransactionalRunUseCase,
+    private readonly afterCommitCase: LocalStorageTransactionalAfterCommitUseCase,
   ) {}
 
   public async run<T>(work: () => Promise<T>): Promise<T> {
-    return await this.runInTransaction.execute(work);
+    return await this.runCase.execute(work);
   }
 
   public afterCommit(hook: () => Promise<void>): void {
-    this.addAfterCommitHook.execute(hook);
+    this.afterCommitCase.execute(hook);
   }
 }

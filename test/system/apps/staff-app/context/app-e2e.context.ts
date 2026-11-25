@@ -19,28 +19,28 @@ interface IAppE2EState {
 
 export class AppE2EContext extends AuthE2EContext {
   public get ledgerAppendQueue(): Queue<ILedgerAppendProcessorPayload> {
-    return this.started.ledgerAppendQueue;
+    return this.appE2EState.ledgerAppendQueue;
   }
 
   public get adminToken(): string {
-    return this.started.adminToken;
+    return this.appE2EState.adminToken;
   }
 
   public get editorToken(): string {
-    return this.started.editorToken;
+    return this.appE2EState.editorToken;
   }
 
   private static readonly POLL_INTERVAL_MS = 500;
   private static readonly POLL_ATTEMPTS = 30;
 
-  private state: Maybe<IAppE2EState>;
+  private _appE2EState: Maybe<IAppE2EState>;
 
-  private get started(): IAppE2EState {
-    if (!this.state) {
+  private get appE2EState(): IAppE2EState {
+    if (!this._appE2EState) {
       throw new Error('AppE2EContext is read before init(): use it inside it() and hooks');
     }
 
-    return this.state;
+    return this._appE2EState;
   }
 
   constructor() {
@@ -57,14 +57,14 @@ export class AppE2EContext extends AuthE2EContext {
     const ledgerAppendQueue = this.moduleFixture.get<Queue<ILedgerAppendProcessorPayload>>(
       getQueueToken(LedgerAppendQueue.NAME),
     );
-    const adminToken = this.jwt.sign({ sub: '1' });
-    const editorToken = this.jwt.sign({ sub: '2' });
+    const adminToken = this.jwtService.sign({ sub: '1' });
+    const editorToken = this.jwtService.sign({ sub: '2' });
 
-    this.state = { processor, ledgerAppendQueue, adminToken, editorToken };
+    this._appE2EState = { processor, ledgerAppendQueue, adminToken, editorToken };
   }
 
   public override async close(): Promise<void> {
-    await this.started.processor.close();
+    await this.appE2EState.processor.close();
     await super.close();
   }
 

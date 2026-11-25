@@ -57,7 +57,7 @@ export class NoteController {
     private readonly update: NoteUpdateUseCase,
     private readonly resolve: NoteResolveUseCase,
     private readonly getRevisions: NoteGetRevisionsUseCase,
-    private readonly remove: NoteDeleteUseCase,
+    private readonly del: NoteDeleteUseCase,
   ) {}
 
   @Post()
@@ -199,6 +199,6 @@ export class NoteController {
     const { noteId } = params;
     const { id: authorId } = user;
 
-    await this.remove.execute({ noteId, authorId });
+    await this.del.execute({ noteId, authorId });
   }
 }

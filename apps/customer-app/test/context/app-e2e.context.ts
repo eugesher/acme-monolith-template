@@ -20,29 +20,29 @@ interface IAppE2EState {
 
 export class AppE2EContext extends AuthE2EContext {
   public get redis(): Redis {
-    return this.started.redis;
+    return this.appE2EState.redis;
   }
 
   public get annToken(): string {
-    return this.started.annToken;
+    return this.appE2EState.annToken;
   }
 
   public get bobToken(): string {
-    return this.started.bobToken;
+    return this.appE2EState.bobToken;
   }
 
   public get carolToken(): string {
-    return this.started.carolToken;
+    return this.appE2EState.carolToken;
   }
 
-  private state: Maybe<IAppE2EState>;
+  private _appE2EState: Maybe<IAppE2EState>;
 
-  private get started(): IAppE2EState {
-    if (!this.state) {
+  private get appE2EState(): IAppE2EState {
+    if (!this._appE2EState) {
       throw new Error('AppE2EContext is read before init(): use it inside it() and hooks');
     }
 
-    return this.state;
+    return this._appE2EState;
   }
 
   constructor() {
@@ -53,11 +53,11 @@ export class AppE2EContext extends AuthE2EContext {
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
-    const annToken = this.jwt.sign({ sub: '101' });
-    const bobToken = this.jwt.sign({ sub: '102' });
-    const carolToken = this.jwt.sign({ sub: '103' });
+    const annToken = this.jwtService.sign({ sub: '101' });
+    const bobToken = this.jwtService.sign({ sub: '102' });
+    const carolToken = this.jwtService.sign({ sub: '103' });
 
-    this.state = { redis, annToken, bobToken, carolToken };
+    this._appE2EState = { redis, annToken, bobToken, carolToken };
   }
 
   public async takeLedgerRecords(): Promise<ILedgerAppendProcessorPayload[]> {
