@@ -1,4 +1,4 @@
-name: 09-key-in-flight
+name: 08-key-in-flight
 description: |-
   e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
   it: should refuse a key still in flight with 409 and add nothing

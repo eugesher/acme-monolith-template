@@ -1,4 +1,4 @@
-name: 05-malformed-id
+name: 04-malformed-id
 description: |-
   e2e: Order › GET /api/orders/:orderId
   it: should refuse an order id that is not a number with 400 from validation

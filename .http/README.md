@@ -50,9 +50,9 @@ A case that sends more than one request has the file of the request it checks, a
 - the replays of a restock and an order send the same request twice, as
   `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with
-  two keys, as `customer-app/order/place/11-simultaneous-last-units` says;
+  two keys, as `customer-app/order/place/10-simultaneous-last-units` says;
 - three simultaneous orders under one key send the same request three times at once, as
-  `customer-app/order/place/13-simultaneous-same-key` says;
+  `customer-app/order/place/12-simultaneous-same-key` says;
 - two simultaneous registrations with one email send the same request twice at once, in
   `customer-app/auth/register/03-simultaneous-same-email` and
   `staff-app/access/user/register/03-simultaneous-same-email`;

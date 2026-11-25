@@ -11,7 +11,6 @@ export class CreateProductSchema1793170002000 implements MigrationInterface {
         version    INT          NOT NULL DEFAULT 1,
         created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        deleted_at TIMESTAMP    NULL,
         UNIQUE KEY uq_product_sku (sku)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     `);

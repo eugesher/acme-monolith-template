@@ -29,7 +29,7 @@ describe('OrderPersistenceProductBuilder', () => {
       const builder = new OrderPersistenceProductBuilder(baseBuilder).forActive(['100', '101']);
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE ( `Product`.`id` IN (?, ?) AND `Product`.`status` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
+        'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE `Product`.`id` IN (?, ?) AND `Product`.`status` = ?',
         ['100', '101', 'active'],
       ]);
     });

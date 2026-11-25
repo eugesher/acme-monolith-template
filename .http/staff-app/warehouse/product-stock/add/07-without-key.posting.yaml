@@ -1,13 +1,12 @@
-name: 07-deleted-product
+name: 07-without-key
 description: |-
   e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
-  it: should answer %s with 404
-  Row: a deleted product
+  it: should refuse a restock without a key with 400
 
-  Expect: 404 Not Found, code PRODUCT_NOT_FOUND
+  Expect: 400 Bad Request, code IDEMPOTENCY_KEY_REQUIRED
   User: editor@example.com (token signed by scripts.py)
 method: POST
-url: $STAFF_APP_BASE_URL/warehouse/product-stock/107/add
+url: $STAFF_APP_BASE_URL/warehouse/product-stock/100/add
 body:
   content: |-
     {
@@ -18,8 +17,6 @@ auth:
   bearer_token:
     token: $token
 headers:
-  - name: Idempotency-Key
-    value: e2e-restock-missing-107
   - name: Content-Type
     value: application/json
 scripts:

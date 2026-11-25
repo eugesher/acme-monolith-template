@@ -155,13 +155,10 @@ export class ProductStockE2E {
         }).toMatchSnapshot();
       });
 
-      it.each([
-        ['an unknown product', '999'],
-        ['a deleted product', '107'],
-      ])('should answer %s with 404', async (_, productId) => {
+      it('should answer an unknown product with 404', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .post(`/api/warehouse/product-stock/${productId}/add`)
-          .set('Idempotency-Key', `e2e-restock-missing-${productId}`)
+          .post('/api/warehouse/product-stock/999/add')
+          .set('Idempotency-Key', 'e2e-restock-missing-999')
           .auth(this.ctx.editorToken, { type: 'bearer' })
           .send({ quantity: 5 })
           .expect(HttpStatus.NOT_FOUND);

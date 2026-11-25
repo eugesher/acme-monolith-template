@@ -255,7 +255,6 @@ export class OrderE2E {
       it.each([
         ['a draft product', '101'],
         ['an archived product', '105'],
-        ['a deleted product', '107'],
         ['an unknown product', '999'],
       ])('should refuse %s with 422 and write nothing', async (_, productId) => {
         const [{ lastId }] = await this.ctx.dataSource.query(
@@ -398,15 +397,6 @@ export class OrderE2E {
       it('should read an order of the caller with a line per unit', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/orders/601')
-          .auth(this.ctx.bobToken, { type: 'bearer' })
-          .expect(HttpStatus.OK);
-
-        expect({ response: { body: response.body } }).toMatchSnapshot();
-      });
-
-      it('should read an order of the caller with a product deleted after the order', async () => {
-        const response = await request(this.ctx.app.getHttpServer())
-          .get('/api/orders/602')
           .auth(this.ctx.bobToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 

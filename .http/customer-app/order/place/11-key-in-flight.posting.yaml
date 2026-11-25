@@ -1,4 +1,4 @@
-name: 12-key-in-flight
+name: 11-key-in-flight
 description: |-
   e2e: Order › POST /api/orders
   it: should refuse a key still in flight with 409 and write nothing

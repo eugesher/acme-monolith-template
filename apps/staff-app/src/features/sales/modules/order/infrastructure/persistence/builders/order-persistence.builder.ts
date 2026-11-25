@@ -23,8 +23,7 @@ export class OrderPersistenceBuilder extends SelectQueryBuilder<Order> {
   }
 
   public forById(orderId: string): this {
-    this.withDeleted()
-      .selectOrder()
+    this.selectOrder()
       .leftJoin(`${this.alias}.orderProducts`, this.orderProductAlias)
       .addSelect([`${this.orderProductAlias}.id`])
       .leftJoin(`${this.orderProductAlias}.product`, this.productAlias)

@@ -1,18 +1,19 @@
-name: 13-simultaneous-same-key
+name: 10-simultaneous-last-units
 description: |-
   e2e: Order › POST /api/orders
-  it: should place one order for simultaneous requests under one key and replay or refuse the others
+  it: should let one of two simultaneous orders for the last units through and refuse the other with 409
 
-  Expect: 201 Created for the request that claims the key; each other one answers the same 201 or 409 Conflict IDEMPOTENT_REQUEST_IN_FLIGHT; one order is written
+  Expect: one 201 Created and one 409 Conflict ORDER_STOCK_INSUFFICIENT; product 103 keeps 1 on hand
   User: carol@example.com (token signed by scripts.py)
-  Note: the e2e sends it three times at once
+  Note: send it with the keys e2e-order-race-key-1 and e2e-order-race-key-2 at once
 method: POST
 url: $CUSTOMER_APP_BASE_URL/orders
 body:
   content: |-
     {
       "productIds": [
-        "100"
+        "103",
+        "103"
       ]
     }
 auth:
@@ -21,7 +22,7 @@ auth:
     token: $token
 headers:
   - name: Idempotency-Key
-    value: e2e-order-same-key-race
+    value: e2e-order-race-key-1
   - name: Content-Type
     value: application/json
 scripts:

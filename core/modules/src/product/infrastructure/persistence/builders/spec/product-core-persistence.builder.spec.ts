@@ -29,7 +29,7 @@ describe('ProductCorePersistenceBuilder', () => {
       const builder = new ProductCorePersistenceBuilder(baseBuilder).forById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
+        'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE `Product`.`id` = ?',
         ['100'],
       ]);
     });
@@ -40,7 +40,7 @@ describe('ProductCorePersistenceBuilder', () => {
       const builder = new ProductCorePersistenceBuilder(baseBuilder).forLockById('100');
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE ( `Product`.`id` = ? ) AND ( `Product`.`deletedAt` IS NULL ) FOR UPDATE',
+        'SELECT `Product`.`id` AS `Product_id`, `Product`.`sku` AS `Product_sku`, `Product`.`status` AS `Product_status`, `Product`.`version` AS `Product_version`, `Product`.`updatedAt` AS `Product_updatedAt` FROM `product` `Product` WHERE `Product`.`id` = ? FOR UPDATE',
         ['100'],
       ]);
     });
