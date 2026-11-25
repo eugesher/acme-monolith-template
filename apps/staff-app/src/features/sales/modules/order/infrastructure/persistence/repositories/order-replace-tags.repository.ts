@@ -19,7 +19,7 @@ export class OrderReplaceTagsRepository
     useClass: OrderReplaceTagsRepository,
   };
 
-  public async lockById(orderId: string): Promise<Nullable<IOrderReplaceTagsRecord>> {
-    return await this.createOrderBuilder().forLockById(orderId).getOne();
+  public async lockOne(orderId: string): Promise<Nullable<IOrderReplaceTagsRecord>> {
+    return await this.createOrderBuilder().forLockOne(orderId).getOne();
   }
 }

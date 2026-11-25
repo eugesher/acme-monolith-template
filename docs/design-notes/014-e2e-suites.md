@@ -54,7 +54,7 @@ one `describe` per feature and calls the methods of the feature class inside it:
 ```ts
 describe('Note', () => {
   noteE2E.handleGetMany();
-  noteE2E.handleEdit();
+  noteE2E.handleUpdate();
 });
 ```
 
@@ -148,7 +148,7 @@ malformed `If-Match`.
 BullMQ writes its own keys at any moment.
 
 **staff-app and customer-app read the job, not the ledger.** Neither processes the queue, so their
-contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-record`
+contexts have `takeLedgerRecords()`: it returns the data of the waiting jobs of the `ledger-append`
 queue and drains the queue, as `takeRootWarnings()` takes the warnings. A case that enqueues takes
 the jobs, so the next case starts from an empty queue.
 
@@ -166,7 +166,7 @@ returned record reaches the ledger is a seam of two apps, so it is a case of the
 staff-app.
 
 **processor-app waits for its queues.** Its cases add jobs to the queues themselves and read the
-tables. `waitForLedgerRecordQueue()` polls `getJobCounts()` every 100 ms until no job is waiting,
+tables. `waitForLedgerAppendQueue()` polls `getJobCounts()` every 100 ms until no job is waiting,
 active or delayed, and throws after 100 polls; the jobs run in the e2e process, so a drained queue
 means the rows are written. A purge case adds a job to the `idempotency-purge` queue, as the job
 scheduler does every five minutes, and `waitFor(description, settled)` polls the rows until the
@@ -194,7 +194,7 @@ second address is still served. A repeated run finds that address blocked alread
 asserts only the last call, so it passes either way.
 
 **An app under test listens on a port of its own.** The context starts the app as `main.ts` does,
-`listen` included, so `PORT` of `.env.test` is 3100, 3101 and 3102 for customer-app, staff-app and
+`listen` included, so `PORT` of `.env.test` is 3100, 3101 and 3102 for staff-app, customer-app and
 processor-app, next to the 3000, 3001 and 3002 of `.env.example`: a suite runs while the app runs
 locally.
 
@@ -234,7 +234,7 @@ keeps a call only when the logger it was called on is the root itself, by `mock.
   `id: expect.any(String)`, and a check after it compares the id with the response and with
   `MAX(id)`. A literal auto-increment id never enters a snapshot.
 - **A case that needs a state the seeds lack makes it and undoes it in `finally`**, as the rollback
-  of a note edit inserts the revision that breaks the edit and deletes it afterwards.
+  of a note update inserts the revision that breaks the update and deletes it afterwards.
 - **A case that writes sends a fixed `x-correlation-id`** when the correlation id lands in a row, so
   the row is literal in the snapshot. The id is a UUID, `e2e00000-0000-4000-8000-…` with a number
   per case, and the seeds use `5eed0000-0000-4000-8000-000000000001`: any other value is replaced.

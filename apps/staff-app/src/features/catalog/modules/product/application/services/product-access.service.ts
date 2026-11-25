@@ -30,7 +30,7 @@ export class ProductAccessService {
 
   private async find(command: IProductAccessLoadCommand): Promise<IProductAccessRecord> {
     const { productId } = command;
-    const productRecord = await this.repository.findById(productId);
+    const productRecord = await this.repository.findOne(productId);
 
     if (!productRecord) {
       throw new ProductNotFoundException(productId);

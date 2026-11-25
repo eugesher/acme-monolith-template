@@ -1,4 +1,4 @@
-export interface IProductStockLedgerRecordAddedCommand {
+export interface IProductStockLedgerAppendAddedCommand {
   productStockId: string;
   subjectId: string;
   occurredAt: string;

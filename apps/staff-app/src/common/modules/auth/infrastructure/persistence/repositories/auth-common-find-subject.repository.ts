@@ -19,9 +19,7 @@ export class AuthCommonFindSubjectRepository
     useClass: AuthCommonFindSubjectRepository,
   };
 
-  public async findActiveById(
-    id: string,
-  ): Promise<Nullable<IAuthCommonFindSubjectStaffUserRecord>> {
-    return await this.createStaffUserBuilder().forActiveById(id).getOne();
+  public async findActiveOne(id: string): Promise<Nullable<IAuthCommonFindSubjectStaffUserRecord>> {
+    return await this.createStaffUserBuilder().forActiveOne(id).getOne();
   }
 }

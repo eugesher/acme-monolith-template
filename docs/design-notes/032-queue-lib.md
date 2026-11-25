@@ -9,11 +9,11 @@ All three apps connect BullMQ the same way, so the connection lives in a lib:
 | `BullSetupModule.registerQueue` | `core/queues`, `queues/` of a processor | `BullModule.registerQueue({ name })`                                    |
 
 ```ts
-export class LedgerQueue {
-  public static readonly NAME = 'ledger-record';
+export class LedgerAppendQueue {
+  public static readonly NAME = QueueNameEnum.LEDGER_APPEND_QUEUE;
 
   public static register(): DynamicModule {
-    return BullSetupModule.registerQueue(LedgerQueue.NAME);
+    return BullSetupModule.registerQueue(LedgerAppendQueue.NAME);
   }
 }
 ```
@@ -28,13 +28,13 @@ in one list, so they cannot drift apart.
 **A queue is a class with its name and its registration.** `NAME` is what BullMQ sees and what
 `@Processor`, `@InjectQueue` and `queue.add` take; `register()` hands it to
 `BullSetupModule.registerQueue` for a module root to import. A queue that several modules use lives
-in `core/queues/src/definitions`, one flat file per queue, `<module>.queue.ts`: `LedgerQueue` and
-`ProductStockPostSubtractQueue` serve the core queue adapters, the failed jobs of staff-app (see
+in `core/queues/src/definitions`, one flat file per queue, `<module>.queue.ts`: `LedgerAppendQueue`
+and `ProductStockPostSubtractQueue` serve the core queue adapters, the failed jobs of staff-app (see
 `041-failed-jobs.md`), the processors and the e2e code. A queue of one processor lives in
 `queues/definitions` of the processor, as `IdempotencyPurgeQueue` of processor-app does (see
 `009-scheduled-processor.md`). The type of a job stays a contract: the payload of a core queue in
-`@acme-core/contracts`, since `ILedgerCoreEnqueueCommand` is built from it, the payload of a queue
-of one processor in its `queues/types`.
+`@acme-core/contracts`, since `ILedgerCoreAppendEnqueueCommand` is built from it, the payload of a
+queue of one processor in its `queues/types`.
 
 **A setup class, not a module.** `BullSetupModule` has no `@Module`: it is a class of static methods
 that return the modules of `@nestjs/bullmq`, and the options are built in the private static
@@ -55,7 +55,7 @@ a command timeout. BullMQ gets the options, not a client: it opens the connectio
 longer than a command timeout. A queue keeps the defaults of ioredis, so an enqueue has a deadline
 of its own (see `022-enqueue-after-commit.md`). The job options are the private constant
 `DEFAULT_JOB_OPTIONS` of `BullSetupModule`, listed in `008-queue-processor.md`. Several apps write
-to `ledger-record` and to `product-stock-post-subtract`; options read from the environment of each
+to `ledger-append` and to `product-stock-post-subtract`; options read from the environment of each
 app would let their jobs retry differently, while the code of the lib is the same in every app.
 
 **The keys of every queue start with `QUEUE_PREFIX`.** It replaces the default `bull` of BullMQ:

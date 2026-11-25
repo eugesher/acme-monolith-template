@@ -11,7 +11,7 @@ export class RolePersistenceStaffRoleBuilder extends SelectQueryBuilder<StaffRol
     return this;
   }
 
-  public forById(id: string): this {
+  public forOne(id: string): this {
     this.selectRoleWithPermissions().where(`${this.alias}.id = :id`, { id });
 
     return this;

@@ -10,8 +10,8 @@ describe('AuthGlobalValidateSubjectUseCase', () => {
   let useCase: AuthGlobalValidateSubjectUseCase;
 
   beforeEach(() => {
-    repository = { findActiveById: jest.fn() };
-    repository.findActiveById.mockResolvedValue({
+    repository = { findActiveOne: jest.fn() };
+    repository.findActiveOne.mockResolvedValue({
       id: 'customer-1',
       email: 'ann@example.com',
     });
@@ -26,7 +26,7 @@ describe('AuthGlobalValidateSubjectUseCase', () => {
 
       expect(subject).toEqual({ id: 'customer-1', email: 'ann@example.com' });
       expect(credentials.verifyAccessToken).toHaveBeenCalledWith('access-token');
-      expect(repository.findActiveById).toHaveBeenCalledWith('customer-1');
+      expect(repository.findActiveOne).toHaveBeenCalledWith('customer-1');
     });
 
     it('returns nothing for a token that does not verify, without reading the customer', async () => {
@@ -35,11 +35,11 @@ describe('AuthGlobalValidateSubjectUseCase', () => {
       const subject = await useCase.execute({ token: 'access-token' });
 
       expect(subject).toBeNull();
-      expect(repository.findActiveById).not.toHaveBeenCalled();
+      expect(repository.findActiveOne).not.toHaveBeenCalled();
     });
 
     it('returns nothing when no active customer matches', async () => {
-      repository.findActiveById.mockResolvedValue(null);
+      repository.findActiveOne.mockResolvedValue(null);
 
       const subject = await useCase.execute({ token: 'access-token' });
 

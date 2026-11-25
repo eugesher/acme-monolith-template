@@ -5,7 +5,7 @@ export type IIdempotencyCoreClaimInsertQuery = Pick<
   'scope' | 'idempotencyKey' | 'requestFingerprint' | 'status' | 'responseBody'
 >;
 
-export interface IIdempotencyCoreClaimFindQuery {
+export interface IIdempotencyCoreClaimFindByKeyQuery {
   scope: string;
   key: string;
 }

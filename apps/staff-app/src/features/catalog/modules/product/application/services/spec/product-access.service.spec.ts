@@ -9,8 +9,8 @@ describe('ProductAccessService', () => {
   let service: ProductAccessService;
 
   beforeEach(() => {
-    repository = { findById: jest.fn() };
-    repository.findById.mockResolvedValue({
+    repository = { findOne: jest.fn() };
+    repository.findOne.mockResolvedValue({
       id: '12',
       sku: 'SKU-0001',
       name: 'Lamp',
@@ -27,11 +27,11 @@ describe('ProductAccessService', () => {
       const product = await service.load({ productId: '12' }, ProductGetOneModel.reconstitute);
 
       expect(product.id).toBe('12');
-      expect(repository.findById).toHaveBeenCalledWith('12');
+      expect(repository.findOne).toHaveBeenCalledWith('12');
     });
 
     it('refuses a missing product with PRODUCT_NOT_FOUND', async () => {
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(
         service.load({ productId: '12' }, ProductGetOneModel.reconstitute),
@@ -45,11 +45,11 @@ describe('ProductAccessService', () => {
   describe('assertExists', () => {
     it('passes for a stored product', async () => {
       await expect(service.assertExists({ productId: '12' })).resolves.toBeUndefined();
-      expect(repository.findById).toHaveBeenCalledWith('12');
+      expect(repository.findOne).toHaveBeenCalledWith('12');
     });
 
     it('refuses a missing product with PRODUCT_NOT_FOUND', async () => {
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(service.assertExists({ productId: '12' })).rejects.toMatchObject({
         code: 'PRODUCT_NOT_FOUND',

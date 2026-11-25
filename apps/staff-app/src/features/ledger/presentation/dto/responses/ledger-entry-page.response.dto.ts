@@ -1,6 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
 import { PageResponseType } from '@acme-libs/http';
+import { LedgerActionEnum, LedgerSubjectTypeEnum } from '@acme-libs/kernel';
 
 class LedgerEntryPageResponseItemDto {
   @ApiResponseProperty({ example: '4210' })
@@ -9,13 +10,13 @@ class LedgerEntryPageResponseItemDto {
   @ApiResponseProperty({ example: 'product-archived:12' })
   public operationKey: string;
 
-  @ApiResponseProperty({ example: 'product' })
+  @ApiResponseProperty({ example: LedgerSubjectTypeEnum.PRODUCT })
   public subjectType: string;
 
   @ApiResponseProperty({ example: '12' })
   public subjectId: string;
 
-  @ApiResponseProperty({ example: 'ProductArchived' })
+  @ApiResponseProperty({ example: LedgerActionEnum.PRODUCT_ARCHIVED })
   public action: string;
 
   @ApiResponseProperty({ example: { title: 'Lamp' } })

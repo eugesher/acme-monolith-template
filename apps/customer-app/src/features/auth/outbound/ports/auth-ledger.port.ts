@@ -1,7 +1,7 @@
-import type { IAuthLedgerRecordRegisteredCommand } from '../types';
+import type { IAuthLedgerAppendRegisteredCommand } from '../types';
 
 export interface IAuthLedgerPort {
-  recordRegistered(command: IAuthLedgerRecordRegisteredCommand): Promise<void>;
+  appendRegistered(command: IAuthLedgerAppendRegisteredCommand): Promise<void>;
 }
 
 export const AUTH_LEDGER_PORT = Symbol('AUTH_LEDGER_PORT');

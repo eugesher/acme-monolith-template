@@ -17,8 +17,8 @@ describe('AuthRegisterUseCase', () => {
   let useCase: AuthRegisterUseCase;
 
   beforeEach(() => {
-    ledger = { recordRegistered: jest.fn() };
-    ledger.recordRegistered.mockResolvedValue(undefined);
+    ledger = { appendRegistered: jest.fn() };
+    ledger.appendRegistered.mockResolvedValue(undefined);
     repository = { insert: jest.fn() };
     repository.insert.mockResolvedValue({
       outcome: AuthRegisterCustomerInsertOutcomeEnum.INSERTED,
@@ -89,14 +89,14 @@ describe('AuthRegisterUseCase', () => {
   it('records the registered customer in the ledger', async () => {
     await useCase.execute({ email: 'Eve@Example.com', password: 'correct-horse-battery' });
 
-    expect(ledger.recordRegistered).toHaveBeenCalledWith({
+    expect(ledger.appendRegistered).toHaveBeenCalledWith({
       subjectId: '105',
       occurredAt: '2026-01-05T08:00:00.000Z',
     });
   });
 
   it('lets a failed ledger record reject', async () => {
-    ledger.recordRegistered.mockRejectedValue(new Error('redis is down'));
+    ledger.appendRegistered.mockRejectedValue(new Error('redis is down'));
 
     const register = useCase.execute({
       email: 'eve@example.com',
@@ -115,6 +115,6 @@ describe('AuthRegisterUseCase', () => {
     });
 
     await expect(execution).rejects.toThrow('Email eve@example.com is already registered');
-    expect(ledger.recordRegistered).not.toHaveBeenCalled();
+    expect(ledger.appendRegistered).not.toHaveBeenCalled();
   });
 });

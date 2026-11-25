@@ -1,4 +1,4 @@
-export interface IOrderLedgerRecordPlacedCommand {
+export interface IOrderLedgerAppendPlacedCommand {
   subjectId: string;
   occurredAt: string;
   payload: {

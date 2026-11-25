@@ -32,8 +32,8 @@ returns, not by the arguments, so a lib mounted by each module that uses it woul
 
 **The hasher runs a bounded number of hashes at once.** Each argon2id hash holds
 `AUTH_ARGON2_MEMORY_COST` KiB, so a flood of logins from many addresses would grow the memory of the
-process with every request. `CredentialsPasswordHasherAdapter` runs `hash` and `verify` through
-`CredentialsPasswordHasherSemaphore`: at most `AUTH_ARGON2_MAX_CONCURRENCY` at a time, the others
+process with every request. `CredentialsPasswordHasherAdapter` runs `hash` and `verify` through a
+`Semaphore` of `@acme-libs/toolkit`: at most `AUTH_ARGON2_MAX_CONCURRENCY` at a time, the others
 wait in order. A call that waits longer than `AUTH_ARGON2_QUEUE_TIMEOUT_MS` leaves the queue with a
 `ServiceUnavailableException`, a `503` that the shared `HttpExceptionFilter` logs as an error. The
 semaphore lives in the adapter of the one module, so every caller of the lib shares one per process:

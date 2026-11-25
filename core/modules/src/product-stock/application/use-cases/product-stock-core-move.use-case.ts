@@ -55,7 +55,7 @@ export class ProductStockCoreMoveUseCase {
     const productIds = stockMovements.distinctProductIds;
     const movementRows = stockMovements.toInsertPayloads();
 
-    await this.repository.lockProducts(productIds);
+    await this.repository.lockMany(productIds);
 
     const insertedRows = await this.repository.insertMany(movementRows);
     const productStocks = ProductStockCoreMovementsModel.toRows(insertedRows);
@@ -88,7 +88,7 @@ export class ProductStockCoreMoveUseCase {
   ): Promise<void> {
     const { correlationId } = command;
 
-    await ReplayRetryHelper.retryThenLogForReplay(() => this.postSubtract.enqueue(command), {
+    await ReplayRetryHelper.run(() => this.postSubtract.enqueue(command), {
       maxAttempts: this.postSubtractRetryAttempts,
       logger: this.logger,
       correlationId,

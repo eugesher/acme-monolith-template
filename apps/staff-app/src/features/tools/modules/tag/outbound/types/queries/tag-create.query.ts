@@ -1,3 +1,3 @@
 import type { Tag } from '@acme-staff/common/entities';
 
-export type ITagCreateQuery = Pick<Tag, 'name'>;
+export type ITagCreateInsertQuery = Pick<Tag, 'name'>;

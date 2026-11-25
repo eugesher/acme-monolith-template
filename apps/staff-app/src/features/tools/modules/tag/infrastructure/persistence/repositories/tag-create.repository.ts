@@ -5,8 +5,8 @@ import { MysqlErrorHelper } from '@acme-libs/toolkit';
 import {
   TAG_CREATE_REPOSITORY_PORT,
   TagCreateInsertOutcomeEnum,
+  type ITagCreateInsertQuery,
   type ITagCreateInsertRecord,
-  type ITagCreateQuery,
   type ITagCreateRecord,
   type ITagCreateRepositoryPort,
 } from '../../../outbound';
@@ -19,7 +19,7 @@ export class TagCreateRepository extends TagPersistenceHost implements ITagCreat
     useClass: TagCreateRepository,
   };
 
-  public async insert(query: ITagCreateQuery): Promise<ITagCreateInsertRecord> {
+  public async insert(query: ITagCreateInsertQuery): Promise<ITagCreateInsertRecord> {
     const tagId = await MysqlErrorHelper.catchDuplicateKey(() =>
       this.tagRepository.insertOne(query),
     );
@@ -32,6 +32,6 @@ export class TagCreateRepository extends TagPersistenceHost implements ITagCreat
   }
 
   public async findInserted(tagId: string): Promise<ITagCreateRecord> {
-    return await this.createTagBuilder().forById(tagId).getOneOrFail();
+    return await this.createTagBuilder().forOne(tagId).getOneOrFail();
   }
 }

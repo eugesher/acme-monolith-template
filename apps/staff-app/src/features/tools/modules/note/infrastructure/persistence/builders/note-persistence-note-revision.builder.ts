@@ -2,10 +2,10 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import type { NoteRevision } from '@acme-staff/common/entities';
 
-import type { INoteGetRevisionsListForNoteQuery } from '../../../outbound';
+import type { INoteGetRevisionsListQuery } from '../../../outbound';
 
 export class NotePersistenceNoteRevisionBuilder extends SelectQueryBuilder<NoteRevision> {
-  public forListForNote(query: INoteGetRevisionsListForNoteQuery): this {
+  public forList(query: INoteGetRevisionsListQuery): this {
     const { limit, offset, noteId } = query;
 
     this.select([

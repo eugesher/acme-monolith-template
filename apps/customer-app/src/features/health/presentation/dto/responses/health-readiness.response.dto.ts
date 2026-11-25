@@ -1,5 +1,6 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 
+import { AppNameEnum } from '@acme-libs/kernel';
 import { HealthDependencyStatusEnum, HealthReadinessStatusEnum } from '@acme-libs/kernel';
 
 class HealthReadinessResponseDependencyDto {
@@ -28,7 +29,7 @@ export class HealthReadinessResponseDto {
   })
   public status: HealthReadinessStatusEnum;
 
-  @ApiResponseProperty({ example: 'customer-app' })
+  @ApiResponseProperty({ example: AppNameEnum.CUSTOMER_APP })
   public app: string;
 
   @ApiResponseProperty({ type: HealthReadinessResponseDependenciesDto })

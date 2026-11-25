@@ -36,7 +36,7 @@ export class ProductCreateUseCase {
     const productLedgerPayload = product.toLedgerPayload();
     const productLoggerPayload = product.toLoggerPayload();
 
-    await this.ledger.recordCreated(productLedgerPayload);
+    await this.ledger.appendCreated(productLedgerPayload);
 
     this.logger.info(productLoggerPayload, 'Product created');
 

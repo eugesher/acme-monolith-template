@@ -32,16 +32,16 @@ describe('QueueDeleteFailedJobUseCase', () => {
 
   describe('execute', () => {
     it('removes the job once it is known to be failed and logs its data and who removed it', async () => {
-      await useCase.execute({ queueName: 'ledger-record', jobId: '7', staffUserId: '1' });
+      await useCase.execute({ queueName: 'ledger-append', jobId: '7', staffUserId: '1' });
 
       expect(failedJobService.ensure).toHaveBeenCalledWith({
-        queueName: 'ledger-record',
+        queueName: 'ledger-append',
         jobId: '7',
       });
-      expect(registry.removeJob).toHaveBeenCalledWith({ queueName: 'ledger-record', jobId: '7' });
+      expect(registry.removeJob).toHaveBeenCalledWith({ queueName: 'ledger-append', jobId: '7' });
       expect(logger.warn).toHaveBeenCalledWith(
         {
-          queueName: 'ledger-record',
+          queueName: 'ledger-append',
           jobId: '7',
           staffUserId: '1',
           data: { record: { subjectId: '5' } },
@@ -54,7 +54,7 @@ describe('QueueDeleteFailedJobUseCase', () => {
       failedJobService.ensure.mockRejectedValue(new Error('not failed'));
 
       await expect(
-        useCase.execute({ queueName: 'ledger-record', jobId: '7', staffUserId: '1' }),
+        useCase.execute({ queueName: 'ledger-append', jobId: '7', staffUserId: '1' }),
       ).rejects.toThrow('not failed');
       expect(registry.removeJob).not.toHaveBeenCalled();
       expect(logger.warn).not.toHaveBeenCalled();

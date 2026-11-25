@@ -22,9 +22,9 @@ describe('ProductCoreArchiveUseCase', () => {
   beforeEach(() => {
     calls = [];
     hooks = [];
-    repository = { lockById: jest.fn(), update: jest.fn(), findById: jest.fn() };
-    repository.lockById.mockImplementation(() => {
-      calls.push('lockById');
+    repository = { lockOne: jest.fn(), update: jest.fn(), findOne: jest.fn() };
+    repository.lockOne.mockImplementation(() => {
+      calls.push('lockOne');
 
       return Promise.resolve({
         id: '12',
@@ -39,8 +39,8 @@ describe('ProductCoreArchiveUseCase', () => {
 
       return Promise.resolve();
     });
-    repository.findById.mockImplementation(() => {
-      calls.push('findById');
+    repository.findOne.mockImplementation(() => {
+      calls.push('findOne');
 
       return Promise.resolve({
         id: '12',
@@ -56,9 +56,9 @@ describe('ProductCoreArchiveUseCase', () => {
 
       return Promise.resolve();
     });
-    ledger = { recordArchived: jest.fn() };
-    ledger.recordArchived.mockImplementation(() => {
-      calls.push('recordArchived');
+    ledger = { appendArchived: jest.fn() };
+    ledger.appendArchived.mockImplementation(() => {
+      calls.push('appendArchived');
 
       return Promise.resolve();
     });
@@ -86,7 +86,7 @@ describe('ProductCoreArchiveUseCase', () => {
       const view = await useCase.execute({ productId: '12', expectedVersion: 3 });
 
       expect(view).toEqual({ outcome: 'archived', currentVersion: 4 });
-      expect(repository.lockById).toHaveBeenCalledWith('12');
+      expect(repository.lockOne).toHaveBeenCalledWith('12');
       expect(repository.update).toHaveBeenCalledWith({
         id: '12',
         versionAsRead: 3,
@@ -101,15 +101,15 @@ describe('ProductCoreArchiveUseCase', () => {
 
       expect(calls).toEqual([
         'begin',
-        'lockById',
+        'lockOne',
         'update',
-        'findById',
+        'findOne',
         'commit',
         'invalidate',
-        'recordArchived',
+        'appendArchived',
       ]);
-      expect(repository.findById).toHaveBeenCalledWith('12');
-      expect(ledger.recordArchived).toHaveBeenCalledWith({
+      expect(repository.findOne).toHaveBeenCalledWith('12');
+      expect(ledger.appendArchived).toHaveBeenCalledWith({
         subjectId: '12',
         version: 4,
         occurredAt: '2026-01-05T08:00:00.000Z',
@@ -118,7 +118,7 @@ describe('ProductCoreArchiveUseCase', () => {
     });
 
     it('answers not-found for an unknown product and writes nothing', async () => {
-      repository.lockById.mockResolvedValue(null);
+      repository.lockOne.mockResolvedValue(null);
 
       const view = await useCase.execute({ productId: '99', expectedVersion: undefined });
 
@@ -136,7 +136,7 @@ describe('ProductCoreArchiveUseCase', () => {
     });
 
     it('answers already-archived for an archived product and announces nothing', async () => {
-      repository.lockById.mockResolvedValue({
+      repository.lockOne.mockResolvedValue({
         id: '12',
         sku: 'SKU-0001',
         status: ProductStatusEnum.ARCHIVED,

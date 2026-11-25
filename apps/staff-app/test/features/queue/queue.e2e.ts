@@ -38,7 +38,7 @@ export class QueueE2E {
 
         try {
           const response = await request(this.ctx.app.getHttpServer())
-            .get('/api/queues/ledger-record/jobs/failed')
+            .get('/api/queues/ledger-append/jobs/failed')
             .query({ page: 1, limit: 10 })
             .auth(this.ctx.viewerToken, { type: 'bearer' })
             .expect(HttpStatus.OK);
@@ -94,20 +94,20 @@ export class QueueE2E {
         });
 
         await request(this.ctx.app.getHttpServer())
-          .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
+          .post(`/api/queues/ledger-append/jobs/failed/${job.id}/retry`)
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NO_CONTENT);
 
         expect({
           state: await job.getState(),
-          failed: await this.ctx.ledgerRecordQueue.getFailedCount(),
+          failed: await this.ctx.ledgerAppendQueue.getFailedCount(),
           records: await this.ctx.takeLedgerRecords(),
         }).toMatchSnapshot();
       });
 
       it('should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED', async () => {
-        const job = await this.ctx.ledgerRecordQueue.add(
-          'ledger-record',
+        const job = await this.ctx.ledgerAppendQueue.add(
+          'ledger-append',
           {
             operationKey: 'e2e-queue:3',
             subjectType: 'product',
@@ -122,7 +122,7 @@ export class QueueE2E {
 
         try {
           const response = await request(this.ctx.app.getHttpServer())
-            .post(`/api/queues/ledger-record/jobs/failed/${job.id}/retry`)
+            .post(`/api/queues/ledger-append/jobs/failed/${job.id}/retry`)
             .auth(this.ctx.adminToken, { type: 'bearer' })
             .expect(HttpStatus.CONFLICT);
 
@@ -130,7 +130,7 @@ export class QueueE2E {
             response: {
               body: {
                 message: expect.stringMatching(
-                  /^Job \S+ of queue ledger-record is delayed, not failed$/,
+                  /^Job \S+ of queue ledger-append is delayed, not failed$/,
                 ),
               },
             },
@@ -142,7 +142,7 @@ export class QueueE2E {
 
       it('should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .post('/api/queues/ledger-record/jobs/failed/999999/retry')
+          .post('/api/queues/ledger-append/jobs/failed/999999/retry')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
 
@@ -174,19 +174,19 @@ export class QueueE2E {
         });
 
         await request(this.ctx.app.getHttpServer())
-          .delete(`/api/queues/ledger-record/jobs/failed/${job.id}`)
+          .delete(`/api/queues/ledger-append/jobs/failed/${job.id}`)
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NO_CONTENT);
 
         expect({
           state: await job.getState(),
-          failed: await this.ctx.ledgerRecordQueue.getFailedCount(),
+          failed: await this.ctx.ledgerAppendQueue.getFailedCount(),
         }).toMatchSnapshot();
       });
 
       it('should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND', async () => {
         const response = await request(this.ctx.app.getHttpServer())
-          .delete('/api/queues/ledger-record/jobs/failed/999999')
+          .delete('/api/queues/ledger-append/jobs/failed/999999')
           .auth(this.ctx.adminToken, { type: 'bearer' })
           .expect(HttpStatus.NOT_FOUND);
 

@@ -5,7 +5,7 @@ import { QueueJobParamDto } from '../queue-job.param.dto';
 
 describe('QueueJobParamDto', () => {
   it.each([
-    ['the name of a queue and the id of a job', { queueName: 'ledger-record', jobId: '42' }],
+    ['the name of a queue and the id of a job', { queueName: 'ledger-append', jobId: '42' }],
     [
       'a name of 64 characters and an id of 128',
       { queueName: 'q'.repeat(64), jobId: '4'.repeat(128) },
@@ -27,11 +27,11 @@ describe('QueueJobParamDto', () => {
     ],
     [
       'an id of 129 characters',
-      { queueName: 'ledger-record', jobId: '4'.repeat(129) },
+      { queueName: 'ledger-append', jobId: '4'.repeat(129) },
       'jobId',
       ['maxLength'],
     ],
-    ['a missing id', { queueName: 'ledger-record' }, 'jobId', ['maxLength', 'isString']],
+    ['a missing id', { queueName: 'ledger-append' }, 'jobId', ['maxLength', 'isString']],
   ])('rejects %s', (_case, params, property, constraints) => {
     const dto = plainToInstance(QueueJobParamDto, params);
 

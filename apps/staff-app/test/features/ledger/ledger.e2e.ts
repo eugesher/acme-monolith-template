@@ -1,13 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 
+import { LedgerActionEnum, LedgerSubjectTypeEnum } from '@acme-libs/kernel';
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import {
-  LEDGER_CORE_PORT,
-  LedgerCoreActionEnum,
-  LedgerCoreSubjectTypeEnum,
-  type ILedgerCorePort,
-} from '@acme-core/contracts/ledger';
+import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
 
 import type { AppE2EContext } from '../../context/app-e2e.context';
 
@@ -60,22 +56,22 @@ export class LedgerE2E {
     });
   }
 
-  public handleEnqueue(): void {
-    describe('LEDGER_CORE_PORT handleEnqueue', () => {
+  public handleAppendEnqueue(): void {
+    describe('LEDGER_CORE_PORT handleAppendEnqueue', () => {
       it('should keep one job for a record enqueued twice under the same operation key', async () => {
         const ledger = this.ctx.moduleFixture.get<ILedgerCorePort>(LEDGER_CORE_PORT);
         const record = {
           operationKey: 'e2e-enqueue:1',
-          subjectType: LedgerCoreSubjectTypeEnum.PRODUCT,
+          subjectType: LedgerSubjectTypeEnum.PRODUCT,
           subjectId: '100',
-          action: LedgerCoreActionEnum.PRODUCT_CREATED,
+          action: LedgerActionEnum.PRODUCT_CREATED,
           payload: { name: 'Twice' },
           occurredAt: '2026-01-05T08:00:00.000Z',
         };
 
         await CorrelationContextHelper.run('e2e00000-0000-4000-8000-000000000019', async () => {
-          await ledger.handleEnqueue(record);
-          await ledger.handleEnqueue(record);
+          await ledger.handleAppendEnqueue(record);
+          await ledger.handleAppendEnqueue(record);
         });
 
         const records = await this.ctx.takeLedgerRecords();

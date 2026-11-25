@@ -20,8 +20,8 @@ export class ProductCoreArchiveRepository
     useClass: ProductCoreArchiveRepository,
   };
 
-  public async lockById(productId: string): Promise<Nullable<IProductCoreArchiveRecord>> {
-    return await this.createProductBuilder().forLockById(productId).getOne();
+  public async lockOne(productId: string): Promise<Nullable<IProductCoreArchiveRecord>> {
+    return await this.createProductBuilder().forLockOne(productId).getOne();
   }
 
   public async update(query: IProductCoreArchiveUpdateQuery): Promise<void> {
@@ -30,7 +30,7 @@ export class ProductCoreArchiveRepository
     await this.productRepository.update({ id, version: versionAsRead }, { status, version });
   }
 
-  public async findById(productId: string): Promise<IProductCoreArchiveRecord> {
-    return await this.createProductBuilder().forById(productId).getOneOrFail();
+  public async findOne(productId: string): Promise<IProductCoreArchiveRecord> {
+    return await this.createProductBuilder().forOne(productId).getOneOrFail();
   }
 }

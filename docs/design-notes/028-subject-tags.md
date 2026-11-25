@@ -17,7 +17,7 @@ module of the template: two modules of staff-app call the same facade methods, s
 | -------------------------------- | --------------- | -------------------------------------------------- |
 | `POST /tools/tags`               | `tag:write`     | creates a tag; a taken name answers 409            |
 | `GET /tools/tags`                | `tag:read`      | a page of tags by name                             |
-| `PATCH /tools/tags/:tagId`       | `tag:write`     | renames a tag; the links keep pointing at it       |
+| `PATCH /tools/tags/:tagId`       | `tag:write`     | updates a tag; the links keep pointing at it       |
 | `DELETE /tools/tags/:tagId`      | `tag:write`     | deletes a tag; `ON DELETE CASCADE` drops its links |
 | `GET /catalog/products/:id/tags` | `product:read`  | the tags of a product, by name                     |
 | `PUT /catalog/products/:id/tags` | `product:write` | replaces them with `{ tagIds }`                    |
@@ -30,7 +30,7 @@ module of the template: two modules of staff-app call the same facade methods, s
 
 `tag` holds the name under `uq_tag_name`. The collation is case-insensitive, so `Fragile` and
 `fragile` are one name. `tag_subject` links a tag to a subject by `tagId`: `subject_type` names the
-caller (`TagCommonSubjectTypeEnum`), `subject_id` is its key, and a rename touches no link. The
+caller (`TagCommonSubjectTypeEnum`), `subject_id` is its key, and an update touches no link. The
 primary key `(tag_id, subject_type, subject_id)` keeps a link single and serves both the foreign key
 and the filter, and `idx_tag_subject_subject (subject_type, subject_id)` serves the tags of a
 subject. A link has no id of its own: nothing points at it, and its columns name it. No foreign key
@@ -38,7 +38,7 @@ points at the subject, since the table serves several; the caller checks the sub
 
 ## Two modules over one table
 
-**The dictionary is a feature, the links are a common module.** Only `/tools/tags` creates, renames
+**The dictionary is a feature, the links are a common module.** Only `/tools/tags` creates, updates
 and deletes tags, so that code stays with its only caller. Reading the tags of a subject, replacing
 them and finding the subjects of a tag are asked by both `product` and `order`, so they move up into
 the common module. `Tag` is mapped by both; each keeps its own model narrowed to what it uses

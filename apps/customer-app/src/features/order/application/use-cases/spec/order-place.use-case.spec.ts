@@ -24,13 +24,13 @@ describe('OrderPlaceUseCase', () => {
   beforeEach(() => {
     calls = [];
     repository = {
-      findActiveProducts: jest.fn(),
+      findActiveMany: jest.fn(),
       insertOrder: jest.fn(),
       insertOrderProducts: jest.fn(),
       findPlaced: jest.fn(),
     };
-    repository.findActiveProducts.mockImplementation(() => {
-      calls.push('findActiveProducts');
+    repository.findActiveMany.mockImplementation(() => {
+      calls.push('findActiveMany');
 
       return Promise.resolve([{ id: '100' }, { id: '103' }]);
     });
@@ -88,9 +88,9 @@ describe('OrderPlaceUseCase', () => {
 
       return Promise.resolve();
     });
-    ledger = { recordPlaced: jest.fn() };
-    ledger.recordPlaced.mockImplementation(() => {
-      calls.push('recordPlaced');
+    ledger = { appendPlaced: jest.fn() };
+    ledger.appendPlaced.mockImplementation(() => {
+      calls.push('appendPlaced');
 
       return Promise.resolve();
     });
@@ -129,7 +129,7 @@ describe('OrderPlaceUseCase', () => {
         body: { productIds: ['100', '103', '100'] },
       });
       expect(productStock.lock).toHaveBeenCalledWith({ productIds: ['100', '103'] });
-      expect(repository.findActiveProducts).toHaveBeenCalledWith(['100', '103']);
+      expect(repository.findActiveMany).toHaveBeenCalledWith(['100', '103']);
       expect(repository.insertOrder).toHaveBeenCalledWith({ customerId: 'customer-1' });
       expect(repository.insertOrderProducts).toHaveBeenCalledWith([
         { orderId: '610', productId: '100' },
@@ -162,14 +162,14 @@ describe('OrderPlaceUseCase', () => {
         'claim',
         'begin',
         'lock',
-        'findActiveProducts',
+        'findActiveMany',
         'insertOrder',
         'insertOrderProducts',
         'findPlaced',
         'withdraw',
         'complete',
         'commit',
-        'recordPlaced',
+        'appendPlaced',
       ]);
     });
 
@@ -180,7 +180,7 @@ describe('OrderPlaceUseCase', () => {
         idempotencyKey: 'key-1',
       });
 
-      expect(ledger.recordPlaced).toHaveBeenCalledWith({
+      expect(ledger.appendPlaced).toHaveBeenCalledWith({
         subjectId: '610',
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: {
@@ -192,7 +192,7 @@ describe('OrderPlaceUseCase', () => {
           ],
         },
       });
-      expect(calls.slice(calls.indexOf('commit'))).toEqual(['commit', 'recordPlaced']);
+      expect(calls.slice(calls.indexOf('commit'))).toEqual(['commit', 'appendPlaced']);
       expect(logger.info).toHaveBeenCalledWith(
         {
           id: '610',
@@ -223,7 +223,7 @@ describe('OrderPlaceUseCase', () => {
       expect(view).toEqual({ id: '610' });
       expect(productStock.lock).not.toHaveBeenCalled();
       expect(repository.insertOrder).not.toHaveBeenCalled();
-      expect(ledger.recordPlaced).not.toHaveBeenCalled();
+      expect(ledger.appendPlaced).not.toHaveBeenCalled();
       expect(logger.info).toHaveBeenCalledWith(
         { idempotencyKey: 'key-1' },
         'Order placement replayed from the idempotency store',
@@ -266,7 +266,7 @@ describe('OrderPlaceUseCase', () => {
         code: 'ORDER_STOCK_INSUFFICIENT',
         message: 'Product 103 has 3 in stock, 4 requested',
       });
-      expect(calls).toEqual(['claim', 'begin', 'lock', 'findActiveProducts', 'release']);
+      expect(calls).toEqual(['claim', 'begin', 'lock', 'findActiveMany', 'release']);
       expect(idempotency.release).toHaveBeenCalledWith({ customerId: 'customer-1', key: 'key-1' });
     });
 
@@ -281,7 +281,7 @@ describe('OrderPlaceUseCase', () => {
         }),
       ).rejects.toThrow('lock wait timeout');
       expect(idempotency.release).toHaveBeenCalledWith({ customerId: 'customer-1', key: 'key-1' });
-      expect(ledger.recordPlaced).not.toHaveBeenCalled();
+      expect(ledger.appendPlaced).not.toHaveBeenCalled();
     });
 
     it('rejects with the failure of the release when the key cannot be released', async () => {
@@ -298,7 +298,7 @@ describe('OrderPlaceUseCase', () => {
     });
 
     it('keeps the completed key when the ledger fails after the commit and rethrows', async () => {
-      ledger.recordPlaced.mockRejectedValue(new Error('ledger down'));
+      ledger.appendPlaced.mockRejectedValue(new Error('ledger down'));
 
       await expect(
         useCase.execute({

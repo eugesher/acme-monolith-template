@@ -68,7 +68,7 @@ export class ProductStockAddUseCase {
     const writeResult = await this.write(command);
     const { stockOnHand, productStockId, productStockLedgerPayload } = writeResult;
 
-    await this.ledger.recordAdded(productStockLedgerPayload);
+    await this.ledger.appendAdded(productStockLedgerPayload);
 
     const addLoggerPayload = ProductStockAddModel.toLoggerPayload({
       productStockId,
@@ -98,7 +98,7 @@ export class ProductStockAddUseCase {
 
     await this.movement.lock({ productId });
 
-    const productRecord = await this.repository.findById(productId);
+    const productRecord = await this.repository.findOne(productId);
 
     if (!productRecord) {
       throw new ProductStockProductNotFoundException(productId);

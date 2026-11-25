@@ -24,7 +24,7 @@ export class AuthE2E {
           .auth(response.body.accessToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 
-        const payload = this.ctx.jwt.verify<{ aud: string; iat: number; exp: number }>(
+        const payload = this.ctx.jwtService.verify<{ aud: string; iat: number; exp: number }>(
           response.body.accessToken,
         );
         const claims = Object.keys(payload).sort();
@@ -110,7 +110,7 @@ export class AuthE2E {
   public handleMe(): void {
     describe('GET /api/auth/me', () => {
       it('should take the roles from the database, not from the token claims', async () => {
-        const forged = this.ctx.jwt.sign({
+        const forged = this.ctx.jwtService.sign({
           sub: '3',
           roles: ['admin'],
           permissions: ['access:manage'],
@@ -138,7 +138,7 @@ export class AuthE2E {
       });
 
       it('should refuse the token of a disabled user', async () => {
-        const token = this.ctx.jwt.sign({ sub: '4' });
+        const token = this.ctx.jwtService.sign({ sub: '4' });
 
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/auth/me')
@@ -149,7 +149,7 @@ export class AuthE2E {
       });
 
       it('should refuse the token of a customer signed with the secret of this app', async () => {
-        const token = this.ctx.jwt.sign({ sub: '101' });
+        const token = this.ctx.jwtService.sign({ sub: '101' });
 
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/auth/me')
@@ -160,7 +160,7 @@ export class AuthE2E {
       });
 
       it('should refuse the token of a staff user issued for the customer audience', async () => {
-        const token = this.ctx.jwt.sign({ sub: '2' }, { audience: 'customer' });
+        const token = this.ctx.jwtService.sign({ sub: '2' }, { audience: 'customer' });
 
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/auth/me')

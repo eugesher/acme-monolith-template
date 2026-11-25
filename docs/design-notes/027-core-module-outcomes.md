@@ -32,6 +32,6 @@ it drops a cache (see `020-cross-app-cache-invalidation.md`) and enqueues a ledg
 ## Wiring
 
 `core/modules/src/product/shell/product-core.module.ts` binds the repository, the cache adapter and
-the core-adapter of the ledger, and mounts `LedgerCoreModule`, which registers the `ledger-record`
+the core-adapter of the ledger, and mounts `LedgerCoreModule`, which registers the `ledger-append`
 queue and reads `REDIS_COMMAND_TIMEOUT_MS` and `ENQUEUE_RETRY_ATTEMPTS`. `CACHE_PORT` comes from the
 global `CacheModule.forRoot()` of each app.

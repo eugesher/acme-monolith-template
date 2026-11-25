@@ -1,8 +1,8 @@
 # 008 — Queue processor
 
-`apps/processor-app/src/processors/ledger-append` processes the `ledger-record` queue and appends
+`apps/processor-app/src/processors/ledger-append` processes the `ledger-append` queue and appends
 each job to `ledger_entry` (see `004-append-only-journal.md`). It is a processor, not a feature: a
-job of the BullMQ queue `ledger-record` enters it, not an HTTP request, and it has no controller.
+job of the BullMQ queue `ledger-append` enters it, not an HTTP request, and it has no controller.
 
 | Layer                        | What it holds                                                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -14,19 +14,20 @@ job of the BullMQ queue `ledger-record` enters it, not an HTTP request, and it h
 
 ## A job is a ready record
 
-The job type `ILedgerRecordProcessorPayload` carries the whole record, and the processor appends it
+The job type `ILedgerAppendProcessorPayload` carries the whole record, and the processor appends it
 as it is, so a new producer needs no change here. The producers do not process the queue:
 processor-app does (see `023-processor-app.md`), and the apps reach the queue through one Redis.
 
-The queue is `LedgerQueue` of `@acme-core/queues` and the job type lives in
+The queue is `LedgerAppendQueue` of `@acme-core/queues` and the job type lives in
 `@acme-core/contracts/ledger`, because an app may not import another. `LedgerCoreModule` of the
-producers and the module root of the ledger processor both mount `LedgerQueue.register()`, which is
-`BullSetupModule.registerQueue(LedgerQueue.NAME)`. BullMQ applies the job options of the producer,
-so every producer enqueues with the same `attempts` and `backoff` because `registerQueue` takes the
-name alone and every queue gets the fixed job options of `BullSetupModule.forRoot()`.
+producers and the module root of the ledger processor both mount `LedgerAppendQueue.register()`,
+which is `BullSetupModule.registerQueue(LedgerAppendQueue.NAME)`. BullMQ applies the job options of
+the producer, so every producer enqueues with the same `attempts` and `backoff` because
+`registerQueue` takes the name alone and every queue gets the fixed job options of
+`BullSetupModule.forRoot()`.
 
-**A processor is a `WorkerHost`.** `@Processor(LedgerQueue.NAME)` makes `@nestjs/bullmq` start a
-worker for the queue, and the worker calls `process(job)`. A queue carries one kind of job, so a
+**A processor is a `WorkerHost`.** `@Processor(LedgerAppendQueue.NAME)` makes `@nestjs/bullmq` start
+a worker for the queue, and the worker calls `process(job)`. A queue carries one kind of job, so a
 producer names the job after its queue.
 
 ## Job options

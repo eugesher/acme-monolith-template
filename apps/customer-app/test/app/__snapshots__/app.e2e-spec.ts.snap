@@ -161,7 +161,7 @@ exports[`App Auth POST /api/auth/register should create a customer who logs in a
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "CustomerRegistered",
       "correlationId": "e2e00000-0000-4000-8000-000000000002",
@@ -476,27 +476,6 @@ exports[`App Order GET /api/orders/:orderId should read an order of the caller w
 }
 `;
 
-exports[`App Order GET /api/orders/:orderId should read an order of the caller with a product deleted after the order 1`] = `
-{
-  "response": {
-    "body": {
-      "createdAt": "2026-01-02T00:00:00.000Z",
-      "id": "602",
-      "orderProducts": [
-        {
-          "id": "603",
-          "product": {
-            "id": "107",
-            "name": "Deleted product",
-            "sku": "SKU-0008",
-          },
-        },
-      ],
-    },
-  },
-}
-`;
-
 exports[`App Order GET /api/orders/:orderId should refuse an order id that is not a number with 400 from validation 1`] = `
 {
   "response": {
@@ -564,7 +543,7 @@ exports[`App Order POST /api/orders should place an order of another customer un
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     "OrderPlaced",
   ],
   "response": {
@@ -644,7 +623,7 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "OrderPlaced",
       "correlationId": "e2e00000-0000-4000-8000-000000000003",
@@ -701,24 +680,6 @@ exports[`App Order POST /api/orders should place the order with a line and a -1 
           },
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`App Order POST /api/orders should refuse a deleted product with 422 and write nothing 1`] = `
-{
-  "db": {
-    "order": [],
-  },
-  "response": {
-    "body": {
-      "code": "ORDER_PRODUCT_NOT_FOUND",
-      "details": {
-        "productId": "107",
-      },
-      "message": "Product 107 was not found",
-      "statusCode": 422,
     },
   },
 }
@@ -863,7 +824,7 @@ exports[`App Order POST /api/orders should replay the same response for the same
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     "OrderPlaced",
   ],
 }

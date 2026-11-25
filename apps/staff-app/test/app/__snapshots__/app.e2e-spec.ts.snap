@@ -789,7 +789,6 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should keep 
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "101",
         "name": "Seeded draft product",
         "sku": "SKU-0002",
@@ -832,7 +831,6 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should refus
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "101",
         "name": "Seeded draft product",
         "sku": "SKU-0002",
@@ -864,7 +862,6 @@ exports[`App Catalog Product PATCH /api/catalog/products/:productId should updat
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "102",
         "name": "Renamed product",
         "sku": "SKU-0003",
@@ -894,7 +891,6 @@ exports[`App Catalog Product POST /api/catalog/products should create a draft an
     "product": [
       {
         "created_at": Any<Date>,
-        "deleted_at": null,
         "id": Any<String>,
         "name": "Created product",
         "sku": "E2E-0001",
@@ -904,7 +900,7 @@ exports[`App Catalog Product POST /api/catalog/products should create a draft an
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductCreated",
       "correlationId": "e2e00000-0000-4000-8000-000000000014",
@@ -962,7 +958,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/archive shoul
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "103",
         "name": "Product to archive",
         "sku": "SKU-0004",
@@ -972,7 +967,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/archive shoul
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductArchived",
       "correlationId": "e2e00000-0000-4000-8000-000000000015",
@@ -1006,7 +1001,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/archive shoul
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "105",
         "name": "Archived product",
         "sku": "SKU-0006",
@@ -1016,7 +1010,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/archive shoul
       },
     ],
   },
-  "ledger_record_queue": [],
+  "ledger_append_queue": [],
   "response": {
     "body": {
       "code": "PRODUCT_ALREADY_ARCHIVED",
@@ -1047,7 +1041,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "100",
         "name": "Seeded reference product",
         "sku": "SKU-0001",
@@ -1057,7 +1050,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
       },
     ],
   },
-  "ledger_record_queue": [],
+  "ledger_append_queue": [],
   "response": {
     "body": {
       "createdAt": "2026-01-01T00:00:00.000Z",
@@ -1081,7 +1074,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "101",
         "name": "Seeded draft product",
         "sku": "SKU-0002",
@@ -1091,7 +1083,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductPublished",
       "correlationId": "e2e00000-0000-4000-8000-000000000016",
@@ -1125,7 +1117,6 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
     "product": [
       {
         "created_at": 2026-01-01T00:00:00.000Z,
-        "deleted_at": null,
         "id": "105",
         "name": "Archived product",
         "sku": "SKU-0006",
@@ -1135,7 +1126,7 @@ exports[`App Catalog Product POST /api/catalog/products/:productId/publish shoul
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductPublished",
       "correlationId": "e2e00000-0000-4000-8000-000000000017",
@@ -1406,7 +1397,7 @@ exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refus
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
       "details": null,
-      "message": "Job 999999 was not found in queue ledger-record",
+      "message": "Job 999999 was not found in queue ledger-append",
       "statusCode": 404,
     },
   },
@@ -1425,7 +1416,7 @@ exports[`App Queue GET /api/queues should list the queues with their job counts 
           "failed": 0,
           "waiting": 0,
         },
-        "name": "ledger-record",
+        "name": "ledger-append",
         "paused": false,
       },
       {
@@ -1466,7 +1457,7 @@ exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page o
           "failedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "failedReason": "The e2e case failed the record",
           "id": StringMatching /\\^\\\\d\\+\\$/,
-          "name": "ledger-record",
+          "name": "ledger-append",
           "processedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
           "stacktrace": [
             Any<String>,
@@ -1501,7 +1492,7 @@ exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should r
     "body": {
       "code": "QUEUE_JOB_NOT_FAILED",
       "details": null,
-      "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-record is delayed, not failed\\$/,
+      "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-append is delayed, not failed\\$/,
       "statusCode": 409,
     },
   },
@@ -1514,7 +1505,7 @@ exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should r
     "body": {
       "code": "QUEUE_JOB_NOT_FOUND",
       "details": null,
-      "message": "Job 999999 was not found in queue ledger-record",
+      "message": "Job 999999 was not found in queue ledger-append",
       "statusCode": 404,
     },
   },
@@ -1636,28 +1627,6 @@ exports[`App Sales Order GET /api/sales/orders/:orderId should answer an unknown
       "details": null,
       "message": "Order 999 was not found",
       "statusCode": 404,
-    },
-  },
-}
-`;
-
-exports[`App Sales Order GET /api/sales/orders/:orderId should read an order with a product deleted after the order 1`] = `
-{
-  "response": {
-    "body": {
-      "createdAt": "2026-01-02T00:00:00.000Z",
-      "customerId": "102",
-      "id": "602",
-      "orderProducts": [
-        {
-          "id": "603",
-          "product": {
-            "id": "107",
-            "name": "Deleted product",
-            "sku": "SKU-0008",
-          },
-        },
-      ],
     },
   },
 }
@@ -1840,7 +1809,7 @@ exports[`App Tools Note DELETE /api/tools/notes/:noteId should hide the note of 
     "note": [
       {
         "author_id": "1",
-        "body": "Edited with the same body.",
+        "body": "Updated with the same body.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "204",
@@ -2098,7 +2067,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should answer 500 and rol
     "note": [
       {
         "author_id": "1",
-        "body": "Edited while a revision is taken.",
+        "body": "Updated while a revision is taken.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "203",
@@ -2127,7 +2096,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should hide the note of a
     "note": [
       {
         "author_id": "1",
-        "body": "Edited with the same body.",
+        "body": "Updated with the same body.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "204",
@@ -2157,7 +2126,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse a stale If-
     "note": [
       {
         "author_id": "1",
-        "body": "Edited with the same body.",
+        "body": "Updated with the same body.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "204",
@@ -2183,7 +2152,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse a stale If-
 }
 `;
 
-exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to edit a resolved note with 409 1`] = `
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to update a resolved note with 409 1`] = `
 {
   "db": {
     "note": [
@@ -2276,7 +2245,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should roll the note back
     "note": [
       {
         "author_id": "1",
-        "body": "Edited while a revision is taken.",
+        "body": "Updated while a revision is taken.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "203",
@@ -2307,13 +2276,13 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should roll the note back
 }
 `;
 
-exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for an edit to the current body 1`] = `
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for an update to the current body 1`] = `
 {
   "db": {
     "note": [
       {
         "author_id": "1",
-        "body": "Edited with the same body.",
+        "body": "Updated with the same body.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "204",
@@ -2329,7 +2298,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for 
   "response": {
     "body": {
       "authorId": "1",
-      "body": "Edited with the same body.",
+      "body": "Updated with the same body.",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "id": "204",
       "resolved": false,
@@ -2382,7 +2351,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should hide the no
     "note": [
       {
         "author_id": "1",
-        "body": "Edited with the same body.",
+        "body": "Updated with the same body.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "204",
@@ -2411,7 +2380,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse a st
     "note": [
       {
         "author_id": "1",
-        "body": "Edited with the same body.",
+        "body": "Updated with the same body.",
         "created_at": 2026-01-01T00:00:00.000Z,
         "deleted_at": null,
         "id": "204",
@@ -2607,7 +2576,7 @@ exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse the name of an
 }
 `;
 
-exports[`App Tools Tag PATCH /api/tools/tags/:tagId should rename the tag 1`] = `
+exports[`App Tools Tag PATCH /api/tools/tags/:tagId should update the tag 1`] = `
 {
   "db": {
     "tag": [
@@ -2722,7 +2691,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     {
       "action": "ProductRestocked",
       "correlationId": "e2e00000-0000-4000-8000-000000000013",
@@ -2740,19 +2709,6 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
     "body": {
       "productId": "106",
       "quantity": 5,
-    },
-  },
-}
-`;
-
-exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should answer a deleted product with 404 1`] = `
-{
-  "response": {
-    "body": {
-      "code": "PRODUCT_STOCK_PRODUCT_NOT_FOUND",
-      "details": null,
-      "message": "Product 107 was not found",
-      "statusCode": 404,
     },
   },
 }
@@ -2893,7 +2849,7 @@ exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId
       },
     ],
   },
-  "ledger_record_queue": [
+  "ledger_append_queue": [
     "ProductRestocked",
   ],
   "response": {

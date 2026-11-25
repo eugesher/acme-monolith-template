@@ -2,16 +2,16 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import type { Tag } from '@acme-staff/common/entities';
 
-import type { ITagGetManyQuery } from '../../../outbound';
+import type { ITagGetManyListQuery } from '../../../outbound';
 
 export class TagPersistenceBuilder extends SelectQueryBuilder<Tag> {
-  public forById(tagId: string): this {
+  public forOne(tagId: string): this {
     this.selectTag().where(`${this.alias}.id = :tagId`, { tagId });
 
     return this;
   }
 
-  public forList(query: ITagGetManyQuery): this {
+  public forList(query: ITagGetManyListQuery): this {
     const { limit, offset } = query;
 
     this.selectTag()

@@ -24,9 +24,9 @@ describe('TagPersistenceBuilder', () => {
     baseBuilder = dataSource.getRepository(Tag).createQueryBuilder(Tag.name);
   });
 
-  describe('forById', () => {
+  describe('forOne', () => {
     it('selects the tag by id', () => {
-      const builder = new TagPersistenceBuilder(baseBuilder).forById('300');
+      const builder = new TagPersistenceBuilder(baseBuilder).forOne('300');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Tag`.`id` AS `Tag_id`, `Tag`.`name` AS `Tag_name`, `Tag`.`createdAt` AS `Tag_createdAt`, `Tag`.`updatedAt` AS `Tag_updatedAt` FROM `tag` `Tag` WHERE `Tag`.`id` = ?',

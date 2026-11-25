@@ -24,9 +24,9 @@ describe('TagCommonPersistenceBuilder', () => {
     baseBuilder = dataSource.getRepository(Tag).createQueryBuilder(Tag.name);
   });
 
-  describe('forList', () => {
+  describe('forSubject', () => {
     it('selects the tags of the subject by name', () => {
-      const builder = new TagCommonPersistenceBuilder(baseBuilder).forList({
+      const builder = new TagCommonPersistenceBuilder(baseBuilder).forSubject({
         subjectType: 'product',
         subjectId: '100',
       });
@@ -38,9 +38,9 @@ describe('TagCommonPersistenceBuilder', () => {
     });
   });
 
-  describe('forLockTags', () => {
+  describe('forLockMany', () => {
     it('selects the given tags by name under a shared lock', () => {
-      const builder = new TagCommonPersistenceBuilder(baseBuilder).forLockTags(['300', '301']);
+      const builder = new TagCommonPersistenceBuilder(baseBuilder).forLockMany(['300', '301']);
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Tag`.`id` AS `Tag_id`, `Tag`.`name` AS `Tag_name` FROM `tag` `Tag` WHERE `Tag`.`id` IN (?, ?) ORDER BY `Tag_name` ASC LOCK IN SHARE MODE',

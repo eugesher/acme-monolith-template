@@ -8,22 +8,22 @@ describe('ProductCoreLedgerCoreAdapter', () => {
   let adapter: ProductCoreLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleEnqueue: jest.fn() };
-    ledger.handleEnqueue.mockResolvedValue();
+    ledger = { handleAppendEnqueue: jest.fn() };
+    ledger.handleAppendEnqueue.mockResolvedValue();
     adapter = new ProductCoreLedgerCoreAdapter(ledger);
   });
 
-  describe('recordArchived', () => {
+  describe('appendArchived', () => {
     it('enqueues the archive under the product and the version it produced', async () => {
-      await adapter.recordArchived({
+      await adapter.appendArchived({
         subjectId: '12',
         version: 4,
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', previousStatus: ProductStatusEnum.ACTIVE },
       });
 
-      expect(ledger.handleEnqueue).toHaveBeenCalledTimes(1);
-      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-archived:12:4',
         subjectType: 'product',
         subjectId: '12',

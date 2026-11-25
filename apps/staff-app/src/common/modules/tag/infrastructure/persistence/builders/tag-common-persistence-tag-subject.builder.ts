@@ -3,12 +3,12 @@ import { SelectQueryBuilder } from 'typeorm';
 import type { TagSubject } from '@acme-staff/common/entities';
 
 import type {
-  ITagCommonFindSubjectIdsQuery,
+  ITagCommonFindSubjectIdsByTagQuery,
   ITagCommonReplaceFindLinkedQuery,
 } from '../../../outbound';
 
 export class TagCommonPersistenceTagSubjectBuilder extends SelectQueryBuilder<TagSubject> {
-  public forList(query: ITagCommonFindSubjectIdsQuery): this {
+  public forTag(query: ITagCommonFindSubjectIdsByTagQuery): this {
     const { subjectType, tagId } = query;
 
     this.select([`${this.alias}.tagId`, `${this.alias}.subjectType`, `${this.alias}.subjectId`])

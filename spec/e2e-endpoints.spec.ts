@@ -14,7 +14,7 @@ describe('e2e endpoints', () => {
       expect.arrayContaining([
         {
           controller: 'apps/staff-app/src/features/tools/modules/tag/shell/tag.controller.ts',
-          handler: 'handleRename',
+          handler: 'handleUpdate',
         },
         {
           controller: 'apps/customer-app/src/features/order/shell/order.controller.ts',

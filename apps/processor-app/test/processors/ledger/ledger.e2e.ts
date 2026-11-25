@@ -8,9 +8,9 @@ export class LedgerE2E {
   }
 
   public process(): void {
-    describe('queue ledger-record', () => {
+    describe('queue ledger-append', () => {
       it('should append the record as a ledger entry under its correlation id', async () => {
-        await this.ctx.ledgerRecordQueue.add('ledger-record', {
+        await this.ctx.ledgerAppendQueue.add('ledger-append', {
           operationKey: 'e2e-record:1',
           subjectType: 'product',
           subjectId: '100',
@@ -20,7 +20,7 @@ export class LedgerE2E {
           correlationId: 'e2e00000-0000-4000-8000-000000000006',
         });
 
-        await this.ctx.waitForLedgerRecordQueue();
+        await this.ctx.waitForLedgerAppendQueue();
 
         expect({
           db: {
@@ -45,9 +45,9 @@ export class LedgerE2E {
           correlationId: 'e2e00000-0000-4000-8000-000000000007',
         };
 
-        await this.ctx.ledgerRecordQueue.add('ledger-record', record);
-        await this.ctx.ledgerRecordQueue.add('ledger-record', record);
-        await this.ctx.waitForLedgerRecordQueue();
+        await this.ctx.ledgerAppendQueue.add('ledger-append', record);
+        await this.ctx.ledgerAppendQueue.add('ledger-append', record);
+        await this.ctx.waitForLedgerAppendQueue();
 
         expect({
           db: {
@@ -60,8 +60,8 @@ export class LedgerE2E {
       });
 
       it('should keep a record that fails its last attempt among the failed jobs', async () => {
-        const job = await this.ctx.ledgerRecordQueue.add(
-          'ledger-record',
+        const job = await this.ctx.ledgerAppendQueue.add(
+          'ledger-append',
           {
             operationKey: 'e2e-record:3',
             subjectType: 'p'.repeat(65),
@@ -84,7 +84,7 @@ export class LedgerE2E {
                 ['e2e-record:3'],
               ),
             },
-            failed: (await this.ctx.ledgerRecordQueue.getFailed()).map((failed) => failed.data),
+            failed: (await this.ctx.ledgerAppendQueue.getFailed()).map((failed) => failed.data),
           }).toMatchSnapshot();
         } finally {
           await job.remove();

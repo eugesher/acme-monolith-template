@@ -4,7 +4,7 @@ import { IdempotencyStatusEnum } from '@acme-libs/kernel';
 
 import {
   IDEMPOTENCY_CORE_RELEASE_REPOSITORY_PORT,
-  type IIdempotencyCoreReleaseQuery,
+  type IIdempotencyCoreReleaseDeleteInFlightQuery,
   type IIdempotencyCoreReleaseRepositoryPort,
 } from '../../../outbound';
 import { IdempotencyCorePersistenceHost } from '../host/idempotency-core-persistence.host';
@@ -19,7 +19,7 @@ export class IdempotencyCoreReleaseRepository
     useClass: IdempotencyCoreReleaseRepository,
   };
 
-  public async deleteInFlight(query: IIdempotencyCoreReleaseQuery): Promise<void> {
+  public async deleteInFlight(query: IIdempotencyCoreReleaseDeleteInFlightQuery): Promise<void> {
     const { scope, key } = query;
 
     await this.idempotencyKeyRepository.delete({

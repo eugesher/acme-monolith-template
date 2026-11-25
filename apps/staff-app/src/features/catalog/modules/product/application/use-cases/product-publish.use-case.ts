@@ -37,7 +37,7 @@ export class ProductPublishUseCase {
     if (previousStatus) {
       const productLedgerPayload = product.toLedgerPayload(previousStatus);
 
-      await this.ledger.recordPublished(productLedgerPayload);
+      await this.ledger.appendPublished(productLedgerPayload);
     }
 
     const productLoggerPayload = product.toLoggerPayload();

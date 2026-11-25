@@ -35,9 +35,9 @@ describe('RolePersistenceStaffRoleBuilder', () => {
     });
   });
 
-  describe('forById', () => {
+  describe('forOne', () => {
     it('selects the role with its permissions by id', () => {
-      const builder = new RolePersistenceStaffRoleBuilder(baseBuilder).forById('2');
+      const builder = new RolePersistenceStaffRoleBuilder(baseBuilder).forOne('2');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `StaffRole`.`id` AS `StaffRole_id`, `StaffRole`.`name` AS `StaffRole_name`, `StaffRolePermission`.`roleId` AS `StaffRolePermission_roleId`, `StaffRolePermission`.`code` AS `StaffRolePermission_code` FROM `staff_role` `StaffRole` LEFT JOIN `staff_role_permissions` `StaffRolePermission` ON `StaffRolePermission`.`role_id`=`StaffRole`.`id` WHERE `StaffRole`.`id` = ?',

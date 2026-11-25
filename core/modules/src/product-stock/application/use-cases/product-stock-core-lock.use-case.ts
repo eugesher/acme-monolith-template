@@ -22,7 +22,7 @@ export class ProductStockCoreLockUseCase {
     command: IProductStockCoreLockCommand,
   ): Promise<IProductStockCoreOnHandView[]> {
     const { productIds } = command;
-    const lockedProducts = await this.repository.lockProducts(productIds);
+    const lockedProducts = await this.repository.lockMany(productIds);
     const lockedIds = ProductStockCoreOnHandModel.toProductIds(lockedProducts);
     const stockSums = await this.repository.sumStock(lockedIds);
     const onHand = ProductStockCoreOnHandModel.reconstitute({

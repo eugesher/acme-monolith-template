@@ -4,7 +4,7 @@ import type { Nullable } from '@acme-libs/toolkit';
 
 import {
   ORDER_GET_ONE_REPOSITORY_PORT,
-  type IOrderGetOneQuery,
+  type IOrderGetOneFindOwnedQuery,
   type IOrderGetOneRecord,
   type IOrderGetOneRepositoryPort,
 } from '../../../outbound';
@@ -20,7 +20,7 @@ export class OrderGetOneRepository
     useClass: OrderGetOneRepository,
   };
 
-  public async findOwned(query: IOrderGetOneQuery): Promise<Nullable<IOrderGetOneRecord>> {
+  public async findOwned(query: IOrderGetOneFindOwnedQuery): Promise<Nullable<IOrderGetOneRecord>> {
     return await this.createOrderBuilder().forOwned(query).getOne();
   }
 }

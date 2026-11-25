@@ -13,9 +13,9 @@ describe('TagCommonReplaceUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { lockTags: jest.fn(), findLinked: jest.fn(), link: jest.fn(), unlink: jest.fn() };
-    repository.lockTags.mockImplementation(() => {
-      calls.push('lockTags');
+    repository = { lockMany: jest.fn(), findLinked: jest.fn(), link: jest.fn(), unlink: jest.fn() };
+    repository.lockMany.mockImplementation(() => {
+      calls.push('lockMany');
 
       return Promise.resolve([
         { id: '301', name: 'promo' },
@@ -67,7 +67,7 @@ describe('TagCommonReplaceUseCase', () => {
         ],
         missingTagIds: [],
       });
-      expect(repository.lockTags).toHaveBeenCalledWith(['302', '301']);
+      expect(repository.lockMany).toHaveBeenCalledWith(['302', '301']);
       expect(repository.findLinked).toHaveBeenCalledWith({
         subjectType: 'product',
         subjectId: '100',
@@ -82,7 +82,7 @@ describe('TagCommonReplaceUseCase', () => {
         subjectId: '100',
         tagIds: ['302'],
       });
-      expect(calls).toEqual(['begin', 'lockTags', 'findLinked', 'unlink', 'link', 'commit']);
+      expect(calls).toEqual(['begin', 'lockMany', 'findLinked', 'unlink', 'link', 'commit']);
       expect(logger.info).toHaveBeenCalledWith(
         {
           subjectType: 'product',
@@ -105,12 +105,12 @@ describe('TagCommonReplaceUseCase', () => {
         tags: [],
         missingTagIds: ['998', '999'],
       });
-      expect(calls).toEqual(['begin', 'lockTags', 'commit']);
+      expect(calls).toEqual(['begin', 'lockMany', 'commit']);
       expect(logger.info).not.toHaveBeenCalled();
     });
 
     it('clears the tags of the subject for an empty list', async () => {
-      repository.lockTags.mockResolvedValue([]);
+      repository.lockMany.mockResolvedValue([]);
 
       const view = await useCase.execute({
         subjectType: TagCommonSubjectTypeEnum.ORDER,

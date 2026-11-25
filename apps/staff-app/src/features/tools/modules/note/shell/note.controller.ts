@@ -27,16 +27,15 @@ import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 import {
   NoteCreateUseCase,
   NoteDeleteUseCase,
-  NoteEditUseCase,
   NoteGetManyUseCase,
   NoteGetOneUseCase,
   NoteGetRevisionsUseCase,
   NoteResolveUseCase,
+  NoteUpdateUseCase,
 } from '../application';
 import { NoteExceptionCodeEnum } from '../domain';
 import {
   NoteCreateRequestDto,
-  NoteEditRequestDto,
   NoteGetManyQueryDto,
   NoteGetRevisionsQueryDto,
   NoteHttpExceptionFilter,
@@ -44,6 +43,7 @@ import {
   NotePageResponseDto,
   NoteResponseDto,
   NoteRevisionPageResponseDto,
+  NoteUpdateRequestDto,
 } from '../presentation';
 
 @ApiTags('Tools/Note')
@@ -54,10 +54,10 @@ export class NoteController {
     private readonly create: NoteCreateUseCase,
     private readonly getMany: NoteGetManyUseCase,
     private readonly getOne: NoteGetOneUseCase,
-    private readonly edit: NoteEditUseCase,
+    private readonly update: NoteUpdateUseCase,
     private readonly resolve: NoteResolveUseCase,
     private readonly getRevisions: NoteGetRevisionsUseCase,
-    private readonly remove: NoteDeleteUseCase,
+    private readonly del: NoteDeleteUseCase,
   ) {}
 
   @Post()
@@ -127,9 +127,9 @@ export class NoteController {
       NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
     ],
   })
-  public async handleEdit(
+  public async handleUpdate(
     @Param() params: NoteIdParamDto,
-    @Body() request: NoteEditRequestDto,
+    @Body() request: NoteUpdateRequestDto,
     @CurrentUser() user: IAuthCurrentUserView,
     @IfMatch() expectedVersion: Maybe<number>,
   ): Promise<NoteResponseDto> {
@@ -137,13 +137,13 @@ export class NoteController {
     const { body } = request;
     const { id: editorId } = user;
 
-    return await this.edit.execute({ noteId, body, editorId, expectedVersion });
+    return await this.update.execute({ noteId, body, editorId, expectedVersion });
   }
 
   @Post(':noteId/resolve')
   @HttpCode(HttpStatus.OK)
   @ApiIfMatchHeader()
-  @ApiOperation({ summary: 'Resolve one of your notes for good; it can no longer be edited' })
+  @ApiOperation({ summary: 'Resolve one of your notes for good; it can no longer be updated' })
   @ApiOkResponse({ type: NoteResponseDto })
   @ApiErrorResponses({
     filterStatus: NoteHttpExceptionFilter.STATUS,
@@ -166,7 +166,7 @@ export class NoteController {
   }
 
   @Get(':noteId/revisions')
-  @ApiOperation({ summary: 'Read the edit history of one of your notes, newest first' })
+  @ApiOperation({ summary: 'Read the update history of one of your notes, newest first' })
   @ApiOkResponse({ type: NoteRevisionPageResponseDto })
   @ApiErrorResponses({
     filterStatus: NoteHttpExceptionFilter.STATUS,
@@ -199,6 +199,6 @@ export class NoteController {
     const { noteId } = params;
     const { id: authorId } = user;
 
-    await this.remove.execute({ noteId, authorId });
+    await this.del.execute({ noteId, authorId });
   }
 }

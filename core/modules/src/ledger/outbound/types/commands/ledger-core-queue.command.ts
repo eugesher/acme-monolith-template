@@ -1,6 +1,6 @@
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 export interface ILedgerCoreQueueAddCommand {
-  record: ILedgerRecordProcessorPayload;
+  record: ILedgerAppendProcessorPayload;
   timeoutMs: number;
 }

@@ -19,9 +19,9 @@ describe('ProductStockPostSubtractUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { findActive: jest.fn() };
-    repository.findActive.mockImplementation((productIds: string[]) => {
-      calls.push('findActive');
+    repository = { findActiveMany: jest.fn() };
+    repository.findActiveMany.mockImplementation((productIds: string[]) => {
+      calls.push('findActiveMany');
 
       const active = productIds.filter((productId) => productId !== '102');
 
@@ -63,8 +63,8 @@ describe('ProductStockPostSubtractUseCase', () => {
       await useCase.execute({ productIds: ['100', '102', '106', '107'] });
 
       expect(onHand.lock).toHaveBeenCalledWith({ productIds: ['100', '102', '106', '107'] });
-      expect(repository.findActive).toHaveBeenCalledWith(['102', '106', '107']);
-      expect(calls).toEqual(['begin', 'lock', 'findActive', 'archive', 'archive', 'commit']);
+      expect(repository.findActiveMany).toHaveBeenCalledWith(['102', '106', '107']);
+      expect(calls).toEqual(['begin', 'lock', 'findActiveMany', 'archive', 'archive', 'commit']);
     });
 
     it('archives the published products that have no stock left and logs each one', async () => {

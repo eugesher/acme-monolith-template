@@ -5,14 +5,14 @@ import {
   TagCreateUseCase,
   TagDeleteUseCase,
   TagGetManyUseCase,
-  TagRenameUseCase,
+  TagUpdateUseCase,
 } from '../application';
 import {
   TagAccessRepository,
   TagCreateRepository,
   TagDeleteRepository,
   TagGetManyRepository,
-  TagRenameRepository,
+  TagUpdateRepository,
 } from '../infrastructure';
 import { TagController } from './tag.controller';
 
@@ -22,13 +22,13 @@ import { TagController } from './tag.controller';
     TagCreateUseCase,
     TagDeleteUseCase,
     TagGetManyUseCase,
-    TagRenameUseCase,
+    TagUpdateUseCase,
     TagAccessService,
     TagAccessRepository.PROVIDER,
     TagCreateRepository.PROVIDER,
     TagDeleteRepository.PROVIDER,
     TagGetManyRepository.PROVIDER,
-    TagRenameRepository.PROVIDER,
+    TagUpdateRepository.PROVIDER,
   ],
 })
 export class TagModule {}

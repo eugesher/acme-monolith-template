@@ -17,11 +17,13 @@ export class ProductStockPostSubtractRepository
     useClass: ProductStockPostSubtractRepository,
   };
 
-  public async findActive(productIds: string[]): Promise<IProductStockPostSubtractProductRecord[]> {
+  public async findActiveMany(
+    productIds: string[],
+  ): Promise<IProductStockPostSubtractProductRecord[]> {
     if (productIds.length === 0) {
       return [];
     }
 
-    return await this.createProductBuilder().forActive(productIds).getMany();
+    return await this.createProductBuilder().forActiveMany(productIds).getMany();
   }
 }

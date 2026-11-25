@@ -5,7 +5,7 @@ import { MysqlErrorHelper, type Nullable } from '@acme-libs/toolkit';
 import {
   IDEMPOTENCY_CORE_CLAIM_REPOSITORY_PORT,
   IdempotencyCoreClaimInsertOutcomeEnum,
-  type IIdempotencyCoreClaimFindQuery,
+  type IIdempotencyCoreClaimFindByKeyQuery,
   type IIdempotencyCoreClaimInsertQuery,
   type IIdempotencyCoreClaimRecord,
   type IIdempotencyCoreClaimRepositoryPort,
@@ -37,8 +37,8 @@ export class IdempotencyCoreClaimRepository
   }
 
   public async findByKey(
-    query: IIdempotencyCoreClaimFindQuery,
+    query: IIdempotencyCoreClaimFindByKeyQuery,
   ): Promise<Nullable<IIdempotencyCoreClaimRecord>> {
-    return await this.createIdempotencyKeyBuilder().forByKey(query).getOne();
+    return await this.createIdempotencyKeyBuilder().forKey(query).getOne();
   }
 }

@@ -38,7 +38,7 @@ export class ProductStockPostSubtractUseCase {
     const outOfStockProductIds = stockOnHand
       .filter((row) => row.quantity <= 0)
       .map((row) => row.productId);
-    const active = await this.repository.findActive(outOfStockProductIds);
+    const active = await this.repository.findActiveMany(outOfStockProductIds);
     const activeIds = active.map((product) => product.id);
 
     for (const productId of activeIds) {

@@ -24,15 +24,15 @@ describe('ProductStockCorePersistenceProductBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forLockProducts', () => {
+  describe('forLockMany', () => {
     it('selects the given products in id order under an exclusive lock', () => {
-      const builder = new ProductStockCorePersistenceProductBuilder(baseBuilder).forLockProducts([
+      const builder = new ProductStockCorePersistenceProductBuilder(baseBuilder).forLockMany([
         '100',
         '101',
       ]);
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE ( `Product`.`id` IN (?, ?) ) AND ( `Product`.`deletedAt` IS NULL ) ORDER BY `Product_id` ASC FOR UPDATE',
+        'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE `Product`.`id` IN (?, ?) ORDER BY `Product_id` ASC FOR UPDATE',
         ['100', '101'],
       ]);
     });

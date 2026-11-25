@@ -26,7 +26,7 @@ export class ProductReplaceTagsUseCase {
   public async execute(command: IProductReplaceTagsCommand): Promise<IProductTagsView> {
     return await this.transaction.run(async () => {
       const { productId, tagIds } = command;
-      const product = await this.repository.lockById(productId);
+      const product = await this.repository.lockOne(productId);
 
       if (!product) {
         throw new ProductNotFoundException(productId);

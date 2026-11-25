@@ -10,6 +10,6 @@ export const IdempotencyKey = createParamDecorator(
       .switchToHttp()
       .getRequest<{ headers: Record<string, Maybe<string | string[]>> }>();
 
-    return IdempotencyKeyHelper.parse(headers['idempotency-key']);
+    return IdempotencyKeyHelper.parse(headers[IdempotencyKeyHelper.HEADER.toLowerCase()]);
   },
 );

@@ -4,11 +4,11 @@ import {
   NoteAccessService,
   NoteCreateUseCase,
   NoteDeleteUseCase,
-  NoteEditUseCase,
   NoteGetManyUseCase,
   NoteGetOneUseCase,
   NoteGetRevisionsUseCase,
   NoteResolveUseCase,
+  NoteUpdateUseCase,
   NoteWriteService,
 } from '../application';
 import {
@@ -16,11 +16,11 @@ import {
   NoteConfigOccRetryAttemptsProvider,
   NoteCreateRepository,
   NoteDeleteRepository,
-  NoteEditRepository,
   NoteGetManyRepository,
   NoteGetRevisionsRepository,
   NoteResolveRepository,
   NoteTransactionAdapter,
+  NoteUpdateRepository,
 } from '../infrastructure';
 import { NoteController } from './note.controller';
 
@@ -30,7 +30,7 @@ import { NoteController } from './note.controller';
     NoteCreateUseCase,
     NoteGetManyUseCase,
     NoteGetOneUseCase,
-    NoteEditUseCase,
+    NoteUpdateUseCase,
     NoteResolveUseCase,
     NoteGetRevisionsUseCase,
     NoteDeleteUseCase,
@@ -39,7 +39,7 @@ import { NoteController } from './note.controller';
     NoteAccessRepository.PROVIDER,
     NoteCreateRepository.PROVIDER,
     NoteDeleteRepository.PROVIDER,
-    NoteEditRepository.PROVIDER,
+    NoteUpdateRepository.PROVIDER,
     NoteGetManyRepository.PROVIDER,
     NoteGetRevisionsRepository.PROVIDER,
     NoteResolveRepository.PROVIDER,

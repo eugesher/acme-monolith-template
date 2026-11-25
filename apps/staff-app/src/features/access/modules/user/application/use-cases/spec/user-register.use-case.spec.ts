@@ -19,7 +19,7 @@ describe('UserRegisterUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { insertUser: jest.fn(), findRoles: jest.fn(), insertUserRoles: jest.fn() };
+    repository = { insertUser: jest.fn(), findMany: jest.fn(), insertUserRoles: jest.fn() };
     repository.insertUser.mockImplementation(() => {
       calls.push('insertUser');
 
@@ -28,8 +28,8 @@ describe('UserRegisterUseCase', () => {
         id: '5',
       });
     });
-    repository.findRoles.mockImplementation(() => {
-      calls.push('findRoles');
+    repository.findMany.mockImplementation(() => {
+      calls.push('findMany');
 
       return Promise.resolve([{ id: '2' }]);
     });
@@ -72,13 +72,13 @@ describe('UserRegisterUseCase', () => {
       passwordHash: 'argon-hash',
       status: 'active',
     });
-    expect(repository.findRoles).toHaveBeenCalledWith(['2']);
+    expect(repository.findMany).toHaveBeenCalledWith(['2']);
     expect(repository.insertUserRoles).toHaveBeenCalledWith([{ userId: '5', roleId: '2' }]);
     expect(calls).toEqual([
       'hashPassword',
       'begin',
       'insertUser',
-      'findRoles',
+      'findMany',
       'insertUserRoles',
       'commit',
     ]);
@@ -96,7 +96,7 @@ describe('UserRegisterUseCase', () => {
       code: IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
       message: 'Role 99 was not found',
     });
-    expect(calls).toEqual(['hashPassword', 'begin', 'insertUser', 'findRoles']);
+    expect(calls).toEqual(['hashPassword', 'begin', 'insertUser', 'findMany']);
   });
 
   it('rejects a weak password before hashing it', async () => {

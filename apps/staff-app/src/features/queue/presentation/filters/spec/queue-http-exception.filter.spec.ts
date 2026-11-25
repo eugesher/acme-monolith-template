@@ -41,12 +41,12 @@ describe('QueueHttpExceptionFilter', () => {
     [
       'QUEUE_JOB_NOT_FOUND',
       404,
-      new QueueJobNotFoundException('ledger-record', '7', 'domain message'),
+      new QueueJobNotFoundException('ledger-append', '7', 'domain message'),
     ],
     [
       'QUEUE_JOB_NOT_FAILED',
       409,
-      new QueueJobNotFailedException('ledger-record', '7', 'waiting', 'domain message'),
+      new QueueJobNotFailedException('ledger-append', '7', 'waiting', 'domain message'),
     ],
   ])(
     'maps %s to %i with the code and the domain message in the body',

@@ -41,7 +41,7 @@ export class AuthE2E {
               ['eve@example.com'],
             ),
           },
-          ledger_record_queue: records.filter((record) => record.subjectId === response.body.id),
+          ledger_append_queue: records.filter((record) => record.subjectId === response.body.id),
         };
 
         expect(actual).toMatchSnapshot({
@@ -56,7 +56,7 @@ export class AuthE2E {
               },
             ],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: expect.any(String),
               subjectId: expect.any(String),
@@ -69,7 +69,7 @@ export class AuthE2E {
           db: {
             customer: [{ id: response.body.id }],
           },
-          ledger_record_queue: [
+          ledger_append_queue: [
             {
               operationKey: `customer-registered:${response.body.id}`,
               subjectId: response.body.id,
@@ -153,7 +153,7 @@ export class AuthE2E {
           .auth(response.body.accessToken, { type: 'bearer' })
           .expect(HttpStatus.OK);
 
-        const payload = this.ctx.jwt.verify<{ aud: string; iat: number; exp: number }>(
+        const payload = this.ctx.jwtService.verify<{ aud: string; iat: number; exp: number }>(
           response.body.accessToken,
         );
         const claims = Object.keys(payload).sort();
@@ -242,7 +242,7 @@ export class AuthE2E {
       });
 
       it('should refuse the token of a disabled customer', async () => {
-        const token = this.ctx.jwt.sign({ sub: '104' });
+        const token = this.ctx.jwtService.sign({ sub: '104' });
 
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/auth/me')
@@ -253,7 +253,7 @@ export class AuthE2E {
       });
 
       it('should refuse the token of a staff user signed with the secret of this app', async () => {
-        const token = this.ctx.jwt.sign({ sub: '1' });
+        const token = this.ctx.jwtService.sign({ sub: '1' });
 
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/auth/me')
@@ -264,7 +264,7 @@ export class AuthE2E {
       });
 
       it('should refuse the token of a customer issued for the staff audience', async () => {
-        const token = this.ctx.jwt.sign({ sub: '101' }, { audience: 'staff' });
+        const token = this.ctx.jwtService.sign({ sub: '101' }, { audience: 'staff' });
 
         const response = await request(this.ctx.app.getHttpServer())
           .get('/api/auth/me')

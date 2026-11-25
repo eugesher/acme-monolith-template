@@ -5,10 +5,10 @@ import type { Redis } from 'ioredis';
 import { AppNameEnum, AuthAudienceEnum } from '@acme-libs/kernel';
 import { CACHE_REDIS_CLIENT_TOKEN } from '@acme-libs/testing';
 import { AuthE2EContext } from '@acme-libs/testing';
-import { LedgerQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
+import { LedgerAppendQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 import { AppModule } from '@acme-customer/app';
 import type { Maybe } from '@acme-libs/toolkit';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
 interface IAppE2EState {
@@ -20,29 +20,29 @@ interface IAppE2EState {
 
 export class AppE2EContext extends AuthE2EContext {
   public get redis(): Redis {
-    return this.started.redis;
+    return this.appE2EState.redis;
   }
 
   public get annToken(): string {
-    return this.started.annToken;
+    return this.appE2EState.annToken;
   }
 
   public get bobToken(): string {
-    return this.started.bobToken;
+    return this.appE2EState.bobToken;
   }
 
   public get carolToken(): string {
-    return this.started.carolToken;
+    return this.appE2EState.carolToken;
   }
 
-  private state: Maybe<IAppE2EState>;
+  private _appE2EState: Maybe<IAppE2EState>;
 
-  private get started(): IAppE2EState {
-    if (!this.state) {
+  private get appE2EState(): IAppE2EState {
+    if (!this._appE2EState) {
       throw new Error('AppE2EContext is read before init(): use it inside it() and hooks');
     }
 
-    return this.state;
+    return this._appE2EState;
   }
 
   constructor() {
@@ -53,16 +53,16 @@ export class AppE2EContext extends AuthE2EContext {
     await super.init();
 
     const redis = this.moduleFixture.get<Redis>(CACHE_REDIS_CLIENT_TOKEN);
-    const annToken = this.jwt.sign({ sub: '101' });
-    const bobToken = this.jwt.sign({ sub: '102' });
-    const carolToken = this.jwt.sign({ sub: '103' });
+    const annToken = this.jwtService.sign({ sub: '101' });
+    const bobToken = this.jwtService.sign({ sub: '102' });
+    const carolToken = this.jwtService.sign({ sub: '103' });
 
-    this.state = { redis, annToken, bobToken, carolToken };
+    this._appE2EState = { redis, annToken, bobToken, carolToken };
   }
 
-  public async takeLedgerRecords(): Promise<ILedgerRecordProcessorPayload[]> {
-    const queue = this.moduleFixture.get<Queue<ILedgerRecordProcessorPayload>>(
-      getQueueToken(LedgerQueue.NAME),
+  public async takeLedgerRecords(): Promise<ILedgerAppendProcessorPayload[]> {
+    const queue = this.moduleFixture.get<Queue<ILedgerAppendProcessorPayload>>(
+      getQueueToken(LedgerAppendQueue.NAME),
     );
     const jobs = await queue.getWaiting();
 

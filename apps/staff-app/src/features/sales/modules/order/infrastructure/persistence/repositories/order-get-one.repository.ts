@@ -19,7 +19,7 @@ export class OrderGetOneRepository
     useClass: OrderGetOneRepository,
   };
 
-  public async findById(orderId: string): Promise<Nullable<IOrderGetOneRecord>> {
-    return await this.createOrderBuilder().forById(orderId).getOne();
+  public async findOne(orderId: string): Promise<Nullable<IOrderGetOneRecord>> {
+    return await this.createOrderBuilder().forOne(orderId).getOne();
   }
 }

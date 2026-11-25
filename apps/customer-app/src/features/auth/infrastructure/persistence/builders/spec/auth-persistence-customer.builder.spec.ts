@@ -24,9 +24,9 @@ describe('AuthPersistenceCustomerBuilder', () => {
     baseBuilder = dataSource.getRepository(Customer).createQueryBuilder(Customer.name);
   });
 
-  describe('forByEmail', () => {
+  describe('forEmail', () => {
     it('selects the credentials and status of the customer with the email', () => {
-      const builder = new AuthPersistenceCustomerBuilder(baseBuilder).forByEmail('ann@example.com');
+      const builder = new AuthPersistenceCustomerBuilder(baseBuilder).forEmail('ann@example.com');
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `Customer`.`id` AS `Customer_id`, `Customer`.`passwordHash` AS `Customer_passwordHash`, `Customer`.`status` AS `Customer_status` FROM `customer` `Customer` WHERE `Customer`.`email` = ?',

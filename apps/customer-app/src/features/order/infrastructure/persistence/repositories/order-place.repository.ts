@@ -20,14 +20,12 @@ export class OrderPlaceRepository
     useClass: OrderPlaceRepository,
   };
 
-  public async findActiveProducts(
-    productIds: readonly string[],
-  ): Promise<IOrderPlaceProductRecord[]> {
+  public async findActiveMany(productIds: readonly string[]): Promise<IOrderPlaceProductRecord[]> {
     if (productIds.length === 0) {
       return [];
     }
 
-    return await this.createProductBuilder().forActive(productIds).getMany();
+    return await this.createProductBuilder().forActiveMany(productIds).getMany();
   }
 
   public async insertOrder(query: IOrderPlaceInsertQuery): Promise<string> {

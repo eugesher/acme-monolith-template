@@ -24,12 +24,12 @@ describe('OrderPersistenceProductBuilder', () => {
     baseBuilder = dataSource.getRepository(Product).createQueryBuilder(Product.name);
   });
 
-  describe('forActive', () => {
+  describe('forActiveMany', () => {
     it('selects the ids of the active products among the given ones', () => {
-      const builder = new OrderPersistenceProductBuilder(baseBuilder).forActive(['100', '101']);
+      const builder = new OrderPersistenceProductBuilder(baseBuilder).forActiveMany(['100', '101']);
 
       expect(builder.getQueryAndParameters()).toEqual([
-        'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE ( `Product`.`id` IN (?, ?) AND `Product`.`status` = ? ) AND ( `Product`.`deletedAt` IS NULL )',
+        'SELECT `Product`.`id` AS `Product_id` FROM `product` `Product` WHERE `Product`.`id` IN (?, ?) AND `Product`.`status` = ?',
         ['100', '101', 'active'],
       ]);
     });

@@ -35,25 +35,25 @@ interface IE2EContextRoute {
 
 export class E2EContext {
   public get app(): INestApplication {
-    return this.initialized.app;
+    return this.e2eContextState.app;
   }
 
   public get moduleFixture(): TestingModule {
-    return this.initialized.moduleFixture;
+    return this.e2eContextState.moduleFixture;
   }
 
   public get dataSource(): DataSource {
-    return this.initialized.dataSource;
+    return this.e2eContextState.dataSource;
   }
 
-  private context: Maybe<IE2EContextState>;
+  private _e2eContextState: Maybe<IE2EContextState>;
 
-  private get initialized(): IE2EContextState {
-    if (!this.context) {
+  private get e2eContextState(): IE2EContextState {
+    if (!this._e2eContextState) {
       throw new Error('The e2e context is read before init(): use it inside it() and hooks');
     }
 
-    return this.context;
+    return this._e2eContextState;
   }
 
   constructor(
@@ -67,7 +67,7 @@ export class E2EContext {
     const app = await E2EContext.start(moduleFixture, this.appName);
     const rootLoggerWarn = jest.spyOn(PinoLogger.root, 'warn');
 
-    this.context = { app, moduleFixture, dataSource, rootLoggerWarn };
+    this._e2eContextState = { app, moduleFixture, dataSource, rootLoggerWarn };
   }
 
   public async close(): Promise<void> {
@@ -75,10 +75,10 @@ export class E2EContext {
   }
 
   public takeRootWarnings(): unknown[][] {
-    const { calls, contexts } = this.initialized.rootLoggerWarn.mock;
+    const { calls, contexts } = this.e2eContextState.rootLoggerWarn.mock;
     const warnings = calls.filter((_, index) => contexts[index] === PinoLogger.root);
 
-    this.initialized.rootLoggerWarn.mockClear();
+    this.e2eContextState.rootLoggerWarn.mockClear();
 
     return warnings;
   }

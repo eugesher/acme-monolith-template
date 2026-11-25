@@ -24,9 +24,9 @@ describe('NotePersistenceNoteRevisionBuilder', () => {
     baseBuilder = dataSource.getRepository(NoteRevision).createQueryBuilder(NoteRevision.name);
   });
 
-  describe('forListForNote', () => {
+  describe('forList', () => {
     it('selects the revisions of the note newest version first inside the page window', () => {
-      const builder = new NotePersistenceNoteRevisionBuilder(baseBuilder).forListForNote({
+      const builder = new NotePersistenceNoteRevisionBuilder(baseBuilder).forList({
         limit: 20,
         offset: 40,
         noteId: '1',

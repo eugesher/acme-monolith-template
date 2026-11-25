@@ -1,8 +1,7 @@
 name: 06-unknown-product
 description: |-
   e2e: Warehouse › ProductStock › POST /api/warehouse/product-stock/:productId/add
-  it: should answer %s with 404
-  Row: an unknown product
+  it: should answer an unknown product with 404
 
   Expect: 404 Not Found, code PRODUCT_NOT_FOUND
   User: editor@example.com (token signed by scripts.py)

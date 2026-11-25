@@ -16,7 +16,7 @@ export class TagCommonFindSubjectIdsUseCase {
 
   public async execute(command: ITagCommonFindSubjectIdsCommand): Promise<string[]> {
     const { subjectType, tagId } = command;
-    const subjectTagRecords = await this.repository.list({ subjectType, tagId });
+    const subjectTagRecords = await this.repository.findByTag({ subjectType, tagId });
 
     return subjectTagRecords.map((record) => record.subjectId);
   }

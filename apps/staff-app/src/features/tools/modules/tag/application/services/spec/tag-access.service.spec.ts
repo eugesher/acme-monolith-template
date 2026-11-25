@@ -1,4 +1,4 @@
-import { TagRenameModel } from '../../../domain';
+import { TagUpdateModel } from '../../../domain';
 import { TagAccessService } from '../tag-access.service';
 import type { ITagAccessRepositoryPort } from '../../../outbound';
 
@@ -7,8 +7,8 @@ describe('TagAccessService', () => {
   let service: TagAccessService;
 
   beforeEach(() => {
-    repository = { findById: jest.fn() };
-    repository.findById.mockResolvedValue({
+    repository = { findOne: jest.fn() };
+    repository.findOne.mockResolvedValue({
       id: '300',
       name: 'fragile',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -19,17 +19,17 @@ describe('TagAccessService', () => {
 
   describe('load', () => {
     it('answers the stored tag rebuilt by the model of the use case', async () => {
-      const tag = await service.load({ tagId: '300' }, TagRenameModel.reconstitute);
+      const tag = await service.load({ tagId: '300' }, TagUpdateModel.reconstitute);
 
-      expect(repository.findById).toHaveBeenCalledWith('300');
+      expect(repository.findOne).toHaveBeenCalledWith('300');
       expect(tag.name).toBe('fragile');
     });
 
     it('refuses an unknown tag with TAG_NOT_FOUND', async () => {
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.load({ tagId: '999' }, TagRenameModel.reconstitute),
+        service.load({ tagId: '999' }, TagUpdateModel.reconstitute),
       ).rejects.toMatchObject({
         code: 'TAG_NOT_FOUND',
         message: 'Tag 999 was not found',

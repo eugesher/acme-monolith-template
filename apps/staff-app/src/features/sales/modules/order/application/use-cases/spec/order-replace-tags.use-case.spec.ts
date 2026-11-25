@@ -15,9 +15,9 @@ describe('OrderReplaceTagsUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { lockById: jest.fn() };
-    repository.lockById.mockImplementation(() => {
-      calls.push('lockById');
+    repository = { lockOne: jest.fn() };
+    repository.lockOne.mockImplementation(() => {
+      calls.push('lockOne');
 
       return Promise.resolve({ id: '600' });
     });
@@ -49,13 +49,13 @@ describe('OrderReplaceTagsUseCase', () => {
       const view = await useCase.execute({ orderId: '600', tagIds: ['302'] });
 
       expect(view).toEqual({ tags: [{ id: '302', name: 'vip' }] });
-      expect(repository.lockById).toHaveBeenCalledWith('600');
+      expect(repository.lockOne).toHaveBeenCalledWith('600');
       expect(tag.replace).toHaveBeenCalledWith({ orderId: '600', tagIds: ['302'] });
-      expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
+      expect(calls).toEqual(['begin', 'lockOne', 'replace', 'commit']);
     });
 
     it('refuses an unknown order with ORDER_NOT_FOUND and replaces nothing', async () => {
-      repository.lockById.mockResolvedValue(null);
+      repository.lockOne.mockResolvedValue(null);
 
       await expect(useCase.execute({ orderId: '999', tagIds: ['302'] })).rejects.toMatchObject({
         code: 'ORDER_NOT_FOUND',

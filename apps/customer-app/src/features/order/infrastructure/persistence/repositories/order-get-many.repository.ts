@@ -2,7 +2,7 @@ import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   ORDER_GET_MANY_REPOSITORY_PORT,
-  type IOrderGetManyQuery,
+  type IOrderGetManyListQuery,
   type IOrderGetManyRecord,
   type IOrderGetManyRepositoryPort,
 } from '../../../outbound';
@@ -18,7 +18,7 @@ export class OrderGetManyRepository
     useClass: OrderGetManyRepository,
   };
 
-  public async list(query: IOrderGetManyQuery): Promise<IOrderGetManyRecord> {
+  public async list(query: IOrderGetManyListQuery): Promise<IOrderGetManyRecord> {
     return await this.createOrderBuilder().forList(query).getManyAndCount();
   }
 }

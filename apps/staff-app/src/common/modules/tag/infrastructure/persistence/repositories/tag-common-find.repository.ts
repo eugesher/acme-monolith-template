@@ -2,7 +2,7 @@ import { Injectable, type ClassProvider } from '@nestjs/common';
 
 import {
   TAG_COMMON_FIND_REPOSITORY_PORT,
-  type ITagCommonFindQuery,
+  type ITagCommonFindBySubjectQuery,
   type ITagCommonFindRecord,
   type ITagCommonFindRepositoryPort,
 } from '../../../outbound';
@@ -18,7 +18,7 @@ export class TagCommonFindRepository
     useClass: TagCommonFindRepository,
   };
 
-  public async list(query: ITagCommonFindQuery): Promise<ITagCommonFindRecord[]> {
-    return await this.createTagBuilder().forList(query).getMany();
+  public async findBySubject(query: ITagCommonFindBySubjectQuery): Promise<ITagCommonFindRecord[]> {
+    return await this.createTagBuilder().forSubject(query).getMany();
   }
 }

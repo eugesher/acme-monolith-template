@@ -23,7 +23,7 @@ export class AuthCommonFindSubjectUseCase {
     command: IAuthCommonFindSubjectCommand,
   ): Promise<Nullable<IAuthCommonSubjectView>> {
     const { userId } = command;
-    const userRecord = await this.repository.findActiveById(userId);
+    const userRecord = await this.repository.findActiveOne(userId);
 
     if (!userRecord) {
       return null;

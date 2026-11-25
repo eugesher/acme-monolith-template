@@ -1,7 +1,7 @@
-import type { IOrderGetManyQuery, IOrderGetManyRecord } from '../types';
+import type { IOrderGetManyListQuery, IOrderGetManyRecord } from '../types';
 
 export interface IOrderGetManyRepositoryPort {
-  list(query: IOrderGetManyQuery): Promise<IOrderGetManyRecord>;
+  list(query: IOrderGetManyListQuery): Promise<IOrderGetManyRecord>;
 }
 
 export const ORDER_GET_MANY_REPOSITORY_PORT = Symbol('ORDER_GET_MANY_REPOSITORY_PORT');

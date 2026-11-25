@@ -7,14 +7,14 @@ import type {
 } from '../../../../outbound';
 
 export abstract class ProductStockCoreBaseRepository extends ProductStockCorePersistenceHost {
-  public async lockProducts(
+  public async lockMany(
     productIds: readonly string[],
   ): Promise<(IProductStockCoreLockProductRecord & IProductStockCoreMoveProductRecord)[]> {
     if (productIds.length === 0) {
       return [];
     }
 
-    return await this.createProductBuilder().forLockProducts(productIds).getMany();
+    return await this.createProductBuilder().forLockMany(productIds).getMany();
   }
 
   public async sumStock(

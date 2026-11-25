@@ -7,14 +7,14 @@ describe('OrderLedgerCoreAdapter', () => {
   let adapter: OrderLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleEnqueue: jest.fn() };
-    ledger.handleEnqueue.mockResolvedValue(undefined);
+    ledger = { handleAppendEnqueue: jest.fn() };
+    ledger.handleAppendEnqueue.mockResolvedValue(undefined);
     adapter = new OrderLedgerCoreAdapter(ledger);
   });
 
-  describe('recordPlaced', () => {
+  describe('appendPlaced', () => {
     it('enqueues the placed order under its operation key with the payload of the order', async () => {
-      await adapter.recordPlaced({
+      await adapter.appendPlaced({
         subjectId: '610',
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: {
@@ -26,8 +26,8 @@ describe('OrderLedgerCoreAdapter', () => {
         },
       });
 
-      expect(ledger.handleEnqueue).toHaveBeenCalledTimes(1);
-      expect(ledger.handleEnqueue).toHaveBeenCalledWith({
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
         operationKey: 'order-placed:610',
         subjectType: 'order',
         subjectId: '610',

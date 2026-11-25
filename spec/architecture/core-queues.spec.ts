@@ -24,7 +24,7 @@ describe('core queues (@acme-core/queues)', () => {
   it('a module root may NOT reach a deep path into the core queues', async () => {
     await expect({
       file: 'apps/staff-app/src/features/queue/shell/queue.module.ts',
-      code: 'import { LedgerQueue } from "@acme-core/queues/definitions/ledger.queue";',
+      code: 'import { LedgerAppendQueue } from "@acme-core/queues/definitions/ledger-append.queue";',
     }).toBreakRule('no-restricted-imports');
   });
 
@@ -36,7 +36,7 @@ describe('core queues (@acme-core/queues)', () => {
   ])('%s MAY register a queue of the core queues', async (file) => {
     await expect({
       file,
-      code: 'import { LedgerQueue } from "@acme-core/queues";',
+      code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
     }).toPassArchitectureLint();
   });
 
@@ -49,7 +49,7 @@ describe('core queues (@acme-core/queues)', () => {
   ])('%s MAY take the name of a queue of the core queues', async (file) => {
     await expect({
       file,
-      code: 'import { LedgerQueue } from "@acme-core/queues";',
+      code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
     }).toPassArchitectureLint();
   });
 
@@ -64,7 +64,7 @@ describe('core queues (@acme-core/queues)', () => {
     async (file) => {
       await expect({
         file,
-        code: 'import { LedgerQueue } from "@acme-core/queues";',
+        code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
       }).toBreakRule('boundaries/dependencies');
     },
   );

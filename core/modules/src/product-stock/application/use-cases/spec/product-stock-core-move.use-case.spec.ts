@@ -17,8 +17,8 @@ describe('ProductStockCoreMoveUseCase', () => {
   let useCase: ProductStockCoreMoveUseCase;
 
   beforeEach(() => {
-    repository = { lockProducts: jest.fn(), insertMany: jest.fn(), sumStock: jest.fn() };
-    repository.lockProducts.mockResolvedValue([{ id: '100' }, { id: '103' }]);
+    repository = { lockMany: jest.fn(), insertMany: jest.fn(), sumStock: jest.fn() };
+    repository.lockMany.mockResolvedValue([{ id: '100' }, { id: '103' }]);
     repository.insertMany.mockResolvedValue([
       { id: '700', createdAt: new Date('2026-01-05T08:00:00.000Z') },
       { id: '701', createdAt: new Date('2026-01-05T08:00:00.000Z') },
@@ -53,7 +53,7 @@ describe('ProductStockCoreMoveUseCase', () => {
         ],
       });
 
-      expect(repository.lockProducts).toHaveBeenCalledWith(['100', '103']);
+      expect(repository.lockMany).toHaveBeenCalledWith(['100', '103']);
       expect(repository.insertMany).toHaveBeenCalledWith([
         { productId: '100', quantity: 5, orderProductId: null },
         { productId: '103', quantity: 2, orderProductId: null },
@@ -94,7 +94,7 @@ describe('ProductStockCoreMoveUseCase', () => {
         movements: [{ productId: '100', quantity: 5, orderProductId: null }],
       });
 
-      expect(repository.lockProducts.mock.invocationCallOrder[0]).toBeLessThan(
+      expect(repository.lockMany.mock.invocationCallOrder[0]).toBeLessThan(
         repository.insertMany.mock.invocationCallOrder[0],
       );
       expect(repository.insertMany.mock.invocationCallOrder[0]).toBeLessThan(
@@ -103,7 +103,7 @@ describe('ProductStockCoreMoveUseCase', () => {
     });
 
     it('lets a failed lock reject before it writes', async () => {
-      repository.lockProducts.mockRejectedValue(new Error('lock wait timeout'));
+      repository.lockMany.mockRejectedValue(new Error('lock wait timeout'));
 
       const move = useCase.execute({
         kind: ProductStockCoreMovementKindEnum.ADD,

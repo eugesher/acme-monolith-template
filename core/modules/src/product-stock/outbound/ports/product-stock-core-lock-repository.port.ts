@@ -1,7 +1,7 @@
 import type { IProductStockCoreLockProductRecord, IProductStockCoreLockSumRecord } from '../types';
 
 export interface IProductStockCoreLockRepositoryPort {
-  lockProducts(productIds: readonly string[]): Promise<IProductStockCoreLockProductRecord[]>;
+  lockMany(productIds: readonly string[]): Promise<IProductStockCoreLockProductRecord[]>;
   sumStock(productIds: readonly string[]): Promise<IProductStockCoreLockSumRecord[]>;
 }
 

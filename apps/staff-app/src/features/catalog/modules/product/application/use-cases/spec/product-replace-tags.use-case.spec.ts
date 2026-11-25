@@ -15,9 +15,9 @@ describe('ProductReplaceTagsUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { lockById: jest.fn() };
-    repository.lockById.mockImplementation(() => {
-      calls.push('lockById');
+    repository = { lockOne: jest.fn() };
+    repository.lockOne.mockImplementation(() => {
+      calls.push('lockOne');
 
       return Promise.resolve({ id: '100' });
     });
@@ -49,13 +49,13 @@ describe('ProductReplaceTagsUseCase', () => {
       const view = await useCase.execute({ productId: '100', tagIds: ['300'] });
 
       expect(view).toEqual({ tags: [{ id: '300', name: 'fragile' }] });
-      expect(repository.lockById).toHaveBeenCalledWith('100');
+      expect(repository.lockOne).toHaveBeenCalledWith('100');
       expect(tag.replace).toHaveBeenCalledWith({ productId: '100', tagIds: ['300'] });
-      expect(calls).toEqual(['begin', 'lockById', 'replace', 'commit']);
+      expect(calls).toEqual(['begin', 'lockOne', 'replace', 'commit']);
     });
 
     it('refuses an unknown product with PRODUCT_NOT_FOUND and replaces nothing', async () => {
-      repository.lockById.mockResolvedValue(null);
+      repository.lockOne.mockResolvedValue(null);
 
       await expect(useCase.execute({ productId: '999', tagIds: ['300'] })).rejects.toMatchObject({
         code: 'PRODUCT_NOT_FOUND',

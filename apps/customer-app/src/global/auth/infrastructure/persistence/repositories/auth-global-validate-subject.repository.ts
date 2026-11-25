@@ -19,9 +19,9 @@ export class AuthGlobalValidateSubjectRepository
     useClass: AuthGlobalValidateSubjectRepository,
   };
 
-  public async findActiveById(
+  public async findActiveOne(
     id: string,
   ): Promise<Nullable<IAuthGlobalValidateSubjectCustomerRecord>> {
-    return await this.createCustomerBuilder().forActiveById(id).getOne();
+    return await this.createCustomerBuilder().forActiveOne(id).getOne();
   }
 }

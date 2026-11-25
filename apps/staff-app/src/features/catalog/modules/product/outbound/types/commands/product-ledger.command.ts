@@ -1,6 +1,6 @@
 import type { ProductStatusEnum } from '@acme-libs/kernel';
 
-export interface IProductLedgerRecordCreatedCommand {
+export interface IProductLedgerAppendCreatedCommand {
   subjectId: string;
   occurredAt: string;
   payload: {
@@ -9,7 +9,7 @@ export interface IProductLedgerRecordCreatedCommand {
   };
 }
 
-export interface IProductLedgerRecordPublishedCommand {
+export interface IProductLedgerAppendPublishedCommand {
   subjectId: string;
   version: number;
   occurredAt: string;

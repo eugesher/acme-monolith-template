@@ -23,9 +23,9 @@ describe('ProductStockAddUseCase', () => {
 
   beforeEach(() => {
     calls = [];
-    repository = { findById: jest.fn() };
-    repository.findById.mockImplementation(() => {
-      calls.push('findById');
+    repository = { findOne: jest.fn() };
+    repository.findOne.mockImplementation(() => {
+      calls.push('findOne');
 
       return Promise.resolve({ id: '12', sku: 'SKU-0001' });
     });
@@ -60,9 +60,9 @@ describe('ProductStockAddUseCase', () => {
 
       return Promise.resolve();
     });
-    ledger = { recordAdded: jest.fn() };
-    ledger.recordAdded.mockImplementation(() => {
-      calls.push('recordAdded');
+    ledger = { appendAdded: jest.fn() };
+    ledger.appendAdded.mockImplementation(() => {
+      calls.push('appendAdded');
 
       return Promise.resolve();
     });
@@ -102,7 +102,7 @@ describe('ProductStockAddUseCase', () => {
         body: { productId: '12', quantity: 5 },
       });
       expect(movement.lock).toHaveBeenCalledWith({ productId: '12' });
-      expect(repository.findById).toHaveBeenCalledWith('12');
+      expect(repository.findOne).toHaveBeenCalledWith('12');
       expect(movement.add).toHaveBeenCalledWith({ productId: '12', quantity: 5 });
       expect(view).toEqual({ productId: '12', quantity: 15 });
       expect(idempotency.complete).toHaveBeenCalledWith({
@@ -114,11 +114,11 @@ describe('ProductStockAddUseCase', () => {
         'claim',
         'begin',
         'lock',
-        'findById',
+        'findOne',
         'add',
         'complete',
         'commit',
-        'recordAdded',
+        'appendAdded',
       ]);
     });
 
@@ -130,13 +130,13 @@ describe('ProductStockAddUseCase', () => {
         idempotencyKey: 'key-1',
       });
 
-      expect(ledger.recordAdded).toHaveBeenCalledWith({
+      expect(ledger.appendAdded).toHaveBeenCalledWith({
         productStockId: '700',
         subjectId: '12',
         occurredAt: '2026-01-05T08:00:00.000Z',
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
-      expect(calls.slice(calls.indexOf('commit'))).toEqual(['commit', 'recordAdded']);
+      expect(calls.slice(calls.indexOf('commit'))).toEqual(['commit', 'appendAdded']);
       expect(logger.info).toHaveBeenCalledWith(
         { id: '700', productId: '12', quantity: 5 },
         'Product restocked',
@@ -158,7 +158,7 @@ describe('ProductStockAddUseCase', () => {
 
       expect(view).toEqual({ productId: '12', quantity: 10 });
       expect(movement.lock).not.toHaveBeenCalled();
-      expect(ledger.recordAdded).not.toHaveBeenCalled();
+      expect(ledger.appendAdded).not.toHaveBeenCalled();
       expect(logger.info).toHaveBeenCalledWith(
         { idempotencyKey: 'key-1' },
         'Product restock replayed from the idempotency store',
@@ -192,7 +192,7 @@ describe('ProductStockAddUseCase', () => {
     });
 
     it('refuses an unknown product with PRODUCT_STOCK_PRODUCT_NOT_FOUND and releases the key', async () => {
-      repository.findById.mockResolvedValue(null);
+      repository.findOne.mockResolvedValue(null);
 
       await expect(
         useCase.execute({
@@ -221,11 +221,11 @@ describe('ProductStockAddUseCase', () => {
         }),
       ).rejects.toThrow('lock wait timeout');
       expect(idempotency.release).toHaveBeenCalledWith({ staffUserId: 'staff-1', key: 'key-1' });
-      expect(ledger.recordAdded).not.toHaveBeenCalled();
+      expect(ledger.appendAdded).not.toHaveBeenCalled();
     });
 
     it('keeps the completed key when the ledger fails after the commit and rethrows', async () => {
-      ledger.recordAdded.mockRejectedValue(new Error('ledger down'));
+      ledger.appendAdded.mockRejectedValue(new Error('ledger down'));
 
       await expect(
         useCase.execute({

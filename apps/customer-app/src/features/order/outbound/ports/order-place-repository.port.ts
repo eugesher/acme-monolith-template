@@ -6,7 +6,7 @@ import type {
 } from '../types';
 
 export interface IOrderPlaceRepositoryPort {
-  findActiveProducts(productIds: readonly string[]): Promise<IOrderPlaceProductRecord[]>;
+  findActiveMany(productIds: readonly string[]): Promise<IOrderPlaceProductRecord[]>;
   insertOrder(query: IOrderPlaceInsertQuery): Promise<string>;
   insertOrderProducts(queries: IOrderPlaceOrderProductInsertQuery[]): Promise<void>;
   findPlaced(orderId: string): Promise<IOrderPlaceRecord>;

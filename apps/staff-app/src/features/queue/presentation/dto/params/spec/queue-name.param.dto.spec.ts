@@ -5,7 +5,7 @@ import { QueueNameParamDto } from '../queue-name.param.dto';
 
 describe('QueueNameParamDto', () => {
   it.each([
-    ['the name of a queue', 'ledger-record'],
+    ['the name of a queue', 'ledger-append'],
     ['a name of 64 characters', 'q'.repeat(64)],
   ])('accepts %s', (_case, queueName) => {
     const dto = plainToInstance(QueueNameParamDto, { queueName });

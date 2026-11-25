@@ -1,16 +1,12 @@
 import { Inject, Injectable, type ClassProvider } from '@nestjs/common';
 
-import {
-  LEDGER_CORE_PORT,
-  LedgerCoreActionEnum,
-  LedgerCoreSubjectTypeEnum,
-  type ILedgerCorePort,
-} from '@acme-core/contracts/ledger';
+import { LedgerActionEnum, LedgerSubjectTypeEnum } from '@acme-libs/kernel';
+import { LEDGER_CORE_PORT, type ILedgerCorePort } from '@acme-core/contracts/ledger';
 
 import {
   ORDER_LEDGER_PORT,
+  type IOrderLedgerAppendPlacedCommand,
   type IOrderLedgerPort,
-  type IOrderLedgerRecordPlacedCommand,
 } from '../../outbound';
 
 @Injectable()
@@ -25,14 +21,14 @@ export class OrderLedgerCoreAdapter implements IOrderLedgerPort {
     private readonly ledger: ILedgerCorePort,
   ) {}
 
-  public async recordPlaced(command: IOrderLedgerRecordPlacedCommand): Promise<void> {
+  public async appendPlaced(command: IOrderLedgerAppendPlacedCommand): Promise<void> {
     const { subjectId, occurredAt, payload } = command;
 
-    await this.ledger.handleEnqueue({
+    await this.ledger.handleAppendEnqueue({
       operationKey: `order-placed:${subjectId}`,
-      subjectType: LedgerCoreSubjectTypeEnum.ORDER,
+      subjectType: LedgerSubjectTypeEnum.ORDER,
       subjectId,
-      action: LedgerCoreActionEnum.ORDER_PLACED,
+      action: LedgerActionEnum.ORDER_PLACED,
       payload,
       occurredAt,
     });

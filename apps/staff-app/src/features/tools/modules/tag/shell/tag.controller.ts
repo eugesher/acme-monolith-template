@@ -27,7 +27,7 @@ import {
   TagCreateUseCase,
   TagDeleteUseCase,
   TagGetManyUseCase,
-  TagRenameUseCase,
+  TagUpdateUseCase,
 } from '../application';
 import { TagExceptionCodeEnum } from '../domain';
 import {
@@ -36,8 +36,8 @@ import {
   TagHttpExceptionFilter,
   TagIdParamDto,
   TagPageResponseDto,
-  TagRenameRequestDto,
   TagResponseDto,
+  TagUpdateRequestDto,
 } from '../presentation';
 
 @ApiTags('Tools/Tag')
@@ -47,8 +47,8 @@ export class TagController {
   constructor(
     private readonly create: TagCreateUseCase,
     private readonly getMany: TagGetManyUseCase,
-    private readonly rename: TagRenameUseCase,
-    private readonly remove: TagDeleteUseCase,
+    private readonly update: TagUpdateUseCase,
+    private readonly del: TagDeleteUseCase,
   ) {}
 
   @Post()
@@ -77,7 +77,7 @@ export class TagController {
 
   @Patch(':tagId')
   @RequiresPermission(PermissionCodeEnum.TAG_WRITE)
-  @ApiOperation({ summary: 'Rename a tag' })
+  @ApiOperation({ summary: 'Update a tag' })
   @ApiOkResponse({ type: TagResponseDto })
   @ApiErrorResponses({
     filterStatus: TagHttpExceptionFilter.STATUS,
@@ -87,14 +87,14 @@ export class TagController {
       TagExceptionCodeEnum.TAG_NAME_TAKEN,
     ],
   })
-  public async handleRename(
+  public async handleUpdate(
     @Param() params: TagIdParamDto,
-    @Body() body: TagRenameRequestDto,
+    @Body() body: TagUpdateRequestDto,
   ): Promise<TagResponseDto> {
     const { tagId } = params;
     const { name } = body;
 
-    return await this.rename.execute({ tagId, name });
+    return await this.update.execute({ tagId, name });
   }
 
   @Delete(':tagId')
@@ -109,6 +109,6 @@ export class TagController {
   public async handleDelete(@Param() params: TagIdParamDto): Promise<void> {
     const { tagId } = params;
 
-    await this.remove.execute({ tagId });
+    await this.del.execute({ tagId });
   }
 }

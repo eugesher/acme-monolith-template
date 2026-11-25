@@ -85,7 +85,7 @@ exports[`App Idempotency queue idempotency-purge should purge the keys older tha
 }
 `;
 
-exports[`App Ledger queue ledger-record should append a record replayed under the same operation key only once 1`] = `
+exports[`App Ledger queue ledger-append should append a record replayed under the same operation key only once 1`] = `
 {
   "db": {
     "ledger_entry": [
@@ -98,7 +98,7 @@ exports[`App Ledger queue ledger-record should append a record replayed under th
 }
 `;
 
-exports[`App Ledger queue ledger-record should append the record as a ledger entry under its correlation id 1`] = `
+exports[`App Ledger queue ledger-append should append the record as a ledger entry under its correlation id 1`] = `
 {
   "db": {
     "ledger_entry": [
@@ -121,7 +121,7 @@ exports[`App Ledger queue ledger-record should append the record as a ledger ent
 }
 `;
 
-exports[`App Ledger queue ledger-record should keep a record that fails its last attempt among the failed jobs 1`] = `
+exports[`App Ledger queue ledger-append should keep a record that fails its last attempt among the failed jobs 1`] = `
 {
   "db": {
     "ledger_entry": [],

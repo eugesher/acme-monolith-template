@@ -14,7 +14,7 @@ describe('specs the coverage cannot ask for', () => {
       expect.arrayContaining([
         'libs/database/src/orm/shell/orm.module.ts',
         'libs/cache/src/shell/cache.module.ts',
-        'apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/tag-rename.request.dto.ts',
+        'apps/staff-app/src/features/tools/modules/tag/presentation/dto/requests/tag-update.request.dto.ts',
         'apps/staff-app/src/features/access/modules/role/presentation/dto/params/role-id.param.dto.ts',
         'apps/staff-app/src/features/queue/presentation/dto/params/queue-job.param.dto.ts',
         'libs/http/src/pagination/page.query.dto.ts',

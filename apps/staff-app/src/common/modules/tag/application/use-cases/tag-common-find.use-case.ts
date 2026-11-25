@@ -13,7 +13,7 @@ export class TagCommonFindUseCase {
 
   public async execute(command: ITagCommonFindCommand): Promise<ITagCommonTagView[]> {
     const { subjectType, subjectId } = command;
-    const subjectTagRecords = await this.repository.list({ subjectType, subjectId });
+    const subjectTagRecords = await this.repository.findBySubject({ subjectType, subjectId });
 
     return subjectTagRecords.map((record) => ({ id: record.id, name: record.name }));
   }

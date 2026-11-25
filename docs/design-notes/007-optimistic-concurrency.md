@@ -25,7 +25,7 @@ Every attempt:
 **The note takes the save from the use case.**
 `NoteWriteService.write(command, reconstitute, mutate, save)` runs the same attempt, and
 `save({ note, versionAsRead })` answers whether the row was updated: the resolve updates one row,
-the edit updates the note and appends its revision in one transaction (see
+the update writes the note and appends its revision in one transaction (see
 `011-multi-table-transaction.md`). A product is always saved by one update, so its write service
 makes it itself.
 
@@ -65,7 +65,7 @@ an unconditional write: a weak tag `W/"3"`, a sign, and the forms `Number` would
 or `12.0`. So is a number beyond the safe integers of JavaScript, which no stored version reaches.
 The ids of the path and the body are checked as strictly, and the decorator and its helper live in
 `libs/http` next to `IdempotencyKey` (see `039-api-surface.md`). The update, publish and archive of
-a product and the edit and resolve of a note read it.
+a product and the update and resolve of a note read it.
 
 ## The change answers the ledger
 
@@ -75,7 +75,7 @@ changed model knows reaches the use case through the answer: `ProductPublishMode
 the status the product left, or nothing for a product that was already active. The stored model
 answers the record, `product.toLedgerPayload(previousStatus)`, with its new version and the
 `updatedAt` the database gave the update, and the use case records nothing when the answer is empty.
-`IProductLedgerPort.recordPublished` adds the operation key and the action and enqueues the record
-on the `ledger-record` queue (see `022-enqueue-after-commit.md` and `004-append-only-journal.md`).
+`IProductLedgerPort.appendPublished` adds the operation key and the action and enqueues the record
+on the `ledger-append` queue (see `022-enqueue-after-commit.md` and `004-append-only-journal.md`).
 The models record no domain events: each fact has one reader, the ledger, and the use case calls it
 directly.

@@ -8,8 +8,8 @@ describe('AuthCommonFindSubjectUseCase', () => {
   let useCase: AuthCommonFindSubjectUseCase;
 
   beforeEach(() => {
-    repository = { findActiveById: jest.fn() };
-    repository.findActiveById.mockResolvedValue({
+    repository = { findActiveOne: jest.fn() };
+    repository.findActiveOne.mockResolvedValue({
       id: 'user-1',
       email: 'editor@example.com',
       userRoles: [
@@ -29,11 +29,11 @@ describe('AuthCommonFindSubjectUseCase', () => {
         roles: ['editor'],
         permissionCodes: ['ledger:read'],
       });
-      expect(repository.findActiveById).toHaveBeenCalledWith('user-1');
+      expect(repository.findActiveOne).toHaveBeenCalledWith('user-1');
     });
 
     it('answers null when no active user matches', async () => {
-      repository.findActiveById.mockResolvedValue(null);
+      repository.findActiveOne.mockResolvedValue(null);
 
       const subject = await useCase.execute({ userId: 'ghost' });
 

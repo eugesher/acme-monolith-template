@@ -50,9 +50,9 @@ A case that sends more than one request has the file of the request it checks, a
 - the replays of a restock and an order send the same request twice, as
   `staff-app/warehouse/product-stock/add/03-replay` and `customer-app/order/place/02-replay` say;
 - two simultaneous orders for the last units of a product send the same request twice at once with
-  two keys, as `customer-app/order/place/11-simultaneous-last-units` says;
+  two keys, as `customer-app/order/place/10-simultaneous-last-units` says;
 - three simultaneous orders under one key send the same request three times at once, as
-  `customer-app/order/place/13-simultaneous-same-key` says;
+  `customer-app/order/place/12-simultaneous-same-key` says;
 - two simultaneous registrations with one email send the same request twice at once, in
   `customer-app/auth/register/03-simultaneous-same-email` and
   `staff-app/access/user/register/03-simultaneous-same-email`;
@@ -100,8 +100,8 @@ leaves the keys of the queues alone. When a description checks cache keys, delet
 Every request with authorization calls a function of `<collection>/scripts.py` in `setup`
 (`as_admin`, `as_editor` and `as_viewer` for staff, `as_bob` and `as_dora` for customers, and so
 on). The function signs an HS256 token of a seeded user (`sub`, `aud`, `iat`) with `JWT_SECRET` from
-`env/apps/<app>/.env` and puts it into the variable `token`, as `ctx.jwt.sign` does in the e2e. This
-also covers tokens that no login issues:
+`env/apps/<app>/.env` and puts it into the variable `token`, as `ctx.jwtService.sign` does in the
+e2e. This also covers tokens that no login issues:
 
 - the token of a disabled user (`as_disabled`, `as_dora`);
 - a token with forged role claims (`as_viewer_forged_claims`);

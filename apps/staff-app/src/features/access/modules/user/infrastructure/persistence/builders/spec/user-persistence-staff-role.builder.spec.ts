@@ -24,9 +24,9 @@ describe('UserPersistenceStaffRoleBuilder', () => {
     baseBuilder = dataSource.getRepository(StaffRole).createQueryBuilder(StaffRole.name);
   });
 
-  describe('forByIds', () => {
+  describe('forMany', () => {
     it('selects the ids of the roles with the given ids', () => {
-      const builder = new UserPersistenceStaffRoleBuilder(baseBuilder).forByIds(['2', '3']);
+      const builder = new UserPersistenceStaffRoleBuilder(baseBuilder).forMany(['2', '3']);
 
       expect(builder.getQueryAndParameters()).toEqual([
         'SELECT `StaffRole`.`id` AS `StaffRole_id` FROM `staff_role` `StaffRole` WHERE `StaffRole`.`id` IN (?, ?)',

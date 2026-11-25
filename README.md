@@ -1,6 +1,6 @@
 # Acme Monolith Template
 
-Three NestJS apps over one MySQL and one Redis: `staff-app` (port 3001), `customer-app` (port 3000)
+Three NestJS apps over one MySQL and one Redis: `staff-app` (port 3000), `customer-app` (port 3001)
 and `processor-app` (port 3002).
 
 ## Prerequisites
@@ -201,7 +201,7 @@ docker compose --env-file env/compose/.env up --build --detach
 ```
 
 The apps start once the `migrations` container has exited with code 0. Each app answers on
-`GET /api/health` at port 3000 (`customer-app`), 3001 (`staff-app`) or 3002 (`processor-app`). MySQL
+`GET /api/health` at port 3000 (`staff-app`), 3001 (`customer-app`) or 3002 (`processor-app`). MySQL
 and Redis are published only on `127.0.0.1`, like Jaeger, whose traces are at
 <http://127.0.0.1:16686>.
 
@@ -230,5 +230,5 @@ docker build --target migrations --tag acme-migrations .
 Run an app image with its env file mounted:
 
 ```bash
-docker run --volume "$PWD/env/apps/staff-app/.env:/app/env/apps/staff-app/.env:ro" --publish 3001:3001 acme-staff-app
+docker run --volume "$PWD/env/apps/staff-app/.env:/app/env/apps/staff-app/.env:ro" --publish 3000:3000 acme-staff-app
 ```

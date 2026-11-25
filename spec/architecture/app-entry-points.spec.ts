@@ -318,7 +318,7 @@ describe('app entry points', () => {
   ])('%s MAY import the ledger record payload of the core ledger', async (file) => {
     await expect({
       file,
-      code: 'import type { ILedgerRecordProcessorPayload } from "@acme-core/contracts/__ledger-fixture__";',
+      code: 'import type { ILedgerAppendProcessorPayload } from "@acme-core/contracts/__ledger-fixture__";',
     }).toPassArchitectureLint();
   });
 
@@ -335,7 +335,7 @@ describe('app entry points', () => {
   ])('%s MAY register the ledger record queue through the core queues', async (file) => {
     await expect({
       file,
-      code: 'import { LedgerQueue } from "@acme-core/queues";',
+      code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
     }).toPassArchitectureLint();
   });
 

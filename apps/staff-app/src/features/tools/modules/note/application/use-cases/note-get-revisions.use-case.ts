@@ -24,7 +24,7 @@ export class NoteGetRevisionsUseCase {
     await this.accessService.assertOwned({ noteId, authorId });
 
     const { limit, offset, page } = PaginationHelper.clampPageWindow({ query: command });
-    const [records, total] = await this.repository.listForNote({ limit, offset, noteId });
+    const [records, total] = await this.repository.list({ limit, offset, noteId });
     const data = NoteGetRevisionsModel.toViewData(records);
 
     return PaginationHelper.toPage({ data, page, limit, total });

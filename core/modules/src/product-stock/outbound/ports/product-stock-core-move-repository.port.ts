@@ -6,7 +6,7 @@ import type {
 } from '../types';
 
 export interface IProductStockCoreMoveRepositoryPort {
-  lockProducts(productIds: readonly string[]): Promise<IProductStockCoreMoveProductRecord[]>;
+  lockMany(productIds: readonly string[]): Promise<IProductStockCoreMoveProductRecord[]>;
   insertMany(
     queries: IProductStockCoreMoveInsertQuery[],
   ): Promise<IProductStockCoreMoveInsertRecord[]>;

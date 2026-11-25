@@ -2,12 +2,12 @@ import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import type { Job, JobsOptions } from 'bullmq';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
-import { LedgerQueue } from '@acme-core/queues';
-import type { ILedgerRecordProcessorPayload } from '@acme-core/contracts/ledger';
+import { LedgerAppendQueue } from '@acme-core/queues';
+import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 import { LedgerAppendReportFailureUseCase, LedgerAppendUseCase } from '../application';
 
-@Processor(LedgerQueue.NAME)
+@Processor(LedgerAppendQueue.NAME)
 export class LedgerAppendProcessor extends WorkerHost {
   constructor(
     private readonly append: LedgerAppendUseCase,
@@ -16,7 +16,7 @@ export class LedgerAppendProcessor extends WorkerHost {
     super();
   }
 
-  public async process(job: Job<ILedgerRecordProcessorPayload>): Promise<void> {
+  public async process(job: Job<ILedgerAppendProcessorPayload>): Promise<void> {
     const { data } = job;
     const { operationKey, subjectType, subjectId, action, payload, occurredAt, correlationId } =
       data;
@@ -27,7 +27,7 @@ export class LedgerAppendProcessor extends WorkerHost {
   }
 
   @OnWorkerEvent('failed')
-  public async handleFailed(job: Job<ILedgerRecordProcessorPayload>, error: Error): Promise<void> {
+  public async handleFailed(job: Job<ILedgerAppendProcessorPayload>, error: Error): Promise<void> {
     const { data, attemptsMade, opts } = job;
     const { operationKey, correlationId } = data;
     const { attempts } = opts as Required<Pick<JobsOptions, 'attempts'>>;

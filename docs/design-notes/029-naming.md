@@ -2,25 +2,30 @@
 
 A name says who or where; the action lives in the method or in the port.
 
-| Element                            | Name                                                                                                                                                                                                                        | Example                                                                 |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| port of a core or lib module       | `I<Module><Layer>Port`, `<MODULE>_<LAYER>_PORT`, `<module>-<layer>.port.ts`; a lib names no layer                                                                                                                           | `IIdempotencyCorePort`, `ICachePort`                                    |
-| facade of that module              | `<Module><Layer>Facade`, `<module>-<layer>.facade.ts`                                                                                                                                                                       | `IdempotencyCoreFacade`, `CacheFacade`                                  |
-| facade method                      | `handle<Action>`                                                                                                                                                                                                            | `handleClaim`, `handleSignAccessToken`                                  |
-| use case held by a facade          | `<action>`, without the context                                                                                                                                                                                             | `claim: IdempotencyCoreClaimUseCase`                                    |
-| domain exception codes             | `<Context>ExceptionCodeEnum`, `<context>-exception-code.enum.ts`                                                                                                                                                            | `OrderExceptionCodeEnum`                                                |
-| queue adapter                      | `<Context><Target>QueueAdapter`, `<context>-<target>-queue.adapter.ts`                                                                                                                                                      | `ProductStockCorePostSubtractQueueAdapter`                              |
-| queue                              | `<Module>Queue` with `NAME` and `register()`, `definitions/<module>.queue.ts` in `core/queues/src` or in `queues/` of a processor; `I<Module>QueuePayload` of a processor queue in `queues/types/<module>-queue.payload.ts` | `LedgerQueue`, `IdempotencyPurgeQueue`, `IIdempotencyPurgeQueuePayload` |
-| transaction port of a module       | `I<Module>TransactionPort`, `<MODULE>_TRANSACTION_PORT`, `<module>-transaction.port.ts`                                                                                                                                     | `IRoleTransactionPort`, `ROLE_TRANSACTION_PORT`                         |
-| transaction adapter                | `<Module>TransactionAdapter`, `persistence/transaction/<module>-transaction.adapter.ts`                                                                                                                                     | `RoleTransactionAdapter`                                                |
-| outcome of a repository write      | `<Port><Subject><Method>OutcomeEnum`, `<port>-<subject>-<method>-outcome.enum.ts`                                                                                                                                           | `RoleCreateStaffRoleInsertOutcomeEnum`                                  |
-| commands of a service              | `I<Context><Service><Method>Command`, one file `<context>-<service>.command.ts`                                                                                                                                             | `IProductAccessLoadCommand` in `product-access.command.ts`              |
-| token of a config value            | `<MODULE>_<PROPERTY>_TOKEN`, `<module>-<property>.token.ts`                                                                                                                                                                 | `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`                                      |
-| binding of an infrastructure class | `public static readonly PROVIDER: ClassProvider<I…Port>` (`031-static-provider.md`)                                                                                                                                         | `OrderIdempotencyCoreAdapter.PROVIDER`                                  |
-| provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                                                                                                                                                           | `ProductConfigOccRetryAttemptsProvider`                                 |
-| type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                                                                                                                                                      | `replay-retry.options.ts`, `utility.type.ts`                            |
-| options of a helper method         | `I<Subject><Action>Options`, `<subject>-<action>.options.ts` next to the helper                                                                                                                                             | `IPageWindowClampOptions`, `IPageBuildOptions`                          |
-| answer of a helper method          | `I<Subject>`, `<subject>.interface.ts` next to the helper                                                                                                                                                                   | `IPageWindow`, `IPage`                                                  |
+| Element                            | Name                                                                                                                                                                                                                        | Example                                                                       |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| port of a core or lib module       | `I<Module><Layer>Port`, `<MODULE>_<LAYER>_PORT`, `<module>-<layer>.port.ts`; a lib names no layer                                                                                                                           | `IIdempotencyCorePort`, `ICachePort`                                          |
+| facade of that module              | `<Module><Layer>Facade`, `<module>-<layer>.facade.ts`                                                                                                                                                                       | `IdempotencyCoreFacade`, `CacheFacade`                                        |
+| facade method                      | `handle<Action>`                                                                                                                                                                                                            | `handleClaim`, `handleSignAccessToken`                                        |
+| use case held by a facade          | `<action>`, without the context                                                                                                                                                                                             | `claim: IdempotencyCoreClaimUseCase`                                          |
+| domain exception codes             | `<Context>ExceptionCodeEnum`, `<context>-exception-code.enum.ts`                                                                                                                                                            | `OrderExceptionCodeEnum`                                                      |
+| queue adapter                      | `<Context><Target>QueueAdapter`, `<context>-<target>-queue.adapter.ts`                                                                                                                                                      | `ProductStockCorePostSubtractQueueAdapter`                                    |
+| queue                              | `<Module>Queue` with `NAME` and `register()`, `definitions/<module>.queue.ts` in `core/queues/src` or in `queues/` of a processor; `I<Module>QueuePayload` of a processor queue in `queues/types/<module>-queue.payload.ts` | `LedgerAppendQueue`, `IdempotencyPurgeQueue`, `IIdempotencyPurgeQueuePayload` |
+| transaction port of a module       | `I<Module>TransactionPort`, `<MODULE>_TRANSACTION_PORT`, `<module>-transaction.port.ts`                                                                                                                                     | `IRoleTransactionPort`, `ROLE_TRANSACTION_PORT`                               |
+| transaction adapter                | `<Module>TransactionAdapter`, `persistence/transaction/<module>-transaction.adapter.ts`                                                                                                                                     | `RoleTransactionAdapter`                                                      |
+| outcome of a repository write      | `<Port><Subject><Method>OutcomeEnum`, `<port>-<subject>-<method>-outcome.enum.ts`                                                                                                                                           | `RoleCreateStaffRoleInsertOutcomeEnum`                                        |
+| commands of a service              | `I<Context><Service><Method>Command`, one file `<context>-<service>.command.ts`                                                                                                                                             | `IProductAccessLoadCommand` in `product-access.command.ts`                    |
+| token of a config value            | `<MODULE>_<PROPERTY>_TOKEN`, `<module>-<property>.token.ts`                                                                                                                                                                 | `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`                                            |
+| binding of an infrastructure class | `public static readonly PROVIDER: ClassProvider<I…Port>` (`031-static-provider.md`)                                                                                                                                         | `OrderIdempotencyCoreAdapter.PROVIDER`                                        |
+| provider of a config value         | `<Module>Config<Property>Provider`, `<module>-config.provider.ts`                                                                                                                                                           | `ProductConfigOccRetryAttemptsProvider`                                       |
+| type file of a lib without layers  | role suffix where the type has one, else `.interface.ts` or `.type.ts`                                                                                                                                                      | `replay-retry.options.ts`, `utility.type.ts`                                  |
+| options of a helper method         | `I<Subject><Action>Options`, `<subject>-<action>.options.ts` next to the helper                                                                                                                                             | `IPageWindowClampOptions`, `IPageBuildOptions`                                |
+| answer of a helper method          | `I<Subject>`, `<subject>.interface.ts` next to the helper                                                                                                                                                                   | `IPageWindow`, `IPage`                                                        |
+| repository method                  | `find` or `lock` with `One`, `Many` or `By<Field>`; `list` for a page                                                                                                                                                       |
+| builder method of a repository     | `for` and the words of the repository method, `for<Field>` without `By`                                                                                                                                                     |
+| query of a repository method       | `I<Port><Method>Query`; a method equal to the last word of the port is dropped                                                                                                                                              |
+| field of a dependency or state     | its type in camelCase; a getter over a private field is `_x` and `get x`                                                                                                                                                    |
+| value shared by HTTP and core      | an enum in `libs/kernel`                                                                                                                                                                                                    |
 
 **A module with one port names it after the module.** The port, its token and its facade carry the
 name of the module and its layer (`Core`, `Common`) and nothing else, so a consumer finds the facade
@@ -48,6 +53,35 @@ class of a feature names its methods after the handlers they test, `healthE2E.ha
 handler builds the command field by field from the request DTO and the caller,
 `const { id: authorId } = user`, and never hands the DTO on, so a field that a DTO gains does not
 reach the use case unseen.
+
+**A repository method says how many rows and how it reads them.** `find` reads, `lock` reads under a
+lock; `One` takes an id, `Many` a list of ids, `By<Field>` another key, `list` a page:
+`findOne(productId)`, `lockMany(tagIds)`, `findByKey(query)`, `list(query)`. A qualifier goes before
+the count, `findActiveOne`, `findActiveMany`. The builder method behind it takes the same words
+after `for`: `forOne`, `forLockOne`, `forMany`, `forList`, and `for<Field>` without `By` (`forKey`,
+`forSubject`). The record type names the entity, so the `lockMany` of the tag replace port and the
+one of core product-stock do not mix.
+
+**A repository query is the port and the method.** `INoteAccessFindOwnedQuery` is the query of
+`findOwned` of `NoteAccess`, `IOrderGetManyListQuery` the query of `list` of `OrderGetMany`. A
+method equal to the last word of the port is not repeated: `update` of `NoteUpdate` takes
+`INoteUpdateQuery`, and its payload and outcome follow, `ITagUpdatePayload`, `TagUpdateOutcomeEnum`.
+A port that writes several tables names the entity and the action instead
+(`IRoleCreateStaffRoleInsertQuery`).
+
+**A field is named after its type.** A dependency or a piece of state takes its type in camelCase,
+`jwtService: JwtService`, and a getter over a private field takes the same word: `_jwtService` and
+`get jwtService`, `_appE2EState` and `get appE2EState`. A field that holds a use case takes the
+action, as above. Where that word is taken, the field changes as little as it can: `delete` is
+reserved, so the delete use case of a controller is `del`; a facade whose port methods are `run` and
+`afterCommit` holds `runCase` and `afterCommitCase`.
+
+**A value that the HTTP contract shares with core lives in `libs/kernel`.** Presentation may not
+import core, so an enum that a response DTO and a core module both need sits in kernel:
+`LedgerActionEnum`, `LedgerSubjectTypeEnum`, `QueueNameEnum` (the `NAME` of every queue of
+`core/queues`), `AuthMetadataKeyEnum`. A Swagger example takes the member,
+`example: QueueNameEnum.LEDGER_APPEND_QUEUE`. Migrations and the expectations of specs and e2e keep
+the literal (`040-unit-specs.md`).
 
 **Exception codes are named after the exceptions.** The enum lists the values of `code` on the
 `<Context>BaseException` subclasses of a module and the exception filter maps them to HTTP statuses,
@@ -87,8 +121,8 @@ implements `IOrderLedgerPort`, `ORDER_LEDGER_PORT`, in
 `application/types/commands/<context>-<service>.command.ts`, next to
 `<context>-<service>.service.ts`. Each command is named after the service and the method that takes
 it, `I<Context><Service><Method>Command`. A port follows the same rule in `outbound/types`:
-`IProductLedgerRecordCreatedCommand` for `recordCreated` and `IProductLedgerRecordPublishedCommand`
-for `recordPublished` share `outbound/types/commands/product-ledger.command.ts`. A use case keeps
+`IProductLedgerAppendCreatedCommand` for `appendCreated` and `IProductLedgerAppendPublishedCommand`
+for `appendPublished` share `outbound/types/commands/product-ledger.command.ts`. A use case keeps
 one command file of its own, `<context>-<verb>.command.ts`.
 
 **A config token is the module, the property and `_TOKEN`.** A token that carries a value read with
@@ -96,11 +130,11 @@ one command file of its own, `<context>-<verb>.command.ts`.
 it reads and the suffix `_TOKEN`: the product module reads `OCC_RETRY_ATTEMPTS` into
 `PRODUCT_OCC_RETRY_ATTEMPTS_TOKEN`, the product-stock core module reads `ENQUEUE_RETRY_ATTEMPTS`
 into `PRODUCT_STOCK_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN` and the ledger core module reads the same
-property into `LEDGER_CORE_ENQUEUE_RETRY_ATTEMPTS_TOKEN`. The token names where the value comes
-from, not what the module does with it, so a reader finds the variable of `.env` by the name alone.
-A module that reads one property for two purposes injects the one token in both places; a purpose
-that needs a value of its own needs a property of its own, and with it a token of its own, so two
-tokens never share a name. A property that already starts with the whole module name is not
+property into `LEDGER_CORE_APPEND_ENQUEUE_RETRY_ATTEMPTS_TOKEN`. The token names where the value
+comes from, not what the module does with it, so a reader finds the variable of `.env` by the name
+alone. A module that reads one property for two purposes injects the one token in both places; a
+purpose that needs a value of its own needs a property of its own, and with it a token of its own,
+so two tokens never share a name. A property that already starts with the whole module name is not
 repeated; one that shares only its first word is: `IDEMPOTENCY_KEY_TTL_HOURS` of the
 `idempotency-purge` processor becomes `IDEMPOTENCY_PURGE_IDEMPOTENCY_KEY_TTL_HOURS_TOKEN`. The
 suffix sets the token apart from the `_PORT` tokens in the same `outbound` barrel. The description

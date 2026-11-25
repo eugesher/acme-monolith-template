@@ -97,7 +97,7 @@ export class TagE2E {
     });
   }
 
-  public handleRename(): void {
+  public handleUpdate(): void {
     describe('PATCH /api/tools/tags/:tagId', () => {
       beforeEach(async () => {
         await this.ctx.dataSource.query(
@@ -109,7 +109,7 @@ export class TagE2E {
         await this.ctx.dataSource.query('DELETE FROM tag WHERE id = 390');
       });
 
-      it('should rename the tag', async () => {
+      it('should update the tag', async () => {
         const response = await request(this.ctx.app.getHttpServer())
           .patch('/api/tools/tags/390')
           .auth(this.ctx.editorToken, { type: 'bearer' })

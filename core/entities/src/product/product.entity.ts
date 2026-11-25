@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   Index,
   PrimaryGeneratedColumn,
@@ -39,7 +38,4 @@ export class Product {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   public readonly updatedAt: Date;
-
-  @DeleteDateColumn({ type: 'timestamp', precision: 0, nullable: true })
-  public readonly deletedAt: Date | null;
 }

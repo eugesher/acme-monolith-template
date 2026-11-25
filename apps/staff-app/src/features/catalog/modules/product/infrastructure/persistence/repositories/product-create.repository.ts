@@ -35,6 +35,6 @@ export class ProductCreateRepository
   }
 
   public async findInserted(productId: string): Promise<IProductCreateRecord> {
-    return await this.createProductBuilder().forById(productId).getOneOrFail();
+    return await this.createProductBuilder().forOne(productId).getOneOrFail();
   }
 }

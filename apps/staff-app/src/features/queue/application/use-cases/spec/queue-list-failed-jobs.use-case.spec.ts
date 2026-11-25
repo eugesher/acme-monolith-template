@@ -39,7 +39,7 @@ describe('QueueListFailedJobsUseCase', () => {
         21,
       ]);
 
-      const page = await useCase.execute({ queueName: 'ledger-record', page: 2, limit: 20 });
+      const page = await useCase.execute({ queueName: 'ledger-append', page: 2, limit: 20 });
 
       expect(page).toEqual({
         page: 2,
@@ -63,17 +63,17 @@ describe('QueueListFailedJobsUseCase', () => {
         ],
       });
       expect(registry.findFailedJobs).toHaveBeenCalledWith({
-        queueName: 'ledger-record',
+        queueName: 'ledger-append',
         offset: 20,
         limit: 20,
       });
     });
 
     it('starts at the first page of 20 jobs by default', async () => {
-      await useCase.execute({ queueName: 'ledger-record', page: undefined, limit: undefined });
+      await useCase.execute({ queueName: 'ledger-append', page: undefined, limit: undefined });
 
       expect(registry.findFailedJobs).toHaveBeenCalledWith({
-        queueName: 'ledger-record',
+        queueName: 'ledger-append',
         offset: 0,
         limit: 20,
       });

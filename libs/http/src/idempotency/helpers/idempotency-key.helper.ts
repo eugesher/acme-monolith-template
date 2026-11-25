@@ -3,6 +3,7 @@ import { BadRequestException, HttpStatus } from '@nestjs/common';
 import type { Maybe } from '@acme-libs/toolkit';
 
 export class IdempotencyKeyHelper {
+  public static readonly HEADER = 'Idempotency-Key';
   public static readonly MAX_LENGTH = 128;
   public static readonly REQUIRED_CODE = 'IDEMPOTENCY_KEY_REQUIRED';
   public static readonly INVALID_CODE = 'IDEMPOTENCY_KEY_INVALID';

@@ -1,7 +1,7 @@
-import type { ITagCommonFindSubjectIdsQuery, ITagCommonFindSubjectIdsRecord } from '../types';
+import type { ITagCommonFindSubjectIdsByTagQuery, ITagCommonFindSubjectIdsRecord } from '../types';
 
 export interface ITagCommonFindSubjectIdsRepositoryPort {
-  list(query: ITagCommonFindSubjectIdsQuery): Promise<ITagCommonFindSubjectIdsRecord[]>;
+  findByTag(query: ITagCommonFindSubjectIdsByTagQuery): Promise<ITagCommonFindSubjectIdsRecord[]>;
 }
 
 export const TAG_COMMON_FIND_SUBJECT_IDS_REPOSITORY_PORT = Symbol(
