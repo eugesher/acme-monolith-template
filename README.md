@@ -3,6 +3,23 @@
 Three NestJS apps on one MySQL and one Redis: `staff-app` (port 3000), `customer-app` (port 3001)
 and `processor-app` (port 3002).
 
+## Contents
+
+- [What you need](#what-you-need)
+- [Run locally](#run-locally)
+  - [Test infrastructure](#test-infrastructure)
+  - [Env files](#env-files)
+  - [Start](#start)
+  - [Debug](#debug)
+- [Migrations](#migrations)
+- [Tests](#tests)
+  - [Unit tests](#unit-tests)
+  - [E2E tests](#e2e-tests)
+- [Run in production](#run-in-production)
+  - [Production env files](#production-env-files)
+  - [With Compose](#with-compose)
+  - [Without Compose](#without-compose)
+
 ## What you need
 
 - Node 26.13 or later
