@@ -72,8 +72,7 @@ cp env/migrations/.env.example env/migrations/.env
 
 ### Start
 
-With the test infrastructure running, create the schema. Later you apply new migrations with the
-same command:
+With the test infrastructure running, create the schema:
 
 ```bash
 yarn migration:run
@@ -111,6 +110,25 @@ example `pwa-node` of `js-debug` with `request: "attach"`. The scripts set
 `RSPACK_SOURCE_MAPS=true`, so the build writes `dist/apps/<app>/main.js.map` with the absolute paths
 of the sources, and breakpoints in the `.ts` files bind. Every other build, `yarn start:dev` and the
 image included, writes no maps.
+
+## Migrations
+
+The migrations live in `migrations/snapshots/`, and their SQL is written by hand: there's no
+generation from the entities. The commands work with the database of `env/migrations/.env`:
+
+| Command                        | What it does                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `yarn migration:create <Name>` | creates `migrations/snapshots/<timestamp>-<Name>.ts` with empty `up` and `down`; the name is PascalCase |
+| `yarn migration:run`           | applies the migrations that haven't run yet                                                             |
+| `yarn migration:revert`        | reverts the last applied one, through its `down`                                                        |
+| `yarn migration:show`          | lists the migrations, the applied ones marked `[X]`                                                     |
+| `yarn migration:cli <command>` | any other TypeORM CLI command with the same config                                                      |
+
+For example:
+
+```bash
+yarn migration:create AddProductSku
+```
 
 ## Tests
 
