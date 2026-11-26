@@ -28,25 +28,14 @@ Then install the dependencies:
 yarn install
 ```
 
-## Env files
+## Run locally
 
-A local run, the migrations and the e2e suites all work on one infrastructure, only the configs
-differ. Every `.env.example` in `env/apps/` and `env/migrations/` already has everything you need to
-connect to that infrastructure and run the system. For a local run you make copies of them (they're
-gitignored), and the `.env.test` files live right in the repo. There are no defaults: if a variable
-is missing or broken, the process stops with a validation error.
+### Test infrastructure
 
-| File                       | Who reads it                                      |
-| -------------------------- | ------------------------------------------------- |
-| `env/apps/<app>/.env`      | the app, on `yarn start:dev`                      |
-| `env/apps/<app>/.env.test` | the e2e and system suites of the app              |
-| `env/migrations/.env`      | `yarn migration:*`                                |
-| `env/migrations/.env.test` | the migrations and seed of the e2e infrastructure |
-
-## Infrastructure
-
-Start MySQL and Redis. The command prints the logs of every container and returns once they're
-ready, with an empty database. The containers keep running in the background:
+Development and e2e get their own infrastructure in Docker: MySQL, Redis, Jaeger and an
+OpenTelemetry collector. A local run and the e2e suites share it, so they share the database too.
+Start it: the command prints the logs of the containers and returns once they're ready, with an
+empty database; the containers keep running in the background:
 
 ```bash
 yarn test:e2e:infra:up
@@ -58,9 +47,21 @@ To remove the containers along with their data:
 yarn test:e2e:infra:down
 ```
 
-## Run locally
+### Env files
 
-Create the env files of the apps and the migrations:
+Every `.env.example` in `env/apps/` and `env/migrations/` already has everything you need to connect
+to the test infrastructure. For a local run you make copies of them (they're gitignored), and the
+`.env.test` files for e2e live right in the repo. There are no defaults: if a variable is missing or
+broken, the process stops with a validation error.
+
+| File                       | Who reads it                                 |
+| -------------------------- | -------------------------------------------- |
+| `env/apps/<app>/.env`      | the app, on `yarn start:dev`                 |
+| `env/apps/<app>/.env.test` | the e2e and system suites of the app         |
+| `env/migrations/.env`      | `yarn migration:*`                           |
+| `env/migrations/.env.test` | the migrations and seed of an e2e data reset |
+
+Make the copies:
 
 ```bash
 cp env/apps/staff-app/.env.example env/apps/staff-app/.env
@@ -69,8 +70,10 @@ cp env/apps/processor-app/.env.example env/apps/processor-app/.env
 cp env/migrations/.env.example env/migrations/.env
 ```
 
-With the infrastructure running, create the schema. Later you apply new migrations to the database
-of `env/migrations/.env` with the same command:
+### Start
+
+With the test infrastructure running, create the schema. Later you apply new migrations with the
+same command:
 
 ```bash
 yarn migration:run
@@ -88,13 +91,12 @@ And start all three apps in watch mode:
 yarn start:dev
 ```
 
-Traces of a local run are at <http://localhost:16687>: the infrastructure includes Jaeger and an
-OpenTelemetry collector.
+Traces are in the Jaeger of the test infrastructure: <http://localhost:16687>.
 
 To start one app, there's `yarn start:dev:staff-app`, `yarn start:dev:customer-app` and
 `yarn start:dev:processor-app`.
 
-## Debug
+### Debug
 
 Start all three apps under the inspector in watch mode:
 
@@ -112,14 +114,14 @@ image included, writes no maps.
 
 ## E2E tests
 
-Rebuild the infrastructure and run every suite one after another, with one report at the end. CI
-runs the same thing:
+Recreate the test infrastructure and run every suite one after another, with one report at the end.
+CI runs the same thing:
 
 ```bash
 yarn test:e2e
 ```
 
-If the infrastructure is already up, `yarn test:e2e:run` runs the same suites without the rebuild.
+If the infrastructure is already up, `yarn test:e2e:run` runs the same suites without recreating it.
 To run one suite, use its script: it resets the data first, because the tests write to the fixtures:
 
 ```bash
@@ -130,32 +132,28 @@ The suites are `test:e2e:staff`, `test:e2e:customer`, `test:e2e:processor`, and 
 `test:e2e:system:staff` and `test:e2e:system:customer`, which start an API app together with
 `processor-app`. Each has a `:run` variant, such as `test:e2e:staff:run`, that skips the reset.
 
-A local run and the e2e suites share the database, so a reset also wipes whatever a local run wrote.
+A local run and the e2e suites share the database, so both `yarn test:e2e` and the reset before a
+suite wipe whatever a local run wrote.
 
 ## Run in production
 
-The root `docker-compose.yml` builds the images, starts MySQL and Redis, applies the migrations and
-starts the three apps. The apps and the migrations read the `.env` files of `env/`, mounted
-read-only into their containers.
+There are two ways. If everything lives on one machine, the root `docker-compose.yml` builds the
+images, starts MySQL, Redis, Jaeger and an OpenTelemetry collector, applies the migrations and
+starts the three apps. If you already have MySQL, Redis and a collector elsewhere (a cloud database,
+for example), and an orchestrator (Kubernetes, ECS) runs the images or CI builds them and pushes
+them to a registry, you don't need Compose: you build and run the images yourself. Both ways use the
+same env files.
 
-This brings up the whole stack on one machine. If you have your own MySQL and Redis and an
-orchestrator runs the images, see [Images without Compose](#images-without-compose).
+### Production env files
 
-Create the env files:
+The apps and the migrations read the `.env` files of `env/`, mounted read-only into their
+containers. These are the same files a local run uses, so on a developer machine the production
+values replace the local ones. Create them from the examples:
 
 ```bash
 cp env/apps/staff-app/.env.example env/apps/staff-app/.env
-```
-
-```bash
 cp env/apps/customer-app/.env.example env/apps/customer-app/.env
-```
-
-```bash
 cp env/apps/processor-app/.env.example env/apps/processor-app/.env
-```
-
-```bash
 cp env/migrations/.env.example env/migrations/.env
 ```
 
@@ -177,6 +175,10 @@ Change these values in the env files. "Apps" means the three `env/apps/<app>/.en
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://otel-collector:4318`                          | apps                        |
 | `OTEL_RESOURCE_ATTRIBUTES`    | `deployment.environment=production`                   | apps                        |
 
+Without Compose, put the addresses of your MySQL, Redis and collector instead of `mysql`, `redis`
+and `otel-collector`, with their ports and passwords. Without a collector, set
+`OTEL_SDK_DISABLED=true`.
+
 `DATABASE_SSL_CA` and `REDIS_TLS_CA` turn on an encrypted connection (TLS) to MySQL and Redis. They
 hold the path to the certificate authority file the app uses to check that it's talking to the real
 server; an empty value means a connection without TLS. You need them when the database or Redis is
@@ -191,8 +193,8 @@ DATABASE_SSL_CA=/app/certs/mysql-ca.pem
 REDIS_TLS_CA=/app/certs/redis-ca.pem
 ```
 
-Mount the folder with the files into every app and into `migrations` in `docker-compose.yml`, next
-to the env file:
+With Compose, mount the folder with the files into every app and into `migrations` in
+`docker-compose.yml`, next to the env file:
 
 ```yaml
 volumes:
@@ -231,6 +233,8 @@ every request from another origin.
 If you change `AUTH_ARGON2_*` in `env/apps/staff-app/.env`, set the same values in
 `env/migrations/.env`: they hash the password of the first administrator.
 
+### With Compose
+
 Create the file with the passwords of the database and Redis, and fill in its three values:
 
 ```bash
@@ -261,11 +265,7 @@ docker compose --env-file env/compose/.env run --rm migrations node ./scripts/no
 Then remove both variables from the file. The administrator creates the other roles and users
 through `/api/access` of `staff-app`.
 
-## Images without Compose
-
-If you already have MySQL, Redis and an OpenTelemetry collector elsewhere (a cloud database, for
-example), and an orchestrator (Kubernetes, ECS) runs the images or CI builds them and pushes them to
-a registry, you don't need Compose: you build and run the images yourself.
+### Without Compose
 
 The `Dockerfile` builds two images: the app and the migrations. The app image has the compiled app
 and its dependencies; `APP_NAME` picks which of the three apps to build:
@@ -282,10 +282,6 @@ the apps don't need:
 ```bash
 docker build --target migrations --tag acme-migrations .
 ```
-
-Fill in the env files as in the table of [Run in production](#run-in-production), but instead of
-`mysql`, `redis` and `otel-collector` put the addresses of your MySQL, Redis and collector, with
-their ports and passwords. Without a collector, set `OTEL_SDK_DISABLED=true`.
 
 First apply the migrations and wait for the container to exit with code 0:
 
