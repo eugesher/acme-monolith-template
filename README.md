@@ -8,6 +8,15 @@ and `processor-app` (port 3002).
 - Node 26.13 or later
 - Docker with Compose
 
+If you don't have the right Node version, install it with [nvm](https://github.com/nvm-sh/nvm):
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | bash && source ~/.nvm/nvm.sh # if you don't have nvm yet
+nvm install # reads the version from .nvmrc
+```
+
+Turn on Yarn through Corepack:
+
 ```bash
 npm install --global corepack # CI and the Dockerfile pin 0.36.0
 corepack enable
