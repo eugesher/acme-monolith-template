@@ -1,0 +1,7 @@
+import type { Maybe } from '@acme-libs/toolkit';
+
+export interface IOrderGetManyCommand {
+  page: Maybe<number>;
+  limit: Maybe<number>;
+  tagId: Maybe<string>;
+}

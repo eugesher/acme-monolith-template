@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`App Auth POST /api/auth/register should create a customer and append the ledger entry of the registration 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "CustomerRegistered",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000023",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": Any<String>,
+        "payload": {},
+        "recorded_at": Any<Date>,
+        "subject_id": Any<String>,
+        "subject_type": "customer",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Order POST /api/orders should place the order, append its ledger entry and archive the sold-out product with its own entry under the correlation id 1`] = `
+{
+  "cache": {
+    "keys": [],
+  },
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "OrderPlaced",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000024",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": Any<String>,
+        "payload": {
+          "customerId": "101",
+          "orderProducts": [
+            {
+              "id": Any<String>,
+              "product": {
+                "id": "103",
+              },
+            },
+            {
+              "id": Any<String>,
+              "product": {
+                "id": "103",
+              },
+            },
+            {
+              "id": Any<String>,
+              "product": {
+                "id": "103",
+              },
+            },
+          ],
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": Any<String>,
+        "subject_type": "order",
+      },
+      {
+        "action": "ProductArchived",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000024",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": "product-archived:103:2",
+        "payload": {
+          "previousStatus": "active",
+          "sku": "SKU-0004",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "103",
+        "subject_type": "product",
+      },
+    ],
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "103",
+        "name": "Product to archive",
+        "sku": "SKU-0004",
+        "status": "archived",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+  },
+}
+`;

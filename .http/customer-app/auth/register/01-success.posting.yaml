@@ -1,0 +1,20 @@
+name: 01-success
+description: |-
+  e2e: Auth › POST /api/auth/register
+  it: should create a customer who logs in and enqueue the ledger record of the registration with the email under the correlation id
+
+  Expect: 201 Created, {id, email} without a token; a customer row eve@example.com, active, with an argon2id hash; a ledger-append job customer-registered:<id> with payload {email} and correlationId e2e00000-0000-4000-8000-000000000002; processor-app appends it to the ledger when it runs on the same Redis
+  Note: then log in as eve@example.com with the same password and GET /auth/me with that token: 200 and 200
+method: POST
+url: $CUSTOMER_APP_BASE_URL/auth/register
+body:
+  content: |-
+    {
+      "email": "Eve@Example.com",
+      "password": "eve-password-please-change"
+    }
+headers:
+  - name: x-correlation-id
+    value: e2e00000-0000-4000-8000-000000000002
+  - name: Content-Type
+    value: application/json

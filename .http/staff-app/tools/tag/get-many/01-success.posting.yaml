@@ -1,0 +1,14 @@
+name: 01-success
+description: |-
+  e2e: Tools › Tag › GET /api/tools/tags
+  it: should list the tags by name
+
+  Expect: 200 OK, fragile, promo and vip, total 3
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/tools/tags
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

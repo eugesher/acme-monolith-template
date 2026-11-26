@@ -1,0 +1,32 @@
+import type { ClassProvider, DynamicModule } from '@nestjs/common';
+
+import { HEALTH_LIB_PORT, type IHealthLibPort } from '@acme-libs/contracts/health';
+import type { AppNameEnum } from '@acme-libs/kernel';
+
+import { HealthLibCheckLivenessUseCase, HealthLibCheckReadinessUseCase } from '../application';
+import {
+  HealthLibAppNameProvider,
+  HealthLibDependencyProbeAdapter,
+  HealthLibUptimeAdapter,
+} from '../infrastructure';
+import { HealthLibFacade } from './health-lib.facade';
+
+export class HealthLibModule {
+  public static forRoot(appName: AppNameEnum): DynamicModule {
+    return {
+      module: HealthLibModule,
+      exports: [HEALTH_LIB_PORT],
+      providers: [
+        {
+          provide: HEALTH_LIB_PORT,
+          useClass: HealthLibFacade,
+        } satisfies ClassProvider<IHealthLibPort>,
+        HealthLibCheckLivenessUseCase,
+        HealthLibCheckReadinessUseCase,
+        HealthLibDependencyProbeAdapter.PROVIDER,
+        HealthLibAppNameProvider.provide(appName),
+        HealthLibUptimeAdapter.PROVIDER,
+      ],
+    };
+  }
+}

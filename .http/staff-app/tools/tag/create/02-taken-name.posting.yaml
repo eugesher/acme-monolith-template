@@ -1,0 +1,23 @@
+name: 02-taken-name
+description: |-
+  e2e: Tools › Tag › POST /api/tools/tags
+  it: should refuse a name that differs from a taken one only in case with 409
+
+  Expect: 409 Conflict, code TAG_NAME_TAKEN
+  User: editor@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/tools/tags
+body:
+  content: |-
+    {
+      "name": "Fragile"
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

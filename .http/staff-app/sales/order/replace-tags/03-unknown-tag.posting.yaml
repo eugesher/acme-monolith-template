@@ -1,0 +1,23 @@
+name: 03-unknown-tag
+description: |-
+  e2e: Sales › Order › PUT /api/sales/orders/:orderId/tags
+  it: should refuse an unknown tag with 422 and keep the tags the order had
+
+  Expect: 422 Unprocessable Entity, code ORDER_TAG_NOT_FOUND, details.missingTagIds 998 and 999; order 600 keeps vip
+  User: editor@example.com (token signed by scripts.py)
+method: PUT
+url: $STAFF_APP_BASE_URL/sales/orders/600/tags
+body:
+  content: |-
+    {
+      "tagIds": ["302", "998", "999"]
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_editor

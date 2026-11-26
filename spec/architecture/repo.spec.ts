@@ -1,0 +1,331 @@
+import { spawnSync } from 'child_process';
+import * as path from 'path';
+
+import '../support/lint';
+import { Scaffold } from '../support/scaffold';
+
+describe('repo', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'core/entities/src/index.ts',
+      'libs/toolkit/src/index.ts',
+      'migrations/config/data-source.ts',
+      'scripts/node/support/script-args.ts',
+      'test/infra/seed/support/seed-rows.ts',
+      'test/system/apps/staff-app/context/__context-fixture__.ts',
+      'apps/__system-fixture__/src/app/index.ts',
+      'apps/__system-fixture__/src/app/shell/app.module.ts',
+      'apps/__other-system-fixture__/src/app/index.ts',
+      'apps/__other-system-fixture__/src/app/shell/app.module.ts',
+      'apps/__system-fixture__/src/features/index.ts',
+      'core/contracts/src/__ledger-fixture__/index.ts',
+      'core/modules/src/__product-fixture__/index.ts',
+      'apps/__cwd-fixture__/src/main.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
+  describe('test scripts (repo:test)', () => {
+    it('a seed script MAY import its own support files', async () => {
+      await expect({
+        file: 'test/infra/seed/__fixture__.ts',
+        code: 'import { x } from "./support/seed-rows";',
+      }).toPassArchitectureLint();
+    });
+
+    it.each(['fs', 'joi', 'path', 'typeorm'])('a seed script MAY import %s', async (source) => {
+      await expect({
+        file: 'test/infra/seed/__fixture__.ts',
+        code: `import x from "${source}";`,
+      }).toPassArchitectureLint();
+    });
+
+    it('a seed script MAY import dotenv — it reads env/migrations/.env.test', async () => {
+      await expect({
+        file: 'test/infra/seed/__fixture__.ts',
+        code: 'import dotenv from "dotenv";',
+      }).toPassArchitectureLint();
+    });
+
+    it.each(['../../../libs/toolkit/src', '../../../core/entities/src'])(
+      'a seed script may NOT import project code (%s) — it runs under plain node',
+      async (source) => {
+        await expect({
+          file: 'test/infra/seed/__fixture__.ts',
+          code: `import { x } from "${source}";`,
+        }).toBreakRule('boundaries/dependencies');
+      },
+    );
+  });
+
+  describe('migrations (repo:migrations)', () => {
+    it('a migration MAY import the migrations config', async () => {
+      await expect({
+        file: 'migrations/snapshots/__fixture__.ts',
+        code: 'import { x } from "../config/data-source";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a migration may NOT import project code — it runs under plain node', async () => {
+      await expect({
+        file: 'migrations/snapshots/__fixture__.ts',
+        code: 'import { x } from "../../core/entities/src";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it.each(['dotenv', 'fs', 'joi', 'path', 'typeorm'])(
+      'the migrations config MAY import %s',
+      async (source) => {
+        await expect({
+          file: 'migrations/config/__fixture__.ts',
+          code: `import x from "${source}";`,
+        }).toPassArchitectureLint();
+      },
+    );
+
+    it('a migration may NOT import a package outside its allowlist', async () => {
+      await expect({
+        file: 'migrations/snapshots/__fixture__.ts',
+        code: 'import { Module } from "@nestjs/common";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+  });
+
+  describe('system tests (repo:system)', () => {
+    it('a system test MAY mount the app modules and its own context', async () => {
+      await expect({
+        file: 'test/system/apps/staff-app/app/__fixture__.ts',
+        code: 'import { x } from "../../../../../apps/__system-fixture__/src/app";\nimport { y } from "../../../../../apps/__other-system-fixture__/src/app";\nimport { z } from "../context/__context-fixture__";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a system test may NOT reach past the app barrel into its shell', async () => {
+      await expect({
+        file: 'test/system/apps/staff-app/app/__fixture__.ts',
+        code: 'import { x } from "../../../../../apps/__system-fixture__/src/app/shell/app.module";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it.each(['@nestjs/bullmq', '@nestjs/common', 'bullmq', 'ioredis', 'supertest'])(
+      'a system test MAY import %s',
+      async (source) => {
+        await expect({
+          file: 'test/system/apps/staff-app/app/__fixture__.ts',
+          code: `import { x } from "${source}";`,
+        }).toPassArchitectureLint();
+      },
+    );
+
+    it('a system test MAY read the contracts of core, to name a queue and its job', async () => {
+      await expect({
+        file: 'test/system/apps/staff-app/context/__fixture__.ts',
+        code: 'import { x } from "@acme-core/contracts/__ledger-fixture__";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a system test MAY use the testing lib', async () => {
+      await expect({
+        file: 'test/system/apps/staff-app/context/__fixture__.ts',
+        code: 'import { x } from "@acme-libs/testing";\nimport { y } from "@acme-libs/testing";',
+      }).toPassArchitectureLint();
+    });
+
+    it.each(['@nestjs/testing', 'typeorm'])(
+      'a system test may NOT import %s — the testing lib boots the apps',
+      async (source) => {
+        await expect({
+          file: 'test/system/apps/staff-app/app/__fixture__.ts',
+          code: `import { x } from "${source}";`,
+        }).toBreakRule('boundaries/dependencies');
+      },
+    );
+
+    it.each([
+      ['the features of an app', '../../../../../apps/__system-fixture__/src/features'],
+      ['a core module', '@acme-core/modules/__product-fixture__'],
+    ])(
+      'a system test may NOT reach %s — it enters an app through its AppModule',
+      async (_, source) => {
+        await expect({
+          file: 'test/system/apps/staff-app/app/__fixture__.ts',
+          code: `import { x } from "${source}";`,
+        }).toBreakRule('boundaries/dependencies');
+      },
+    );
+
+    it('a seed script may NOT reach the app modules', async () => {
+      await expect({
+        file: 'test/infra/seed/__fixture__.ts',
+        code: 'import { x } from "../../../apps/__system-fixture__/src/app";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+  });
+
+  describe('scripts (repo:scripts)', () => {
+    it('a script MAY import its own support files', async () => {
+      await expect({
+        file: 'scripts/node/__fixture__.ts',
+        code: 'import { x } from "./support/script-args";',
+      }).toPassArchitectureLint();
+    });
+
+    it.each(['argon2', 'child_process', 'dotenv', 'fs', 'joi', 'os', 'path', 'typeorm'])(
+      'a script MAY import %s',
+      async (source) => {
+        await expect({
+          file: 'scripts/node/__fixture__.ts',
+          code: `import { x } from "${source}";`,
+        }).toPassArchitectureLint();
+      },
+    );
+
+    it('a script may NOT import a package outside its allowlist', async () => {
+      await expect({
+        file: 'scripts/node/__fixture__.ts',
+        code: 'import { Redis } from "ioredis";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+
+    it('a script may NOT import project code', async () => {
+      await expect({
+        file: 'scripts/node/__fixture__.ts',
+        code: 'import { x } from "../../libs/toolkit/src";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+  });
+
+  describe('plain node files (migrations, scripts, seeds)', () => {
+    it.each([
+      ['migrations/snapshots/__fixture__.ts', '__dirname'],
+      ['migrations/config/__fixture__.ts', '__filename'],
+      ['scripts/node/__fixture__.ts', 'require'],
+      ['test/infra/seed/__fixture__.ts', 'module'],
+      ['scripts/node/__fixture__.ts', 'exports'],
+    ])(
+      '%s may NOT use the CommonJS global %s — node runs it as an ES module',
+      async (file, name) => {
+        await expect({ file, code: `export const x = ${name};` }).toBreakRule(
+          'no-restricted-globals',
+        );
+      },
+    );
+
+    it('the ES module path of the file is open', async () => {
+      await expect({
+        file: 'migrations/config/__fixture__.ts',
+        code: 'export const x = import.meta.dirname;',
+      }).toPassArchitectureLint();
+    });
+
+    it.each(['joi', 'dotenv', 'typeorm'])(
+      'a namespace import of the CommonJS package %s is forbidden — it has no callable members under ESM',
+      async (source) => {
+        await expect({
+          file: 'migrations/config/__fixture__.ts',
+          code: `import * as x from "${source}";`,
+        }).toBreakRule('no-restricted-syntax');
+      },
+    );
+
+    it.each(['path', 'node:path', 'fs/promises'])(
+      'a namespace import of the node module %s is allowed',
+      async (source) => {
+        await expect({
+          file: 'scripts/node/__fixture__.ts',
+          code: `import * as x from "${source}";`,
+        }).not.toBreakRule('no-restricted-syntax');
+      },
+    );
+
+    it('the CommonJS globals stay open to the app code', async () => {
+      await expect({
+        file: 'apps/__repo-fixture__/src/main.ts',
+        code: 'export const x = __dirname;',
+      }).not.toBreakRule('no-restricted-globals');
+    });
+  });
+
+  describe('working directory', () => {
+    it.each([
+      ['migrations', 'config/data-source.ts'],
+      ['apps/__cwd-fixture__', 'src/main.ts'],
+    ])(
+      'linting from %s, as an editor does from the nearest package, classifies %s from the repo root',
+      (cwd, file) => {
+        const root = path.resolve(__dirname, '../..');
+        const eslint = path.join(root, 'node_modules/eslint/bin/eslint.js');
+
+        const result = spawnSync(process.execPath, [eslint, '--max-warnings', '0', file], {
+          cwd: path.join(root, cwd),
+          encoding: 'utf8',
+        });
+
+        expect(result.stdout).toBe('');
+        expect(result.status).toBe(0);
+      },
+    );
+  });
+
+  describe('root configs (repo:config)', () => {
+    it('a root TypeScript file is a known file', async () => {
+      await expect({
+        file: '__fixture__.ts',
+        code: 'export const x = 1;',
+      }).toPassArchitectureLint();
+    });
+  });
+
+  describe('repo specs (repo:spec)', () => {
+    it('a repo spec MAY import the spec support', async () => {
+      await expect({
+        file: 'spec/architecture/__fixture__.spec.ts',
+        code: 'import { x } from "../support/lint";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a repo spec MAY drive ESLint', async () => {
+      await expect({
+        file: 'spec/support/__fixture__.ts',
+        code: 'import { ESLint } from "eslint";',
+      }).toPassArchitectureLint();
+    });
+
+    it('a repo spec may NOT import project code', async () => {
+      await expect({
+        file: 'spec/architecture/__fixture__.spec.ts',
+        code: 'import { x } from "../../libs/toolkit/src";',
+      }).toBreakRule('boundaries/dependencies');
+    });
+  });
+
+  describe('unknown files', () => {
+    it.each([
+      'apps/__repo-fixture__/src/__fixture__.ts',
+      'core/__repo-fixture__/src/__fixture__.ts',
+      'libs/__repo-fixture__/__fixture__.ts',
+    ])('%s matches NO pattern and fails lint', async (file) => {
+      await expect({ file, code: 'export const orphan = 1;' }).toBreakRule(
+        'boundaries/no-unknown-files',
+      );
+    });
+
+    it('a file of a new top-level folder MAY match no pattern — only apps, core and libs need one', async () => {
+      await expect({
+        file: 'tools/__fixture__.ts',
+        code: 'export const tool = 1;',
+      }).toPassArchitectureLint();
+    });
+
+    it('an import of a file outside every pattern fails lint', async () => {
+      await expect({
+        file: 'apps/__repo-fixture__/src/features/product/domain/__fixture__.ts',
+        code: 'import x from "../../../../../../package.json";',
+      }).toBreakRule('boundaries/no-unknown-dependencies');
+    });
+  });
+});

@@ -1,0 +1,23 @@
+import { ProductE2E } from './modules/product.e2e';
+import type { AppE2EContext } from '../../context/app-e2e.context';
+
+export class CatalogE2E {
+  private constructor(private readonly productE2E: ProductE2E) {}
+
+  public static of(ctx: AppE2EContext): CatalogE2E {
+    return new CatalogE2E(ProductE2E.of(ctx));
+  }
+
+  public execute(): void {
+    describe('Product', () => {
+      this.productE2E.handleGetMany();
+      this.productE2E.handleGetOne();
+      this.productE2E.handleCreate();
+      this.productE2E.handleUpdate();
+      this.productE2E.handleArchive();
+      this.productE2E.handlePublish();
+      this.productE2E.handleGetTags();
+      this.productE2E.handleReplaceTags();
+    });
+  }
+}

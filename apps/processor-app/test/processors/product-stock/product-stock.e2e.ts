@@ -1,0 +1,80 @@
+import type { AppE2EContext } from '../../context/app-e2e.context';
+
+export class ProductStockE2E {
+  private constructor(private readonly ctx: AppE2EContext) {}
+
+  public static of(ctx: AppE2EContext): ProductStockE2E {
+    return new ProductStockE2E(ctx);
+  }
+
+  public process(): void {
+    describe('queue product-stock-post-subtract', () => {
+      it('should archive a published product without stock and record the archive in the ledger under the correlation id', async () => {
+        await this.ctx.productStockPostSubtractQueue.add('product-stock-post-subtract', {
+          productIds: ['106'],
+          correlationId: 'e2e00000-0000-4000-8000-000000000004',
+        });
+
+        await this.ctx.waitForPostSubtractQueue();
+        await this.ctx.waitForLedgerAppendQueue();
+
+        expect({
+          db: {
+            product: await this.ctx.dataSource.query(
+              'SELECT id, status, version FROM product WHERE id = 106',
+            ),
+            ledger_entry: await this.ctx.dataSource.query(
+              'SELECT operation_key, action, payload, correlation_id FROM ledger_entry WHERE subject_id = ? ORDER BY id',
+              ['106'],
+            ),
+          },
+        }).toMatchSnapshot();
+      });
+
+      it('should leave a published product with stock and a draft without stock as they are', async () => {
+        await this.ctx.productStockPostSubtractQueue.add('product-stock-post-subtract', {
+          productIds: ['100', '102'],
+          correlationId: 'e2e00000-0000-4000-8000-000000000005',
+        });
+
+        await this.ctx.waitForPostSubtractQueue();
+        await this.ctx.waitForLedgerAppendQueue();
+
+        expect({
+          db: {
+            product: await this.ctx.dataSource.query(
+              'SELECT id, status, version FROM product WHERE id IN (100, 102) ORDER BY id',
+            ),
+            ledger_entry: await this.ctx.dataSource.query(
+              'SELECT operation_key FROM ledger_entry WHERE correlation_id = ?',
+              ['e2e00000-0000-4000-8000-000000000005'],
+            ),
+          },
+        }).toMatchSnapshot();
+      });
+
+      it('should complete without a write when every product keeps stock, as after most orders', async () => {
+        await this.ctx.productStockPostSubtractQueue.add('product-stock-post-subtract', {
+          productIds: ['100'],
+          correlationId: 'e2e00000-0000-4000-8000-000000000027',
+        });
+
+        await this.ctx.waitForPostSubtractQueue();
+        await this.ctx.waitForLedgerAppendQueue();
+
+        expect({
+          db: {
+            product: await this.ctx.dataSource.query(
+              'SELECT id, status, version FROM product WHERE id = 100',
+            ),
+            ledger_entry: await this.ctx.dataSource.query(
+              'SELECT operation_key FROM ledger_entry WHERE correlation_id = ?',
+              ['e2e00000-0000-4000-8000-000000000027'],
+            ),
+          },
+          failed: await this.ctx.productStockPostSubtractQueue.getFailedCount(),
+        }).toMatchSnapshot();
+      });
+    });
+  }
+}

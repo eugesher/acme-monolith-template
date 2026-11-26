@@ -1,0 +1,269 @@
+import '../support/lint';
+import { Scaffold } from '../support/scaffold';
+
+describe('unused edges', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'apps/__unused-fixture__/src/common/shared/concurrency/index.ts',
+      'apps/__unused-fixture__/src/contracts/idempotency/index.ts',
+      'apps/__unused-fixture__/src/common/modules/idempotency/domain/index.ts',
+      'apps/__unused-fixture__/src/features/product/domain/index.ts',
+      'apps/__unused-fixture__/src/app/setup/config/config-setup.module.ts',
+      'core/modules/src/__unused-fixture__/domain/index.ts',
+      'core/contracts/src/__unused-fixture__/index.ts',
+      'core/entities/src/index.ts',
+      'libs/config/src/index.ts',
+      'libs/database/src/index.ts',
+      'libs/http/src/index.ts',
+      'libs/observability/src/index.ts',
+      'libs/contracts/src/auth/index.ts',
+      'libs/contracts/src/cache/index.ts',
+      'libs/contracts/src/database/index.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
+  describe('app root', () => {
+    it.each([
+      [
+        'the app module may NOT reach a shared barrel: shared code is used by the modules it mounts',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../common/shared/concurrency',
+      ],
+      [
+        'the app module may NOT reach the entities: the ORM setup module registers them',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../../../../core/entities/src',
+      ],
+      [
+        'the app module may NOT reach the config lib: the config setup module binds it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../../../../libs/config/src',
+      ],
+      [
+        'a setup module may NOT reach the database lib: the app lib mounts OrmModule',
+        'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
+        '../../../../../../libs/database/src',
+      ],
+      [
+        'the app module may NOT reach the database contracts: the database and local-storage libs bind them',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '../../../../../libs/contracts/src/database',
+      ],
+      [
+        'the app module may NOT import @nestjs-cls/transactional: the local-storage lib configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '@nestjs-cls/transactional',
+      ],
+      [
+        'the app module may NOT import @nestjs-cls/transactional-adapter-typeorm: the local-storage lib configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '@nestjs-cls/transactional-adapter-typeorm',
+      ],
+      [
+        'the app module may NOT import @nestjs/config: a setup module in app/setup configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '@nestjs/config',
+      ],
+      [
+        'the app module may NOT import @nestjs/typeorm: the database lib configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        '@nestjs/typeorm',
+      ],
+      [
+        'the app module may NOT import joi: a setup module in app/setup configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        'joi',
+      ],
+      [
+        'the app module may NOT import nestjs-cls: the local-storage lib configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        'nestjs-cls',
+      ],
+      [
+        'the app module may NOT import typeorm: the database lib configures it',
+        'apps/__unused-fixture__/src/app/shell/app.module.ts',
+        'typeorm',
+      ],
+      [
+        'a setup module may NOT import typeorm: the database lib configures it',
+        'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
+        'typeorm',
+      ],
+      [
+        'a setup module may NOT reach a shared barrel: shared code is used by the modules',
+        'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
+        '../../../common/shared/concurrency',
+      ],
+      [
+        'a setup module may NOT reach the http lib: the app module binds the global pipes and filters',
+        'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
+        '../../../../../../libs/http/src',
+      ],
+      [
+        'a setup module may NOT reach the observability lib: the app module sets up the logger',
+        'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
+        '../../../../../../libs/observability/src',
+      ],
+    ])('%s', async (_, file, source) => {
+      await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+        'boundaries/dependencies',
+      );
+    });
+  });
+
+  describe('global modules', () => {
+    it.each([
+      [
+        'the root of a global module may NOT reach the observability lib: it wires providers and logs nothing',
+        'apps/__unused-fixture__/src/global/auth/shell/__fixture__.ts',
+        '../../../../../../libs/observability/src',
+      ],
+      [
+        'global infrastructure may NOT reach the contracts of a lib: a core-adapter implements the lib port',
+        'apps/__unused-fixture__/src/global/auth/infrastructure/__fixture__.ts',
+        '../../../../../../libs/contracts/src/auth',
+      ],
+      [
+        'a global core-adapter may NOT reach a shared barrel: it translates between contracts only',
+        'apps/__unused-fixture__/src/global/auth/infrastructure/core-adapters/__fixture__.ts',
+        '../../../../common/shared/concurrency',
+      ],
+    ])('%s', async (_, file, source) => {
+      await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+        'boundaries/dependencies',
+      );
+    });
+  });
+
+  describe('e2e', () => {
+    it.each([
+      [
+        'the e2e code may NOT reach a setup module: it boots the whole app module',
+        'apps/__unused-fixture__/test/context/__fixture__.ts',
+        '../../src/app/setup/config/config-setup.module.ts',
+      ],
+      [
+        'the e2e code may NOT reach the contracts of a lib: it reads Redis through the test entry point of the cache lib',
+        'apps/__unused-fixture__/test/context/__fixture__.ts',
+        '../../../../libs/contracts/src/cache',
+      ],
+      [
+        'the e2e code may NOT reach the http lib: it checks HTTP from outside the app',
+        'apps/__unused-fixture__/test/context/__fixture__.ts',
+        '../../../../libs/http/src',
+      ],
+    ])('%s', async (_, file, source) => {
+      await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+        'boundaries/dependencies',
+      );
+    });
+  });
+
+  describe('features', () => {
+    it.each([
+      [
+        'feature application may NOT reach a shared barrel: shared code serves the HTTP surface',
+        'apps/__unused-fixture__/src/features/product/application/__fixture__.ts',
+        '../../../common/shared/concurrency',
+      ],
+      [
+        'feature persistence may NOT reach BullMQ: jobs are enqueued from infrastructure/queue',
+        'apps/__unused-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
+        '@nestjs/bullmq',
+      ],
+      [
+        'feature presentation may NOT reach the observability lib: the middleware of the app sets the correlation id',
+        'apps/__unused-fixture__/src/features/product/shell/__fixture__.ts',
+        '../../../../../../libs/observability/src',
+      ],
+      [
+        'the feature root may NOT reach its domain: it wires providers, and the domain has none',
+        'apps/__unused-fixture__/src/features/product/shell/__fixture__.module.ts',
+        '../domain',
+      ],
+    ])('%s', async (_, file, source) => {
+      await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+        'boundaries/dependencies',
+      );
+    });
+  });
+
+  describe('common modules', () => {
+    it.each([
+      [
+        'common outbound may NOT reach the contracts of its module: a port speaks the module types, the contracts serve consumers',
+        'apps/__unused-fixture__/src/common/modules/idempotency/outbound/__fixture__.ts',
+        '../../../../contracts/idempotency',
+      ],
+      [
+        'common infrastructure may NOT reach the contracts of its module: it implements outbound ports',
+        'apps/__unused-fixture__/src/common/modules/idempotency/infrastructure/persistence/__fixture__.ts',
+        '../../../../../contracts/idempotency',
+      ],
+      [
+        'common infrastructure may NOT reach the contracts of a lib: only feature infrastructure caches',
+        'apps/__unused-fixture__/src/common/modules/idempotency/infrastructure/persistence/__fixture__.ts',
+        '../../../../../../../../libs/contracts/src/cache',
+      ],
+      [
+        'a common facade may NOT reach the http lib: it hands the call to a use case',
+        'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.facade.ts',
+        '../../../../../../../libs/http/src',
+      ],
+      [
+        'a common facade may NOT reach the observability lib: it hands the call to a use case',
+        'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.facade.ts',
+        '../../../../../../../libs/observability/src',
+      ],
+      [
+        'the common module root may NOT reach its domain: it wires providers, and the domain has none',
+        'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        '../domain',
+      ],
+    ])('%s', async (_, file, source) => {
+      await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+        'boundaries/dependencies',
+      );
+    });
+  });
+
+  describe('core modules', () => {
+    it.each([
+      [
+        'core infrastructure may NOT reach the contracts of its module: it implements outbound ports',
+        'core/modules/src/__unused-fixture__/infrastructure/persistence/__fixture__.ts',
+        '../../../../../contracts/src/__unused-fixture__',
+      ],
+      [
+        'core infrastructure may NOT reach the auth contracts of a lib: a core module guards no route',
+        'core/modules/src/__unused-fixture__/infrastructure/persistence/__fixture__.ts',
+        '../../../../../../libs/contracts/src/auth',
+      ],
+      [
+        'a core facade may NOT reach the http lib: it hands the call to a use case',
+        'core/modules/src/__unused-fixture__/shell/__fixture__.facade.ts',
+        '../../../../../libs/http/src',
+      ],
+      [
+        'a core facade may NOT reach the observability lib: it hands the call to a use case',
+        'core/modules/src/__unused-fixture__/shell/__fixture__.facade.ts',
+        '../../../../../libs/observability/src',
+      ],
+      [
+        'the core module root may NOT reach its domain: it wires providers, and the domain has none',
+        'core/modules/src/__unused-fixture__/shell/__fixture__.ts',
+        '../domain',
+      ],
+    ])('%s', async (_, file, source) => {
+      await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
+        'boundaries/dependencies',
+      );
+    });
+  });
+});

@@ -1,0 +1,65 @@
+import base64
+import hashlib
+import hmac
+import json
+import time
+from pathlib import Path
+
+AUDIENCE = "customer"
+OTHER_AUDIENCE = "staff"
+ENV_DIR = Path(__file__).resolve().parents[2] / "env" / "apps"
+ENV_FILE = ENV_DIR / "customer-app" / ".env"
+ANN_ID = "101"
+BOB_ID = "102"
+CAROL_ID = "103"
+DORA_ID = "104"
+STAFF_ADMIN_ID = "1"
+
+
+def capture_login(response, posting) -> None:
+    data = response.json()
+    posting.set_variable("access_token", data["accessToken"])
+
+
+def as_ann(posting) -> None:
+    sign(posting, {"sub": ANN_ID})
+
+
+def as_bob(posting) -> None:
+    sign(posting, {"sub": BOB_ID})
+
+
+def as_carol(posting) -> None:
+    sign(posting, {"sub": CAROL_ID})
+
+
+def as_dora(posting) -> None:
+    sign(posting, {"sub": DORA_ID})
+
+
+def as_staff_user(posting) -> None:
+    sign(posting, {"sub": STAFF_ADMIN_ID})
+
+
+def as_ann_for_staff_audience(posting) -> None:
+    sign(posting, {"sub": ANN_ID}, audience=OTHER_AUDIENCE)
+
+
+def sign(posting, claims: dict, env_file: Path = ENV_FILE, audience: str = AUDIENCE) -> None:
+    header = encode(json.dumps({"alg": "HS256", "typ": "JWT"}, separators=(",", ":")).encode())
+    payload = encode(json.dumps({**claims, "aud": audience, "iat": int(time.time())}, separators=(",", ":")).encode())
+    signing_input = f"{header}.{payload}"
+    signature = hmac.new(access_secret(env_file).encode(), signing_input.encode(), hashlib.sha256).digest()
+    posting.set_variable("token", f"{signing_input}.{encode(signature)}")
+
+
+def encode(value: bytes) -> str:
+    return base64.urlsafe_b64encode(value).rstrip(b"=").decode()
+
+
+def access_secret(env_file: Path) -> str:
+    for line in env_file.read_text().splitlines():
+        name, _, value = line.partition("=")
+        if name.strip() == "JWT_SECRET":
+            return value.strip().strip('"')
+    raise KeyError(f"JWT_SECRET is missing in {env_file}")

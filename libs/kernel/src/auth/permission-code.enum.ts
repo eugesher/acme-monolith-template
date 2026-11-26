@@ -1,0 +1,15 @@
+export enum PermissionCodeEnum {
+  LEDGER_READ = 'ledger:read',
+  ACCESS_MANAGE = 'access:manage',
+  PRODUCT_READ = 'product:read',
+  PRODUCT_WRITE = 'product:write',
+  PRODUCT_ARCHIVE = 'product:archive',
+  PRODUCT_RESTOCK = 'product:restock',
+  ORDER_READ = 'order:read',
+  ORDER_WRITE = 'order:write',
+  QUEUE_READ = 'queue:read',
+  QUEUE_RETRY = 'queue:retry',
+  QUEUE_DELETE = 'queue:delete',
+  TAG_READ = 'tag:read',
+  TAG_WRITE = 'tag:write',
+}

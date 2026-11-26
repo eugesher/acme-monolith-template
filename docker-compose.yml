@@ -1,0 +1,153 @@
+name: acme
+
+services:
+  mysql:
+    image: mysql:9.7.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: acme_db
+      MYSQL_USER: acme
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+    ports:
+      - '127.0.0.1:3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -uroot -p"$$MYSQL_ROOT_PASSWORD"']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - backend
+
+  redis:
+    image: redis:8.10.3-alpine
+    command: ['sh', '-c', 'exec redis-server --requirepass "$$REDISCLI_AUTH"']
+    environment:
+      REDISCLI_AUTH: ${REDIS_SERVER_PASSWORD:?set REDIS_SERVER_PASSWORD}
+    ports:
+      - '127.0.0.1:6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - backend
+
+  migrations:
+    build:
+      context: .
+      target: migrations
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./env/migrations/.env
+        target: /app/env/migrations/.env
+        read_only: true
+        bind:
+          create_host_path: false
+    restart: 'no'
+    networks:
+      - backend
+
+  customer-app:
+    build:
+      context: .
+      args:
+        APP_NAME: customer-app
+    ports:
+      - '3001:3001'
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./env/apps/customer-app/.env
+        target: /app/env/apps/customer-app/.env
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - backend
+
+  staff-app:
+    build:
+      context: .
+      args:
+        APP_NAME: staff-app
+    ports:
+      - '3000:3000'
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./env/apps/staff-app/.env
+        target: /app/env/apps/staff-app/.env
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - backend
+
+  processor-app:
+    build:
+      context: .
+      args:
+        APP_NAME: processor-app
+    ports:
+      - '3002:3002'
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./env/apps/processor-app/.env
+        target: /app/env/apps/processor-app/.env
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - backend
+
+  jaeger:
+    image: jaegertracing/jaeger:2.22.0
+    ports:
+      - '127.0.0.1:16686:16686'
+    networks:
+      - backend
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.164.0
+    command: ['--config=/etc/otelcol-contrib/config.yaml']
+    volumes:
+      - ./otel-collector.config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - '127.0.0.1:4317:4317'
+      - '127.0.0.1:4318:4318'
+    depends_on:
+      - jaeger
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql-data:

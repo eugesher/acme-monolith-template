@@ -1,0 +1,14 @@
+name: 05-empty-body
+description: |-
+  e2e: Auth › POST /api/auth/login
+  it: should refuse an empty body with 400 from validation
+
+  Expect: 400 Bad Request, code VALIDATION_FAILED, fields email and password
+method: POST
+url: $STAFF_APP_BASE_URL/auth/login
+body:
+  content: |-
+    {}
+headers:
+  - name: Content-Type
+    value: application/json

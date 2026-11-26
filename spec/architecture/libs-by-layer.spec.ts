@@ -1,0 +1,524 @@
+import '../support/lint';
+import { Scaffold } from '../support/scaffold';
+
+describe('libs by layer', () => {
+  let scaffold: Scaffold;
+
+  beforeAll(() => {
+    scaffold = Scaffold.create([
+      'libs/auth/src/index.ts',
+      'libs/cache/src/index.ts',
+      'libs/config/src/index.ts',
+      'libs/credentials/src/index.ts',
+      'libs/database/src/index.ts',
+      'libs/domain/src/index.ts',
+      'libs/health/src/index.ts',
+      'libs/http/src/index.ts',
+      'libs/kernel/src/index.ts',
+      'libs/observability/src/index.ts',
+      'libs/openapi/src/index.ts',
+      'libs/toolkit/src/index.ts',
+      'libs/contracts/src/auth/index.ts',
+      'libs/contracts/src/cache/index.ts',
+      'libs/contracts/src/database/index.ts',
+      'libs/contracts/src/local-storage/index.ts',
+    ]);
+  });
+
+  afterAll(() => {
+    scaffold.remove();
+  });
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/features/product/outbound/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+    ['apps/__layers-fixture__/src/contracts/audit/__fixture__.ts', '../../../../../libs'],
+    ['core/modules/src/__ledger-fixture__/domain/__fixture__.ts', '../../../../../libs'],
+    ['core/modules/src/__ledger-fixture__/outbound/__fixture__.ts', '../../../../../libs'],
+    ['core/contracts/src/__ledger-fixture__/__fixture__.ts', '../../../../libs'],
+  ])('%s may reach only the framework-free libs', async (file, libs) => {
+    const others = [
+      'app',
+      'auth',
+      'cache',
+      'config',
+      'database',
+      'health',
+      'http',
+      'observability',
+      'openapi',
+    ];
+
+    await expect({
+      file,
+      code: `import { x } from "${libs}/kernel/src";\nimport { y } from "${libs}/toolkit/src";\nimport { z } from "${libs}/domain/src";`,
+    }).toPassArchitectureLint();
+
+    for (const lib of others) {
+      await expect({
+        file,
+        code: `import { x } from "${libs}/${lib}/src";`,
+      }).toBreakRule('boundaries/dependencies');
+    }
+  });
+
+  it('main may reach only the libs that run before or outside DI', async () => {
+    const allowed = ['app', 'kernel', 'observability'];
+    const libs = [
+      'app',
+      'auth',
+      'cache',
+      'config',
+      'database',
+      'domain',
+      'health',
+      'http',
+      'kernel',
+      'observability',
+      'openapi',
+      'toolkit',
+    ];
+
+    const reachable = libs.filter((lib) => allowed.includes(lib));
+    const unreachable = libs.filter((lib) => !allowed.includes(lib));
+
+    for (const lib of reachable) {
+      await expect({
+        file: 'apps/__layers-fixture__/src/main.ts',
+        code: `import { x } from "../../../libs/${lib}/src";`,
+      }).toPassArchitectureLint();
+    }
+
+    for (const lib of unreachable) {
+      await expect({
+        file: 'apps/__layers-fixture__/src/main.ts',
+        code: `import { x } from "../../../libs/${lib}/src";`,
+      }).toBreakRule('boundaries/dependencies');
+    }
+  });
+
+  it('presentation MAY reach the HTTP lib', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import { x } from "../../../../../../libs/http/src";',
+    }).toPassArchitectureLint();
+  });
+
+  it('presentation MAY reach the auth lib for its route decorators', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import { x } from "../../../../../../libs/auth/src";',
+    }).toPassArchitectureLint();
+  });
+
+  it('presentation MAY reach the auth lib contract for the type of the current user', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import type { x } from "../../../../../../libs/contracts/src/auth";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    'import { CurrentUser, Public, RequiresPermission } from "@acme-libs/auth";',
+    'import { PermissionCodeEnum } from "@acme-libs/kernel";',
+    'import type { IAuthCurrentUserView } from "@acme-libs/contracts/auth";',
+  ])('presentation MAY take %s', async (code) => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/auth/shell/__fixture__.ts',
+      code,
+    }).toPassArchitectureLint();
+  });
+
+  it('the global auth module MAY wire the claim guards', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/global/auth/shell/__fixture__.ts',
+      code: 'import { AuthJwtModule, AuthPermissionModule } from "@acme-libs/auth";\nimport { AUTH_USER_VALIDATOR_PORT } from "@acme-libs/contracts/auth";',
+    }).toPassArchitectureLint();
+  });
+
+  it('application may NOT reach the auth lib contract', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      code: 'import type { x } from "../../../../../../../libs/contracts/src/auth";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    ['apps/__layers-fixture__/src/processors/purge/shell/__fixture__.ts', '../../../../../../libs'],
+  ])('%s may NOT reach the auth lib', async (file, libs) => {
+    await expect({ file, code: `import { x } from "${libs}/auth/src";` }).toBreakRule(
+      'boundaries/dependencies',
+    );
+  });
+
+  it('application may NOT reach the HTTP lib', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      code: 'import { x } from "../../../../../../../libs/http/src";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/processors/purge/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/common/modules/idempotency/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/global/auth/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+  ])('infrastructure MAY reach the database contracts: %s', async (file, libs) => {
+    await expect({
+      file,
+      code: `import { x } from "${libs}/contracts/src/database";`,
+    }).toPassArchitectureLint();
+  });
+
+  it('the AppModule may NOT reach the database lib, the app lib mounts it', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../../../../libs/database/src";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    ['apps/__layers-fixture__/src/features/product/shell/__fixture__.ts', '../../../../../../libs'],
+    [
+      'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+      '../../../../../../libs',
+    ],
+    ['core/modules/src/__ledger-fixture__/shell/ledger-core.facade.ts', '../../../../../libs'],
+    [
+      'apps/__layers-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/processors/purge/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/common/modules/idempotency/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/global/auth/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+  ])('nothing else may reach the database lib: %s', async (file, libs) => {
+    await expect({
+      file,
+      code: `import { x } from "${libs}/database/src";`,
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/infrastructure/persistence/transaction/__fixture__.ts',
+      '../../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/processors/purge/infrastructure/persistence/transaction/__fixture__.ts',
+      '../../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/common/modules/idempotency/infrastructure/persistence/transaction/__fixture__.ts',
+      '../../../../../../../../../libs',
+    ],
+    [
+      'core/modules/src/__ledger-fixture__/infrastructure/persistence/transaction/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+  ])('%s MAY reach the transaction port in the local-storage contracts', async (file, libs) => {
+    await expect({
+      file,
+      code: `import { x } from "${libs}/contracts/src/local-storage";`,
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/features/product/outbound/__fixture__.ts',
+      '../../../../../../libs',
+    ],
+    ['apps/__layers-fixture__/src/features/product/shell/__fixture__.ts', '../../../../../../libs'],
+    [
+      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/processors/purge/application/services/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    [
+      'apps/__layers-fixture__/src/common/modules/idempotency/application/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    ['core/modules/src/__ledger-fixture__/application/__fixture__.ts', '../../../../../libs'],
+    ['core/modules/src/__ledger-fixture__/shell/ledger-core.facade.ts', '../../../../../libs'],
+  ])(
+    '%s may NOT reach the local-storage contracts, the transaction adapter of the module wraps them',
+    async (file, libs) => {
+      await expect({
+        file,
+        code: `import { x } from "${libs}/contracts/src/local-storage";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it.each([
+    [
+      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      '../../../../../../../libs',
+    ],
+    ['core/modules/src/__ledger-fixture__/application/__fixture__.ts', '../../../../../libs'],
+  ])(
+    '%s may NOT reach the cache contracts, only the database contracts are open to the application',
+    async (file, libs) => {
+      await expect({
+        file,
+        code: `import { x } from "${libs}/contracts/src/cache";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it('infrastructure MAY reach the lib contracts it adapts', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/infrastructure/cache/__fixture__.ts',
+      code: 'import { x } from "../../../../../../../libs/contracts/src/cache";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    ['apps/__layers-fixture__/src/features/product/infrastructure/cache/__fixture__.ts', 'cache'],
+    ['apps/__layers-fixture__/src/features/product/infrastructure/cache/__fixture__.ts', 'http'],
+    ['apps/__layers-fixture__/src/features/product/infrastructure/cache/__fixture__.ts', 'config'],
+    [
+      'apps/__layers-fixture__/src/features/product/infrastructure/cache/__fixture__.ts',
+      'observability',
+    ],
+  ])(
+    '%s may NOT reach the %s lib root — adapters take the lib contracts, Nest modules are wired at the root',
+    async (file, lib) => {
+      await expect({
+        file,
+        code: `import { x } from "../../../../../../../libs/${lib}/src";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it('the app may NOT reach the cache lib, the app lib mounts it', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/app/setup/config/__fixture__.ts',
+      code: 'import { x } from "../../../../../../libs/cache/src";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it.each([
+    ['apps/__layers-fixture__/src/app/setup/app-setup.module.ts', '../../../../../libs', 'app'],
+    [
+      'apps/__layers-fixture__/src/app/setup/app-setup.module.ts',
+      '../../../../../libs',
+      'credentials',
+    ],
+    [
+      'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+      '../../../../../../libs',
+      'auth',
+    ],
+    [
+      'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+      '../../../../../../libs',
+      'health',
+    ],
+    [
+      'apps/__layers-fixture__/src/global/auth/shell/__fixture__.ts',
+      '../../../../../../libs',
+      'auth',
+    ],
+  ])(
+    '%s MAY reach %s/%s, the Nest module of a lib is wired where it is used',
+    async (file, libs, lib) => {
+      await expect({
+        file,
+        code: `import { x } from "${libs}/${lib}/src";`,
+      }).toPassArchitectureLint();
+    },
+  );
+
+  it.each([
+    ['core/modules/src/__ledger-fixture__/shell/__fixture__.ts', '../../../../../libs', 'cache'],
+    [
+      'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+      '../../../../../../libs',
+      'cache',
+    ],
+    [
+      'apps/__layers-fixture__/src/processors/purge/shell/__fixture__.module.ts',
+      '../../../../../../libs',
+      'auth',
+    ],
+  ])(
+    'the module root %s may NOT reach %s/%s, it wires only the libs it uses',
+    async (file, libs, lib) => {
+      await expect({
+        file,
+        code: `import { x } from "${libs}/${lib}/src";`,
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it.each([
+    'apps/__layers-fixture__/src/features/product/infrastructure/config/__fixture__.ts',
+    'apps/__layers-fixture__/src/processors/purge/infrastructure/config/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/infrastructure/config/__fixture__.ts',
+    'apps/__layers-fixture__/src/app/setup/config/__fixture__.ts',
+  ])('%s MAY bind config values through the config lib', async (file) => {
+    await expect({
+      file,
+      code: 'import { ConfigValueProvider } from "@acme-libs/config";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/shell/ledger-core.facade.ts',
+    'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+    'apps/__layers-fixture__/src/processors/purge/shell/__fixture__.module.ts',
+    'apps/__layers-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+    'apps/__layers-fixture__/src/global/auth/shell/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+  ])(
+    '%s may NOT reach the config lib — values arrive through tokens bound in infrastructure/config',
+    async (file) => {
+      await expect({
+        file,
+        code: 'import { ConfigValueProvider } from "@acme-libs/config";',
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it.each([
+    'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+    'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+  ])('%s may NOT read ConfigService directly', async (file) => {
+    await expect({
+      file,
+      code: 'import { ConfigService } from "@nestjs/config";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it('bootstrap MAY set up the config module with its own Joi schema', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/app/setup/config/__fixture__.ts',
+      code: 'import { ConfigModule } from "@nestjs/config";\nimport Joi from "joi";',
+    }).toPassArchitectureLint();
+  });
+
+  it('main may NOT read the config: AppBootstrap of the app lib reads the port and the prefix', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/main.ts',
+      code: 'import { ConfigService } from "@nestjs/config";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it('a feature may NOT import joi — validation of env is the app bootstrap job', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
+      code: 'import Joi from "joi";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it.each([
+    'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/__layers-fixture__/src/processors/purge/application/services/__fixture__.ts',
+    'apps/__layers-fixture__/src/common/modules/idempotency/application/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
+    'apps/__layers-fixture__/src/common/shared/auth/__fixture__.ts',
+  ])('%s MAY log through nestjs-pino', async (file) => {
+    await expect({
+      file,
+      code: 'import { InjectPinoLogger, PinoLogger } from "nestjs-pino";',
+    }).toPassArchitectureLint();
+  });
+
+  it.each([
+    'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
+    'apps/__layers-fixture__/src/processors/purge/shell/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
+    'core/modules/src/__ledger-fixture__/shell/ledger-core.facade.ts',
+  ])(
+    '%s may NOT log through nestjs-pino — outcomes are logged by the application',
+    async (file) => {
+      await expect({
+        file,
+        code: 'import { PinoLogger } from "nestjs-pino";',
+      }).toBreakRule('boundaries/dependencies');
+    },
+  );
+
+  it.each([
+    'apps/__layers-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
+  ])('%s may NOT reach the observability lib', async (file) => {
+    await expect({
+      file,
+      code: 'import { CorrelationContextHelper } from "@acme-libs/observability";',
+    }).toBreakRule('boundaries/dependencies');
+  });
+
+  it('a processor MAY read the correlation context from the observability lib', async () => {
+    await expect({
+      file: 'apps/__layers-fixture__/src/processors/purge/shell/__fixture__.ts',
+      code: 'import { CorrelationContextHelper } from "@acme-libs/observability";',
+    }).toPassArchitectureLint();
+  });
+});

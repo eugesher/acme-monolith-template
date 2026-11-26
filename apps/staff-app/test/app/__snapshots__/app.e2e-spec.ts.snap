@@ -1,0 +1,2862 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`App Access Permission GET /api/access/permissions should list every permission code 1`] = `
+{
+  "response": {
+    "body": {
+      "codes": [
+        "ledger:read",
+        "access:manage",
+        "product:read",
+        "product:write",
+        "product:archive",
+        "product:restock",
+        "order:read",
+        "order:write",
+        "queue:read",
+        "queue:retry",
+        "queue:delete",
+        "tag:read",
+        "tag:write",
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Access Permission GET /api/access/permissions should refuse a caller without access:manage 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "FORBIDDEN",
+      "details": null,
+      "message": "Insufficient permissions",
+      "statusCode": 403,
+    },
+  },
+}
+`;
+
+exports[`App Access Role GET /api/access/roles should list the roles with their permissions from the database 1`] = `
+{
+  "response": {
+    "body": [
+      {
+        "id": "1",
+        "name": "admin",
+        "permissionCodes": [
+          "access:manage",
+          "ledger:read",
+          "order:read",
+          "order:write",
+          "product:archive",
+          "product:read",
+          "product:restock",
+          "product:write",
+          "queue:delete",
+          "queue:read",
+          "queue:retry",
+          "tag:read",
+          "tag:write",
+        ],
+      },
+      {
+        "id": "2",
+        "name": "editor",
+        "permissionCodes": [
+          "ledger:read",
+          "order:read",
+          "order:write",
+          "product:archive",
+          "product:read",
+          "product:restock",
+          "product:write",
+          "tag:read",
+          "tag:write",
+        ],
+      },
+      {
+        "id": "3",
+        "name": "viewer",
+        "permissionCodes": [
+          "ledger:read",
+          "order:read",
+          "product:read",
+          "queue:read",
+          "tag:read",
+        ],
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Access Role POST /api/access/roles should create a role with an empty permission list 1`] = `
+{
+  "db": {
+    "staff_role": [
+      {
+        "name": "auditor",
+      },
+    ],
+    "staff_role_permissions": [],
+  },
+  "response": {
+    "body": {
+      "id": Any<String>,
+      "name": "auditor",
+      "permissionCodes": [],
+    },
+  },
+}
+`;
+
+exports[`App Access Role POST /api/access/roles should create a role with its permissions and answer 201 1`] = `
+{
+  "db": {
+    "staff_role": [
+      {
+        "name": "auditor",
+      },
+    ],
+    "staff_role_permissions": [
+      {
+        "code": "ledger:read",
+      },
+      {
+        "code": "order:read",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "id": Any<String>,
+      "name": "auditor",
+      "permissionCodes": [
+        "ledger:read",
+        "order:read",
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Access Role POST /api/access/roles should refuse a taken name with 409 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_ROLE_NAME_TAKEN",
+      "details": null,
+      "message": "Role name admin is already taken",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Access Role PUT /api/access/roles/:roleId/permissions should answer 404 for an unknown role 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_ROLE_NOT_FOUND",
+      "details": null,
+      "message": "Role 99 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Access Role PUT /api/access/roles/:roleId/permissions should clear the permissions of the role for an empty list 1`] = `
+{
+  "db": {
+    "staff_role_permissions": [],
+  },
+  "response": {
+    "body": {
+      "id": "3",
+      "name": "viewer",
+      "permissionCodes": [],
+    },
+  },
+}
+`;
+
+exports[`App Access Role PUT /api/access/roles/:roleId/permissions should reassign the permissions and refuse the same token at once 1`] = `
+{
+  "before": {
+    "status": 200,
+  },
+  "db": {
+    "staff_role_permissions": [
+      {
+        "code": "product:write",
+        "role_id": "3",
+      },
+    ],
+  },
+  "ledger": {
+    "code": "FORBIDDEN",
+    "details": null,
+    "message": "Insufficient permissions",
+    "statusCode": 403,
+  },
+  "response": {
+    "body": {
+      "id": "3",
+      "name": "viewer",
+      "permissionCodes": [
+        "product:write",
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Access User POST /api/access/users should create a user who can log in at once 1`] = `
+{
+  "db": {
+    "staff_user": [
+      {
+        "created_at": Any<Date>,
+        "email": "new-viewer@example.com",
+        "id": Any<String>,
+        "password_hash": Any<String>,
+        "status": "active",
+      },
+    ],
+    "staff_user_roles": [
+      {
+        "role_id": "3",
+        "user_id": Any<String>,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "email": "new-viewer@example.com",
+      "id": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Access User POST /api/access/users should create a user without roles for an empty list 1`] = `
+{
+  "db": {
+    "staff_user": [
+      {
+        "email": "no-role@example.com",
+        "id": Any<String>,
+      },
+    ],
+    "staff_user_roles": [],
+  },
+  "response": {
+    "body": {
+      "email": "no-role@example.com",
+      "id": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Access User POST /api/access/users should let one of two simultaneous registrations with one email through and refuse the other with 409 1`] = `
+{
+  "db": {
+    "staff_user": [
+      {
+        "email": "race-viewer@example.com",
+      },
+    ],
+  },
+  "refused": {
+    "body": {
+      "code": "AUTH_EMAIL_TAKEN",
+      "details": null,
+      "message": "Email is already registered",
+      "statusCode": 409,
+    },
+  },
+  "statuses": [
+    201,
+    409,
+  ],
+}
+`;
+
+exports[`App Access User POST /api/access/users should refuse a role that is not stored with 422 and create no user 1`] = `
+{
+  "db": {
+    "staff_user": [],
+  },
+  "response": {
+    "body": {
+      "code": "AUTH_ROLE_NOT_FOUND",
+      "details": null,
+      "message": "Role 99 was not found",
+      "statusCode": 422,
+    },
+  },
+}
+`;
+
+exports[`App Access User POST /api/access/users should refuse a taken email in another case with 409 1`] = `
+{
+  "db": {
+    "staff_user": [
+      {
+        "email": "editor@example.com",
+        "id": "2",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "AUTH_EMAIL_TAKEN",
+      "details": null,
+      "message": "Email is already registered",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Access User PUT /api/access/users/:userId/roles should answer 404 for an unknown user 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_USER_NOT_FOUND",
+      "details": null,
+      "message": "User 99 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Access User PUT /api/access/users/:userId/roles should answer 422 for a role that is not stored and change nothing 1`] = `
+{
+  "db": {
+    "staff_user_roles": [
+      {
+        "role_id": "2",
+        "user_id": "4",
+      },
+      {
+        "role_id": "3",
+        "user_id": "4",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "AUTH_ROLE_NOT_FOUND",
+      "details": null,
+      "message": "Role 99 was not found",
+      "statusCode": 422,
+    },
+  },
+}
+`;
+
+exports[`App Access User PUT /api/access/users/:userId/roles should clear the roles with an empty list and answer 200 1`] = `
+{
+  "db": {
+    "staff_user_roles": [],
+  },
+  "response": {
+    "body": {
+      "id": "4",
+      "roleIds": [],
+    },
+  },
+}
+`;
+
+exports[`App Access User PUT /api/access/users/:userId/roles should reassign the roles and answer 200 1`] = `
+{
+  "db": {
+    "staff_user_roles": [
+      {
+        "role_id": "2",
+        "user_id": "4",
+      },
+      {
+        "role_id": "3",
+        "user_id": "4",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "id": "4",
+      "roleIds": [
+        "2",
+        "3",
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Auth GET /api/auth/me should refuse a caller without a token 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
+      "message": "Unauthorized",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Auth GET /api/auth/me should refuse the token of a customer signed with the secret of this app 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
+      "message": "Unauthorized",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Auth GET /api/auth/me should refuse the token of a disabled user 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
+      "message": "Unauthorized",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Auth GET /api/auth/me should refuse the token of a staff user issued for the customer audience 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "UNAUTHORIZED",
+      "details": null,
+      "message": "Unauthorized",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Auth GET /api/auth/me should take the roles from the database, not from the token claims 1`] = `
+{
+  "response": {
+    "body": {
+      "email": "viewer@example.com",
+      "id": "3",
+      "roles": [
+        "viewer",
+      ],
+    },
+  },
+  "roles": {
+    "code": "FORBIDDEN",
+    "details": null,
+    "message": "Insufficient permissions",
+    "statusCode": 403,
+  },
+}
+`;
+
+exports[`App Auth POST /api/auth/login should answer 429 to an address that spends the auth limit and keep serving another address 1`] = `
+{
+  "blocked": {
+    "body": {
+      "code": "TOO_MANY_REQUESTS",
+      "details": null,
+      "message": "Too many requests",
+      "statusCode": 429,
+    },
+    "retryAfter": StringMatching /\\^\\\\d\\+\\$/,
+  },
+  "other": {
+    "body": {
+      "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
+      "message": "Invalid credentials",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Auth POST /api/auth/login should issue an access token of the subject alone, valid for the lifetime of this app 1`] = `
+{
+  "audience": "staff",
+  "claims": [
+    "aud",
+    "exp",
+    "iat",
+    "sub",
+  ],
+  "lifetime": 43200,
+  "me": {
+    "email": "editor@example.com",
+    "id": "2",
+    "roles": [
+      "editor",
+    ],
+  },
+  "response": {
+    "body": {
+      "accessToken": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Auth POST /api/auth/login should refuse a disabled user with 403 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_USER_INACTIVE",
+      "details": null,
+      "message": "User 4 is disabled",
+      "statusCode": 403,
+    },
+  },
+}
+`;
+
+exports[`App Auth POST /api/auth/login should refuse a wrong password with the same 401 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
+      "message": "Invalid credentials",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Auth POST /api/auth/login should refuse an empty body with 400 from validation 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "email",
+            "messages": [
+              "email must be shorter than or equal to 255 characters",
+              "email must be an email",
+            ],
+          },
+          {
+            "field": "password",
+            "messages": [
+              "password must be shorter than or equal to 256 characters",
+              "password must be longer than or equal to 1 characters",
+              "password must be a string",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Auth POST /api/auth/login should refuse an unknown email with the same 401 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "AUTH_INVALID_CREDENTIALS",
+      "details": null,
+      "message": "Invalid credentials",
+      "statusCode": 401,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product GET /api/catalog/products should list only the products that carry the tag 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 2,
+      "data": [
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "101",
+          "name": "Seeded draft product",
+          "sku": "SKU-0002",
+          "status": "draft",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "100",
+          "name": "Seeded reference product",
+          "sku": "SKU-0001",
+          "status": "active",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 2,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product GET /api/catalog/products should list the catalog, newest first 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 7,
+      "data": [
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "106",
+          "name": "Sold out product",
+          "sku": "SKU-0007",
+          "status": "active",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "105",
+          "name": "Archived product",
+          "sku": "SKU-0006",
+          "status": "archived",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 2,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "104",
+          "name": "Product under concurrent renames",
+          "sku": "SKU-0005",
+          "status": "draft",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "103",
+          "name": "Product to archive",
+          "sku": "SKU-0004",
+          "status": "active",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "102",
+          "name": "Product to rename",
+          "sku": "SKU-0003",
+          "status": "draft",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "101",
+          "name": "Seeded draft product",
+          "sku": "SKU-0002",
+          "status": "draft",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "100",
+          "name": "Seeded reference product",
+          "sku": "SKU-0001",
+          "status": "active",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 7,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product GET /api/catalog/products/:productId should answer an unknown product with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "PRODUCT_NOT_FOUND",
+      "details": null,
+      "message": "Product 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product GET /api/catalog/products/:productId should read a product 1`] = `
+{
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "102",
+      "name": "Product to rename",
+      "sku": "SKU-0003",
+      "status": "draft",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product GET /api/catalog/products/:productId/tags should answer an unknown product with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "PRODUCT_NOT_FOUND",
+      "details": null,
+      "message": "Product 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product GET /api/catalog/products/:productId/tags should read the tags of the product, by name 1`] = `
+{
+  "response": {
+    "body": {
+      "tags": [
+        {
+          "id": "300",
+          "name": "fragile",
+        },
+        {
+          "id": "301",
+          "name": "promo",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PATCH /api/catalog/products/:productId should apply every one of concurrent updates without If-Match 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "id": "104",
+        "version": 6,
+      },
+    ],
+  },
+  "statuses": [
+    200,
+    200,
+    200,
+    200,
+    200,
+  ],
+}
+`;
+
+exports[`App Catalog Product PATCH /api/catalog/products/:productId should keep the product as is for a body without fields 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "101",
+        "name": "Seeded draft product",
+        "sku": "SKU-0002",
+        "status": "draft",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "101",
+      "name": "Seeded draft product",
+      "sku": "SKU-0002",
+      "status": "draft",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PATCH /api/catalog/products/:productId should refuse a malformed If-Match with 400 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "IF_MATCH_INVALID",
+      "details": null,
+      "message": "The If-Match header must be a non-negative integer version",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PATCH /api/catalog/products/:productId should refuse a stale If-Match with 412 and the current version 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "101",
+        "name": "Seeded draft product",
+        "sku": "SKU-0002",
+        "status": "draft",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "VERSION_MISMATCH",
+      "details": {
+        "currentVersion": 1,
+      },
+      "message": "Product 101: If-Match version 0 does not match the current version 1",
+      "statusCode": 412,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PATCH /api/catalog/products/:productId should update the name with a quoted If-Match, bump the version and drop the cached customer catalog 1`] = `
+{
+  "cache": {
+    "keys": [],
+  },
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "102",
+        "name": "Renamed product",
+        "sku": "SKU-0003",
+        "status": "draft",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "102",
+      "name": "Renamed product",
+      "sku": "SKU-0003",
+      "status": "draft",
+      "updatedAt": Any<String>,
+      "version": 2,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products should create a draft and queue the ledger record under the correlation id 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "created_at": Any<Date>,
+        "id": Any<String>,
+        "name": "Created product",
+        "sku": "E2E-0001",
+        "status": "draft",
+        "updated_at": Any<Date>,
+        "version": 1,
+      },
+    ],
+  },
+  "ledger_append_queue": [
+    {
+      "action": "ProductCreated",
+      "correlationId": "e2e00000-0000-4000-8000-000000000014",
+      "occurredAt": Any<String>,
+      "operationKey": Any<String>,
+      "payload": {
+        "name": "Created product",
+        "sku": "E2E-0001",
+      },
+      "subjectId": Any<String>,
+      "subjectType": "product",
+    },
+  ],
+  "response": {
+    "body": {
+      "createdAt": Any<String>,
+      "id": Any<String>,
+      "name": "Created product",
+      "sku": "E2E-0001",
+      "status": "draft",
+      "updatedAt": Any<String>,
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products should refuse a taken sku with 409 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "id": "100",
+        "name": "Seeded reference product",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "PRODUCT_SKU_TAKEN",
+      "details": null,
+      "message": "Product sku SKU-0001 is already registered",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/archive should archive, queue one ledger record under the correlation id and drop the cached customer catalog 1`] = `
+{
+  "cache": {
+    "keys": [],
+  },
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "103",
+        "name": "Product to archive",
+        "sku": "SKU-0004",
+        "status": "archived",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+  },
+  "ledger_append_queue": [
+    {
+      "action": "ProductArchived",
+      "correlationId": "e2e00000-0000-4000-8000-000000000015",
+      "occurredAt": Any<String>,
+      "operationKey": "product-archived:103:2",
+      "payload": {
+        "previousStatus": "active",
+        "sku": "SKU-0004",
+      },
+      "subjectId": "103",
+      "subjectType": "product",
+    },
+  ],
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "103",
+      "name": "Product to archive",
+      "sku": "SKU-0004",
+      "status": "archived",
+      "updatedAt": Any<String>,
+      "version": 2,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/archive should refuse to archive an archived product with 409 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "105",
+        "name": "Archived product",
+        "sku": "SKU-0006",
+        "status": "archived",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 2,
+      },
+    ],
+  },
+  "ledger_append_queue": [],
+  "response": {
+    "body": {
+      "code": "PRODUCT_ALREADY_ARCHIVED",
+      "details": null,
+      "message": "Product 105 is already archived",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should answer 404 for an unknown product 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "PRODUCT_NOT_FOUND",
+      "details": null,
+      "message": "Product 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should keep a published product as is and queue nothing 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "100",
+        "name": "Seeded reference product",
+        "sku": "SKU-0001",
+        "status": "active",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "ledger_append_queue": [],
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "100",
+      "name": "Seeded reference product",
+      "sku": "SKU-0001",
+      "status": "active",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should publish a draft, queue one ledger record under the correlation id and drop the cached customer catalog 1`] = `
+{
+  "cache": {
+    "keys": [],
+  },
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "101",
+        "name": "Seeded draft product",
+        "sku": "SKU-0002",
+        "status": "active",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+  },
+  "ledger_append_queue": [
+    {
+      "action": "ProductPublished",
+      "correlationId": "e2e00000-0000-4000-8000-000000000016",
+      "occurredAt": Any<String>,
+      "operationKey": "product-published:101:2",
+      "payload": {
+        "previousStatus": "draft",
+        "sku": "SKU-0002",
+      },
+      "subjectId": "101",
+      "subjectType": "product",
+    },
+  ],
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "101",
+      "name": "Seeded draft product",
+      "sku": "SKU-0002",
+      "status": "active",
+      "updatedAt": Any<String>,
+      "version": 2,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should publish an archived product again under a ledger record of its new version 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "105",
+        "name": "Archived product",
+        "sku": "SKU-0006",
+        "status": "active",
+        "updated_at": Any<Date>,
+        "version": 3,
+      },
+    ],
+  },
+  "ledger_append_queue": [
+    {
+      "action": "ProductPublished",
+      "correlationId": "e2e00000-0000-4000-8000-000000000017",
+      "occurredAt": Any<String>,
+      "operationKey": "product-published:105:3",
+      "payload": {
+        "previousStatus": "archived",
+        "sku": "SKU-0006",
+      },
+      "subjectId": "105",
+      "subjectType": "product",
+    },
+  ],
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "105",
+      "name": "Archived product",
+      "sku": "SKU-0006",
+      "status": "active",
+      "updatedAt": Any<String>,
+      "version": 3,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should answer an unknown product with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "PRODUCT_NOT_FOUND",
+      "details": null,
+      "message": "Product 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should link the tags of the body and answer them by name 1`] = `
+{
+  "db": {
+    "tag_subject": [
+      {
+        "subject_id": "103",
+        "subject_type": "product",
+        "tag_id": "300",
+      },
+      {
+        "subject_id": "103",
+        "subject_type": "product",
+        "tag_id": "301",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "tags": [
+        {
+          "id": "300",
+          "name": "fragile",
+        },
+        {
+          "id": "301",
+          "name": "promo",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should refuse an unknown tag with 422 and keep the tags the product had 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "PRODUCT_TAG_NOT_FOUND",
+      "details": {
+        "missingTagIds": [
+          "998",
+          "999",
+        ],
+      },
+      "message": "Some of the tags do not exist",
+      "statusCode": 422,
+    },
+  },
+  "tags": {
+    "tags": [
+      {
+        "id": "300",
+        "name": "fragile",
+      },
+      {
+        "id": "301",
+        "name": "promo",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Catalog Product PUT /api/catalog/products/:productId/tags should replace the tags the product had and clear them with an empty list 1`] = `
+{
+  "cleared": {
+    "tags": [],
+  },
+  "db": {
+    "tag_subject": [],
+  },
+  "replaced": {
+    "tags": [
+      {
+        "id": "301",
+        "name": "promo",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Health GET /api/health should answer the preflight of an origin of HTTP_CORS_ORIGINS 1`] = `
+{
+  "headers": {
+    "access-control-allow-methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "access-control-allow-origin": "https://app.example.test",
+    "access-control-expose-headers": "x-correlation-id,Retry-After,Retry-After-auth",
+  },
+}
+`;
+
+exports[`App Health GET /api/health should report liveness and mint a correlation id 1`] = `
+{
+  "response": {
+    "body": {
+      "app": "staff-app",
+      "status": "ok",
+      "uptimeSeconds": Any<Number>,
+    },
+  },
+}
+`;
+
+exports[`App Health GET /api/health should set the security headers of helmet 1`] = `
+{
+  "headers": {
+    "content-security-policy": "default-src 'none';frame-ancestors 'none'",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-powered-by": undefined,
+  },
+}
+`;
+
+exports[`App Health GET /api/health/ready should report readiness of the database and the cache 1`] = `
+{
+  "response": {
+    "body": {
+      "app": "staff-app",
+      "dependencies": {
+        "cache": {
+          "latencyMs": Any<Number>,
+          "status": "ok",
+        },
+        "database": {
+          "latencyMs": Any<Number>,
+          "status": "ok",
+        },
+      },
+      "status": "ready",
+    },
+  },
+}
+`;
+
+exports[`App Ledger GET /api/ledger should list the entries of one correlation id 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "action": "ProductCreated",
+          "correlationId": "e2e00000-0000-4000-8000-000000000026",
+          "id": "490",
+          "occurredAt": "2026-01-07T08:00:00.000Z",
+          "operationKey": "e2e-ledger:1",
+          "payload": {},
+          "recordedAt": "2026-01-07T08:00:00.000Z",
+          "subjectId": "101",
+          "subjectType": "product",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
+exports[`App Ledger GET /api/ledger should list the entries of one subject 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "action": "ProductCreated",
+          "correlationId": "5eed0000-0000-4000-8000-000000000001",
+          "id": "400",
+          "occurredAt": "2026-01-01T00:00:00.000Z",
+          "operationKey": "product-created:100",
+          "payload": {
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
+          "recordedAt": "2026-01-01T00:00:00.000Z",
+          "subjectId": "100",
+          "subjectType": "product",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
+exports[`App Ledger GET /api/ledger should refuse a malformed page with 400 from validation 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "page",
+            "messages": [
+              "page must be a positive number",
+              "page must be an integer number",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should delete a failed job 1`] = `
+{
+  "failed": 0,
+  "state": "unknown",
+}
+`;
+
+exports[`App Queue DELETE /api/queues/:queueName/jobs/failed/:jobId should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "QUEUE_JOB_NOT_FOUND",
+      "details": null,
+      "message": "Job 999999 was not found in queue ledger-append",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Queue GET /api/queues should list the queues with their job counts 1`] = `
+{
+  "response": {
+    "body": [
+      {
+        "jobCounts": {
+          "active": 0,
+          "completed": 0,
+          "delayed": 0,
+          "failed": 0,
+          "waiting": 0,
+        },
+        "name": "ledger-append",
+        "paused": false,
+      },
+      {
+        "jobCounts": {
+          "active": 0,
+          "completed": 0,
+          "delayed": 0,
+          "failed": 0,
+          "waiting": 0,
+        },
+        "name": "product-stock-post-subtract",
+        "paused": false,
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Queue GET /api/queues/:queueName/jobs/failed should answer a page of the failed jobs with the reason and the instants of the failure 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "attempts": 1,
+          "attemptsMade": 1,
+          "createdAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
+          "data": {
+            "action": "ProductCreated",
+            "correlationId": "e2e00000-0000-4000-8000-000000000009",
+            "occurredAt": "2026-01-06T08:00:00.000Z",
+            "operationKey": "e2e-queue:1",
+            "payload": {},
+            "subjectId": "200",
+            "subjectType": "product",
+          },
+          "failedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
+          "failedReason": "The e2e case failed the record",
+          "id": StringMatching /\\^\\\\d\\+\\$/,
+          "name": "ledger-append",
+          "processedAt": StringMatching /\\^\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}T\\\\d\\{2\\}:\\\\d\\{2\\}:\\\\d\\{2\\}\\\\\\.\\\\d\\{3\\}Z\\$/,
+          "stacktrace": [
+            Any<String>,
+          ],
+        },
+      ],
+      "limit": 10,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
+exports[`App Queue GET /api/queues/:queueName/jobs/failed should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "QUEUE_NOT_FOUND",
+      "details": null,
+      "message": "Queue unknown was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse a job that is not failed with 409 QUEUE_JOB_NOT_FAILED 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "QUEUE_JOB_NOT_FAILED",
+      "details": null,
+      "message": StringMatching /\\^Job \\\\S\\+ of queue ledger-append is delayed, not failed\\$/,
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "QUEUE_JOB_NOT_FOUND",
+      "details": null,
+      "message": "Job 999999 was not found in queue ledger-append",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should refuse an unknown queue with 404 QUEUE_NOT_FOUND 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "QUEUE_NOT_FOUND",
+      "details": null,
+      "message": "Queue unknown was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should return a failed record to the queue 1`] = `
+{
+  "failed": 0,
+  "records": [
+    {
+      "action": "ProductArchived",
+      "correlationId": "e2e00000-0000-4000-8000-000000000010",
+      "occurredAt": "2026-01-06T09:00:00.000Z",
+      "operationKey": "e2e-queue:2",
+      "payload": {
+        "previousStatus": "active",
+        "sku": "SKU-0004",
+      },
+      "subjectId": "201",
+      "subjectType": "product",
+    },
+  ],
+  "state": "waiting",
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders should answer the page window it was asked for 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "customerId": "102",
+          "id": "601",
+        },
+      ],
+      "limit": 1,
+      "page": 2,
+      "pageCount": 3,
+      "total": 3,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders should list only the orders that carry the tag 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "customerId": "101",
+          "id": "600",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders should list the orders of every customer, newest first 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 3,
+      "data": [
+        {
+          "createdAt": "2026-01-02T00:00:00.000Z",
+          "customerId": "102",
+          "id": "602",
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "customerId": "102",
+          "id": "601",
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "customerId": "101",
+          "id": "600",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 3,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders/:orderId should answer an unknown order with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "ORDER_NOT_FOUND",
+      "details": null,
+      "message": "Order 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders/:orderId should read the order of any customer with its products 1`] = `
+{
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "customerId": "101",
+      "id": "600",
+      "orderProducts": [
+        {
+          "id": "600",
+          "product": {
+            "id": "100",
+            "name": "Seeded reference product",
+            "sku": "SKU-0001",
+          },
+        },
+        {
+          "id": "601",
+          "product": {
+            "id": "106",
+            "name": "Sold out product",
+            "sku": "SKU-0007",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders/:orderId should refuse a malformed order id with 400 from validation 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "orderId",
+            "messages": [
+              "orderId must be a positive integer",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders/:orderId/tags should answer an unknown order with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "ORDER_NOT_FOUND",
+      "details": null,
+      "message": "Order 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order GET /api/sales/orders/:orderId/tags should read the tags of the order, by name 1`] = `
+{
+  "response": {
+    "body": {
+      "tags": [
+        {
+          "id": "302",
+          "name": "vip",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should answer an unknown order with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "ORDER_NOT_FOUND",
+      "details": null,
+      "message": "Order 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should link the tags of the body and answer them by name 1`] = `
+{
+  "db": {
+    "tag_subject": [
+      {
+        "subject_id": "601",
+        "subject_type": "order",
+        "tag_id": "300",
+      },
+      {
+        "subject_id": "601",
+        "subject_type": "order",
+        "tag_id": "302",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "tags": [
+        {
+          "id": "300",
+          "name": "fragile",
+        },
+        {
+          "id": "302",
+          "name": "vip",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should refuse an unknown tag with 422 and keep the tags the order had 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "ORDER_TAG_NOT_FOUND",
+      "details": {
+        "missingTagIds": [
+          "998",
+          "999",
+        ],
+      },
+      "message": "Some of the tags do not exist",
+      "statusCode": 422,
+    },
+  },
+  "tags": {
+    "tags": [
+      {
+        "id": "302",
+        "name": "vip",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Sales Order PUT /api/sales/orders/:orderId/tags should replace the tags the order had and clear them with an empty list 1`] = `
+{
+  "cleared": {
+    "tags": [],
+  },
+  "db": {
+    "tag_subject": [],
+  },
+  "replaced": {
+    "tags": [
+      {
+        "id": "300",
+        "name": "fragile",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Tools Note DELETE /api/tools/notes/:noteId should hide the note of another staff user with 404 and delete nothing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 204 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note DELETE /api/tools/notes/:noteId should soft-delete a note and hide it from every read 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Customer called twice; refunded manually.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": Any<Date>,
+        "id": "200",
+        "resolved": 0,
+        "subject_id": "100",
+        "subject_type": "product",
+        "updated_at": Any<Date>,
+        "version": 3,
+      },
+    ],
+  },
+  "getOne": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 200 was not found",
+      "statusCode": 404,
+    },
+  },
+  "getRevisions": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 200 was not found",
+      "statusCode": 404,
+    },
+  },
+  "response": {
+    "body": {},
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes should filter by resolution 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "authorId": "1",
+          "body": "Already handled.",
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "202",
+          "resolved": true,
+          "subjectId": "101",
+          "subjectType": "product",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 2,
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes should list only the notes of the caller, with no permission needed 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 0,
+      "data": [],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 0,
+      "total": 0,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes should list the notes of one subject, newest first 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 2,
+      "data": [
+        {
+          "authorId": "1",
+          "body": "Check the supplier.",
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "201",
+          "resolved": false,
+          "subjectId": "100",
+          "subjectType": "product",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+        {
+          "authorId": "1",
+          "body": "Customer called about this.",
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "200",
+          "resolved": false,
+          "subjectId": "100",
+          "subjectType": "product",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+          "version": 1,
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 2,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes should refuse half of a subject filter with 400 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "NOTE_SUBJECT_INVALID",
+      "details": null,
+      "message": "A subject filter needs both subjectType and subjectId, or neither",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes/:noteId should answer 404 for a missing note 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 299 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes/:noteId should hide the note of another staff user with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 200 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes/:noteId should read one note 1`] = `
+{
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Already handled.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "202",
+      "resolved": true,
+      "subjectId": "101",
+      "subjectType": "product",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "version": 2,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes/:noteId/revisions should answer 404 for the revisions of a missing note 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 299 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes/:noteId/revisions should hide the revisions of a note of another staff user with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 202 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note GET /api/tools/notes/:noteId/revisions should list the revisions of a note 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "bodyAfter": "Already handled.",
+          "bodyBefore": "Handled soon.",
+          "correlationId": "5eed0000-0000-4000-8000-000000000001",
+          "editorId": "1",
+          "id": "200",
+          "noteId": "202",
+          "noteVersion": 2,
+          "recordedAt": "2026-01-01T00:00:00.000Z",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should answer 500 and roll the note back when the revision table is missing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated while a revision is taken.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "203",
+        "resolved": 0,
+        "subject_id": "T-1",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "INTERNAL_SERVER_ERROR",
+      "details": null,
+      "message": "Internal Server Error",
+      "statusCode": 500,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should hide the note of another staff user with 404 and write nothing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+    "note_revision": [],
+  },
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 204 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse a stale If-Match with 412 and the current version and write nothing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+    "note_revision": [],
+  },
+  "response": {
+    "body": {
+      "code": "VERSION_MISMATCH",
+      "details": {
+        "currentVersion": 1,
+      },
+      "message": "Note 204: If-Match version 7 does not match the current version 1",
+      "statusCode": 412,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to update a resolved note with 409 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Already handled.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "202",
+        "resolved": 1,
+        "subject_id": "101",
+        "subject_type": "product",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 2,
+      },
+    ],
+    "note_revision": [
+      {
+        "body_after": "Already handled.",
+        "body_before": "Handled soon.",
+        "correlation_id": "5eed0000-0000-4000-8000-000000000001",
+        "editor_id": "1",
+        "id": "200",
+        "note_id": "202",
+        "note_version": 2,
+        "recorded_at": 2026-01-01T00:00:00.000Z,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "NOTE_RESOLVED",
+      "details": null,
+      "message": "Note 202 is resolved and can no longer be modified",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should rewrite the body under a matching If-Match and record a revision under the correlation id 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Customer called twice; refunded manually.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "200",
+        "resolved": 0,
+        "subject_id": "100",
+        "subject_type": "product",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+    "note_revision": [
+      {
+        "body_after": "Customer called twice; refunded manually.",
+        "body_before": "Customer called about this.",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000018",
+        "editor_id": "1",
+        "id": Any<String>,
+        "note_id": "200",
+        "note_version": 2,
+        "recorded_at": Any<Date>,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Customer called twice; refunded manually.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "200",
+      "resolved": false,
+      "subjectId": "100",
+      "subjectType": "product",
+      "updatedAt": Any<String>,
+      "version": 2,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should roll the note back when the revision insert fails 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated while a revision is taken.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "203",
+        "resolved": 0,
+        "subject_id": "T-1",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+    "note_revision": [
+      {
+        "body_after": "Taken after.",
+        "id": "299",
+        "note_id": "203",
+        "note_version": 2,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "CONFLICT",
+      "details": null,
+      "message": "Resource already exists",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for an update to the current body 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+    "note_revision": [],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Updated with the same body.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "204",
+      "resolved": false,
+      "subjectId": "T-2",
+      "subjectType": "ticket",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes should create an unresolved note on an opaque subject 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Customer called.",
+        "created_at": Any<Date>,
+        "deleted_at": null,
+        "id": Any<String>,
+        "resolved": 0,
+        "subject_id": "T-900",
+        "subject_type": "support-ticket",
+        "updated_at": Any<Date>,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Customer called.",
+      "createdAt": Any<String>,
+      "id": Any<String>,
+      "resolved": false,
+      "subjectId": "T-900",
+      "subjectType": "support-ticket",
+      "updatedAt": Any<String>,
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should hide the note of another staff user with 404 and resolve nothing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "NOTE_NOT_FOUND",
+      "details": null,
+      "message": "Note 204 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse a stale If-Match with 412 and resolve nothing 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated with the same body.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "204",
+        "resolved": 0,
+        "subject_id": "T-2",
+        "subject_type": "ticket",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "VERSION_MISMATCH",
+      "details": {
+        "currentVersion": 1,
+      },
+      "message": "Note 204: If-Match version 7 does not match the current version 1",
+      "statusCode": 412,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse to resolve a resolved note with 409 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Already handled.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "202",
+        "resolved": 1,
+        "subject_id": "101",
+        "subject_type": "product",
+        "updated_at": 2026-01-01T00:00:00.000Z,
+        "version": 2,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "NOTE_RESOLVED",
+      "details": null,
+      "message": "Note 202 is resolved and can no longer be modified",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should resolve a note under a matching If-Match 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Check the supplier.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "201",
+        "resolved": 1,
+        "subject_id": "100",
+        "subject_type": "product",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Check the supplier.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "201",
+      "resolved": true,
+      "subjectId": "100",
+      "subjectType": "product",
+      "updatedAt": Any<String>,
+      "version": 2,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag DELETE /api/tools/tags/:tagId should answer an unknown tag with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "TAG_NOT_FOUND",
+      "details": null,
+      "message": "Tag 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag GET /api/tools/tags should answer the page window it was asked for 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 1,
+      "data": [
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "302",
+          "name": "vip",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+        },
+      ],
+      "limit": 2,
+      "page": 2,
+      "pageCount": 2,
+      "total": 3,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag GET /api/tools/tags should list the tags by name 1`] = `
+{
+  "response": {
+    "body": {
+      "count": 3,
+      "data": [
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "300",
+          "name": "fragile",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "301",
+          "name": "promo",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+        },
+        {
+          "createdAt": "2026-01-01T00:00:00.000Z",
+          "id": "302",
+          "name": "vip",
+          "updatedAt": "2026-01-01T00:00:00.000Z",
+        },
+      ],
+      "limit": 20,
+      "page": 1,
+      "pageCount": 1,
+      "total": 3,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag PATCH /api/tools/tags/:tagId should answer an unknown tag with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "TAG_NOT_FOUND",
+      "details": null,
+      "message": "Tag 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag PATCH /api/tools/tags/:tagId should answer the tag as it is when the name does not change 1`] = `
+{
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "390",
+      "name": "seasonal",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag PATCH /api/tools/tags/:tagId should refuse the name of another tag with 409 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "TAG_NAME_TAKEN",
+      "details": null,
+      "message": "A tag named vip already exists",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag PATCH /api/tools/tags/:tagId should update the tag 1`] = `
+{
+  "db": {
+    "tag": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "390",
+        "name": "winter",
+        "updated_at": Any<Date>,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "390",
+      "name": "winter",
+      "updatedAt": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag POST /api/tools/tags should create a tag with the trimmed name 1`] = `
+{
+  "db": {
+    "tag": [
+      {
+        "created_at": Any<Date>,
+        "id": Any<String>,
+        "name": "heavy",
+        "updated_at": Any<Date>,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "createdAt": Any<String>,
+      "id": Any<String>,
+      "name": "heavy",
+      "updatedAt": Any<String>,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag POST /api/tools/tags should refuse a name of spaces with 400 from the domain 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "TAG_NAME_INVALID",
+      "details": null,
+      "message": "Tag.name must be a non-empty string of at most 64 characters",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Tools Tag POST /api/tools/tags should refuse a name that differs from a taken one only in case with 409 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "TAG_NAME_TAKEN",
+      "details": null,
+      "message": "A tag named Fragile already exists",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should add the units to a sold-out product, record the key, queue the ledger record under the correlation id and keep the cached customer catalog 1`] = `
+{
+  "cache": {
+    "keys": [
+      "acme:catalog:v1:page:1:limit:20",
+    ],
+  },
+  "db": {
+    "idempotency_key": [
+      {
+        "created_at": Any<Date>,
+        "id": Any<String>,
+        "idempotency_key": "e2e-restock-key",
+        "request_fingerprint": "f221eaac047dc3cc80d8c9ee9d9c752481cb15973ff880c71519f4158a3ec24e",
+        "response_body": Any<String>,
+        "scope": "staff:2",
+        "status": "completed",
+      },
+    ],
+    "product_stock": [
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "701",
+        "order_product_id": null,
+        "product_id": "106",
+        "quantity": 1,
+      },
+      {
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "id": "703",
+        "order_product_id": "601",
+        "product_id": "106",
+        "quantity": -1,
+      },
+      {
+        "created_at": Any<Date>,
+        "id": Any<String>,
+        "order_product_id": null,
+        "product_id": "106",
+        "quantity": 5,
+      },
+    ],
+  },
+  "ledger_append_queue": [
+    {
+      "action": "ProductRestocked",
+      "correlationId": "e2e00000-0000-4000-8000-000000000013",
+      "occurredAt": Any<String>,
+      "operationKey": Any<String>,
+      "payload": {
+        "quantity": 5,
+        "sku": "SKU-0007",
+      },
+      "subjectId": "106",
+      "subjectType": "product",
+    },
+  ],
+  "response": {
+    "body": {
+      "productId": "106",
+      "quantity": 5,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should answer an unknown product with 404 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "PRODUCT_STOCK_PRODUCT_NOT_FOUND",
+      "details": null,
+      "message": "Product 999 was not found",
+      "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a key still in flight with 409 and add nothing 1`] = `
+{
+  "db": {
+    "idempotency_key": [
+      {
+        "response_body": null,
+        "scope": "staff:2",
+        "status": "in_flight",
+      },
+    ],
+    "product_stock": [],
+  },
+  "response": {
+    "body": {
+      "code": "IDEMPOTENT_REQUEST_IN_FLIGHT",
+      "details": null,
+      "message": "Idempotency-Key e2e-restock-in-flight-key is still being processed, retry shortly",
+      "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse a restock without a key with 400 1`] = `
+{
+  "response": {
+    "body": {
+      "code": "IDEMPOTENCY_KEY_REQUIRED",
+      "details": null,
+      "message": "The Idempotency-Key header is required for this operation",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should refuse the same key with another quantity with 422 1`] = `
+{
+  "db": {
+    "product_stock": [
+      {
+        "product_id": "102",
+        "quantity": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "code": "IDEMPOTENCY_KEY_REUSED",
+      "details": null,
+      "message": "Idempotency-Key e2e-restock-reuse-key was already used with a different request body",
+      "statusCode": 422,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should replay the same response for the same key and body without a second movement 1`] = `
+{
+  "db": {
+    "product_stock": [
+      {
+        "order_product_id": null,
+        "product_id": "100",
+        "quantity": 10,
+      },
+      {
+        "order_product_id": "600",
+        "product_id": "100",
+        "quantity": -1,
+      },
+      {
+        "order_product_id": "602",
+        "product_id": "100",
+        "quantity": -1,
+      },
+      {
+        "order_product_id": null,
+        "product_id": "100",
+        "quantity": 2,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "productId": "100",
+      "quantity": 10,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should restock a draft 1`] = `
+{
+  "response": {
+    "body": {
+      "productId": "101",
+      "quantity": 8,
+    },
+  },
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should restock an archived product and leave it archived 1`] = `
+{
+  "db": {
+    "product": [
+      {
+        "id": "105",
+        "status": "archived",
+        "version": 2,
+      },
+    ],
+    "product_stock": [
+      {
+        "quantity": 4,
+      },
+      {
+        "quantity": 5,
+      },
+    ],
+  },
+  "ledger_append_queue": [
+    "ProductRestocked",
+  ],
+  "response": {
+    "body": {
+      "productId": "105",
+      "quantity": 9,
+    },
+  },
+}
+`;

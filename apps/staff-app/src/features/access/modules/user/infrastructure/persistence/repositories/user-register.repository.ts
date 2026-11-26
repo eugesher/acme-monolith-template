@@ -1,0 +1,55 @@
+import { Injectable, type ClassProvider } from '@nestjs/common';
+
+import { MysqlErrorHelper } from '@acme-libs/toolkit';
+
+import {
+  USER_REGISTER_REPOSITORY_PORT,
+  UserRegisterStaffUserInsertOutcomeEnum,
+  type IUserRegisterRepositoryPort,
+  type IUserRegisterStaffRoleRecord,
+  type IUserRegisterStaffUserInsertQuery,
+  type IUserRegisterStaffUserInsertRecord,
+  type IUserRegisterStaffUserRoleInsertQuery,
+} from '../../../outbound';
+import { UserPersistenceHost } from '../host/user-persistence.host';
+
+@Injectable()
+export class UserRegisterRepository
+  extends UserPersistenceHost
+  implements IUserRegisterRepositoryPort
+{
+  public static readonly PROVIDER: ClassProvider<IUserRegisterRepositoryPort> = {
+    provide: USER_REGISTER_REPOSITORY_PORT,
+    useClass: UserRegisterRepository,
+  };
+
+  public async insertUser(
+    query: IUserRegisterStaffUserInsertQuery,
+  ): Promise<IUserRegisterStaffUserInsertRecord> {
+    const userId = await MysqlErrorHelper.catchDuplicateKey(() =>
+      this.staffUserRepository.insertOne(query),
+    );
+
+    if (userId === null) {
+      return { outcome: UserRegisterStaffUserInsertOutcomeEnum.DUPLICATE };
+    }
+
+    return { outcome: UserRegisterStaffUserInsertOutcomeEnum.INSERTED, id: userId };
+  }
+
+  public async findMany(ids: readonly string[]): Promise<IUserRegisterStaffRoleRecord[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    return await this.createStaffRoleBuilder().forMany(ids).getMany();
+  }
+
+  public async insertUserRoles(queries: IUserRegisterStaffUserRoleInsertQuery[]): Promise<void> {
+    if (queries.length === 0) {
+      return;
+    }
+
+    await this.staffUserRoleRepository.insert(queries);
+  }
+}

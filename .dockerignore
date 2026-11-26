@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.yarn/cache
+.yarn/install-state.gz
+.husky
+jest
+coverage
+**/.env.test
+**/.env

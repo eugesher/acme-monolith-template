@@ -1,0 +1,202 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`App Health GET /api/health should answer the preflight of an origin of HTTP_CORS_ORIGINS 1`] = `
+{
+  "headers": {
+    "access-control-allow-methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "access-control-allow-origin": "https://app.example.test",
+    "access-control-expose-headers": "x-correlation-id,Retry-After,Retry-After-auth",
+  },
+}
+`;
+
+exports[`App Health GET /api/health should report liveness and mint a correlation id 1`] = `
+{
+  "response": {
+    "body": {
+      "app": "processor-app",
+      "status": "ok",
+      "uptimeSeconds": Any<Number>,
+    },
+  },
+}
+`;
+
+exports[`App Health GET /api/health should set the security headers of helmet 1`] = `
+{
+  "headers": {
+    "content-security-policy": "default-src 'none';frame-ancestors 'none'",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-powered-by": undefined,
+  },
+}
+`;
+
+exports[`App Health GET /api/health/ready should report readiness of the database and the cache 1`] = `
+{
+  "response": {
+    "body": {
+      "app": "processor-app",
+      "dependencies": {
+        "cache": {
+          "latencyMs": Any<Number>,
+          "status": "ok",
+        },
+        "database": {
+          "latencyMs": Any<Number>,
+          "status": "ok",
+        },
+      },
+      "status": "ready",
+    },
+  },
+}
+`;
+
+exports[`App Idempotency queue idempotency-purge should purge the in-flight keys older than the in-flight TTL and keep the rest 1`] = `
+{
+  "db": {
+    "idempotency_key": [
+      {
+        "idempotency_key": "e2e-stuck-completed",
+        "status": "completed",
+      },
+      {
+        "idempotency_key": "e2e-stuck-fresh",
+        "status": "in_flight",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Idempotency queue idempotency-purge should purge the keys older than the TTL and keep the fresh ones 1`] = `
+{
+  "db": {
+    "idempotency_key": [
+      {
+        "idempotency_key": "e2e-purge-fresh",
+        "status": "completed",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Ledger queue ledger-append should append a record replayed under the same operation key only once 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductArchived",
+        "operation_key": "e2e-record:2",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Ledger queue ledger-append should append the record as a ledger entry under its correlation id 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductCreated",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000006",
+        "id": Any<String>,
+        "occurred_at": 2026-01-05T08:00:00.000Z,
+        "operation_key": "e2e-record:1",
+        "payload": {
+          "name": "Recorded product",
+          "sku": "SKU-0001",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "100",
+        "subject_type": "product",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Ledger queue ledger-append should keep a record that fails its last attempt among the failed jobs 1`] = `
+{
+  "db": {
+    "ledger_entry": [],
+  },
+  "failed": [
+    {
+      "action": "ProductCreated",
+      "correlationId": "e2e00000-0000-4000-8000-000000000008",
+      "occurredAt": "2026-01-05T10:00:00.000Z",
+      "operationKey": "e2e-record:3",
+      "payload": {},
+      "subjectId": "102",
+      "subjectType": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+    },
+  ],
+}
+`;
+
+exports[`App ProductStock queue product-stock-post-subtract should archive a published product without stock and record the archive in the ledger under the correlation id 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductArchived",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000004",
+        "operation_key": "product-archived:106:2",
+        "payload": {
+          "previousStatus": "active",
+          "sku": "SKU-0007",
+        },
+      },
+    ],
+    "product": [
+      {
+        "id": "106",
+        "status": "archived",
+        "version": 2,
+      },
+    ],
+  },
+}
+`;
+
+exports[`App ProductStock queue product-stock-post-subtract should complete without a write when every product keeps stock, as after most orders 1`] = `
+{
+  "db": {
+    "ledger_entry": [],
+    "product": [
+      {
+        "id": "100",
+        "status": "active",
+        "version": 1,
+      },
+    ],
+  },
+  "failed": 0,
+}
+`;
+
+exports[`App ProductStock queue product-stock-post-subtract should leave a published product with stock and a draft without stock as they are 1`] = `
+{
+  "db": {
+    "ledger_entry": [],
+    "product": [
+      {
+        "id": "100",
+        "status": "active",
+        "version": 1,
+      },
+      {
+        "id": "102",
+        "status": "draft",
+        "version": 1,
+      },
+    ],
+  },
+}
+`;

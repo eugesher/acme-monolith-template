@@ -1,0 +1,75 @@
+import type { Queue } from 'bullmq';
+
+import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
+
+import { ProductStockCorePostSubtractQueueAdapter } from '../product-stock-core-post-subtract-queue.adapter';
+
+describe('ProductStockCorePostSubtractQueueAdapter', () => {
+  let add: jest.Mock;
+  let adapter: ProductStockCorePostSubtractQueueAdapter;
+
+  beforeEach(() => {
+    add = jest.fn().mockResolvedValue({ id: '1' });
+    adapter = new ProductStockCorePostSubtractQueueAdapter({
+      add,
+    } as unknown as Queue<IProductStockPostSubtractPayload>);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  describe('enqueue', () => {
+    it('adds the products with the correlation id as one job', async () => {
+      await adapter.enqueue({
+        productIds: ['100', '106'],
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+        timeoutMs: 500,
+      });
+
+      expect(add).toHaveBeenCalledWith('product-stock-post-subtract', {
+        productIds: ['100', '106'],
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+      });
+    });
+
+    it('passes a failing add through', async () => {
+      add.mockRejectedValue(new Error('redis is down'));
+
+      const enqueueing = adapter.enqueue({
+        productIds: ['100'],
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+        timeoutMs: 500,
+      });
+
+      await expect(enqueueing).rejects.toThrow('redis is down');
+    });
+
+    it('gives up on an add that hangs, as BullMQ does while Redis is down', async () => {
+      jest.useFakeTimers();
+      add.mockReturnValue(new Promise(() => undefined));
+
+      const enqueueing = adapter.enqueue({
+        productIds: ['100'],
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+        timeoutMs: 500,
+      });
+
+      jest.advanceTimersByTime(500);
+
+      await expect(enqueueing).rejects.toThrow('Enqueue timed out after 500 ms');
+    });
+
+    it('clears the timer once the add settles', async () => {
+      jest.useFakeTimers();
+
+      await adapter.enqueue({
+        productIds: ['100'],
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+        timeoutMs: 500,
+      });
+
+      expect(jest.getTimerCount()).toBe(0);
+    });
+  });
+});

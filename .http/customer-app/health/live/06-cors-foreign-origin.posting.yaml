@@ -1,0 +1,11 @@
+name: 06-cors-foreign-origin
+description: |-
+  e2e: Health › GET /api/health
+  it: should not allow an origin outside HTTP_CORS_ORIGINS
+
+  Expect: 200 OK without access-control-allow-origin
+  Note: needs HTTP_CORS_ORIGINS=https://app.example.test in env/apps/customer-app/.env, as .env.test sets it
+url: $CUSTOMER_APP_BASE_URL/health
+headers:
+  - name: origin
+    value: https://evil.example.test

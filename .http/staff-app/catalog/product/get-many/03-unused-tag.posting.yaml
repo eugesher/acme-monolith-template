@@ -1,0 +1,17 @@
+name: 03-unused-tag
+description: |-
+  e2e: Catalog › Product › GET /api/catalog/products
+  it: should answer an empty page for a tag no product carries
+
+  Expect: 200 OK, an empty page, total 0
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/catalog/products
+params:
+  - name: tagId
+    value: '302'
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

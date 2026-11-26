@@ -1,0 +1,13 @@
+import type {
+  IProductStockCoreLockCommand,
+  IProductStockCoreMoveCommand,
+  IProductStockCoreMoveView,
+  IProductStockCoreOnHandView,
+} from '../types';
+
+export interface IProductStockCorePort {
+  handleLock(command: IProductStockCoreLockCommand): Promise<IProductStockCoreOnHandView[]>;
+  handleMove(command: IProductStockCoreMoveCommand): Promise<IProductStockCoreMoveView>;
+}
+
+export const PRODUCT_STOCK_CORE_PORT = Symbol('PRODUCT_STOCK_CORE_PORT');

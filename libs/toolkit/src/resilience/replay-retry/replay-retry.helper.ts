@@ -1,0 +1,29 @@
+import type { IReplayRetryOptions } from './replay-retry.options';
+
+export class ReplayRetryHelper {
+  public static async run(
+    operation: () => Promise<unknown>,
+    options: IReplayRetryOptions,
+  ): Promise<void> {
+    const { maxAttempts, logger, correlationId, label, context, replayMessage } = options;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await operation();
+
+        return;
+      } catch (error) {
+        if (attempt < maxAttempts) {
+          logger.warn(
+            { err: error, correlationId, attempt, ...context },
+            `${label} failed — retrying`,
+          );
+
+          continue;
+        }
+
+        logger.error({ err: error, correlationId, ...context }, replayMessage);
+      }
+    }
+  }
+}

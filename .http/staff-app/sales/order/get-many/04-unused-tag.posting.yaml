@@ -1,0 +1,17 @@
+name: 04-unused-tag
+description: |-
+  e2e: Sales › Order › GET /api/sales/orders
+  it: should answer an empty page for a tag no order carries
+
+  Expect: 200 OK, an empty page, total 0
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/sales/orders
+params:
+  - name: tagId
+    value: '301'
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

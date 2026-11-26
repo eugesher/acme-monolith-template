@@ -1,0 +1,10 @@
+import type { IProductStockCoreLockProductRecord, IProductStockCoreLockSumRecord } from '../types';
+
+export interface IProductStockCoreLockRepositoryPort {
+  lockMany(productIds: readonly string[]): Promise<IProductStockCoreLockProductRecord[]>;
+  sumStock(productIds: readonly string[]): Promise<IProductStockCoreLockSumRecord[]>;
+}
+
+export const PRODUCT_STOCK_CORE_LOCK_REPOSITORY_PORT = Symbol(
+  'PRODUCT_STOCK_CORE_LOCK_REPOSITORY_PORT',
+);

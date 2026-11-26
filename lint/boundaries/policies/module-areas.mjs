@@ -1,0 +1,169 @@
+import {
+  baseLibs,
+  coreDomain,
+  from,
+  fromFile,
+  fromSpec,
+  layerOf,
+  libContracts,
+  libs,
+  own,
+  packages,
+  persistenceTypes,
+  to,
+} from './selectors.mjs';
+
+const areaPolicies = (area, sharedFacing) => {
+  const prefix = `acme-app:${area}`;
+  const layer = layerOf(prefix, ['app', 'module']);
+
+  return [
+    from(`${prefix}:index`, [to(`${prefix}:module`, { ...own('app'), module: '*' })]),
+    from(`${prefix}:modules:index`, [
+      to(`${prefix}:module`, {
+        ...own('app'),
+        module: '{{ from.file.captured.module }}/modules/*',
+      }),
+    ]),
+    from(`${prefix}:domain`, [layer('domain'), coreDomain, baseLibs()]),
+    from(`${prefix}:outbound`, [layer('outbound'), baseLibs(), ...sharedFacing.outbound]),
+    fromFile(`${prefix}:outbound`, persistenceTypes, [
+      to('acme-core:entities'),
+      to('acme-app:common:entities', own('app')),
+    ]),
+    from(`${prefix}:application`, [
+      layer('domain'),
+      layer('outbound'),
+      layer('application'),
+      coreDomain,
+      ...sharedFacing.application,
+      baseLibs('observability'),
+      packages('nestjs-pino'),
+    ]),
+    from(`${prefix}:infrastructure`, [
+      layer('outbound'),
+      layer('infrastructure'),
+      layer('infrastructure:core-adapters'),
+      layer('infrastructure:common-adapters'),
+      layer('infrastructure:lib-adapters'),
+      layer('infrastructure:queue'),
+      layer('infrastructure:config'),
+      to('acme-core:entities'),
+      to('acme-app:common:entities', own('app')),
+      baseLibs(),
+      libContracts('cache', 'database', 'local-storage'),
+      ...sharedFacing.infrastructure,
+    ]),
+    fromSpec(`${prefix}:infrastructure:core-adapters`),
+    from(`${prefix}:infrastructure:core-adapters`, [
+      layer('outbound'),
+      to('acme-core:contracts'),
+      baseLibs(),
+      packages('@nestjs/common'),
+    ]),
+    fromSpec(`${prefix}:infrastructure:common-adapters`),
+    from(`${prefix}:infrastructure:common-adapters`, [
+      layer('outbound'),
+      to('acme-app:contracts', own('app')),
+      baseLibs(),
+      ...sharedFacing.commonAdapters,
+    ]),
+    fromSpec(`${prefix}:infrastructure:lib-adapters`),
+    from(`${prefix}:infrastructure:lib-adapters`, [
+      layer('outbound'),
+      baseLibs(),
+      ...sharedFacing.libAdapters,
+    ]),
+    fromSpec(`${prefix}:infrastructure:queue`),
+    from(`${prefix}:infrastructure:queue`, [
+      layer('outbound'),
+      layer('infrastructure:queue'),
+      ...(sharedFacing.queues ? [layer('queues')] : []),
+      to('acme-app:contracts', own('app')),
+      to('acme-core:contracts'),
+      to('acme-core:queues'),
+      baseLibs(),
+      ...sharedFacing.queue,
+    ]),
+    fromSpec(`${prefix}:infrastructure:config`),
+    from(`${prefix}:infrastructure:config`, [
+      layer('outbound'),
+      libs('config'),
+      packages('@nestjs/common'),
+    ]),
+    ...(sharedFacing.presentation
+      ? [
+          from(`${prefix}:presentation`, [
+            layer('domain'),
+            layer('presentation'),
+            ...sharedFacing.presentation,
+          ]),
+        ]
+      : []),
+    ...(sharedFacing.queues
+      ? [from(`${prefix}:queues`, [layer('queues'), ...sharedFacing.queues])]
+      : []),
+    from(`${prefix}:shell`, [
+      layer('domain'),
+      layer('application'),
+      ...(sharedFacing.presentation ? [layer('presentation')] : []),
+      ...(sharedFacing.queues ? [layer('queues')] : []),
+      layer('shell'),
+      ...sharedFacing.shell,
+    ]),
+    from(`${prefix}:shell:module`, [
+      layer('application'),
+      layer('infrastructure'),
+      ...(sharedFacing.queues ? [layer('queues')] : []),
+      layer('shell'),
+      layer('modules:index'),
+      to('acme-app:common:shared:index', own('app')),
+      to('acme-app:common:modules:index', own('app')),
+      to('acme-core:modules:index'),
+      ...sharedFacing.module,
+    ]),
+    from(`${prefix}:module`, [layer('shell:module')]),
+  ];
+};
+
+const featureFacing = [
+  to('acme-app:common:shared:index', own('app')),
+  libContracts('auth'),
+  baseLibs('auth', 'http'),
+  packages('@nestjs/common', '@nestjs/swagger', 'class-transformer', 'class-validator'),
+];
+
+export const moduleAreas = [
+  ...areaPolicies('features', {
+    outbound: [],
+    application: [packages('@nestjs/common')],
+    infrastructure: [packages('@nestjs/common', 'typeorm')],
+    commonAdapters: [packages('@nestjs/common')],
+    libAdapters: [libContracts('credentials', 'health'), packages('@nestjs/common')],
+    queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
+    presentation: featureFacing,
+    shell: featureFacing,
+    module: [
+      to('acme-core:queues'),
+      baseLibs('auth', 'health', 'http'),
+      packages('@nestjs/common'),
+    ],
+  }),
+  ...areaPolicies('processors', {
+    outbound: [],
+    application: [packages('@nestjs/common')],
+    infrastructure: [packages('@nestjs/common', 'typeorm')],
+    commonAdapters: [packages('@nestjs/common')],
+    libAdapters: [packages('@nestjs/common')],
+    queue: [packages('@nestjs/bullmq', '@nestjs/common', 'bullmq')],
+    queues: [libs('queue'), packages('@nestjs/common')],
+    shell: [
+      to('acme-app:contracts', own('app')),
+      to('acme-core:contracts'),
+      to('acme-core:queues'),
+      baseLibs('observability'),
+      packages('@nestjs/bullmq', '@nestjs/common', 'bullmq'),
+    ],
+    module: [to('acme-core:queues'), baseLibs(), packages('@nestjs/common')],
+  }),
+];

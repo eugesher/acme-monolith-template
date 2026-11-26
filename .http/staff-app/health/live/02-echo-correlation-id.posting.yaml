@@ -1,0 +1,10 @@
+name: 02-echo-correlation-id
+description: |-
+  e2e: Health › GET /api/health
+  it: should echo an inbound correlation id
+
+  Expect: 200 OK, response header x-correlation-id: e2e00000-0000-4000-8000-000000000001
+url: $STAFF_APP_BASE_URL/health
+headers:
+  - name: x-correlation-id
+    value: e2e00000-0000-4000-8000-000000000001

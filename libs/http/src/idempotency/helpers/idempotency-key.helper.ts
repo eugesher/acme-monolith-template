@@ -1,0 +1,32 @@
+import { BadRequestException, HttpStatus } from '@nestjs/common';
+
+import type { Maybe } from '@acme-libs/toolkit';
+
+export class IdempotencyKeyHelper {
+  public static readonly HEADER = 'Idempotency-Key';
+  public static readonly MAX_LENGTH = 128;
+  public static readonly REQUIRED_CODE = 'IDEMPOTENCY_KEY_REQUIRED';
+  public static readonly INVALID_CODE = 'IDEMPOTENCY_KEY_INVALID';
+
+  public static parse(header: Maybe<string | string[]>): string {
+    const key = typeof header === 'string' ? header.trim() : '';
+
+    if (key.length === 0) {
+      throw new BadRequestException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'The Idempotency-Key header is required for this operation',
+        code: IdempotencyKeyHelper.REQUIRED_CODE,
+      });
+    }
+
+    if (key.length > IdempotencyKeyHelper.MAX_LENGTH) {
+      throw new BadRequestException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: `The Idempotency-Key header must be at most ${IdempotencyKeyHelper.MAX_LENGTH} characters`,
+        code: IdempotencyKeyHelper.INVALID_CODE,
+      });
+    }
+
+    return key;
+  }
+}

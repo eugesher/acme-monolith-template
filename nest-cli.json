@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps",
+  "root": "apps",
+  "monorepo": true,
+  "compilerOptions": {
+    "builder": "rspack",
+    "deleteOutDir": true,
+    "tsConfigPath": "tsconfig.json"
+  },
+  "projects": {
+    "staff-app": {
+      "type": "application",
+      "root": "apps/staff-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/staff-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/staff-app/tsconfig.app.json"
+      }
+    },
+    "customer-app": {
+      "type": "application",
+      "root": "apps/customer-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/customer-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/customer-app/tsconfig.app.json"
+      }
+    },
+    "processor-app": {
+      "type": "application",
+      "root": "apps/processor-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/processor-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/processor-app/tsconfig.app.json"
+      }
+    },
+    "app": {
+      "type": "library",
+      "root": "libs/app",
+      "entryFile": "index",
+      "sourceRoot": "libs/app/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/app/tsconfig.lib.json"
+      }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
+    "cache": {
+      "type": "library",
+      "root": "libs/cache",
+      "entryFile": "index",
+      "sourceRoot": "libs/cache/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cache/tsconfig.lib.json"
+      }
+    },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json"
+      }
+    },
+    "contracts-auth": {
+      "type": "library",
+      "root": "libs/contracts/src/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src/auth",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    },
+    "contracts-cache": {
+      "type": "library",
+      "root": "libs/contracts/src/cache",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src/cache",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    },
+    "contracts-credentials": {
+      "type": "library",
+      "root": "libs/contracts/src/credentials",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src/credentials",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    },
+    "contracts-database": {
+      "type": "library",
+      "root": "libs/contracts/src/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src/database",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    },
+    "contracts-health": {
+      "type": "library",
+      "root": "libs/contracts/src/health",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src/health",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    },
+    "contracts-local-storage": {
+      "type": "library",
+      "root": "libs/contracts/src/local-storage",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src/local-storage",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    },
+    "core-contracts-idempotency": {
+      "type": "library",
+      "root": "core/contracts/src/idempotency",
+      "entryFile": "index",
+      "sourceRoot": "core/contracts/src/idempotency",
+      "compilerOptions": {
+        "tsConfigPath": "core/contracts/tsconfig.lib.json"
+      }
+    },
+    "core-contracts-ledger": {
+      "type": "library",
+      "root": "core/contracts/src/ledger",
+      "entryFile": "index",
+      "sourceRoot": "core/contracts/src/ledger",
+      "compilerOptions": {
+        "tsConfigPath": "core/contracts/tsconfig.lib.json"
+      }
+    },
+    "core-contracts-product": {
+      "type": "library",
+      "root": "core/contracts/src/product",
+      "entryFile": "index",
+      "sourceRoot": "core/contracts/src/product",
+      "compilerOptions": {
+        "tsConfigPath": "core/contracts/tsconfig.lib.json"
+      }
+    },
+    "core-contracts-product-stock": {
+      "type": "library",
+      "root": "core/contracts/src/product-stock",
+      "entryFile": "index",
+      "sourceRoot": "core/contracts/src/product-stock",
+      "compilerOptions": {
+        "tsConfigPath": "core/contracts/tsconfig.lib.json"
+      }
+    },
+    "core-domain": {
+      "type": "library",
+      "root": "core/domain",
+      "entryFile": "index",
+      "sourceRoot": "core/domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "core/domain/tsconfig.lib.json"
+      }
+    },
+    "core-entities": {
+      "type": "library",
+      "root": "core/entities",
+      "entryFile": "index",
+      "sourceRoot": "core/entities/src",
+      "compilerOptions": {
+        "tsConfigPath": "core/entities/tsconfig.lib.json"
+      }
+    },
+    "core-modules-idempotency": {
+      "type": "library",
+      "root": "core/modules/src/idempotency",
+      "entryFile": "index",
+      "sourceRoot": "core/modules/src/idempotency",
+      "compilerOptions": {
+        "tsConfigPath": "core/modules/tsconfig.lib.json"
+      }
+    },
+    "core-modules-ledger": {
+      "type": "library",
+      "root": "core/modules/src/ledger",
+      "entryFile": "index",
+      "sourceRoot": "core/modules/src/ledger",
+      "compilerOptions": {
+        "tsConfigPath": "core/modules/tsconfig.lib.json"
+      }
+    },
+    "core-modules-product": {
+      "type": "library",
+      "root": "core/modules/src/product",
+      "entryFile": "index",
+      "sourceRoot": "core/modules/src/product",
+      "compilerOptions": {
+        "tsConfigPath": "core/modules/tsconfig.lib.json"
+      }
+    },
+    "core-modules-product-stock": {
+      "type": "library",
+      "root": "core/modules/src/product-stock",
+      "entryFile": "index",
+      "sourceRoot": "core/modules/src/product-stock",
+      "compilerOptions": {
+        "tsConfigPath": "core/modules/tsconfig.lib.json"
+      }
+    },
+    "core-queues": {
+      "type": "library",
+      "root": "core/queues",
+      "entryFile": "index",
+      "sourceRoot": "core/queues/src",
+      "compilerOptions": {
+        "tsConfigPath": "core/queues/tsconfig.lib.json"
+      }
+    },
+    "credentials": {
+      "type": "library",
+      "root": "libs/credentials",
+      "entryFile": "index",
+      "sourceRoot": "libs/credentials/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/credentials/tsconfig.lib.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "domain": {
+      "type": "library",
+      "root": "libs/domain",
+      "entryFile": "index",
+      "sourceRoot": "libs/domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/domain/tsconfig.lib.json"
+      }
+    },
+    "health": {
+      "type": "library",
+      "root": "libs/health",
+      "entryFile": "index",
+      "sourceRoot": "libs/health/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/health/tsconfig.lib.json"
+      }
+    },
+    "http": {
+      "type": "library",
+      "root": "libs/http",
+      "entryFile": "index",
+      "sourceRoot": "libs/http/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/http/tsconfig.lib.json"
+      }
+    },
+    "kernel": {
+      "type": "library",
+      "root": "libs/kernel",
+      "entryFile": "index",
+      "sourceRoot": "libs/kernel/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/kernel/tsconfig.lib.json"
+      }
+    },
+    "local-storage": {
+      "type": "library",
+      "root": "libs/local-storage",
+      "entryFile": "index",
+      "sourceRoot": "libs/local-storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/local-storage/tsconfig.lib.json"
+      }
+    },
+    "observability": {
+      "type": "library",
+      "root": "libs/observability",
+      "entryFile": "index",
+      "sourceRoot": "libs/observability/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/observability/tsconfig.lib.json"
+      }
+    },
+    "openapi": {
+      "type": "library",
+      "root": "libs/openapi",
+      "entryFile": "index",
+      "sourceRoot": "libs/openapi/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/openapi/tsconfig.lib.json"
+      }
+    },
+    "queue": {
+      "type": "library",
+      "root": "libs/queue",
+      "entryFile": "index",
+      "sourceRoot": "libs/queue/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/queue/tsconfig.lib.json"
+      }
+    },
+    "testing": {
+      "type": "library",
+      "root": "libs/testing",
+      "entryFile": "index",
+      "sourceRoot": "libs/testing/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/testing/tsconfig.lib.json"
+      }
+    },
+    "toolkit": {
+      "type": "library",
+      "root": "libs/toolkit",
+      "entryFile": "index",
+      "sourceRoot": "libs/toolkit/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/toolkit/tsconfig.lib.json"
+      }
+    }
+  }
+}

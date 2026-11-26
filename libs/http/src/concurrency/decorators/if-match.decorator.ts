@@ -1,0 +1,15 @@
+import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
+
+import type { Maybe } from '@acme-libs/toolkit';
+
+import { IfMatchHelper } from '../helpers/if-match.helper';
+
+export const IfMatch = createParamDecorator(
+  (_data: unknown, context: ExecutionContext): Maybe<number> => {
+    const { headers } = context
+      .switchToHttp()
+      .getRequest<{ headers: Record<string, Maybe<string | string[]>> }>();
+
+    return IfMatchHelper.parse(headers[IfMatchHelper.HEADER.toLowerCase()]);
+  },
+);

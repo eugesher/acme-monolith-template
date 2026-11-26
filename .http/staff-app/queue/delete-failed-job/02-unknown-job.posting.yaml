@@ -1,0 +1,15 @@
+name: 02-unknown-job
+description: |-
+  e2e: Queue › DELETE /api/queues/:queueName/jobs/failed/:jobId
+  it: should refuse an unknown job with 404 QUEUE_JOB_NOT_FOUND
+
+  Expect: 404 Not Found, code QUEUE_JOB_NOT_FOUND
+  User: admin@example.com (token signed by scripts.py)
+method: DELETE
+url: $STAFF_APP_BASE_URL/queues/ledger-append/jobs/failed/999999
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_admin

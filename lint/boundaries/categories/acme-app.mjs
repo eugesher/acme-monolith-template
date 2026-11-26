@@ -1,0 +1,92 @@
+import { moduleAreaLayers, moduleAreas } from './module-layers.mjs';
+
+export const acmeApp = [
+  ['acme-app:main', 'apps/*/src/main.ts', ['app']],
+  ['acme-app:global:index', 'apps/*/src/global/index.ts', ['app']],
+  ['acme-app:global:module:index', 'apps/*/src/global/*/index.ts', ['app', 'module']],
+  [
+    'acme-app:global:infrastructure:core-adapters',
+    'apps/*/src/global/*/infrastructure/core-adapters/**',
+    ['app', 'module'],
+  ],
+  [
+    'acme-app:global:infrastructure:common-adapters',
+    'apps/*/src/global/*/infrastructure/common-adapters/**',
+    ['app', 'module'],
+  ],
+  [
+    'acme-app:global:infrastructure:lib-adapters',
+    'apps/*/src/global/*/infrastructure/lib-adapters/**',
+    ['app', 'module'],
+  ],
+  ['acme-app:global:application', 'apps/*/src/global/*/application/**', ['app', 'module']],
+  ['acme-app:global:outbound', 'apps/*/src/global/*/outbound/**', ['app', 'module', 'file']],
+  ['acme-app:global:infrastructure', 'apps/*/src/global/*/infrastructure/**', ['app', 'module']],
+  ['acme-app:global:shell', 'apps/*/src/global/*/shell/**', ['app', 'module']],
+  ['acme-app:app:index', 'apps/*/src/app/index.ts', ['app']],
+  ['acme-app:app:module', 'apps/*/src/app/shell/app.module.ts', ['app']],
+  ['acme-app:app:setup', 'apps/*/src/app/setup/app-setup.module.ts', ['app']],
+  ['acme-app:app:entities', 'apps/*/src/app/setup/entities/**', ['app']],
+  ['acme-app:app', 'apps/*/src/app/**', ['app']],
+  ['acme-app:common:modules:domain', 'apps/*/src/common/modules/*/domain/**', ['app', 'module']],
+  [
+    'acme-app:common:modules:outbound',
+    'apps/*/src/common/modules/*/outbound/**',
+    ['app', 'module', 'file'],
+  ],
+  [
+    'acme-app:common:modules:application',
+    'apps/*/src/common/modules/*/application/**',
+    ['app', 'module'],
+  ],
+  [
+    'acme-app:common:modules:infrastructure:core-adapters',
+    'apps/*/src/common/modules/*/infrastructure/core-adapters/**',
+    ['app', 'module', 'file'],
+  ],
+  [
+    'acme-app:common:modules:infrastructure:common-adapters',
+    'apps/*/src/common/modules/*/infrastructure/common-adapters/**',
+    ['app', 'module', 'file'],
+  ],
+  [
+    'acme-app:common:modules:infrastructure',
+    'apps/*/src/common/modules/*/infrastructure/**',
+    ['app', 'module'],
+  ],
+  [
+    'acme-app:common:modules:shell:facade',
+    'apps/*/src/common/modules/*/shell/*.facade.ts',
+    ['app', 'module'],
+  ],
+  ['acme-app:common:modules:shell', 'apps/*/src/common/modules/*/shell/**', ['app', 'module']],
+  ['acme-app:common:modules:index', 'apps/*/src/common/modules/index.ts', ['app']],
+  [
+    'acme-app:common:modules:module:index',
+    'apps/*/src/common/modules/*/index.ts',
+    ['app', 'module'],
+  ],
+  ['acme-app:common:entities', 'apps/*/src/common/entities/**', ['app']],
+  ['acme-app:contracts', 'apps/*/src/contracts/*/**', ['app', 'module']],
+  ['acme-app:common:shared:index', 'apps/*/src/common/shared/index.ts', ['app']],
+  ['acme-app:common:shared:module:index', 'apps/*/src/common/shared/*/index.ts', ['app']],
+  ['acme-app:common:shared', 'apps/*/src/common/shared/*/**', ['app', 'module']],
+  ['acme-app:test', 'apps/*/test/**', ['app']],
+  ...moduleAreas.flatMap((area) => [
+    [`acme-app:${area}:index`, `apps/*/src/${area}/index.ts`, ['app']],
+    [`acme-app:${area}:modules:index`, `apps/*/src/${area}/*/modules/index.ts`, ['app', 'module']],
+    [
+      `acme-app:${area}:shell:module`,
+      `apps/*/src/${area}/{*,*/modules/*}/shell/*.module.ts`,
+      ['app', 'module'],
+    ],
+    ...moduleAreaLayers[area].map((layer) => [
+      `acme-app:${area}:${layer}`,
+      `apps/*/src/${area}/{*,*/modules/*}/${layer.replace(':', '/')}/**`,
+      layer.includes(':') || layer === 'outbound'
+        ? ['app', 'module', 'single', 'area', 'submodule', 'file']
+        : ['app', 'module'],
+    ]),
+    [`acme-app:${area}:module`, `apps/*/src/${area}/{*,*/modules/*}/*.ts`, ['app', 'module']],
+  ]),
+];

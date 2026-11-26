@@ -1,0 +1,117 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`App Catalog Product POST /api/catalog/products should create a draft and append its ledger entry under the correlation id 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductCreated",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000020",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": Any<String>,
+        "payload": {
+          "name": "Created product",
+          "sku": "SYS-0001",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": Any<String>,
+        "subject_type": "product",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/archive should append the ledger entry of the archive under the correlation id 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductArchived",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000021",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": "product-archived:103:2",
+        "payload": {
+          "previousStatus": "active",
+          "sku": "SKU-0004",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "103",
+        "subject_type": "product",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Catalog Product POST /api/catalog/products/:productId/publish should append the ledger entry of the publication under the correlation id 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductPublished",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000022",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": "product-published:101:2",
+        "payload": {
+          "previousStatus": "draft",
+          "sku": "SKU-0002",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "101",
+        "subject_type": "product",
+      },
+    ],
+  },
+}
+`;
+
+exports[`App Queue POST /api/queues/:queueName/jobs/failed/:jobId/retry should return a failed record to the queue and append it once its cause is gone 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductArchived",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000025",
+        "id": Any<String>,
+        "occurred_at": 2026-01-06T09:00:00.000Z,
+        "operation_key": "e2e-system-queue:1",
+        "payload": {
+          "previousStatus": "active",
+          "sku": "SKU-0004",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "201",
+        "subject_type": "product",
+      },
+    ],
+  },
+  "failed": 0,
+}
+`;
+
+exports[`App Warehouse ProductStock POST /api/warehouse/product-stock/:productId/add should add the units and append the ledger entry of the stock row 1`] = `
+{
+  "db": {
+    "ledger_entry": [
+      {
+        "action": "ProductRestocked",
+        "correlation_id": "e2e00000-0000-4000-8000-000000000019",
+        "id": Any<String>,
+        "occurred_at": Any<Date>,
+        "operation_key": Any<String>,
+        "payload": {
+          "quantity": 5,
+          "sku": "SKU-0007",
+        },
+        "recorded_at": Any<Date>,
+        "subject_id": "106",
+        "subject_type": "product",
+      },
+    ],
+  },
+}
+`;

@@ -1,0 +1,14 @@
+name: 02-unknown-queue
+description: |-
+  e2e: Queue › GET /api/queues/:queueName/jobs/failed
+  it: should refuse an unknown queue with 404 QUEUE_NOT_FOUND
+
+  Expect: 404 Not Found, code QUEUE_NOT_FOUND
+  User: viewer@example.com (token signed by scripts.py)
+url: $STAFF_APP_BASE_URL/queues/unknown/jobs/failed
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_viewer

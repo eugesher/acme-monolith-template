@@ -1,0 +1,20 @@
+name: 02-page-window
+description: |-
+  e2e: Catalog › GET /api/products
+  it: should answer the page of the window with the total of every page
+
+  Expect: 200 OK, product 103 alone, total 3
+  User: bob@example.com (token signed by scripts.py)
+  Before: Redis: DEL every acme:catalog:* key
+url: $CUSTOMER_APP_BASE_URL/products
+params:
+  - name: page
+    value: '2'
+  - name: limit
+    value: '1'
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+scripts:
+  setup: scripts.py:as_bob
