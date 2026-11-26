@@ -112,7 +112,33 @@ example `pwa-node` of `js-debug` with `request: "attach"`. The scripts set
 of the sources, and breakpoints in the `.ts` files bind. Every other build, `yarn start:dev` and the
 image included, writes no maps.
 
-## E2E tests
+## Tests
+
+### Unit tests
+
+The unit tests don't need any infrastructure. Run them all:
+
+```bash
+yarn test:unit
+```
+
+With coverage, like CI: the threshold is 100% for every file of `apps`, `core` and `libs`, and the
+report goes to `coverage/unit`:
+
+```bash
+yarn test:unit:coverage
+```
+
+To run one file or folder, add its path:
+
+```bash
+yarn test:unit libs/toolkit
+```
+
+The specs run one at a time: the architecture specs of `spec/` create and remove temporary fixtures,
+and in parallel they get in each other's way.
+
+### E2E tests
 
 Recreate the test infrastructure and run every suite one after another, with one report at the end.
 CI runs the same thing:
