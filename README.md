@@ -15,6 +15,13 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | bash 
 nvm install # reads the version from .nvmrc
 ```
 
+On a minimal Linux (a server, a Docker image) Node won't start without `libatomic1`. On Ubuntu and
+Debian:
+
+```bash
+sudo apt-get install libatomic1
+```
+
 Turn on Yarn through Corepack:
 
 ```bash
