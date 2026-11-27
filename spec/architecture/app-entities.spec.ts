@@ -68,22 +68,21 @@ describe('app entities (@acme-<app>/common/entities)', () => {
       '../../../common/entities',
     ],
     [
-      'apps/__entities-fixture__/src/features/product/outbound/__fixture__.ts',
-      '../../../common/entities',
+      'apps/__entities-fixture__/src/features/product/outbound/ports/__fixture__.ts',
+      '../../../../common/entities',
     ],
     [
       'apps/__entities-fixture__/src/features/product/application/cases/__fixture__.ts',
       '../../../../common/entities',
     ],
     [
-      'apps/__entities-fixture__/src/features/product/shell/__fixture__.ts',
+      'apps/__entities-fixture__/src/features/product/shell/__fixture__.controller.ts',
       '../../../common/entities',
     ],
     [
       'apps/__entities-fixture__/src/features/product/shell/product.module.ts',
       '../../../common/entities',
     ],
-    ['apps/__entities-fixture__/src/common/shared/auth/__fixture__.ts', '../../entities'],
     ['apps/__entities-fixture__/src/main.ts', './common/entities'],
   ])(
     '%s may NOT import the entities of its app, a table is reached only through a repository',
@@ -101,8 +100,8 @@ describe('app entities (@acme-<app>/common/entities)', () => {
       '../../../../../../../__entities-fixture__/src/common/entities',
     ],
     [
-      'apps/__other-entities-fixture__/src/processors/purge/infrastructure/__fixture__.ts',
-      '../../../../../__entities-fixture__/src/common/entities',
+      'apps/__other-entities-fixture__/src/processors/purge/infrastructure/persistence/__fixture__.ts',
+      '../../../../../../__entities-fixture__/src/common/entities',
     ],
     [
       'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',

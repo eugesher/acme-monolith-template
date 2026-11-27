@@ -82,14 +82,14 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('the module root MAY mount a common module', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../common/modules";',
     }).toPassArchitectureLint();
   });
 
   it('the module root MAY mount a core module — the staff subject of two apps lives in core', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../../../../core/modules/src/__identity-fixture__";',
     }).toPassArchitectureLint();
   });
@@ -110,35 +110,35 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('the module root MAY reach app contracts and its own infrastructure', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../contracts/auth";\nimport { y } from "../infrastructure";',
     }).toPassArchitectureLint();
   });
 
   it('the module root may NOT import entities — it wires them through infrastructure', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../../../../core/entities/src";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('the module root may NOT reach app contracts of another name', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../contracts/audit";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('the module root may NOT reach core contracts', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../../../../core/contracts/src/__identity-fixture__";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('the module root may NOT reach a feature', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../features/product";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -226,14 +226,14 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('the module root MAY reach its own application', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { x } from "../application";',
     }).toPassArchitectureLint();
   });
 
   it('the module root may NOT reach its own outbound — infrastructure binds the tokens', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
       code: 'import { y } from "../outbound";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -257,9 +257,9 @@ describe('global modules (global/) — modules without controllers', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it.each(['../application', '@nestjs/common'])('outbound may NOT reach %s', async (source) => {
+  it.each(['../../application', '@nestjs/common'])('outbound may NOT reach %s', async (source) => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/outbound/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/outbound/ports/__fixture__.ts',
       code: `import { x } from "${source}";`,
     }).toBreakRule('boundaries/dependencies');
   });
@@ -304,29 +304,45 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('another global module may NOT reach auth infrastructure', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/audit/infrastructure/__fixture__.ts',
-      code: 'import { x } from "../../auth/infrastructure";',
+      file: 'apps/__global-fixture__/src/global/audit/infrastructure/persistence/__fixture__.ts',
+      code: 'import { x } from "../../../auth/infrastructure";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('the shell MAY reach the auth lib contract, whatever the name of the module', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/session/shell/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/session/shell/__fixture__.module.ts',
       code: 'import { x } from "../../../../../../libs/contracts/src/auth";',
     }).toPassArchitectureLint();
   });
 
   it.each([
-    ['shell', 'cache', '../../../../../../libs/contracts/src/cache'],
-    ['shell', 'credentials', '../../../../../../libs/contracts/src/credentials'],
-    ['infrastructure/common-adapters', 'auth', '../../../../../../../libs/contracts/src/auth'],
-    ['infrastructure/lib-adapters', 'cache', '../../../../../../../libs/contracts/src/cache'],
-    ['infrastructure/lib-adapters', 'health', '../../../../../../../libs/contracts/src/health'],
+    ['shell/__fixture__.module.ts', 'cache', '../../../../../../libs/contracts/src/cache'],
+    [
+      'shell/__fixture__.module.ts',
+      'credentials',
+      '../../../../../../libs/contracts/src/credentials',
+    ],
+    [
+      'infrastructure/common-adapters/__fixture__.ts',
+      'auth',
+      '../../../../../../../libs/contracts/src/auth',
+    ],
+    [
+      'infrastructure/lib-adapters/__fixture__.ts',
+      'cache',
+      '../../../../../../../libs/contracts/src/cache',
+    ],
+    [
+      'infrastructure/lib-adapters/__fixture__.ts',
+      'health',
+      '../../../../../../../libs/contracts/src/health',
+    ],
   ])(
     'the %s of a global module may NOT reach the %s lib contract it does not use',
-    async (layer, _lib, contracts) => {
+    async (file, _lib, contracts) => {
       await expect({
-        file: `apps/__global-fixture__/src/global/auth/${layer}/__fixture__.ts`,
+        file: `apps/__global-fixture__/src/global/auth/${file}`,
         code: `import { x } from "${contracts}";`,
       }).toBreakRule('boundaries/dependencies');
     },
@@ -340,7 +356,7 @@ describe('global modules (global/) — modules without controllers', () => {
   });
 
   it.each([
-    'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+    'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
     'apps/__global-fixture__/src/global/auth/infrastructure/common-adapters/__fixture__.ts',
   ])('%s MAY import @nestjs/common', async (file) => {
     await expect({
@@ -350,7 +366,7 @@ describe('global modules (global/) — modules without controllers', () => {
   });
 
   it.each([
-    'apps/__global-fixture__/src/global/auth/shell/__fixture__.ts',
+    'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
     'apps/__global-fixture__/src/global/auth/infrastructure/common-adapters/__fixture__.ts',
   ])('%s may NOT import @nestjs/jwt — the auth lib verifies tokens', async (file) => {
     await expect({

@@ -100,13 +100,12 @@ describe('app entry points', () => {
   it.each([
     ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../..'],
     ['apps/__entry-fixture__/src/app/setup/config/__fixture__.ts', '../../shell/app.module'],
-    ['apps/__entry-fixture__/src/global/auth/shell/__fixture__.ts', '../../../app'],
+    ['apps/__entry-fixture__/src/global/auth/shell/__fixture__.module.ts', '../../../app'],
     ['apps/__entry-fixture__/src/features/product/shell/product.module.ts', '../../../app'],
     [
       'apps/__entry-fixture__/src/processors/idempotency/shell/__fixture__.module.ts',
       '../../../app',
     ],
-    ['apps/__entry-fixture__/src/common/shared/ledger/__fixture__.ts', '../../../app'],
   ])('%s may NOT import the AppModule, only main and the tests do', async (file, source) => {
     await expect({
       file,
@@ -179,7 +178,7 @@ describe('app entry points', () => {
       '../../../../../../libs/credentials/src',
     ],
     [
-      'apps/__entry-fixture__/src/features/health/shell/__fixture__.ts',
+      'apps/__entry-fixture__/src/features/health/shell/__fixture__.controller.ts',
       '../../../../../../libs/app/src',
     ],
   ])('%s may NOT reach %s, only the app setup module does', async (file, source) => {
@@ -253,7 +252,7 @@ describe('app entry points', () => {
   });
 
   it.each([
-    ['apps/__entry-fixture__/src/features/health/shell/__fixture__.ts', '../..'],
+    ['apps/__entry-fixture__/src/features/health/shell/__fixture__.controller.ts', '../..'],
     ['apps/__entry-fixture__/src/main.ts', './features'],
   ])(
     '%s may NOT import the features index by %s, only the app root wires features',
@@ -281,14 +280,14 @@ describe('app entry points', () => {
 
   it('a feature presentation may NOT import the health lib contracts', async () => {
     await expect({
-      file: 'apps/customer-app/src/features/health/shell/__fixture__.ts',
+      file: 'apps/customer-app/src/features/health/shell/__fixture__.controller.ts',
       code: 'import { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
     }).toBreakRule('boundaries/dependencies');
   });
 
   it('a feature presentation may NOT import the health lib root', async () => {
     await expect({
-      file: 'apps/customer-app/src/features/health/shell/__fixture__.ts',
+      file: 'apps/customer-app/src/features/health/shell/__fixture__.controller.ts',
       code: 'import { HealthLibModule } from "@acme-libs/health";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -306,7 +305,7 @@ describe('app entry points', () => {
 
   it('a staff-app feature presentation MAY import the header decorators of the http lib', async () => {
     await expect({
-      file: 'apps/staff-app/src/features/health/shell/__fixture__.ts',
+      file: 'apps/staff-app/src/features/health/shell/__fixture__.controller.ts',
       code: 'import { IdempotencyKey, IfMatch } from "@acme-libs/http";',
     }).toPassArchitectureLint();
   });
@@ -381,7 +380,7 @@ describe('app entry points', () => {
       '../../../../../__entry-fixture__/src/common/modules',
     ],
     [
-      'apps/__other-entry-fixture__/src/features/health/shell/__fixture__.ts',
+      'apps/__other-entry-fixture__/src/features/health/shell/__fixture__.controller.ts',
       '../../../../../__entry-fixture__/src/common/modules',
     ],
     [

@@ -18,8 +18,6 @@ describe('common modules (common/modules/<module>)', () => {
       'apps/__common-fixture__/src/common/modules/audit/index.ts',
       'apps/__common-fixture__/src/common/modules/audit/application/index.ts',
       'apps/__common-fixture__/src/common/modules/audit/outbound/index.ts',
-      'apps/__common-fixture__/src/common/shared/index.ts',
-      'apps/__common-fixture__/src/common/shared/concurrency/index.ts',
       'apps/__common-fixture__/src/contracts/idempotency/index.ts',
       'apps/__common-fixture__/src/contracts/audit/index.ts',
       'apps/__common-fixture__/src/features/product/index.ts',
@@ -51,7 +49,7 @@ describe('common modules (common/modules/<module>)', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['domain', 'outbound'])('common %s is framework-free', async (layer) => {
+    it.each(['domain', 'outbound/ports'])('common %s is framework-free', async (layer) => {
       await expect({
         file: `apps/__common-fixture__/src/common/modules/idempotency/${layer}/__fixture__.ts`,
         code: 'import { Injectable } from "@nestjs/common";',
@@ -60,8 +58,8 @@ describe('common modules (common/modules/<module>)', () => {
 
     it('common outbound may NOT reach domain — a port speaks its own types', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/outbound/__fixture__.ts',
-        code: 'import { x } from "../domain";',
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/outbound/ports/__fixture__.ts',
+        code: 'import { x } from "../../domain";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -103,11 +101,11 @@ describe('common modules (common/modules/<module>)', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['application', 'shell'])(
+    it.each(['application/__fixture__.ts', 'shell/__fixture__.module.ts'])(
       'common %s may NOT import typeorm, only infrastructure talks to the database',
-      async (layer) => {
+      async (file) => {
         await expect({
-          file: `apps/__common-fixture__/src/common/modules/idempotency/${layer}/__fixture__.ts`,
+          file: `apps/__common-fixture__/src/common/modules/idempotency/${file}`,
           code: 'import { Repository } from "typeorm";',
         }).toBreakRule('boundaries/dependencies');
       },
@@ -141,14 +139,14 @@ describe('common modules (common/modules/<module>)', () => {
   describe('core from a common module', () => {
     it('the common module root MAY import a core module to wire it', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
         code: 'import { x } from "../../../../../../../core/modules/src/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
     it('the common module root may NOT reach core contracts', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
         code: 'import { x } from "../../../../../../../core/contracts/src/__ledger-fixture__";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -189,24 +187,7 @@ describe('common modules (common/modules/<module>)', () => {
     });
   });
 
-  describe('other common modules and shared code', () => {
-    it('the common module root MAY import a shared barrel', async () => {
-      await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
-        code: 'import { x } from "../../../shared";',
-      }).toPassArchitectureLint();
-    });
-
-    it.each([
-      ['application', '../../../shared/concurrency'],
-      ['infrastructure/persistence', '../../../../shared/concurrency'],
-    ])('common %s may NOT reach a shared barrel', async (folder, source) => {
-      await expect({
-        file: `apps/__common-fixture__/src/common/modules/idempotency/${folder}/__fixture__.ts`,
-        code: `import { x } from "${source}";`,
-      }).toBreakRule('boundaries/dependencies');
-    });
-
+  describe('other common modules', () => {
     it('common infrastructure/common-adapters MAY reach the contracts of another common module', async () => {
       await expect({
         file: 'apps/__common-fixture__/src/common/modules/idempotency/infrastructure/common-adapters/__fixture__.ts',
@@ -236,7 +217,7 @@ describe('common modules (common/modules/<module>)', () => {
 
     it('the common module root MAY import another common module to wire it', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
         code: 'import { x } from "../..";',
       }).toPassArchitectureLint();
     });
@@ -263,13 +244,6 @@ describe('common modules (common/modules/<module>)', () => {
       await expect({
         file: 'apps/__common-fixture__/src/common/modules/idempotency/application/__fixture__.ts',
         code: 'import { x } from "../../audit/application";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-
-    it('common/shared may NOT reach a common module', async () => {
-      await expect({
-        file: 'apps/__common-fixture__/src/common/shared/concurrency/__fixture__.ts',
-        code: 'import { x } from "../../modules";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -337,14 +311,14 @@ describe('common modules (common/modules/<module>)', () => {
 
     it('any other file in shell/ is the composition root and MAY reach infrastructure', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
         code: 'import { x } from "../infrastructure";',
       }).toPassArchitectureLint();
     });
 
     it('the composition root may NOT import entities — it wires them through infrastructure', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        file: 'apps/__common-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
         code: 'import { x } from "../../../../../../../core/entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -394,7 +368,7 @@ describe('common modules (common/modules/<module>)', () => {
 
     it('presentation may NOT reach app contracts — common modules are reached through common-adapters', async () => {
       await expect({
-        file: 'apps/__common-fixture__/src/features/product/shell/__fixture__.ts',
+        file: 'apps/__common-fixture__/src/features/product/shell/__fixture__.controller.ts',
         code: 'import { x } from "../../../contracts/idempotency";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -411,7 +385,10 @@ describe('common modules (common/modules/<module>)', () => {
         'apps/__common-fixture__/src/features/product/shell/__fixture__.module.ts',
         '../../../common/modules',
       ],
-      ['apps/__common-fixture__/src/global/auth/shell/__fixture__.ts', '../../../common/modules'],
+      [
+        'apps/__common-fixture__/src/global/auth/shell/__fixture__.module.ts',
+        '../../../common/modules',
+      ],
     ])('the module root %s MAY mount a common module', async (file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toPassArchitectureLint();
     });
@@ -442,7 +419,7 @@ describe('common modules (common/modules/<module>)', () => {
 
     it.each([
       [
-        'apps/__common-other-fixture__/src/features/health/shell/__fixture__.ts',
+        'apps/__common-other-fixture__/src/features/health/shell/__fixture__.controller.ts',
         '../../../../../__common-fixture__/src/contracts/idempotency',
       ],
       [

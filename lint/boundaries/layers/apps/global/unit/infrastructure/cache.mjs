@@ -1,0 +1,23 @@
+export const appsGlobalUnitInfrastructureCache = {
+  category: 'apps:global:unit:infrastructure:cache',
+  pattern: 'apps/*/src/global/*/infrastructure/cache/**',
+  capture: ['app', 'unit'],
+  allow: [
+    '@acme-<app>/global/<unit>/infrastructure/index',
+    '@acme-<app>/global/<unit>/infrastructure/persistence',
+    '@acme-<app>/global/<unit>/infrastructure/cache',
+    '@acme-<app>/global/<unit>/infrastructure/core-adapters',
+    '@acme-<app>/global/<unit>/infrastructure/common-adapters',
+    '@acme-<app>/global/<unit>/infrastructure/lib-adapters',
+    '@acme-<app>/global/<unit>/outbound/**',
+    '@acme-<app>/contracts/<unit>',
+    '@acme-core/entities',
+    '@acme-<app>/common/entities',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@acme-libs/contracts/database',
+    '@nestjs/common',
+    'typeorm',
+  ],
+};

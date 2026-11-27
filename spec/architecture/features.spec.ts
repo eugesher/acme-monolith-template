@@ -101,7 +101,7 @@ describe('features', () => {
 
     it('the controller may NOT reach its outbound — ports belong to the application', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.controller.ts',
         code: 'import { x } from "../outbound";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -149,7 +149,7 @@ describe('features', () => {
 
     it('the controller may NOT reach infrastructure', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.controller.ts',
         code: 'import { x } from "../infrastructure";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -170,7 +170,7 @@ describe('features', () => {
 
     it('the controller MAY reach its application and presentation', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.controller.ts',
         code: 'import { x } from "../application";\nimport { y } from "../presentation";',
       }).toPassArchitectureLint();
     });
@@ -212,7 +212,7 @@ describe('features', () => {
 
     it('the controller MAY import the HTTP and OpenAPI decorators', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/shell/__fixture__.controller.ts',
         code: 'import { Controller, Get } from "@nestjs/common";\nimport { ApiOkResponse } from "@nestjs/swagger";',
       }).toPassArchitectureLint();
     });
@@ -280,7 +280,7 @@ describe('features', () => {
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['application', 'domain', 'outbound', 'infrastructure/queue'])(
+    it.each(['application', 'domain', 'outbound/ports', 'infrastructure/queue'])(
       '%s may NOT import typeorm — tables are persistence',
       async (layer) => {
         await expect({
@@ -354,7 +354,7 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['application', 'domain', 'infrastructure', 'outbound'])(
+    it.each(['application', 'domain', 'infrastructure/persistence', 'outbound/ports'])(
       '%s may NOT import class-validator — request validation is a presentation job',
       async (layer) => {
         await expect({
@@ -378,11 +378,15 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['application/cases', 'infrastructure/persistence', 'shell'])(
+    it.each([
+      'application/cases/__fixture__.ts',
+      'infrastructure/persistence/__fixture__.ts',
+      'shell/__fixture__.controller.ts',
+    ])(
       '%s may NOT take the credentials or health port — a lib port is reached through infrastructure/lib-adapters',
-      async (layer) => {
+      async (file) => {
         await expect({
-          file: `apps/__features-fixture__/src/features/product/${layer}/__fixture__.ts`,
+          file: `apps/__features-fixture__/src/features/product/${file}`,
           code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";\nimport { HEALTH_LIB_PORT } from "@acme-libs/contracts/health";',
         }).toBreakRule('boundaries/dependencies');
       },
@@ -432,7 +436,7 @@ describe('features', () => {
     it.each([
       'shell/__fixture__.module.ts',
       'application/__fixture__.ts',
-      'infrastructure/__fixture__.ts',
+      'infrastructure/persistence/__fixture__.ts',
     ])(
       'features/product/%s may NOT mount the credentials lib — the AppModule mounts it once for the app',
       async (file) => {

@@ -44,11 +44,11 @@ describe('core domain (@acme-core/domain)', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/outbound/__fixture__.ts',
-    'apps/staff-app/src/features/product/infrastructure/__fixture__.ts',
-    'apps/staff-app/src/features/product/shell/__fixture__.ts',
+    'apps/staff-app/src/features/product/outbound/ports/__fixture__.ts',
+    'apps/staff-app/src/features/product/infrastructure/persistence/__fixture__.ts',
+    'apps/staff-app/src/features/product/shell/__fixture__.controller.ts',
     'apps/staff-app/src/features/product/shell/product.module.ts',
-    'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
     'core/entities/src/__fixture__.ts',
     'libs/http/src/__fixture__.ts',
   ])(

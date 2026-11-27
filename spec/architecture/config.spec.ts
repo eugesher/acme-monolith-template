@@ -53,44 +53,25 @@ describe('the config itself (eslint.config.mjs, as ESLint resolves it)', () => {
     expect(config.settings['boundaries/files-single-match']).toBe(true);
   });
 
-  it.each([
-    ['apps:features:unit:infrastructure:core-adapters', 'apps:features:unit:infrastructure'],
-    ['apps:features:unit:infrastructure:common-adapters', 'apps:features:unit:infrastructure'],
-    ['apps:features:unit:infrastructure:lib-adapters', 'apps:features:unit:infrastructure'],
-    ['apps:features:unit:infrastructure:config', 'apps:features:unit:infrastructure'],
-    ['apps:processors:unit:infrastructure:config', 'apps:processors:unit:infrastructure'],
-    ['core:modules:unit:infrastructure:config', 'core:modules:unit:infrastructure'],
-    ['apps:processors:unit:infrastructure:core-adapters', 'apps:processors:unit:infrastructure'],
-    ['apps:processors:unit:infrastructure:common-adapters', 'apps:processors:unit:infrastructure'],
-    [
-      'apps:common:modules:unit:infrastructure:core-adapters',
-      'apps:common:modules:unit:infrastructure',
-    ],
-    [
-      'apps:common:modules:unit:infrastructure:common-adapters',
-      'apps:common:modules:unit:infrastructure',
-    ],
-    ['apps:global:unit:infrastructure:common-adapters', 'apps:global:unit:infrastructure'],
-    ['apps:global:unit:infrastructure:lib-adapters', 'apps:global:unit:infrastructure'],
-    ['apps:common:modules:unit:shell:facade', 'apps:common:modules:unit:shell'],
-    ['core:modules:unit:shell:facade', 'core:modules:unit:shell'],
-    ['libs:contracts', 'libs'],
-  ])('keeps %s AHEAD of %s — first match wins', (specific, general) => {
-    expect(categories.indexOf(specific)).toBeGreaterThanOrEqual(0);
-    expect(categories.indexOf(specific)).toBeLessThan(categories.indexOf(general));
-  });
+  it.each([['libs:contracts', 'libs']])(
+    'keeps %s AHEAD of %s — first match wins',
+    (specific, general) => {
+      expect(categories.indexOf(specific)).toBeGreaterThanOrEqual(0);
+      expect(categories.indexOf(specific)).toBeLessThan(categories.indexOf(general));
+    },
+  );
 
   it('gives core modules the app layers, with facades in shell/ instead of presentation/', () => {
     expect(categories).toEqual(
       expect.arrayContaining([
         'apps:features:unit:domain',
         'core:modules:unit:domain',
-        'apps:features:unit:outbound',
-        'core:modules:unit:outbound',
+        'apps:features:unit:outbound:index',
+        'core:modules:unit:outbound:index',
         'apps:features:unit:application',
         'core:modules:unit:application',
-        'apps:features:unit:infrastructure',
-        'core:modules:unit:infrastructure',
+        'apps:features:unit:infrastructure:index',
+        'core:modules:unit:infrastructure:index',
         'apps:features:unit:presentation',
         'core:modules:unit:shell:facade',
       ]),

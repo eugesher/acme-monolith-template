@@ -36,12 +36,6 @@ const units = [
   ['@acme-core/modules/<unit>/', 'core:modules:unit', ['unit']],
 ];
 
-const unitPaths = {
-  'shell/*.module': 'shell:module',
-  'shell/*.facade': 'shell:facade',
-  modules: 'modules:index',
-};
-
 const fixed = {
   '@acme-*/app': to('apps:app:index'),
   '@acme-<app>/app': to('apps:app:index', own('app')),
@@ -52,23 +46,20 @@ const fixed = {
   '@acme-<app>/global': to('apps:global:index', own('app')),
   '@acme-<app>/global/*': to('apps:global:unit:index', own('app')),
   '@acme-<app>/features': to('apps:features:index', own('app')),
-  '@acme-<app>/features/*': to('apps:features:unit', { ...own('app'), unit: '*' }),
-  '@acme-<app>/features/<unit>/modules/*': to('apps:features:unit', {
+  '@acme-<app>/features/*': to('apps:features:unit:index', { ...own('app'), unit: '*' }),
+  '@acme-<app>/features/<unit>/modules/*': to('apps:features:unit:index', {
     ...own('app'),
     unit: '{{ from.file.captured.unit }}/modules/*',
   }),
   '@acme-<app>/processors': to('apps:processors:index', own('app')),
-  '@acme-<app>/processors/*': to('apps:processors:unit', { ...own('app'), unit: '*' }),
-  '@acme-<app>/processors/<unit>/modules/*': to('apps:processors:unit', {
+  '@acme-<app>/processors/*': to('apps:processors:unit:index', { ...own('app'), unit: '*' }),
+  '@acme-<app>/processors/<unit>/modules/*': to('apps:processors:unit:index', {
     ...own('app'),
     unit: '{{ from.file.captured.unit }}/modules/*',
   }),
   '@acme-<app>/common/entities': to('apps:common:entities', own('app')),
   '@acme-<app>/common/modules': to('apps:common:modules:index', own('app')),
   '@acme-<app>/common/modules/*': to('apps:common:modules:unit:index', own('app')),
-  '@acme-<app>/common/shared': to('apps:common:shared:index', own('app')),
-  '@acme-<app>/common/shared/*': to('apps:common:shared:unit:index', own('app')),
-  '@acme-<app>/common/shared/*/**': to('apps:common:shared:unit', own('app')),
   '@acme-<app>/contracts': to('apps:contracts', own('app')),
   '@acme-<app>/contracts/<unit>': to('apps:contracts', own('app', 'unit')),
   'apps/<app>/test/**': to('apps:test', own('app')),
@@ -123,7 +114,7 @@ const unitSelector = (specifier, categories) => {
     return targets.length > 0 ? targets.map((target) => to(target, own(...keys))) : null;
   }
 
-  const target = `${category}:${unitPaths[path] ?? path.replaceAll('/', ':')}`;
+  const target = `${category}:${path.replace('/*.', ':').replaceAll('/', ':')}`;
 
   return categories.has(target) ? [to(target, own(...keys))] : null;
 };
