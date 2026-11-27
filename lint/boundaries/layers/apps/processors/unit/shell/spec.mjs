@@ -5,7 +5,6 @@ export const appsProcessorsUnitShellSpec = {
   allow: [
     '@acme-<app>/processors/<unit>/application',
     '@acme-<app>/processors/<unit>/shell/*.processor',
-    '@acme-<app>/processors/<unit>/shell/spec',
     '@acme-core/contracts',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

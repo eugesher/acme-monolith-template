@@ -3,7 +3,6 @@ export const appsFeaturesUnitInfrastructureIndex = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/infrastructure/index',
     '@acme-<app>/features/<unit>/infrastructure/persistence',
     '@acme-<app>/features/<unit>/infrastructure/cache',
     '@acme-<app>/features/<unit>/infrastructure/core-adapters',

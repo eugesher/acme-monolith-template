@@ -4,7 +4,6 @@ export const coreModulesUnitInfrastructureLibAdapters = {
   capture: ['unit'],
   allow: [
     '@acme-core/modules/<unit>/outbound/**',
-    '@acme-core/modules/<unit>/infrastructure/lib-adapters',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',

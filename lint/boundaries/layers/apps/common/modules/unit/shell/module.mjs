@@ -6,7 +6,6 @@ export const appsCommonModulesUnitShellModule = {
     '@acme-<app>/common/modules/<unit>/application',
     '@acme-<app>/common/modules/<unit>/infrastructure/index',
     '@acme-<app>/common/modules/<unit>/shell/*.facade',
-    '@acme-<app>/common/modules/<unit>/shell/*.module',
     '@acme-<app>/contracts/<unit>',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

@@ -6,7 +6,6 @@ export const appsFeaturesUnitShellController = {
     '@acme-<app>/features/<unit>/domain',
     '@acme-<app>/features/<unit>/application',
     '@acme-<app>/features/<unit>/presentation',
-    '@acme-<app>/features/<unit>/shell/*.controller',
     '@acme-libs/contracts/auth',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

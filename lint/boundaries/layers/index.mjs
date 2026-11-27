@@ -9,9 +9,7 @@ import { appsCommonModulesIndex } from './apps/common/modules/modules-index.mjs'
 import { appsCommonModulesUnitApplication } from './apps/common/modules/unit/application.mjs';
 import { appsCommonModulesUnitDomain } from './apps/common/modules/unit/domain.mjs';
 import { appsCommonModulesUnitInfrastructureCache } from './apps/common/modules/unit/infrastructure/cache.mjs';
-import { appsCommonModulesUnitInfrastructureCommonAdaptersSpec } from './apps/common/modules/unit/infrastructure/common-adapters-spec.mjs';
 import { appsCommonModulesUnitInfrastructureCommonAdapters } from './apps/common/modules/unit/infrastructure/common-adapters.mjs';
-import { appsCommonModulesUnitInfrastructureCoreAdaptersSpec } from './apps/common/modules/unit/infrastructure/core-adapters-spec.mjs';
 import { appsCommonModulesUnitInfrastructureCoreAdapters } from './apps/common/modules/unit/infrastructure/core-adapters.mjs';
 import { appsCommonModulesUnitInfrastructureIndex } from './apps/common/modules/unit/infrastructure/infrastructure-index.mjs';
 import { appsCommonModulesUnitInfrastructurePersistence } from './apps/common/modules/unit/infrastructure/persistence.mjs';
@@ -62,7 +60,6 @@ import { appsGlobalIndex } from './apps/global/global-index.mjs';
 import { appsGlobalUnitApplication } from './apps/global/unit/application.mjs';
 import { appsGlobalUnitInfrastructureCache } from './apps/global/unit/infrastructure/cache.mjs';
 import { appsGlobalUnitInfrastructureCommonAdapters } from './apps/global/unit/infrastructure/common-adapters.mjs';
-import { appsGlobalUnitInfrastructureCoreAdaptersSpec } from './apps/global/unit/infrastructure/core-adapters-spec.mjs';
 import { appsGlobalUnitInfrastructureCoreAdapters } from './apps/global/unit/infrastructure/core-adapters.mjs';
 import { appsGlobalUnitInfrastructureIndex } from './apps/global/unit/infrastructure/infrastructure-index.mjs';
 import { appsGlobalUnitInfrastructureLibAdapters } from './apps/global/unit/infrastructure/lib-adapters.mjs';
@@ -84,14 +81,12 @@ import { appsProcessorsIndex } from './apps/processors/processors-index.mjs';
 import { appsProcessorsUnitApplication } from './apps/processors/unit/application.mjs';
 import { appsProcessorsUnitDomain } from './apps/processors/unit/domain.mjs';
 import { appsProcessorsUnitInfrastructureCache } from './apps/processors/unit/infrastructure/cache.mjs';
-import { appsProcessorsUnitInfrastructureCommonAdaptersSpec } from './apps/processors/unit/infrastructure/common-adapters-spec.mjs';
 import { appsProcessorsUnitInfrastructureCommonAdapters } from './apps/processors/unit/infrastructure/common-adapters.mjs';
 import { appsProcessorsUnitInfrastructureConfigSpec } from './apps/processors/unit/infrastructure/config-spec.mjs';
 import { appsProcessorsUnitInfrastructureConfig } from './apps/processors/unit/infrastructure/config.mjs';
 import { appsProcessorsUnitInfrastructureCoreAdaptersSpec } from './apps/processors/unit/infrastructure/core-adapters-spec.mjs';
 import { appsProcessorsUnitInfrastructureCoreAdapters } from './apps/processors/unit/infrastructure/core-adapters.mjs';
 import { appsProcessorsUnitInfrastructureIndex } from './apps/processors/unit/infrastructure/infrastructure-index.mjs';
-import { appsProcessorsUnitInfrastructureLibAdaptersSpec } from './apps/processors/unit/infrastructure/lib-adapters-spec.mjs';
 import { appsProcessorsUnitInfrastructureLibAdapters } from './apps/processors/unit/infrastructure/lib-adapters.mjs';
 import { appsProcessorsUnitInfrastructurePersistence } from './apps/processors/unit/infrastructure/persistence.mjs';
 import { appsProcessorsUnitInfrastructureQueueSpec } from './apps/processors/unit/infrastructure/queue-spec.mjs';
@@ -305,19 +300,14 @@ export const layers = layersOf(import.meta.dirname, [
   repoMigrations,
   repoTestSystem,
   repoTestInfra,
-  appsGlobalUnitInfrastructureCoreAdaptersSpec,
   appsFeaturesUnitInfrastructureCoreAdaptersSpec,
   appsFeaturesUnitInfrastructureCommonAdaptersSpec,
   appsFeaturesUnitInfrastructureLibAdaptersSpec,
   appsFeaturesUnitInfrastructureQueueSpec,
   appsFeaturesUnitInfrastructureConfigSpec,
   appsProcessorsUnitInfrastructureCoreAdaptersSpec,
-  appsProcessorsUnitInfrastructureCommonAdaptersSpec,
-  appsProcessorsUnitInfrastructureLibAdaptersSpec,
   appsProcessorsUnitInfrastructureQueueSpec,
   appsProcessorsUnitInfrastructureConfigSpec,
-  appsCommonModulesUnitInfrastructureCoreAdaptersSpec,
-  appsCommonModulesUnitInfrastructureCommonAdaptersSpec,
   libsContractsDatabase,
   libsApp,
   libsAuth,

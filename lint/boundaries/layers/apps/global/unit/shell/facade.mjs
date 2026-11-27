@@ -3,7 +3,6 @@ export const appsGlobalUnitShellFacade = {
   pattern: 'apps/*/src/global/*/shell/*.facade.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/shell/*.facade',
     '@acme-<app>/global/<unit>/application',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

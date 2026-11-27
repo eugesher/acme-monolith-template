@@ -3,7 +3,6 @@ export const appsGlobalUnitInfrastructureCoreAdapters = {
   pattern: 'apps/*/src/global/*/infrastructure/core-adapters/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/infrastructure/core-adapters',
     '@acme-<app>/global/<unit>/outbound/**',
     '@acme-core/contracts',
     '@acme-libs/kernel',

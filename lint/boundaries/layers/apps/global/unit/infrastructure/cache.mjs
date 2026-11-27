@@ -5,7 +5,6 @@ export const appsGlobalUnitInfrastructureCache = {
   allow: [
     '@acme-<app>/global/<unit>/infrastructure/index',
     '@acme-<app>/global/<unit>/infrastructure/persistence',
-    '@acme-<app>/global/<unit>/infrastructure/cache',
     '@acme-<app>/global/<unit>/infrastructure/core-adapters',
     '@acme-<app>/global/<unit>/infrastructure/common-adapters',
     '@acme-<app>/global/<unit>/infrastructure/lib-adapters',

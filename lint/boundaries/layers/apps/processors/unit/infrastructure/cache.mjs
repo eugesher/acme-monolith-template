@@ -6,7 +6,6 @@ export const appsProcessorsUnitInfrastructureCache = {
     '@acme-<app>/processors/<unit>/outbound/**',
     '@acme-<app>/processors/<unit>/infrastructure/index',
     '@acme-<app>/processors/<unit>/infrastructure/persistence',
-    '@acme-<app>/processors/<unit>/infrastructure/cache',
     '@acme-<app>/processors/<unit>/infrastructure/core-adapters',
     '@acme-<app>/processors/<unit>/infrastructure/common-adapters',
     '@acme-<app>/processors/<unit>/infrastructure/lib-adapters',

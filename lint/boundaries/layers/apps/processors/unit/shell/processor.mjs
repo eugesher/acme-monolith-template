@@ -5,7 +5,6 @@ export const appsProcessorsUnitShellProcessor = {
   allow: [
     '@acme-<app>/processors/<unit>/application',
     '@acme-<app>/processors/<unit>/queues',
-    '@acme-<app>/processors/<unit>/shell/*.processor',
     '@acme-core/contracts',
     '@acme-core/queues',
     '@acme-libs/kernel',

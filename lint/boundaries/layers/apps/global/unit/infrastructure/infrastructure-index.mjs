@@ -3,7 +3,6 @@ export const appsGlobalUnitInfrastructureIndex = {
   pattern: 'apps/*/src/global/*/infrastructure/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/infrastructure/index',
     '@acme-<app>/global/<unit>/infrastructure/persistence',
     '@acme-<app>/global/<unit>/infrastructure/common-adapters',
     '@acme-<app>/global/<unit>/infrastructure/lib-adapters',

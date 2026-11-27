@@ -3,7 +3,6 @@ export const appsGlobalUnitShellModule = {
   pattern: 'apps/*/src/global/*/shell/*.module.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/shell/*.module',
     '@acme-<app>/global/<unit>/shell/*.facade',
     '@acme-<app>/global/<unit>/application',
     '@acme-<app>/global/<unit>/infrastructure/index',

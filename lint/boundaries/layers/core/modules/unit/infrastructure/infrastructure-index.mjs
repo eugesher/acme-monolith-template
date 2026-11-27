@@ -3,7 +3,6 @@ export const coreModulesUnitInfrastructureIndex = {
   pattern: 'core/modules/src/*/infrastructure/index.ts',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/infrastructure/index',
     '@acme-core/modules/<unit>/infrastructure/persistence',
     '@acme-core/modules/<unit>/infrastructure/cache',
     '@acme-core/modules/<unit>/infrastructure/queue',
