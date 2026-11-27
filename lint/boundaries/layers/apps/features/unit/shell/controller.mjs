@@ -15,7 +15,5 @@ export const appsFeaturesUnitShellController = {
     '@acme-libs/http',
     '@nestjs/common',
     '@nestjs/swagger',
-    'class-transformer',
-    'class-validator',
   ],
 };

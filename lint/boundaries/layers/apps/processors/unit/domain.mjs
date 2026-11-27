@@ -4,7 +4,6 @@ export const appsProcessorsUnitDomain = {
   capture: ['app', 'unit'],
   allow: [
     '@acme-<app>/processors/<unit>/domain',
-    '@acme-core/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',

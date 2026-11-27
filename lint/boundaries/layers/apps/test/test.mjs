@@ -5,7 +5,6 @@ export const appsTest = {
   allow: [
     'apps/<app>/test/**',
     '@acme-<app>/app',
-    '@acme-<app>/contracts',
     '@acme-core/contracts',
     '@acme-core/entities',
     '@acme-core/queues',

@@ -8,6 +8,5 @@ export const appsProcessorsUnitOutboundTypesQueries = {
     '@acme-libs/toolkit',
     '@acme-libs/domain',
     '@acme-core/entities',
-    '@acme-<app>/common/entities',
   ],
 };

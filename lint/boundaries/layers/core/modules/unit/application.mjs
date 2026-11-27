@@ -6,7 +6,6 @@ export const coreModulesUnitApplication = {
     '@acme-core/modules/<unit>/domain',
     '@acme-core/modules/<unit>/outbound/**',
     '@acme-core/modules/<unit>/application',
-    '@acme-core/domain',
     '@acme-core/contracts/<unit>',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

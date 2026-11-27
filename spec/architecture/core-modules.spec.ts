@@ -73,13 +73,6 @@ describe('core modules', () => {
       },
     );
 
-    it('core infrastructure MAY bind its core-adapters', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
-        code: 'import { x } from "../core-adapters/ledger-core-identity-core.adapter";',
-      }).toPassArchitectureLint();
-    });
-
     it('the module root MAY mount another core module through its barrel', async () => {
       await expect({
         file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
@@ -114,13 +107,6 @@ describe('core modules', () => {
       await expect({
         file: 'core/modules/src/__product-fixture__/application/cases/__fixture__.ts',
         code: 'import { PRODUCT_CORE_PORT } from "@acme-core/contracts/__product-fixture__";',
-      }).toPassArchitectureLint();
-    });
-
-    it('core outbound MAY reach its own contracts: a queue command carries the record of the contract', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/outbound/ports/__fixture__.ts',
-        code: 'import { x } from "../../../../../contracts/src/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 

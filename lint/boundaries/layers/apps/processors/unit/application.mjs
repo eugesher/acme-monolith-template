@@ -6,7 +6,6 @@ export const appsProcessorsUnitApplication = {
     '@acme-<app>/processors/<unit>/domain',
     '@acme-<app>/processors/<unit>/outbound/**',
     '@acme-<app>/processors/<unit>/application',
-    '@acme-core/domain',
     '@nestjs/common',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

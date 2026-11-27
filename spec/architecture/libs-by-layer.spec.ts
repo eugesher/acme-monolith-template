@@ -374,11 +374,6 @@ describe('libs by layer', () => {
     [
       'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
       '../../../../../../libs',
-      'auth',
-    ],
-    [
-      'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
-      '../../../../../../libs',
       'health',
     ],
     [

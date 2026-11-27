@@ -5,11 +5,9 @@ export const appsFeaturesUnitPresentation = {
   allow: [
     '@acme-<app>/features/<unit>/domain',
     '@acme-<app>/features/<unit>/presentation',
-    '@acme-libs/contracts/auth',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',
-    '@acme-libs/auth',
     '@acme-libs/http',
     '@nestjs/common',
     '@nestjs/swagger',

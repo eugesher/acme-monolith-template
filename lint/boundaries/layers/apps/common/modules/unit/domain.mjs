@@ -4,7 +4,6 @@ export const appsCommonModulesUnitDomain = {
   capture: ['app', 'unit'],
   allow: [
     '@acme-<app>/common/modules/<unit>/domain',
-    '@acme-core/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',

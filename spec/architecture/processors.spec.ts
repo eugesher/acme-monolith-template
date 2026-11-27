@@ -82,10 +82,10 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   });
 
   describe('the processor root', () => {
-    it('MAY reach its layers, core and common modules', async () => {
+    it('MAY reach its layers and core modules', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-append/shell/__fixture__.module.ts',
-        code: 'import { x } from "../application";\nimport { y } from "./ledger-append.processor";\nimport { z } from "../../../../../../core/modules/src/__ledger-fixture__";\nimport { w } from "../../../common/modules";',
+        code: 'import { x } from "../application";\nimport { y } from "./ledger-append.processor";\nimport { z } from "../../../../../../core/modules/src/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
 
@@ -216,10 +216,10 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   });
 
   describe('processors (shell)', () => {
-    it('a processor MAY reach its application, app contracts and the observability lib', async () => {
+    it('a processor MAY reach its application and the observability lib', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/ledger-append/shell/__fixture__.processor.ts',
-        code: 'import { x } from "../application";\nimport { y } from "../../../contracts/ledger-append";\nimport { z } from "../../../../../../libs/observability/src";',
+        code: 'import { x } from "../application";\nimport { z } from "../../../../../../libs/observability/src";',
       }).toPassArchitectureLint();
     });
 
@@ -381,13 +381,6 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   });
 
   describe('nested processors (<module>/modules/<submodule>)', () => {
-    it('the aggregator root MAY mount its submodules through modules/index.ts', async () => {
-      await expect({
-        file: 'apps/__processors-fixture__/src/processors/digest/shell/__fixture__.module.ts',
-        code: 'import { x } from "../modules";',
-      }).toPassArchitectureLint();
-    });
-
     it('the submodules index MAY re-export its own submodule roots', async () => {
       await expect({
         file: 'apps/__processors-fixture__/src/processors/digest/modules/index.ts',

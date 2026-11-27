@@ -21,7 +21,6 @@ describe('features', () => {
       'apps/__features-fixture__/src/features/product/outbound/index.ts',
       'apps/__features-fixture__/src/features/product/application/index.ts',
       'apps/__features-fixture__/src/features/product/infrastructure/index.ts',
-      'apps/__features-fixture__/src/features/product/infrastructure/cache/product-cache.adapter.ts',
       'apps/__features-fixture__/src/features/product/infrastructure/persistence/repositories/product.repository.ts',
       'apps/__features-fixture__/src/features/product/presentation/index.ts',
       'apps/__features-fixture__/src/features/note/application/index.ts',
@@ -290,14 +289,13 @@ describe('features', () => {
       },
     );
 
-    it('infrastructure/queue MAY reach app contracts and inject a Bull queue', async () => {
+    it('infrastructure/queue MAY inject a Bull queue', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/queue/__fixture__.ts',
         code: [
           'import { InjectQueue } from "@nestjs/bullmq";',
           'import { Injectable } from "@nestjs/common";',
           'import type { Queue } from "bullmq";',
-          'import { x } from "../../../../contracts/ledger-append";',
         ].join('\n'),
       }).toPassArchitectureLint();
     });
@@ -501,7 +499,7 @@ describe('features', () => {
     it('an import inside the infrastructure layer MAY use a direct file path', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
-        code: 'import { x } from "../cache/product-cache.adapter";',
+        code: 'import { x } from "./repositories/product.repository";',
       }).toPassArchitectureLint();
     });
 

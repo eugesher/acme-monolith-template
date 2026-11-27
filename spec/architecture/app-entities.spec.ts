@@ -27,10 +27,6 @@ describe('app entities (@acme-<app>/common/entities)', () => {
   it.each([
     ['apps/__entities-fixture__/src/app/setup/entities/index.ts', '../../../common/entities'],
     [
-      'apps/__entities-fixture__/src/global/auth/infrastructure/persistence/repositories/__fixture__.ts',
-      '../../../../../common/entities',
-    ],
-    [
       'apps/__entities-fixture__/src/features/product/infrastructure/persistence/repositories/__fixture__.ts',
       '../../../../../common/entities',
     ],
@@ -114,10 +110,10 @@ describe('app entities (@acme-<app>/common/entities)', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('an app entity MAY import typeorm, the kernel lib, the core entities and its siblings', async () => {
+  it('an app entity MAY import typeorm, the kernel lib and its siblings', async () => {
     await expect({
       file: 'apps/__entities-fixture__/src/common/entities/note/__fixture__.ts',
-      code: 'import { Entity } from "typeorm";\nimport { ProductStatusEnum } from "@acme-libs/kernel";\nimport { Product } from "@acme-core/entities";\nimport { NoteRevision } from "./note-revision.entity";',
+      code: 'import { Entity } from "typeorm";\nimport { ProductStatusEnum } from "@acme-libs/kernel";\nimport { NoteRevision } from "./note-revision.entity";',
     }).toPassArchitectureLint();
   });
 

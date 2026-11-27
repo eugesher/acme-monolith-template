@@ -3,12 +3,9 @@ export const appsProcessorsUnitShellProcessor = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/shell/*.processor.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/processors/<unit>/domain',
     '@acme-<app>/processors/<unit>/application',
     '@acme-<app>/processors/<unit>/queues',
     '@acme-<app>/processors/<unit>/shell/*.processor',
-    '@acme-<app>/processors/<unit>/shell/spec',
-    '@acme-<app>/contracts',
     '@acme-core/contracts',
     '@acme-core/queues',
     '@acme-libs/kernel',

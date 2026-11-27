@@ -29,7 +29,6 @@ describe('core entities (@acme-core/entities)', () => {
   it.each([
     'apps/staff-app/src/app/setup/entities/index.ts',
     'apps/staff-app/src/features/product/infrastructure/persistence/repositories/__fixture__.ts',
-    'apps/staff-app/src/common/modules/idempotency/infrastructure/persistence/repositories/__fixture__.ts',
     'apps/processor-app/src/processors/purge/infrastructure/persistence/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
   ])('%s MAY import the entities', async (file) => {

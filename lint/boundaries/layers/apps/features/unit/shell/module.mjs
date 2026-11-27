@@ -5,8 +5,6 @@ export const appsFeaturesUnitShellModule = {
   allow: [
     '@acme-<app>/features/<unit>/application',
     '@acme-<app>/features/<unit>/infrastructure/index',
-    '@acme-<app>/features/<unit>/infrastructure/persistence',
-    '@acme-<app>/features/<unit>/infrastructure/cache',
     '@acme-<app>/features/<unit>/shell/*.controller',
     '@acme-<app>/features/<unit>/modules/index',
     '@acme-<app>/common/modules',
@@ -15,9 +13,7 @@ export const appsFeaturesUnitShellModule = {
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',
-    '@acme-libs/auth',
     '@acme-libs/health',
-    '@acme-libs/http',
     '@nestjs/common',
   ],
 };

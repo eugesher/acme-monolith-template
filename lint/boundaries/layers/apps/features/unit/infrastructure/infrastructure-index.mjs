@@ -3,7 +3,6 @@ export const appsFeaturesUnitInfrastructureIndex = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
     '@acme-<app>/features/<unit>/infrastructure/index',
     '@acme-<app>/features/<unit>/infrastructure/persistence',
     '@acme-<app>/features/<unit>/infrastructure/cache',
@@ -12,15 +11,8 @@ export const appsFeaturesUnitInfrastructureIndex = {
     '@acme-<app>/features/<unit>/infrastructure/lib-adapters',
     '@acme-<app>/features/<unit>/infrastructure/queue',
     '@acme-<app>/features/<unit>/infrastructure/config',
-    '@acme-core/entities',
-    '@acme-<app>/common/entities',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',
-    '@acme-libs/contracts/cache',
-    '@acme-libs/contracts/database',
-    '@acme-libs/contracts/local-storage',
-    '@nestjs/common',
-    'typeorm',
   ],
 };

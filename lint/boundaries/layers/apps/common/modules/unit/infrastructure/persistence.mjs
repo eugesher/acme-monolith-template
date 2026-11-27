@@ -4,12 +4,7 @@ export const appsCommonModulesUnitInfrastructurePersistence = {
   capture: ['app', 'unit'],
   allow: [
     '@acme-<app>/common/modules/<unit>/outbound/**',
-    '@acme-<app>/common/modules/<unit>/infrastructure/index',
     '@acme-<app>/common/modules/<unit>/infrastructure/persistence',
-    '@acme-<app>/common/modules/<unit>/infrastructure/cache',
-    '@acme-<app>/common/modules/<unit>/infrastructure/core-adapters',
-    '@acme-<app>/common/modules/<unit>/infrastructure/common-adapters',
-    '@acme-core/entities',
     '@acme-<app>/common/entities',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',

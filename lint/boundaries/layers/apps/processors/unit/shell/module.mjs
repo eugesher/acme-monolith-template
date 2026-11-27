@@ -5,13 +5,8 @@ export const appsProcessorsUnitShellModule = {
   allow: [
     '@acme-<app>/processors/<unit>/application',
     '@acme-<app>/processors/<unit>/infrastructure/index',
-    '@acme-<app>/processors/<unit>/infrastructure/persistence',
-    '@acme-<app>/processors/<unit>/infrastructure/cache',
     '@acme-<app>/processors/<unit>/queues',
     '@acme-<app>/processors/<unit>/shell/*.processor',
-    '@acme-<app>/processors/<unit>/shell/spec',
-    '@acme-<app>/processors/<unit>/modules/index',
-    '@acme-<app>/common/modules',
     '@acme-core/modules/*',
     '@acme-core/queues',
     '@acme-libs/kernel',

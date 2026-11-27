@@ -4,7 +4,6 @@ export const coreModulesUnitDomain = {
   capture: ['unit'],
   allow: [
     '@acme-core/modules/<unit>/domain',
-    '@acme-core/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',

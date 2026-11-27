@@ -87,13 +87,6 @@ describe('global modules (global/) — modules without controllers', () => {
     }).toPassArchitectureLint();
   });
 
-  it('the module root MAY mount a core module — the staff subject of two apps lives in core', async () => {
-    await expect({
-      file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
-      code: 'import { x } from "../../../../../../core/modules/src/__identity-fixture__";',
-    }).toPassArchitectureLint();
-  });
-
   it('a core adapter MAY reach the core contracts and its own outbound', async () => {
     await expect({
       file: 'apps/__global-fixture__/src/global/auth/infrastructure/core-adapters/__fixture__.ts',
@@ -108,10 +101,10 @@ describe('global modules (global/) — modules without controllers', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the module root MAY reach app contracts and its own infrastructure', async () => {
+  it('the module root MAY reach its own infrastructure', async () => {
     await expect({
       file: 'apps/__global-fixture__/src/global/auth/shell/__fixture__.module.ts',
-      code: 'import { x } from "../../../contracts/auth";\nimport { y } from "../infrastructure";',
+      code: 'import { y } from "../infrastructure";',
     }).toPassArchitectureLint();
   });
 
@@ -210,10 +203,10 @@ describe('global modules (global/) — modules without controllers', () => {
     }).toBreakRule('boundaries/dependencies');
   });
 
-  it('the rest of infrastructure MAY reach entities, app contracts and its own adapters', async () => {
+  it('the rest of infrastructure MAY reach the core entities', async () => {
     await expect({
       file: 'apps/__global-fixture__/src/global/auth/infrastructure/persistence/__fixture__.ts',
-      code: 'import { x } from "../../../../../../../core/entities/src";\nimport { y } from "../../../../contracts/auth";\nimport { z } from "../common-adapters";\nimport { w } from "../lib-adapters";',
+      code: 'import { x } from "../../../../../../../core/entities/src";',
     }).toPassArchitectureLint();
   });
 

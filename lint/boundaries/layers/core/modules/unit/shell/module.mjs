@@ -5,8 +5,6 @@ export const coreModulesUnitShellModule = {
   allow: [
     '@acme-core/modules/<unit>/application',
     '@acme-core/modules/<unit>/infrastructure/index',
-    '@acme-core/modules/<unit>/infrastructure/persistence',
-    '@acme-core/modules/<unit>/infrastructure/cache',
     '@acme-core/modules/<unit>/shell/*.facade',
     '@acme-core/modules/<unit>/shell/*.module',
     '@acme-core/contracts/<unit>',

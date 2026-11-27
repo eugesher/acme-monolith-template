@@ -7,7 +7,6 @@ export const appsCommonModulesUnitOutboundTypesRecords = {
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
     '@acme-libs/domain',
-    '@acme-core/entities',
     '@acme-<app>/common/entities',
   ],
 };
