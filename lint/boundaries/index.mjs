@@ -2,339 +2,359 @@ import boundariesPlugin from 'eslint-plugin-boundaries';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 
-import appMain from './layers/apps/app-main.mjs';
-import appIndex from './layers/apps/app/app-index.mjs';
-import appSetupConfig from './layers/apps/app/app-setup-config.mjs';
-import appSetupEntities from './layers/apps/app/app-setup-entities.mjs';
-import appSetupModule from './layers/apps/app/app-setup-module.mjs';
-import appShellModule from './layers/apps/app/app-shell-module.mjs';
-import appCommonEntity from './layers/apps/common/app-common-entity.mjs';
-import appCommonModuleApplication from './layers/apps/common/app-common-module-application.mjs';
-import appCommonModuleDomain from './layers/apps/common/app-common-module-domain.mjs';
-import appCommonModuleIndex from './layers/apps/common/app-common-module-index.mjs';
-import appCommonModuleInfrastructureCommonAdapterSpec from './layers/apps/common/app-common-module-infrastructure-common-adapter-spec.mjs';
-import appCommonModuleInfrastructureCommonAdapter from './layers/apps/common/app-common-module-infrastructure-common-adapter.mjs';
-import appCommonModuleInfrastructureCoreAdapterSpec from './layers/apps/common/app-common-module-infrastructure-core-adapter-spec.mjs';
-import appCommonModuleInfrastructureCoreAdapter from './layers/apps/common/app-common-module-infrastructure-core-adapter.mjs';
-import appCommonModuleInfrastructure from './layers/apps/common/app-common-module-infrastructure.mjs';
-import appCommonModuleModuleIndex from './layers/apps/common/app-common-module-module-index.mjs';
-import appCommonModuleOutboundPort from './layers/apps/common/app-common-module-outbound-port.mjs';
-import appCommonModuleOutboundToken from './layers/apps/common/app-common-module-outbound-token.mjs';
-import appCommonModuleOutboundTypeCommand from './layers/apps/common/app-common-module-outbound-type-command.mjs';
-import appCommonModuleOutboundTypeEnum from './layers/apps/common/app-common-module-outbound-type-enum.mjs';
-import appCommonModuleOutboundTypeQuery from './layers/apps/common/app-common-module-outbound-type-query.mjs';
-import appCommonModuleOutboundTypeRecord from './layers/apps/common/app-common-module-outbound-type-record.mjs';
-import appCommonModuleOutboundTypeView from './layers/apps/common/app-common-module-outbound-type-view.mjs';
-import appCommonModuleOutboundType from './layers/apps/common/app-common-module-outbound-type.mjs';
-import appCommonModuleOutbound from './layers/apps/common/app-common-module-outbound.mjs';
-import appCommonModuleShellFacade from './layers/apps/common/app-common-module-shell-facade.mjs';
-import appCommonModuleShell from './layers/apps/common/app-common-module-shell.mjs';
-import appCommonSharedIndex from './layers/apps/common/app-common-shared-index.mjs';
-import appCommonSharedModuleIndex from './layers/apps/common/app-common-shared-module-index.mjs';
-import appCommonShared from './layers/apps/common/app-common-shared.mjs';
-import appContract from './layers/apps/contracts/app-contract.mjs';
-import appFeatureApplication from './layers/apps/features/app-feature-application.mjs';
-import appFeatureDomain from './layers/apps/features/app-feature-domain.mjs';
-import appFeatureIndex from './layers/apps/features/app-feature-index.mjs';
-import appFeatureInfrastructureCommonAdapterSpec from './layers/apps/features/app-feature-infrastructure-common-adapter-spec.mjs';
-import appFeatureInfrastructureCommonAdapter from './layers/apps/features/app-feature-infrastructure-common-adapter.mjs';
-import appFeatureInfrastructureConfigSpec from './layers/apps/features/app-feature-infrastructure-config-spec.mjs';
-import appFeatureInfrastructureConfig from './layers/apps/features/app-feature-infrastructure-config.mjs';
-import appFeatureInfrastructureCoreAdapterSpec from './layers/apps/features/app-feature-infrastructure-core-adapter-spec.mjs';
-import appFeatureInfrastructureCoreAdapter from './layers/apps/features/app-feature-infrastructure-core-adapter.mjs';
-import appFeatureInfrastructureLibAdapterSpec from './layers/apps/features/app-feature-infrastructure-lib-adapter-spec.mjs';
-import appFeatureInfrastructureLibAdapter from './layers/apps/features/app-feature-infrastructure-lib-adapter.mjs';
-import appFeatureInfrastructureQueueSpec from './layers/apps/features/app-feature-infrastructure-queue-spec.mjs';
-import appFeatureInfrastructureQueue from './layers/apps/features/app-feature-infrastructure-queue.mjs';
-import appFeatureInfrastructure from './layers/apps/features/app-feature-infrastructure.mjs';
-import appFeatureModuleIndex from './layers/apps/features/app-feature-module-index.mjs';
-import appFeatureModule from './layers/apps/features/app-feature-module.mjs';
-import appFeatureOutboundPort from './layers/apps/features/app-feature-outbound-port.mjs';
-import appFeatureOutboundToken from './layers/apps/features/app-feature-outbound-token.mjs';
-import appFeatureOutboundTypeCommand from './layers/apps/features/app-feature-outbound-type-command.mjs';
-import appFeatureOutboundTypeEnum from './layers/apps/features/app-feature-outbound-type-enum.mjs';
-import appFeatureOutboundTypeQuery from './layers/apps/features/app-feature-outbound-type-query.mjs';
-import appFeatureOutboundTypeRecord from './layers/apps/features/app-feature-outbound-type-record.mjs';
-import appFeatureOutboundTypeView from './layers/apps/features/app-feature-outbound-type-view.mjs';
-import appFeatureOutboundType from './layers/apps/features/app-feature-outbound-type.mjs';
-import appFeatureOutbound from './layers/apps/features/app-feature-outbound.mjs';
-import appFeaturePresentation from './layers/apps/features/app-feature-presentation.mjs';
-import appFeatureShellModule from './layers/apps/features/app-feature-shell-module.mjs';
-import appFeatureShell from './layers/apps/features/app-feature-shell.mjs';
-import appGlobalApplication from './layers/apps/global/app-global-application.mjs';
-import appGlobalIndex from './layers/apps/global/app-global-index.mjs';
-import appGlobalInfrastructureCommonAdapter from './layers/apps/global/app-global-infrastructure-common-adapter.mjs';
-import appGlobalInfrastructureCoreAdapterSpec from './layers/apps/global/app-global-infrastructure-core-adapter-spec.mjs';
-import appGlobalInfrastructureCoreAdapter from './layers/apps/global/app-global-infrastructure-core-adapter.mjs';
-import appGlobalInfrastructureLibAdapter from './layers/apps/global/app-global-infrastructure-lib-adapter.mjs';
-import appGlobalInfrastructure from './layers/apps/global/app-global-infrastructure.mjs';
-import appGlobalModuleIndex from './layers/apps/global/app-global-module-index.mjs';
-import appGlobalOutboundPort from './layers/apps/global/app-global-outbound-port.mjs';
-import appGlobalOutboundToken from './layers/apps/global/app-global-outbound-token.mjs';
-import appGlobalOutboundTypeCommand from './layers/apps/global/app-global-outbound-type-command.mjs';
-import appGlobalOutboundTypeEnum from './layers/apps/global/app-global-outbound-type-enum.mjs';
-import appGlobalOutboundTypeQuery from './layers/apps/global/app-global-outbound-type-query.mjs';
-import appGlobalOutboundTypeRecord from './layers/apps/global/app-global-outbound-type-record.mjs';
-import appGlobalOutboundTypeView from './layers/apps/global/app-global-outbound-type-view.mjs';
-import appGlobalOutboundType from './layers/apps/global/app-global-outbound-type.mjs';
-import appGlobalOutbound from './layers/apps/global/app-global-outbound.mjs';
-import appGlobalShell from './layers/apps/global/app-global-shell.mjs';
-import appProcessorApplication from './layers/apps/processors/app-processor-application.mjs';
-import appProcessorDomain from './layers/apps/processors/app-processor-domain.mjs';
-import appProcessorIndex from './layers/apps/processors/app-processor-index.mjs';
-import appProcessorInfrastructureCommonAdapterSpec from './layers/apps/processors/app-processor-infrastructure-common-adapter-spec.mjs';
-import appProcessorInfrastructureCommonAdapter from './layers/apps/processors/app-processor-infrastructure-common-adapter.mjs';
-import appProcessorInfrastructureConfigSpec from './layers/apps/processors/app-processor-infrastructure-config-spec.mjs';
-import appProcessorInfrastructureConfig from './layers/apps/processors/app-processor-infrastructure-config.mjs';
-import appProcessorInfrastructureCoreAdapterSpec from './layers/apps/processors/app-processor-infrastructure-core-adapter-spec.mjs';
-import appProcessorInfrastructureCoreAdapter from './layers/apps/processors/app-processor-infrastructure-core-adapter.mjs';
-import appProcessorInfrastructureLibAdapterSpec from './layers/apps/processors/app-processor-infrastructure-lib-adapter-spec.mjs';
-import appProcessorInfrastructureLibAdapter from './layers/apps/processors/app-processor-infrastructure-lib-adapter.mjs';
-import appProcessorInfrastructureQueueSpec from './layers/apps/processors/app-processor-infrastructure-queue-spec.mjs';
-import appProcessorInfrastructureQueue from './layers/apps/processors/app-processor-infrastructure-queue.mjs';
-import appProcessorInfrastructure from './layers/apps/processors/app-processor-infrastructure.mjs';
-import appProcessorModuleIndex from './layers/apps/processors/app-processor-module-index.mjs';
-import appProcessorModule from './layers/apps/processors/app-processor-module.mjs';
-import appProcessorOutboundPort from './layers/apps/processors/app-processor-outbound-port.mjs';
-import appProcessorOutboundToken from './layers/apps/processors/app-processor-outbound-token.mjs';
-import appProcessorOutboundTypeCommand from './layers/apps/processors/app-processor-outbound-type-command.mjs';
-import appProcessorOutboundTypeEnum from './layers/apps/processors/app-processor-outbound-type-enum.mjs';
-import appProcessorOutboundTypeQuery from './layers/apps/processors/app-processor-outbound-type-query.mjs';
-import appProcessorOutboundTypeRecord from './layers/apps/processors/app-processor-outbound-type-record.mjs';
-import appProcessorOutboundTypeView from './layers/apps/processors/app-processor-outbound-type-view.mjs';
-import appProcessorOutboundType from './layers/apps/processors/app-processor-outbound-type.mjs';
-import appProcessorOutbound from './layers/apps/processors/app-processor-outbound.mjs';
-import appProcessorQueue from './layers/apps/processors/app-processor-queue.mjs';
-import appProcessorShellModule from './layers/apps/processors/app-processor-shell-module.mjs';
-import appProcessorShell from './layers/apps/processors/app-processor-shell.mjs';
-import appTest from './layers/apps/test/app-test.mjs';
-import coreContract from './layers/core/core-contract.mjs';
+import appsAppIndex from './layers/apps/app/apps-app-index.mjs';
+import appsAppSetupConfig from './layers/apps/app/apps-app-setup-config.mjs';
+import appsAppSetupEntities from './layers/apps/app/apps-app-setup-entities.mjs';
+import appsAppSetupModule from './layers/apps/app/apps-app-setup-module.mjs';
+import appsAppShell from './layers/apps/app/apps-app-shell.mjs';
+import appsMain from './layers/apps/apps-main.mjs';
+import appsCommonEntities from './layers/apps/common/apps-common-entities.mjs';
+import appsCommonModulesIndex from './layers/apps/common/apps-common-modules-index.mjs';
+import appsCommonModulesUnitApplication from './layers/apps/common/apps-common-modules-unit-application.mjs';
+import appsCommonModulesUnitDomain from './layers/apps/common/apps-common-modules-unit-domain.mjs';
+import appsCommonModulesUnitIndex from './layers/apps/common/apps-common-modules-unit-index.mjs';
+import appsCommonModulesUnitInfrastructureCache from './layers/apps/common/apps-common-modules-unit-infrastructure-cache.mjs';
+import appsCommonModulesUnitInfrastructureCommonAdaptersSpec from './layers/apps/common/apps-common-modules-unit-infrastructure-common-adapters-spec.mjs';
+import appsCommonModulesUnitInfrastructureCommonAdapters from './layers/apps/common/apps-common-modules-unit-infrastructure-common-adapters.mjs';
+import appsCommonModulesUnitInfrastructureCoreAdaptersSpec from './layers/apps/common/apps-common-modules-unit-infrastructure-core-adapters-spec.mjs';
+import appsCommonModulesUnitInfrastructureCoreAdapters from './layers/apps/common/apps-common-modules-unit-infrastructure-core-adapters.mjs';
+import appsCommonModulesUnitInfrastructurePersistence from './layers/apps/common/apps-common-modules-unit-infrastructure-persistence.mjs';
+import appsCommonModulesUnitInfrastructure from './layers/apps/common/apps-common-modules-unit-infrastructure.mjs';
+import appsCommonModulesUnitOutboundPorts from './layers/apps/common/apps-common-modules-unit-outbound-ports.mjs';
+import appsCommonModulesUnitOutboundTokens from './layers/apps/common/apps-common-modules-unit-outbound-tokens.mjs';
+import appsCommonModulesUnitOutboundTypesCommands from './layers/apps/common/apps-common-modules-unit-outbound-types-commands.mjs';
+import appsCommonModulesUnitOutboundTypesEnums from './layers/apps/common/apps-common-modules-unit-outbound-types-enums.mjs';
+import appsCommonModulesUnitOutboundTypesQueries from './layers/apps/common/apps-common-modules-unit-outbound-types-queries.mjs';
+import appsCommonModulesUnitOutboundTypesRecords from './layers/apps/common/apps-common-modules-unit-outbound-types-records.mjs';
+import appsCommonModulesUnitOutboundTypesViews from './layers/apps/common/apps-common-modules-unit-outbound-types-views.mjs';
+import appsCommonModulesUnitOutboundTypes from './layers/apps/common/apps-common-modules-unit-outbound-types.mjs';
+import appsCommonModulesUnitOutbound from './layers/apps/common/apps-common-modules-unit-outbound.mjs';
+import appsCommonModulesUnitShellFacade from './layers/apps/common/apps-common-modules-unit-shell-facade.mjs';
+import appsCommonModulesUnitShell from './layers/apps/common/apps-common-modules-unit-shell.mjs';
+import appsCommonSharedIndex from './layers/apps/common/apps-common-shared-index.mjs';
+import appsCommonSharedUnitIndex from './layers/apps/common/apps-common-shared-unit-index.mjs';
+import appsCommonSharedUnit from './layers/apps/common/apps-common-shared-unit.mjs';
+import appsContracts from './layers/apps/contracts/apps-contracts.mjs';
+import appsFeaturesIndex from './layers/apps/features/apps-features-index.mjs';
+import appsFeaturesUnitApplication from './layers/apps/features/apps-features-unit-application.mjs';
+import appsFeaturesUnitDomain from './layers/apps/features/apps-features-unit-domain.mjs';
+import appsFeaturesUnitInfrastructureCache from './layers/apps/features/apps-features-unit-infrastructure-cache.mjs';
+import appsFeaturesUnitInfrastructureCommonAdaptersSpec from './layers/apps/features/apps-features-unit-infrastructure-common-adapters-spec.mjs';
+import appsFeaturesUnitInfrastructureCommonAdapters from './layers/apps/features/apps-features-unit-infrastructure-common-adapters.mjs';
+import appsFeaturesUnitInfrastructureConfigSpec from './layers/apps/features/apps-features-unit-infrastructure-config-spec.mjs';
+import appsFeaturesUnitInfrastructureConfig from './layers/apps/features/apps-features-unit-infrastructure-config.mjs';
+import appsFeaturesUnitInfrastructureCoreAdaptersSpec from './layers/apps/features/apps-features-unit-infrastructure-core-adapters-spec.mjs';
+import appsFeaturesUnitInfrastructureCoreAdapters from './layers/apps/features/apps-features-unit-infrastructure-core-adapters.mjs';
+import appsFeaturesUnitInfrastructureLibAdaptersSpec from './layers/apps/features/apps-features-unit-infrastructure-lib-adapters-spec.mjs';
+import appsFeaturesUnitInfrastructureLibAdapters from './layers/apps/features/apps-features-unit-infrastructure-lib-adapters.mjs';
+import appsFeaturesUnitInfrastructurePersistence from './layers/apps/features/apps-features-unit-infrastructure-persistence.mjs';
+import appsFeaturesUnitInfrastructureQueueSpec from './layers/apps/features/apps-features-unit-infrastructure-queue-spec.mjs';
+import appsFeaturesUnitInfrastructureQueue from './layers/apps/features/apps-features-unit-infrastructure-queue.mjs';
+import appsFeaturesUnitInfrastructure from './layers/apps/features/apps-features-unit-infrastructure.mjs';
+import appsFeaturesUnitModulesIndex from './layers/apps/features/apps-features-unit-modules-index.mjs';
+import appsFeaturesUnitOutboundPorts from './layers/apps/features/apps-features-unit-outbound-ports.mjs';
+import appsFeaturesUnitOutboundTokens from './layers/apps/features/apps-features-unit-outbound-tokens.mjs';
+import appsFeaturesUnitOutboundTypesCommands from './layers/apps/features/apps-features-unit-outbound-types-commands.mjs';
+import appsFeaturesUnitOutboundTypesEnums from './layers/apps/features/apps-features-unit-outbound-types-enums.mjs';
+import appsFeaturesUnitOutboundTypesQueries from './layers/apps/features/apps-features-unit-outbound-types-queries.mjs';
+import appsFeaturesUnitOutboundTypesRecords from './layers/apps/features/apps-features-unit-outbound-types-records.mjs';
+import appsFeaturesUnitOutboundTypesViews from './layers/apps/features/apps-features-unit-outbound-types-views.mjs';
+import appsFeaturesUnitOutboundTypes from './layers/apps/features/apps-features-unit-outbound-types.mjs';
+import appsFeaturesUnitOutbound from './layers/apps/features/apps-features-unit-outbound.mjs';
+import appsFeaturesUnitPresentation from './layers/apps/features/apps-features-unit-presentation.mjs';
+import appsFeaturesUnitShellModule from './layers/apps/features/apps-features-unit-shell-module.mjs';
+import appsFeaturesUnitShell from './layers/apps/features/apps-features-unit-shell.mjs';
+import appsFeaturesUnit from './layers/apps/features/apps-features-unit.mjs';
+import appsGlobalIndex from './layers/apps/global/apps-global-index.mjs';
+import appsGlobalUnitApplication from './layers/apps/global/apps-global-unit-application.mjs';
+import appsGlobalUnitIndex from './layers/apps/global/apps-global-unit-index.mjs';
+import appsGlobalUnitInfrastructureCache from './layers/apps/global/apps-global-unit-infrastructure-cache.mjs';
+import appsGlobalUnitInfrastructureCommonAdapters from './layers/apps/global/apps-global-unit-infrastructure-common-adapters.mjs';
+import appsGlobalUnitInfrastructureCoreAdaptersSpec from './layers/apps/global/apps-global-unit-infrastructure-core-adapters-spec.mjs';
+import appsGlobalUnitInfrastructureCoreAdapters from './layers/apps/global/apps-global-unit-infrastructure-core-adapters.mjs';
+import appsGlobalUnitInfrastructureLibAdapters from './layers/apps/global/apps-global-unit-infrastructure-lib-adapters.mjs';
+import appsGlobalUnitInfrastructurePersistence from './layers/apps/global/apps-global-unit-infrastructure-persistence.mjs';
+import appsGlobalUnitInfrastructure from './layers/apps/global/apps-global-unit-infrastructure.mjs';
+import appsGlobalUnitOutboundPorts from './layers/apps/global/apps-global-unit-outbound-ports.mjs';
+import appsGlobalUnitOutboundTokens from './layers/apps/global/apps-global-unit-outbound-tokens.mjs';
+import appsGlobalUnitOutboundTypesCommands from './layers/apps/global/apps-global-unit-outbound-types-commands.mjs';
+import appsGlobalUnitOutboundTypesEnums from './layers/apps/global/apps-global-unit-outbound-types-enums.mjs';
+import appsGlobalUnitOutboundTypesQueries from './layers/apps/global/apps-global-unit-outbound-types-queries.mjs';
+import appsGlobalUnitOutboundTypesRecords from './layers/apps/global/apps-global-unit-outbound-types-records.mjs';
+import appsGlobalUnitOutboundTypesViews from './layers/apps/global/apps-global-unit-outbound-types-views.mjs';
+import appsGlobalUnitOutboundTypes from './layers/apps/global/apps-global-unit-outbound-types.mjs';
+import appsGlobalUnitOutbound from './layers/apps/global/apps-global-unit-outbound.mjs';
+import appsGlobalUnitShell from './layers/apps/global/apps-global-unit-shell.mjs';
+import appsProcessorsIndex from './layers/apps/processors/apps-processors-index.mjs';
+import appsProcessorsUnitApplication from './layers/apps/processors/apps-processors-unit-application.mjs';
+import appsProcessorsUnitDomain from './layers/apps/processors/apps-processors-unit-domain.mjs';
+import appsProcessorsUnitInfrastructureCache from './layers/apps/processors/apps-processors-unit-infrastructure-cache.mjs';
+import appsProcessorsUnitInfrastructureCommonAdaptersSpec from './layers/apps/processors/apps-processors-unit-infrastructure-common-adapters-spec.mjs';
+import appsProcessorsUnitInfrastructureCommonAdapters from './layers/apps/processors/apps-processors-unit-infrastructure-common-adapters.mjs';
+import appsProcessorsUnitInfrastructureConfigSpec from './layers/apps/processors/apps-processors-unit-infrastructure-config-spec.mjs';
+import appsProcessorsUnitInfrastructureConfig from './layers/apps/processors/apps-processors-unit-infrastructure-config.mjs';
+import appsProcessorsUnitInfrastructureCoreAdaptersSpec from './layers/apps/processors/apps-processors-unit-infrastructure-core-adapters-spec.mjs';
+import appsProcessorsUnitInfrastructureCoreAdapters from './layers/apps/processors/apps-processors-unit-infrastructure-core-adapters.mjs';
+import appsProcessorsUnitInfrastructureLibAdaptersSpec from './layers/apps/processors/apps-processors-unit-infrastructure-lib-adapters-spec.mjs';
+import appsProcessorsUnitInfrastructureLibAdapters from './layers/apps/processors/apps-processors-unit-infrastructure-lib-adapters.mjs';
+import appsProcessorsUnitInfrastructurePersistence from './layers/apps/processors/apps-processors-unit-infrastructure-persistence.mjs';
+import appsProcessorsUnitInfrastructureQueueSpec from './layers/apps/processors/apps-processors-unit-infrastructure-queue-spec.mjs';
+import appsProcessorsUnitInfrastructureQueue from './layers/apps/processors/apps-processors-unit-infrastructure-queue.mjs';
+import appsProcessorsUnitInfrastructure from './layers/apps/processors/apps-processors-unit-infrastructure.mjs';
+import appsProcessorsUnitModulesIndex from './layers/apps/processors/apps-processors-unit-modules-index.mjs';
+import appsProcessorsUnitOutboundPorts from './layers/apps/processors/apps-processors-unit-outbound-ports.mjs';
+import appsProcessorsUnitOutboundTokens from './layers/apps/processors/apps-processors-unit-outbound-tokens.mjs';
+import appsProcessorsUnitOutboundTypesCommands from './layers/apps/processors/apps-processors-unit-outbound-types-commands.mjs';
+import appsProcessorsUnitOutboundTypesEnums from './layers/apps/processors/apps-processors-unit-outbound-types-enums.mjs';
+import appsProcessorsUnitOutboundTypesQueries from './layers/apps/processors/apps-processors-unit-outbound-types-queries.mjs';
+import appsProcessorsUnitOutboundTypesRecords from './layers/apps/processors/apps-processors-unit-outbound-types-records.mjs';
+import appsProcessorsUnitOutboundTypesViews from './layers/apps/processors/apps-processors-unit-outbound-types-views.mjs';
+import appsProcessorsUnitOutboundTypes from './layers/apps/processors/apps-processors-unit-outbound-types.mjs';
+import appsProcessorsUnitOutbound from './layers/apps/processors/apps-processors-unit-outbound.mjs';
+import appsProcessorsUnitQueues from './layers/apps/processors/apps-processors-unit-queues.mjs';
+import appsProcessorsUnitShellModule from './layers/apps/processors/apps-processors-unit-shell-module.mjs';
+import appsProcessorsUnitShell from './layers/apps/processors/apps-processors-unit-shell.mjs';
+import appsProcessorsUnit from './layers/apps/processors/apps-processors-unit.mjs';
+import appsTest from './layers/apps/test/apps-test.mjs';
+import coreContracts from './layers/core/core-contracts.mjs';
 import coreDomain from './layers/core/core-domain.mjs';
-import coreEntity from './layers/core/core-entity.mjs';
-import coreModuleApplication from './layers/core/core-module-application.mjs';
-import coreModuleDomain from './layers/core/core-module-domain.mjs';
-import coreModuleInfrastructureConfig from './layers/core/core-module-infrastructure-config.mjs';
-import coreModuleInfrastructureCoreAdapter from './layers/core/core-module-infrastructure-core-adapter.mjs';
-import coreModuleInfrastructureLibAdapter from './layers/core/core-module-infrastructure-lib-adapter.mjs';
-import coreModuleInfrastructureQueue from './layers/core/core-module-infrastructure-queue.mjs';
-import coreModuleInfrastructure from './layers/core/core-module-infrastructure.mjs';
-import coreModuleModuleIndex from './layers/core/core-module-module-index.mjs';
-import coreModuleOutboundPort from './layers/core/core-module-outbound-port.mjs';
-import coreModuleOutboundToken from './layers/core/core-module-outbound-token.mjs';
-import coreModuleOutboundTypeCommand from './layers/core/core-module-outbound-type-command.mjs';
-import coreModuleOutboundTypeEnum from './layers/core/core-module-outbound-type-enum.mjs';
-import coreModuleOutboundTypeQuery from './layers/core/core-module-outbound-type-query.mjs';
-import coreModuleOutboundTypeRecord from './layers/core/core-module-outbound-type-record.mjs';
-import coreModuleOutboundTypeView from './layers/core/core-module-outbound-type-view.mjs';
-import coreModuleOutboundType from './layers/core/core-module-outbound-type.mjs';
-import coreModuleOutbound from './layers/core/core-module-outbound.mjs';
-import coreModuleShellFacade from './layers/core/core-module-shell-facade.mjs';
-import coreModuleShell from './layers/core/core-module-shell.mjs';
-import coreQueue from './layers/core/core-queue.mjs';
-import libAppBootstrap from './layers/libs/lib-app-bootstrap.mjs';
-import libAppSetup from './layers/libs/lib-app-setup.mjs';
-import libApp from './layers/libs/lib-app.mjs';
-import libApplication from './layers/libs/lib-application.mjs';
-import libAuth from './layers/libs/lib-auth.mjs';
-import libCache from './layers/libs/lib-cache.mjs';
-import libConfig from './layers/libs/lib-config.mjs';
-import libContractDatabase from './layers/libs/lib-contract-database.mjs';
-import libContract from './layers/libs/lib-contract.mjs';
-import libCredentials from './layers/libs/lib-credentials.mjs';
-import libDatabaseOrmApplication from './layers/libs/lib-database-orm-application.mjs';
-import libDatabaseOrmShell from './layers/libs/lib-database-orm-shell.mjs';
-import libDatabaseSpec from './layers/libs/lib-database-spec.mjs';
-import libDatabase from './layers/libs/lib-database.mjs';
-import libHealth from './layers/libs/lib-health.mjs';
-import libHttp from './layers/libs/lib-http.mjs';
-import libInfrastructure from './layers/libs/lib-infrastructure.mjs';
-import libLocalStorage from './layers/libs/lib-local-storage.mjs';
-import libObservability from './layers/libs/lib-observability.mjs';
-import libOpenapi from './layers/libs/lib-openapi.mjs';
-import libOutbound from './layers/libs/lib-outbound.mjs';
-import libQueue from './layers/libs/lib-queue.mjs';
-import libShellSpec from './layers/libs/lib-shell-spec.mjs';
-import libShell from './layers/libs/lib-shell.mjs';
-import libTesting from './layers/libs/lib-testing.mjs';
-import libToolkitDatabase from './layers/libs/lib-toolkit-database.mjs';
-import libToolkit from './layers/libs/lib-toolkit.mjs';
-import lib from './layers/libs/lib.mjs';
-import repoConfig from './layers/repo/repo-config.mjs';
-import repoMigration from './layers/repo/repo-migration.mjs';
-import repoScript from './layers/repo/repo-script.mjs';
+import coreEntities from './layers/core/core-entities.mjs';
+import coreModulesUnitApplication from './layers/core/core-modules-unit-application.mjs';
+import coreModulesUnitDomain from './layers/core/core-modules-unit-domain.mjs';
+import coreModulesUnitIndex from './layers/core/core-modules-unit-index.mjs';
+import coreModulesUnitInfrastructureCache from './layers/core/core-modules-unit-infrastructure-cache.mjs';
+import coreModulesUnitInfrastructureConfig from './layers/core/core-modules-unit-infrastructure-config.mjs';
+import coreModulesUnitInfrastructureCoreAdapters from './layers/core/core-modules-unit-infrastructure-core-adapters.mjs';
+import coreModulesUnitInfrastructureLibAdapters from './layers/core/core-modules-unit-infrastructure-lib-adapters.mjs';
+import coreModulesUnitInfrastructurePersistence from './layers/core/core-modules-unit-infrastructure-persistence.mjs';
+import coreModulesUnitInfrastructureQueue from './layers/core/core-modules-unit-infrastructure-queue.mjs';
+import coreModulesUnitInfrastructure from './layers/core/core-modules-unit-infrastructure.mjs';
+import coreModulesUnitOutboundPorts from './layers/core/core-modules-unit-outbound-ports.mjs';
+import coreModulesUnitOutboundTokens from './layers/core/core-modules-unit-outbound-tokens.mjs';
+import coreModulesUnitOutboundTypesCommands from './layers/core/core-modules-unit-outbound-types-commands.mjs';
+import coreModulesUnitOutboundTypesEnums from './layers/core/core-modules-unit-outbound-types-enums.mjs';
+import coreModulesUnitOutboundTypesQueries from './layers/core/core-modules-unit-outbound-types-queries.mjs';
+import coreModulesUnitOutboundTypesRecords from './layers/core/core-modules-unit-outbound-types-records.mjs';
+import coreModulesUnitOutboundTypesViews from './layers/core/core-modules-unit-outbound-types-views.mjs';
+import coreModulesUnitOutboundTypes from './layers/core/core-modules-unit-outbound-types.mjs';
+import coreModulesUnitOutbound from './layers/core/core-modules-unit-outbound.mjs';
+import coreModulesUnitShellFacade from './layers/core/core-modules-unit-shell-facade.mjs';
+import coreModulesUnitShell from './layers/core/core-modules-unit-shell.mjs';
+import coreQueues from './layers/core/core-queues.mjs';
+import libsAppBootstrap from './layers/libs/libs-app-bootstrap.mjs';
+import libsAppSetup from './layers/libs/libs-app-setup.mjs';
+import libsApp from './layers/libs/libs-app.mjs';
+import libsApplication from './layers/libs/libs-application.mjs';
+import libsAuth from './layers/libs/libs-auth.mjs';
+import libsCache from './layers/libs/libs-cache.mjs';
+import libsConfig from './layers/libs/libs-config.mjs';
+import libsContractsDatabase from './layers/libs/libs-contracts-database.mjs';
+import libsContracts from './layers/libs/libs-contracts.mjs';
+import libsCredentials from './layers/libs/libs-credentials.mjs';
+import libsDatabaseOrmApplication from './layers/libs/libs-database-orm-application.mjs';
+import libsDatabaseOrmShell from './layers/libs/libs-database-orm-shell.mjs';
+import libsDatabaseSpec from './layers/libs/libs-database-spec.mjs';
+import libsDatabase from './layers/libs/libs-database.mjs';
+import libsHealth from './layers/libs/libs-health.mjs';
+import libsHttp from './layers/libs/libs-http.mjs';
+import libsInfrastructure from './layers/libs/libs-infrastructure.mjs';
+import libsLocalStorage from './layers/libs/libs-local-storage.mjs';
+import libsObservability from './layers/libs/libs-observability.mjs';
+import libsOpenapi from './layers/libs/libs-openapi.mjs';
+import libsOutbound from './layers/libs/libs-outbound.mjs';
+import libsQueue from './layers/libs/libs-queue.mjs';
+import libsShellSpec from './layers/libs/libs-shell-spec.mjs';
+import libsShell from './layers/libs/libs-shell.mjs';
+import libsTesting from './layers/libs/libs-testing.mjs';
+import libsToolkitDatabase from './layers/libs/libs-toolkit-database.mjs';
+import libsToolkit from './layers/libs/libs-toolkit.mjs';
+import libs from './layers/libs/libs.mjs';
+import repoMigrations from './layers/repo/repo-migrations.mjs';
+import repoScripts from './layers/repo/repo-scripts.mjs';
 import repoSpec from './layers/repo/repo-spec.mjs';
+import repoTestInfra from './layers/repo/repo-test-infra.mjs';
 import repoTestSystem from './layers/repo/repo-test-system.mjs';
-import repoTest from './layers/repo/repo-test.mjs';
+import repo from './layers/repo/repo.mjs';
 import spec from './layers/repo/spec.mjs';
 import { selectorsOf } from './specifiers.mjs';
 
 const root = join(import.meta.dirname, '../..');
 
 const files = [
-  appMain,
-  appGlobalIndex,
-  appGlobalModuleIndex,
-  appGlobalInfrastructureCoreAdapter,
-  appGlobalInfrastructureCommonAdapter,
-  appGlobalInfrastructureLibAdapter,
-  appGlobalApplication,
-  appGlobalOutboundPort,
-  appGlobalOutboundToken,
-  appGlobalOutboundTypeCommand,
-  appGlobalOutboundTypeEnum,
-  appGlobalOutboundTypeQuery,
-  appGlobalOutboundTypeRecord,
-  appGlobalOutboundTypeView,
-  appGlobalOutboundType,
-  appGlobalOutbound,
-  appGlobalInfrastructure,
-  appGlobalShell,
-  appIndex,
-  appShellModule,
-  appSetupModule,
-  appSetupEntities,
-  appSetupConfig,
-  appCommonModuleDomain,
-  appCommonModuleOutboundPort,
-  appCommonModuleOutboundToken,
-  appCommonModuleOutboundTypeCommand,
-  appCommonModuleOutboundTypeEnum,
-  appCommonModuleOutboundTypeQuery,
-  appCommonModuleOutboundTypeRecord,
-  appCommonModuleOutboundTypeView,
-  appCommonModuleOutboundType,
-  appCommonModuleOutbound,
-  appCommonModuleApplication,
-  appCommonModuleInfrastructureCoreAdapter,
-  appCommonModuleInfrastructureCommonAdapter,
-  appCommonModuleInfrastructure,
-  appCommonModuleShellFacade,
-  appCommonModuleShell,
-  appCommonModuleIndex,
-  appCommonModuleModuleIndex,
-  appCommonEntity,
-  appContract,
-  appCommonSharedIndex,
-  appCommonSharedModuleIndex,
-  appCommonShared,
-  appTest,
-  appFeatureIndex,
-  appFeatureModuleIndex,
-  appFeatureShellModule,
-  appFeatureDomain,
-  appFeatureOutboundPort,
-  appFeatureOutboundToken,
-  appFeatureOutboundTypeCommand,
-  appFeatureOutboundTypeEnum,
-  appFeatureOutboundTypeQuery,
-  appFeatureOutboundTypeRecord,
-  appFeatureOutboundTypeView,
-  appFeatureOutboundType,
-  appFeatureOutbound,
-  appFeatureApplication,
-  appFeatureInfrastructureCoreAdapter,
-  appFeatureInfrastructureCommonAdapter,
-  appFeatureInfrastructureLibAdapter,
-  appFeatureInfrastructureQueue,
-  appFeatureInfrastructureConfig,
-  appFeatureInfrastructure,
-  appFeaturePresentation,
-  appFeatureShell,
-  appFeatureModule,
-  appProcessorIndex,
-  appProcessorModuleIndex,
-  appProcessorShellModule,
-  appProcessorDomain,
-  appProcessorOutboundPort,
-  appProcessorOutboundToken,
-  appProcessorOutboundTypeCommand,
-  appProcessorOutboundTypeEnum,
-  appProcessorOutboundTypeQuery,
-  appProcessorOutboundTypeRecord,
-  appProcessorOutboundTypeView,
-  appProcessorOutboundType,
-  appProcessorOutbound,
-  appProcessorApplication,
-  appProcessorInfrastructureCoreAdapter,
-  appProcessorInfrastructureCommonAdapter,
-  appProcessorInfrastructureLibAdapter,
-  appProcessorInfrastructureQueue,
-  appProcessorInfrastructureConfig,
-  appProcessorInfrastructure,
-  appProcessorShell,
-  appProcessorQueue,
-  appProcessorModule,
-  coreModuleDomain,
-  coreModuleOutboundPort,
-  coreModuleOutboundToken,
-  coreModuleOutboundTypeCommand,
-  coreModuleOutboundTypeEnum,
-  coreModuleOutboundTypeQuery,
-  coreModuleOutboundTypeRecord,
-  coreModuleOutboundTypeView,
-  coreModuleOutboundType,
-  coreModuleOutbound,
-  coreModuleApplication,
-  coreModuleInfrastructureQueue,
-  coreModuleInfrastructureConfig,
-  coreModuleInfrastructureCoreAdapter,
-  coreModuleInfrastructureLibAdapter,
-  coreModuleInfrastructure,
-  coreModuleShellFacade,
-  coreModuleShell,
-  coreModuleModuleIndex,
-  coreContract,
+  appsMain,
+  appsGlobalIndex,
+  appsGlobalUnitIndex,
+  appsGlobalUnitInfrastructureCoreAdapters,
+  appsGlobalUnitInfrastructureCommonAdapters,
+  appsGlobalUnitInfrastructureLibAdapters,
+  appsGlobalUnitApplication,
+  appsGlobalUnitOutboundPorts,
+  appsGlobalUnitOutboundTokens,
+  appsGlobalUnitOutboundTypesCommands,
+  appsGlobalUnitOutboundTypesEnums,
+  appsGlobalUnitOutboundTypesQueries,
+  appsGlobalUnitOutboundTypesRecords,
+  appsGlobalUnitOutboundTypesViews,
+  appsGlobalUnitOutboundTypes,
+  appsGlobalUnitOutbound,
+  appsGlobalUnitInfrastructurePersistence,
+  appsGlobalUnitInfrastructureCache,
+  appsGlobalUnitInfrastructure,
+  appsGlobalUnitShell,
+  appsAppIndex,
+  appsAppShell,
+  appsAppSetupEntities,
+  appsAppSetupConfig,
+  appsAppSetupModule,
+  appsCommonModulesUnitDomain,
+  appsCommonModulesUnitOutboundPorts,
+  appsCommonModulesUnitOutboundTokens,
+  appsCommonModulesUnitOutboundTypesCommands,
+  appsCommonModulesUnitOutboundTypesEnums,
+  appsCommonModulesUnitOutboundTypesQueries,
+  appsCommonModulesUnitOutboundTypesRecords,
+  appsCommonModulesUnitOutboundTypesViews,
+  appsCommonModulesUnitOutboundTypes,
+  appsCommonModulesUnitOutbound,
+  appsCommonModulesUnitApplication,
+  appsCommonModulesUnitInfrastructureCoreAdapters,
+  appsCommonModulesUnitInfrastructureCommonAdapters,
+  appsCommonModulesUnitInfrastructurePersistence,
+  appsCommonModulesUnitInfrastructureCache,
+  appsCommonModulesUnitInfrastructure,
+  appsCommonModulesUnitShellFacade,
+  appsCommonModulesUnitShell,
+  appsCommonModulesIndex,
+  appsCommonModulesUnitIndex,
+  appsCommonEntities,
+  appsContracts,
+  appsCommonSharedIndex,
+  appsCommonSharedUnitIndex,
+  appsCommonSharedUnit,
+  appsTest,
+  appsFeaturesIndex,
+  appsFeaturesUnitModulesIndex,
+  appsFeaturesUnitShellModule,
+  appsFeaturesUnitDomain,
+  appsFeaturesUnitOutboundPorts,
+  appsFeaturesUnitOutboundTokens,
+  appsFeaturesUnitOutboundTypesCommands,
+  appsFeaturesUnitOutboundTypesEnums,
+  appsFeaturesUnitOutboundTypesQueries,
+  appsFeaturesUnitOutboundTypesRecords,
+  appsFeaturesUnitOutboundTypesViews,
+  appsFeaturesUnitOutboundTypes,
+  appsFeaturesUnitOutbound,
+  appsFeaturesUnitApplication,
+  appsFeaturesUnitInfrastructureCoreAdapters,
+  appsFeaturesUnitInfrastructureCommonAdapters,
+  appsFeaturesUnitInfrastructureLibAdapters,
+  appsFeaturesUnitInfrastructureQueue,
+  appsFeaturesUnitInfrastructureConfig,
+  appsFeaturesUnitInfrastructurePersistence,
+  appsFeaturesUnitInfrastructureCache,
+  appsFeaturesUnitInfrastructure,
+  appsFeaturesUnitPresentation,
+  appsFeaturesUnitShell,
+  appsFeaturesUnit,
+  appsProcessorsIndex,
+  appsProcessorsUnitModulesIndex,
+  appsProcessorsUnitShellModule,
+  appsProcessorsUnitDomain,
+  appsProcessorsUnitOutboundPorts,
+  appsProcessorsUnitOutboundTokens,
+  appsProcessorsUnitOutboundTypesCommands,
+  appsProcessorsUnitOutboundTypesEnums,
+  appsProcessorsUnitOutboundTypesQueries,
+  appsProcessorsUnitOutboundTypesRecords,
+  appsProcessorsUnitOutboundTypesViews,
+  appsProcessorsUnitOutboundTypes,
+  appsProcessorsUnitOutbound,
+  appsProcessorsUnitApplication,
+  appsProcessorsUnitInfrastructureCoreAdapters,
+  appsProcessorsUnitInfrastructureCommonAdapters,
+  appsProcessorsUnitInfrastructureLibAdapters,
+  appsProcessorsUnitInfrastructureQueue,
+  appsProcessorsUnitInfrastructureConfig,
+  appsProcessorsUnitInfrastructurePersistence,
+  appsProcessorsUnitInfrastructureCache,
+  appsProcessorsUnitInfrastructure,
+  appsProcessorsUnitShell,
+  appsProcessorsUnitQueues,
+  appsProcessorsUnit,
+  coreModulesUnitDomain,
+  coreModulesUnitOutboundPorts,
+  coreModulesUnitOutboundTokens,
+  coreModulesUnitOutboundTypesCommands,
+  coreModulesUnitOutboundTypesEnums,
+  coreModulesUnitOutboundTypesQueries,
+  coreModulesUnitOutboundTypesRecords,
+  coreModulesUnitOutboundTypesViews,
+  coreModulesUnitOutboundTypes,
+  coreModulesUnitOutbound,
+  coreModulesUnitApplication,
+  coreModulesUnitInfrastructureQueue,
+  coreModulesUnitInfrastructureConfig,
+  coreModulesUnitInfrastructureCoreAdapters,
+  coreModulesUnitInfrastructureLibAdapters,
+  coreModulesUnitInfrastructurePersistence,
+  coreModulesUnitInfrastructureCache,
+  coreModulesUnitInfrastructure,
+  coreModulesUnitShellFacade,
+  coreModulesUnitShell,
+  coreModulesUnitIndex,
+  coreContracts,
   coreDomain,
-  coreEntity,
-  coreQueue,
-  libContract,
-  lib,
+  coreEntities,
+  coreQueues,
+  libsContracts,
+  libs,
   repoSpec,
-  repoScript,
-  repoMigration,
+  repoScripts,
+  repoMigrations,
   repoTestSystem,
-  repoTest,
-  repoConfig,
-  appGlobalInfrastructureCoreAdapterSpec,
-  appFeatureInfrastructureCoreAdapterSpec,
-  appFeatureInfrastructureCommonAdapterSpec,
-  appFeatureInfrastructureLibAdapterSpec,
-  appFeatureInfrastructureQueueSpec,
-  appFeatureInfrastructureConfigSpec,
-  appProcessorInfrastructureCoreAdapterSpec,
-  appProcessorInfrastructureCommonAdapterSpec,
-  appProcessorInfrastructureLibAdapterSpec,
-  appProcessorInfrastructureQueueSpec,
-  appProcessorInfrastructureConfigSpec,
-  appCommonModuleInfrastructureCoreAdapterSpec,
-  appCommonModuleInfrastructureCommonAdapterSpec,
-  libContractDatabase,
-  libApp,
-  libAuth,
-  libCache,
-  libConfig,
-  libCredentials,
-  libDatabase,
-  libHealth,
-  libHttp,
-  libLocalStorage,
-  libObservability,
-  libOpenapi,
-  libQueue,
-  libTesting,
-  libAppSetup,
-  libAppBootstrap,
+  repoTestInfra,
+  repo,
+  appsGlobalUnitInfrastructureCoreAdaptersSpec,
+  appsFeaturesUnitInfrastructureCoreAdaptersSpec,
+  appsFeaturesUnitInfrastructureCommonAdaptersSpec,
+  appsFeaturesUnitInfrastructureLibAdaptersSpec,
+  appsFeaturesUnitInfrastructureQueueSpec,
+  appsFeaturesUnitInfrastructureConfigSpec,
+  appsProcessorsUnitInfrastructureCoreAdaptersSpec,
+  appsProcessorsUnitInfrastructureCommonAdaptersSpec,
+  appsProcessorsUnitInfrastructureLibAdaptersSpec,
+  appsProcessorsUnitInfrastructureQueueSpec,
+  appsProcessorsUnitInfrastructureConfigSpec,
+  appsCommonModulesUnitInfrastructureCoreAdaptersSpec,
+  appsCommonModulesUnitInfrastructureCommonAdaptersSpec,
+  libsContractsDatabase,
+  libsApp,
+  libsAuth,
+  libsCache,
+  libsConfig,
+  libsCredentials,
+  libsDatabase,
+  libsHealth,
+  libsHttp,
+  libsLocalStorage,
+  libsObservability,
+  libsOpenapi,
+  libsQueue,
+  libsTesting,
+  libsAppSetup,
+  libsAppBootstrap,
   spec,
-  libDatabaseSpec,
-  libToolkit,
-  libToolkitDatabase,
-  libShell,
-  libApplication,
-  libInfrastructure,
-  libOutbound,
-  libShellSpec,
-  libDatabaseOrmShell,
-  libDatabaseOrmApplication,
+  libsDatabaseSpec,
+  libsToolkit,
+  libsToolkitDatabase,
+  libsShell,
+  libsApplication,
+  libsInfrastructure,
+  libsOutbound,
+  libsShellSpec,
+  libsDatabaseOrmShell,
+  libsDatabaseOrmApplication,
 ];
 
 const present = readdirSync(join(import.meta.dirname, 'layers'), { recursive: true }).filter(
@@ -376,6 +396,19 @@ const policies = layers
     from: fromOf(layer),
     allow: layer.allow.flatMap((specifier) => selectorsOf(specifier, categoryNames)),
   }));
+
+const dangling = [
+  ...new Set(
+    policies
+      .flatMap(({ from, allow }) => [from.file, ...allow.map(({ to }) => to.file)])
+      .filter((file) => file?.categories && !categoryNames.has(file.categories))
+      .map((file) => file.categories),
+  ),
+];
+
+if (dangling.length > 0) {
+  throw new Error(`lint/boundaries: unknown categories ${dangling.join(', ')}`);
+}
 
 export const boundaries = [
   {

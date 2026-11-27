@@ -30,7 +30,7 @@ describe('repo', () => {
     scaffold.remove();
   });
 
-  describe('test scripts (repo:test)', () => {
+  describe('test scripts (repo:test:infra)', () => {
     it('a seed script MAY import its own support files', async () => {
       await expect({
         file: 'test/infra/seed/__fixture__.ts',
@@ -271,7 +271,7 @@ describe('repo', () => {
     );
   });
 
-  describe('root configs (repo:config)', () => {
+  describe('root configs (repo)', () => {
     it('a root TypeScript file is a known file', async () => {
       await expect({
         file: '__fixture__.ts',

@@ -21,7 +21,7 @@ describe('features', () => {
       'apps/__features-fixture__/src/features/product/outbound/index.ts',
       'apps/__features-fixture__/src/features/product/application/index.ts',
       'apps/__features-fixture__/src/features/product/infrastructure/index.ts',
-      'apps/__features-fixture__/src/features/product/infrastructure/hasher/product-hasher.adapter.ts',
+      'apps/__features-fixture__/src/features/product/infrastructure/cache/product-cache.adapter.ts',
       'apps/__features-fixture__/src/features/product/infrastructure/persistence/repositories/product.repository.ts',
       'apps/__features-fixture__/src/features/product/presentation/index.ts',
       'apps/__features-fixture__/src/features/note/application/index.ts',
@@ -497,7 +497,7 @@ describe('features', () => {
     it('an import inside the infrastructure layer MAY use a direct file path', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
-        code: 'import { x } from "../hasher/product-hasher.adapter";',
+        code: 'import { x } from "../cache/product-cache.adapter";',
       }).toPassArchitectureLint();
     });
 

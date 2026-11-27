@@ -54,27 +54,27 @@ describe('the config itself (eslint.config.mjs, as ESLint resolves it)', () => {
   });
 
   it.each([
-    ['acme-app:features:infrastructure:core-adapters', 'acme-app:features:infrastructure'],
-    ['acme-app:features:infrastructure:common-adapters', 'acme-app:features:infrastructure'],
-    ['acme-app:features:infrastructure:lib-adapters', 'acme-app:features:infrastructure'],
-    ['acme-app:features:infrastructure:config', 'acme-app:features:infrastructure'],
-    ['acme-app:processors:infrastructure:config', 'acme-app:processors:infrastructure'],
-    ['acme-core:modules:infrastructure:config', 'acme-core:modules:infrastructure'],
-    ['acme-app:processors:infrastructure:core-adapters', 'acme-app:processors:infrastructure'],
-    ['acme-app:processors:infrastructure:common-adapters', 'acme-app:processors:infrastructure'],
+    ['apps:features:unit:infrastructure:core-adapters', 'apps:features:unit:infrastructure'],
+    ['apps:features:unit:infrastructure:common-adapters', 'apps:features:unit:infrastructure'],
+    ['apps:features:unit:infrastructure:lib-adapters', 'apps:features:unit:infrastructure'],
+    ['apps:features:unit:infrastructure:config', 'apps:features:unit:infrastructure'],
+    ['apps:processors:unit:infrastructure:config', 'apps:processors:unit:infrastructure'],
+    ['core:modules:unit:infrastructure:config', 'core:modules:unit:infrastructure'],
+    ['apps:processors:unit:infrastructure:core-adapters', 'apps:processors:unit:infrastructure'],
+    ['apps:processors:unit:infrastructure:common-adapters', 'apps:processors:unit:infrastructure'],
     [
-      'acme-app:common:modules:infrastructure:core-adapters',
-      'acme-app:common:modules:infrastructure',
+      'apps:common:modules:unit:infrastructure:core-adapters',
+      'apps:common:modules:unit:infrastructure',
     ],
     [
-      'acme-app:common:modules:infrastructure:common-adapters',
-      'acme-app:common:modules:infrastructure',
+      'apps:common:modules:unit:infrastructure:common-adapters',
+      'apps:common:modules:unit:infrastructure',
     ],
-    ['acme-app:global:infrastructure:common-adapters', 'acme-app:global:infrastructure'],
-    ['acme-app:global:infrastructure:lib-adapters', 'acme-app:global:infrastructure'],
-    ['acme-app:common:modules:shell:facade', 'acme-app:common:modules:shell'],
-    ['acme-core:modules:shell:facade', 'acme-core:modules:shell'],
-    ['acme-libs:contracts', 'acme-libs'],
+    ['apps:global:unit:infrastructure:common-adapters', 'apps:global:unit:infrastructure'],
+    ['apps:global:unit:infrastructure:lib-adapters', 'apps:global:unit:infrastructure'],
+    ['apps:common:modules:unit:shell:facade', 'apps:common:modules:unit:shell'],
+    ['core:modules:unit:shell:facade', 'core:modules:unit:shell'],
+    ['libs:contracts', 'libs'],
   ])('keeps %s AHEAD of %s — first match wins', (specific, general) => {
     expect(categories.indexOf(specific)).toBeGreaterThanOrEqual(0);
     expect(categories.indexOf(specific)).toBeLessThan(categories.indexOf(general));
@@ -83,18 +83,18 @@ describe('the config itself (eslint.config.mjs, as ESLint resolves it)', () => {
   it('gives core modules the app layers, with facades in shell/ instead of presentation/', () => {
     expect(categories).toEqual(
       expect.arrayContaining([
-        'acme-app:features:domain',
-        'acme-core:modules:domain',
-        'acme-app:features:outbound',
-        'acme-core:modules:outbound',
-        'acme-app:features:application',
-        'acme-core:modules:application',
-        'acme-app:features:infrastructure',
-        'acme-core:modules:infrastructure',
-        'acme-app:features:presentation',
-        'acme-core:modules:shell:facade',
+        'apps:features:unit:domain',
+        'core:modules:unit:domain',
+        'apps:features:unit:outbound',
+        'core:modules:unit:outbound',
+        'apps:features:unit:application',
+        'core:modules:unit:application',
+        'apps:features:unit:infrastructure',
+        'core:modules:unit:infrastructure',
+        'apps:features:unit:presentation',
+        'core:modules:unit:shell:facade',
       ]),
     );
-    expect(categories).not.toContain('acme-core:modules:presentation');
+    expect(categories).not.toContain('core:modules:unit:presentation');
   });
 });
