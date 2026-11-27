@@ -1,3 +1,3 @@
-export * from './cases/order-get-many.case';
-export * from './cases/order-get-one.case';
+export * from './cases/order-get-details.case';
+export * from './cases/order-get-list.case';
 export * from './cases/order-place.case';

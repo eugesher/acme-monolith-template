@@ -5,10 +5,10 @@ import { CurrentUser } from '@acme-libs/auth';
 import { ApiErrorResponses, ApiIdempotencyKeyHeader, IdempotencyKey } from '@acme-libs/http';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
-import { OrderGetManyCase, OrderGetOneCase, OrderPlaceCase } from '../application';
+import { OrderGetDetailsCase, OrderGetListCase, OrderPlaceCase } from '../application';
 import { OrderExceptionCodeEnum } from '../domain';
 import {
-  OrderGetManyQueryDto,
+  OrderGetListQueryDto,
   OrderHttpExceptionFilter,
   OrderIdParamDto,
   OrderPlaceRequestDto,
@@ -22,8 +22,8 @@ import {
 export class OrderController {
   constructor(
     private readonly placeCase: OrderPlaceCase,
-    private readonly getManyCase: OrderGetManyCase,
-    private readonly getOneCase: OrderGetOneCase,
+    private readonly getListCase: OrderGetListCase,
+    private readonly getDetailsCase: OrderGetDetailsCase,
   ) {}
 
   @Post()
@@ -54,14 +54,14 @@ export class OrderController {
   @Get()
   @ApiOperation({ summary: 'List the orders of the caller, newest first' })
   @ApiOkResponse({ type: OrderSummaryPageResponseDto })
-  public async getMany(
+  public async getList(
     @CurrentUser() user: IAuthCurrentUserView,
-    @Query() query: OrderGetManyQueryDto,
+    @Query() query: OrderGetListQueryDto,
   ): Promise<OrderSummaryPageResponseDto> {
     const { id: customerId } = user;
     const { page, limit } = query;
 
-    return await this.getManyCase.execute({ customerId, page, limit });
+    return await this.getListCase.execute({ customerId, page, limit });
   }
 
   @Get(':orderId')
@@ -71,13 +71,13 @@ export class OrderController {
     filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
-  public async getOne(
+  public async getDetails(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: OrderIdParamDto,
   ): Promise<OrderResponseDto> {
     const { id: customerId } = user;
     const { orderId } = params;
 
-    return await this.getOneCase.execute({ customerId, orderId });
+    return await this.getDetailsCase.execute({ customerId, orderId });
   }
 }

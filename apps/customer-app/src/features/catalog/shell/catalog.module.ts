@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
 
-import { CatalogProductListCase } from '../application';
+import { CatalogGetProductListCase } from '../application';
 import {
   CatalogCacheAdapter,
   CatalogConfigCacheTtlMsDefaultProvider,
-  CatalogProductListRepository,
+  CatalogGetProductListRepository,
 } from '../infrastructure';
 import { CatalogController } from './catalog.controller';
 
 @Module({
   controllers: [CatalogController],
   providers: [
-    CatalogProductListCase,
-    CatalogProductListRepository.PROVIDER,
+    CatalogGetProductListCase,
+    CatalogGetProductListRepository.PROVIDER,
     CatalogCacheAdapter.PROVIDER,
     CatalogConfigCacheTtlMsDefaultProvider,
   ],

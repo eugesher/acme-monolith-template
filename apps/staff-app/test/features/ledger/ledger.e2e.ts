@@ -14,7 +14,7 @@ export class LedgerE2E {
     return new LedgerE2E(ctx);
   }
 
-  public listEntries(): void {
+  public getMany(): void {
     describe('GET /api/ledger', () => {
       it('should list the entries of one subject', async () => {
         const response = await request(this.ctx.app.getHttpServer())

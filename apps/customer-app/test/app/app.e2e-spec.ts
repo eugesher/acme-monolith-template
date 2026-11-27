@@ -46,10 +46,10 @@ describe('App', () => {
       ['POST /api/auth/register', 'AuthRegisterRequestDto'],
       ['GET /api/health'],
       ['GET /api/health/ready'],
-      ['GET /api/orders', 'OrderGetManyQueryDto'],
+      ['GET /api/orders', 'OrderGetListQueryDto'],
       ['POST /api/orders', 'OrderPlaceRequestDto'],
       ['GET /api/orders/:orderId', 'OrderIdParamDto'],
-      ['GET /api/products', 'CatalogProductListQueryDto'],
+      ['GET /api/products', 'CatalogGetProductListQueryDto'],
     ]);
   });
 
@@ -66,12 +66,12 @@ describe('App', () => {
 
   describe('Catalog', () => {
     catalogE2E.hooks();
-    catalogE2E.productList();
+    catalogE2E.getProductList();
   });
 
   describe('Order', () => {
     orderE2E.place();
-    orderE2E.getMany();
-    orderE2E.getOne();
+    orderE2E.getList();
+    orderE2E.getDetails();
   });
 });

@@ -10,7 +10,7 @@ export class PermissionE2E {
     return new PermissionE2E(ctx);
   }
 
-  public list(): void {
+  public getMany(): void {
     describe('GET /api/access/permissions', () => {
       it('should list every permission code', async () => {
         const response = await request(this.ctx.app.getHttpServer())

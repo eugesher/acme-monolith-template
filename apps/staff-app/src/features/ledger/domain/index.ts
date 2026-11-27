@@ -1,3 +1,3 @@
-export * from './models/ledger-list-entries.model';
+export * from './models/ledger-get-many.model';
 
 export * from './types';

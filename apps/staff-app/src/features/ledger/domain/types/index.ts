@@ -1,3 +1,3 @@
-export * from './data/ledger-list-entries-reconstitute.interface';
+export * from './data/ledger-get-many-reconstitute.interface';
 
-export * from './snapshots/ledger-list-entries-snapshot.interface';
+export * from './snapshots/ledger-get-many-snapshot.interface';

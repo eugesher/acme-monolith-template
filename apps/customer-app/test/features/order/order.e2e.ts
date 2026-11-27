@@ -379,7 +379,7 @@ export class OrderE2E {
     });
   }
 
-  public getMany(): void {
+  public getList(): void {
     describe('GET /api/orders', () => {
       it('should list only the orders of the caller, newest first, without their products', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -392,7 +392,7 @@ export class OrderE2E {
     });
   }
 
-  public getOne(): void {
+  public getDetails(): void {
     describe('GET /api/orders/:orderId', () => {
       it('should read an order of the caller with a line per unit', async () => {
         const response = await request(this.ctx.app.getHttpServer())

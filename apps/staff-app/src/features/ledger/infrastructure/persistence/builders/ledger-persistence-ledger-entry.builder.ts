@@ -2,10 +2,10 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import type { LedgerEntry } from '@acme-core/entities';
 
-import type { ILedgerListEntriesQuery } from '../../../outbound';
+import type { ILedgerGetManyListQuery } from '../../../outbound';
 
 export class LedgerPersistenceLedgerEntryBuilder extends SelectQueryBuilder<LedgerEntry> {
-  public forList(query: ILedgerListEntriesQuery): this {
+  public forList(query: ILedgerGetManyListQuery): this {
     const { limit, offset, subjectType, subjectId, correlationId } = query;
 
     this.select([

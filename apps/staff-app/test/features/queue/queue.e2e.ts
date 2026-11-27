@@ -10,7 +10,7 @@ export class QueueE2E {
     return new QueueE2E(ctx);
   }
 
-  public list(): void {
+  public getMany(): void {
     describe('GET /api/queues', () => {
       it('should list the queues with their job counts', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -23,7 +23,7 @@ export class QueueE2E {
     });
   }
 
-  public listFailedJobs(): void {
+  public getFailedJobs(): void {
     describe('GET /api/queues/:queueName/jobs/failed', () => {
       it('should answer a page of the failed jobs with the reason and the instants of the failure', async () => {
         const job = await this.ctx.failLedgerRecord({

@@ -16,11 +16,11 @@ export class AccessE2E {
 
   public execute(): void {
     describe('Permission', () => {
-      this.permissionE2E.list();
+      this.permissionE2E.getMany();
     });
 
     describe('Role', () => {
-      this.roleE2E.list();
+      this.roleE2E.getMany();
       this.roleE2E.create();
       this.roleE2E.reassignPermissions();
     });

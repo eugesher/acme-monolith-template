@@ -5,7 +5,7 @@ import { RequiresPermission } from '@acme-libs/auth';
 import { ApiErrorResponses } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 
-import { RoleCreateCase, RoleListCase, RoleReassignPermissionsCase } from '../application';
+import { RoleCreateCase, RoleGetManyCase, RoleReassignPermissionsCase } from '../application';
 import {
   RoleCreateRequestDto,
   RoleHttpExceptionFilter,
@@ -19,7 +19,7 @@ import {
 @Controller('access/roles')
 export class RoleController {
   constructor(
-    private readonly listCase: RoleListCase,
+    private readonly getManyCase: RoleGetManyCase,
     private readonly createCase: RoleCreateCase,
     private readonly reassignPermissionsCase: RoleReassignPermissionsCase,
   ) {}
@@ -28,8 +28,8 @@ export class RoleController {
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'List roles and the permissions they grant' })
   @ApiOkResponse({ type: RoleResponseDto, isArray: true })
-  public async list(): Promise<RoleResponseDto[]> {
-    return await this.listCase.execute();
+  public async getMany(): Promise<RoleResponseDto[]> {
+    return await this.getManyCase.execute();
   }
 
   @Post()

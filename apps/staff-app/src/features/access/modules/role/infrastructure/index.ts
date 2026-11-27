@@ -1,4 +1,4 @@
 export * from './persistence/repositories/role-create.repository';
-export * from './persistence/repositories/role-list.repository';
+export * from './persistence/repositories/role-get-many.repository';
 export * from './persistence/repositories/role-reassign-permissions.repository';
 export * from './persistence/transaction/role-transaction.adapter';

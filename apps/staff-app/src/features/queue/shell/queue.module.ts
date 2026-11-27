@@ -5,8 +5,8 @@ import { LedgerAppendQueue, ProductStockPostSubtractQueue } from '@acme-core/que
 import {
   QueueDeleteFailedJobCase,
   QueueFailedJobService,
-  QueueListCase,
-  QueueListFailedJobsCase,
+  QueueGetFailedJobsCase,
+  QueueGetManyCase,
   QueueRetryFailedJobCase,
 } from '../application';
 import { QueueRegistryAdapter } from '../infrastructure';
@@ -16,8 +16,8 @@ import { QueueController } from './queue.controller';
   imports: [LedgerAppendQueue.register(), ProductStockPostSubtractQueue.register()],
   controllers: [QueueController],
   providers: [
-    QueueListCase,
-    QueueListFailedJobsCase,
+    QueueGetManyCase,
+    QueueGetFailedJobsCase,
     QueueRetryFailedJobCase,
     QueueDeleteFailedJobCase,
     QueueFailedJobService,

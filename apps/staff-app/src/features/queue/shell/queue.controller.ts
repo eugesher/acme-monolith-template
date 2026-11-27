@@ -18,16 +18,16 @@ import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import {
   QueueDeleteFailedJobCase,
-  QueueListCase,
-  QueueListFailedJobsCase,
+  QueueGetFailedJobsCase,
+  QueueGetManyCase,
   QueueRetryFailedJobCase,
 } from '../application';
 import { QueueExceptionCodeEnum } from '../domain';
 import {
   QueueFailedJobPageResponseDto,
+  QueueGetFailedJobsQueryDto,
   QueueHttpExceptionFilter,
   QueueJobParamDto,
-  QueueListFailedJobsQueryDto,
   QueueNameParamDto,
   QueueResponseDto,
 } from '../presentation';
@@ -37,8 +37,8 @@ import {
 @Controller('queues')
 export class QueueController {
   constructor(
-    private readonly listCase: QueueListCase,
-    private readonly listFailedJobsCase: QueueListFailedJobsCase,
+    private readonly getManyCase: QueueGetManyCase,
+    private readonly getFailedJobsCase: QueueGetFailedJobsCase,
     private readonly retryFailedJobCase: QueueRetryFailedJobCase,
     private readonly deleteFailedJobCase: QueueDeleteFailedJobCase,
   ) {}
@@ -47,8 +47,8 @@ export class QueueController {
   @RequiresPermission(PermissionCodeEnum.QUEUE_READ)
   @ApiOperation({ summary: 'List the queues with the counts of their jobs' })
   @ApiOkResponse({ type: [QueueResponseDto] })
-  public async list(): Promise<QueueResponseDto[]> {
-    return await this.listCase.execute();
+  public async getMany(): Promise<QueueResponseDto[]> {
+    return await this.getManyCase.execute();
   }
 
   @Get(':queueName/jobs/failed')
@@ -59,14 +59,14 @@ export class QueueController {
     filterStatus: QueueHttpExceptionFilter.STATUS,
     codes: [QueueExceptionCodeEnum.QUEUE_NOT_FOUND],
   })
-  public async listFailedJobs(
+  public async getFailedJobs(
     @Param() params: QueueNameParamDto,
-    @Query() query: QueueListFailedJobsQueryDto,
+    @Query() query: QueueGetFailedJobsQueryDto,
   ): Promise<QueueFailedJobPageResponseDto> {
     const { queueName } = params;
     const { page, limit } = query;
 
-    return await this.listFailedJobsCase.execute({ queueName, page, limit });
+    return await this.getFailedJobsCase.execute({ queueName, page, limit });
   }
 
   @Post(':queueName/jobs/failed/:jobId/retry')

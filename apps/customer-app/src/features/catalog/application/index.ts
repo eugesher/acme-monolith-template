@@ -1,1 +1,1 @@
-export * from './cases/catalog-product-list.case';
+export * from './cases/catalog-get-product-list.case';

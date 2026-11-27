@@ -1,22 +1,22 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { CatalogProductListCase } from '../application';
-import { CatalogProductListQueryDto, CatalogProductPageResponseDto } from '../presentation';
+import { CatalogGetProductListCase } from '../application';
+import { CatalogGetProductListQueryDto, CatalogProductPageResponseDto } from '../presentation';
 
 @ApiTags('Catalog')
 @Controller('products')
 export class CatalogController {
-  constructor(private readonly productListCase: CatalogProductListCase) {}
+  constructor(private readonly getProductListCase: CatalogGetProductListCase) {}
 
   @Get()
   @ApiOperation({ summary: 'List the active products, by id' })
   @ApiOkResponse({ type: CatalogProductPageResponseDto })
-  public async productList(
-    @Query() query: CatalogProductListQueryDto,
+  public async getProductList(
+    @Query() query: CatalogGetProductListQueryDto,
   ): Promise<CatalogProductPageResponseDto> {
     const { page, limit } = query;
 
-    return await this.productListCase.execute({ page, limit });
+    return await this.getProductListCase.execute({ page, limit });
   }
 }

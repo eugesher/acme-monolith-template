@@ -1,1 +1,1 @@
-export * from './cases/ledger-list-entries.case';
+export * from './cases/ledger-get-many.case';

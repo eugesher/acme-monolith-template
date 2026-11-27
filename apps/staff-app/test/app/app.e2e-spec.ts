@@ -141,13 +141,9 @@ describe('App', () => {
       ],
       ['GET /api/health'],
       ['GET /api/health/ready'],
-      ['GET /api/ledger', 'LedgerListEntriesQueryDto'],
+      ['GET /api/ledger', 'LedgerGetManyQueryDto'],
       ['GET /api/queues'],
-      [
-        'GET /api/queues/:queueName/jobs/failed',
-        'QueueNameParamDto',
-        'QueueListFailedJobsQueryDto',
-      ],
+      ['GET /api/queues/:queueName/jobs/failed', 'QueueNameParamDto', 'QueueGetFailedJobsQueryDto'],
       ['DELETE /api/queues/:queueName/jobs/failed/:jobId', 'QueueJobParamDto'],
       ['POST /api/queues/:queueName/jobs/failed/:jobId/retry', 'QueueJobParamDto'],
       ['GET /api/sales/orders', 'OrderGetManyQueryDto'],
@@ -188,13 +184,13 @@ describe('App', () => {
   });
 
   describe('Ledger', () => {
-    ledgerE2E.listEntries();
+    ledgerE2E.getMany();
     ledgerE2E.appendEnqueue();
   });
 
   describe('Queue', () => {
-    queueE2E.list();
-    queueE2E.listFailedJobs();
+    queueE2E.getMany();
+    queueE2E.getFailedJobs();
     queueE2E.retryFailedJob();
     queueE2E.deleteFailedJob();
   });

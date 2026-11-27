@@ -36,10 +36,10 @@ describe('e2e endpoints', () => {
     it('takes the decorated methods of a controller as its route handlers', () => {
       const handlers = routeHandlersOf(
         'item.controller.ts',
-        'class ItemController { @Get() list() {} @Post() create() {} private map() {} }',
+        'class ItemController { @Get() getMany() {} @Post() create() {} private map() {} }',
       );
 
-      expect(handlers).toEqual(['list', 'create']);
+      expect(handlers).toEqual(['getMany', 'create']);
     });
 
     it.each([
@@ -67,7 +67,7 @@ describe('e2e endpoints', () => {
         'no method for the endpoint',
         {
           'apps/x/test/features/item/item.e2e.ts':
-            'export class ItemE2E { public list(): void {} }',
+            'export class ItemE2E { public getMany(): void {} }',
         },
         'ItemE2E of apps/x/test/features/item/item.e2e.ts has no create, the endpoint of apps/x/src/features/item/shell/item.controller.ts',
       ],
@@ -84,7 +84,7 @@ describe('e2e endpoints', () => {
         {
           'apps/x/test/features/item/item.e2e.ts':
             'export class ItemE2E { public create(): void { it("creates", () => {}); } }',
-          'apps/x/test/app/app.e2e-spec.ts': 'const itemE2E = ItemE2E.of(ctx); itemE2E.list();',
+          'apps/x/test/app/app.e2e-spec.ts': 'const itemE2E = ItemE2E.of(ctx); itemE2E.getMany();',
         },
         'ItemE2E.create is never run by the suite of x',
       ],

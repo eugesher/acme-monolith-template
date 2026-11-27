@@ -10,7 +10,7 @@ export class RoleE2E {
     return new RoleE2E(ctx);
   }
 
-  public list(): void {
+  public getMany(): void {
     describe('GET /api/access/roles', () => {
       it('should list the roles with their permissions from the database', async () => {
         const response = await request(this.ctx.app.getHttpServer())

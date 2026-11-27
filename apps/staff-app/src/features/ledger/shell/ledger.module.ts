@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { LedgerListEntriesCase } from '../application';
-import { LedgerListEntriesRepository } from '../infrastructure';
+import { LedgerGetManyCase } from '../application';
+import { LedgerGetManyRepository } from '../infrastructure';
 import { LedgerController } from './ledger.controller';
 
 @Module({
   controllers: [LedgerController],
-  providers: [LedgerListEntriesCase, LedgerListEntriesRepository.PROVIDER],
+  providers: [LedgerGetManyCase, LedgerGetManyRepository.PROVIDER],
 })
 export class LedgerModule {}
