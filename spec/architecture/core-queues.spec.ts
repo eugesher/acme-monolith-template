@@ -55,7 +55,6 @@ describe('core queues (@acme-core/queues)', () => {
 
   it.each([
     'apps/staff-app/src/features/queue/application/cases/__fixture__.ts',
-    'apps/staff-app/src/common/shared/ledger/__fixture__.ts',
     'core/modules/src/ledger/application/__fixture__.ts',
     'core/contracts/src/__ledger-fixture__/__fixture__.ts',
     'libs/queue/src/__fixture__.ts',

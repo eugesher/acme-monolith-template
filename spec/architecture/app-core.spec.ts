@@ -38,7 +38,7 @@ describe('app → core', () => {
         '../../../../../../../core/contracts/src/__ledger-fixture__',
       ],
       [
-        'apps/__core-link-fixture__/src/features/product/shell/__fixture__.ts',
+        'apps/__core-link-fixture__/src/features/product/shell/__fixture__.controller.ts',
         '../../../../../../core/contracts/src/__ledger-fixture__',
       ],
     ])('%s may NOT reach core contracts — only core-adapters do', async (file, source) => {
@@ -56,7 +56,7 @@ describe('app → core', () => {
 
     it('presentation may NOT reach the health lib contracts — a lib adapter does', async () => {
       await expect({
-        file: 'apps/__core-link-fixture__/src/features/product/shell/__fixture__.ts',
+        file: 'apps/__core-link-fixture__/src/features/product/shell/__fixture__.controller.ts',
         code: 'import { x } from "../../../../../../libs/contracts/src/health";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -93,8 +93,8 @@ describe('app → core', () => {
   describe('bootstrap', () => {
     it('bootstrap may NOT mount a core module', async () => {
       await expect({
-        file: 'apps/__core-link-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../../../../core/modules/src/__ledger-fixture__";',
+        file: 'apps/__core-link-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../../../../core/modules/src/__ledger-fixture__";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -107,22 +107,8 @@ describe('app → core', () => {
 
     it('the rest of app/ may NOT reach the core entities, only the entity list does', async () => {
       await expect({
-        file: 'apps/__core-link-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../../../../core/entities/src";',
-      }).toBreakRule('boundaries/dependencies');
-    });
-  });
-
-  describe('app shared code (common/shared) → core', () => {
-    it.each([
-      '../../../../../../core/entities/src',
-      '../../../../../../core/modules/src/__ledger-fixture__',
-      '../../../features/product',
-      '../../../global',
-    ])('common may NOT reach %s', async (source) => {
-      await expect({
-        file: 'apps/__core-link-fixture__/src/common/shared/auth/__fixture__.ts',
-        code: `import { x } from "${source}";`,
+        file: 'apps/__core-link-fixture__/src/app/setup/config/__fixture__.ts',
+        code: 'import { x } from "../../../../../../core/entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
   });

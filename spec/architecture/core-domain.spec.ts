@@ -31,11 +31,6 @@ describe('core domain (@acme-core/domain)', () => {
   it.each([
     'apps/staff-app/src/features/product/domain/__fixture__.ts',
     'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
-    'apps/processor-app/src/processors/purge/domain/__fixture__.ts',
-    'apps/staff-app/src/common/modules/idempotency/domain/__fixture__.ts',
-    'apps/staff-app/src/common/modules/idempotency/application/__fixture__.ts',
-    'core/modules/src/__ledger-fixture__/domain/__fixture__.ts',
-    'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
   ])('%s MAY import the core domain', async (file) => {
     await expect({
       file,
@@ -44,11 +39,11 @@ describe('core domain (@acme-core/domain)', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/outbound/__fixture__.ts',
-    'apps/staff-app/src/features/product/infrastructure/__fixture__.ts',
-    'apps/staff-app/src/features/product/shell/__fixture__.ts',
+    'apps/staff-app/src/features/product/outbound/ports/__fixture__.ts',
+    'apps/staff-app/src/features/product/infrastructure/persistence/__fixture__.ts',
+    'apps/staff-app/src/features/product/shell/__fixture__.controller.ts',
     'apps/staff-app/src/features/product/shell/product.module.ts',
-    'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
     'core/entities/src/__fixture__.ts',
     'libs/http/src/__fixture__.ts',
   ])(

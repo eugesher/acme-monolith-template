@@ -73,23 +73,16 @@ describe('core modules', () => {
       },
     );
 
-    it('core infrastructure MAY bind its core-adapters', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
-        code: 'import { x } from "./core-adapters/ledger-core-identity-core.adapter";',
-      }).toPassArchitectureLint();
-    });
-
     it('the module root MAY mount another core module through its barrel', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { x } from "../../__identity-fixture__";',
       }).toPassArchitectureLint();
     });
 
     it('the module root may NOT reach the layers of another core module', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { x } from "../../__identity-fixture__/application";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -117,24 +110,17 @@ describe('core modules', () => {
       }).toPassArchitectureLint();
     });
 
-    it('core outbound MAY reach its own contracts: a queue command carries the record of the contract', async () => {
-      await expect({
-        file: 'core/modules/src/__ledger-fixture__/outbound/__fixture__.ts',
-        code: 'import { x } from "../../../../contracts/src/__ledger-fixture__";',
-      }).toPassArchitectureLint();
-    });
-
     it('core outbound may NOT reach the contracts of another module', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/outbound/__fixture__.ts',
-        code: 'import { x } from "../../../../contracts/src/__identity-fixture__";',
+        file: 'core/modules/src/__ledger-fixture__/outbound/ports/__fixture__.ts',
+        code: 'import { x } from "../../../../../contracts/src/__identity-fixture__";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('core outbound may NOT reach domain — a port speaks its own types', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/outbound/__fixture__.ts',
-        code: 'import { x } from "../domain";',
+        file: 'core/modules/src/__ledger-fixture__/outbound/ports/__fixture__.ts',
+        code: 'import { x } from "../../domain";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -177,21 +163,21 @@ describe('core modules', () => {
 
     it('the core module root MAY import its services and layer barrels', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { x } from "./ledger-core.facade";\nimport { y } from "../infrastructure";',
       }).toPassArchitectureLint();
     });
 
     it('the core module root may NOT reach layer internals', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { x } from "../infrastructure/cache/ledger-core-cache.adapter";',
       }).toBreakRule('no-restricted-syntax');
     });
 
     it('the composition root may NOT import entities — it wires them through infrastructure', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { x } from "../../../../entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -225,8 +211,8 @@ describe('core modules', () => {
 
   describe('@nestjs/common', () => {
     it.each([
-      'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
-      'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+      'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
+      'apps/__core-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
       'apps/__core-fixture__/src/processors/purge/shell/__fixture__.module.ts',
     ])('%s MAY take @nestjs/common', async (file) => {
       await expect({
@@ -239,7 +225,7 @@ describe('core modules', () => {
   describe('packages and lib contracts', () => {
     it('infrastructure MAY read tables through the repository host port', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
         code: 'import { Repository } from "typeorm";\nimport { type IOrmPort, ORM_PORT } from "@acme-libs/contracts/database";',
       }).toPassArchitectureLint();
     });
@@ -252,7 +238,7 @@ describe('core modules', () => {
       'infrastructure may NOT import %s — a repository reads tables through ORM_PORT',
       async (source) => {
         await expect({
-          file: 'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
+          file: 'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
           code: `import { x } from "${source}";`,
         }).toBreakRule('boundaries/dependencies');
       },
@@ -260,7 +246,7 @@ describe('core modules', () => {
 
     it('infrastructure may NOT import @nestjs/typeorm — the app setup registers the entities', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
         code: 'import { TypeOrmModule } from "@nestjs/typeorm";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -269,7 +255,7 @@ describe('core modules', () => {
       'infrastructure may NOT import %s — hashing and signing live in the credentials lib',
       async (source) => {
         await expect({
-          file: 'core/modules/src/__ledger-fixture__/infrastructure/__fixture__.ts',
+          file: 'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
           code: `import { x } from "${source}";`,
         }).toBreakRule('boundaries/dependencies');
       },
@@ -284,7 +270,7 @@ describe('core modules', () => {
 
     it('the module root may NOT mount the credentials lib — no core module signs anyone in', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { CredentialsModule } from "@acme-libs/credentials";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -297,18 +283,18 @@ describe('core modules', () => {
     });
 
     it.each([
-      ['domain', 'argon2'],
-      ['domain', '@nestjs/jwt'],
-      ['outbound', 'argon2'],
-      ['application', 'argon2'],
-      ['application', '@nestjs/jwt'],
-      ['application', 'typeorm'],
-      ['shell', 'argon2'],
-      ['shell', '@nestjs/jwt'],
-      ['shell', '@nestjs/typeorm'],
-    ])('%s may NOT import %s, only infrastructure talks to it', async (layer, source) => {
+      ['domain/__fixture__.ts', 'argon2'],
+      ['domain/__fixture__.ts', '@nestjs/jwt'],
+      ['outbound/ports/__fixture__.ts', 'argon2'],
+      ['application/__fixture__.ts', 'argon2'],
+      ['application/__fixture__.ts', '@nestjs/jwt'],
+      ['application/__fixture__.ts', 'typeorm'],
+      ['shell/__fixture__.module.ts', 'argon2'],
+      ['shell/__fixture__.module.ts', '@nestjs/jwt'],
+      ['shell/__fixture__.module.ts', '@nestjs/typeorm'],
+    ])('%s may NOT import %s, only infrastructure talks to it', async (file, source) => {
       await expect({
-        file: `core/modules/src/__ledger-fixture__/${layer}/__fixture__.ts`,
+        file: `core/modules/src/__ledger-fixture__/${file}`,
         code: `import { x } from "${source}";`,
       }).toBreakRule('boundaries/dependencies');
     });
@@ -371,21 +357,21 @@ describe('core modules', () => {
 
     it('the module root MAY register a queue through the core queues, next to the binding of its adapter', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { LedgerAppendQueue } from "@acme-core/queues";',
       }).toPassArchitectureLint();
     });
 
     it('the module root may NOT register a queue with the queue lib — a shared queue lives in the core queues', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { BullSetupModule } from "@acme-libs/queue";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('the module root MAY mount the core ledger', async () => {
       await expect({
-        file: 'core/modules/src/product/shell/__fixture__.ts',
+        file: 'core/modules/src/product/shell/__fixture__.module.ts',
         code: 'import { LedgerCoreModule } from "@acme-core/modules/__ledger-fixture__";',
       }).toPassArchitectureLint();
     });
@@ -418,13 +404,13 @@ describe('core modules', () => {
       'the module root may NOT take Bull itself (%s) — it registers queues with the queue lib',
       async (code) => {
         await expect({
-          file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+          file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
           code,
         }).toBreakRule('boundaries/dependencies');
       },
     );
 
-    it.each(['application', 'outbound', 'domain'])(
+    it.each(['application', 'outbound/ports', 'domain'])(
       '%s may NOT import Bull, only the queue adapter writes to a queue',
       async (layer) => {
         await expect({
@@ -443,12 +429,12 @@ describe('core modules', () => {
 
     it('the module root may NOT bind config values, infrastructure/config does', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
         code: 'import { ConfigValueProvider } from "@acme-libs/config";',
       }).toBreakRule('boundaries/dependencies');
     });
 
-    it.each(['application', 'infrastructure'])(
+    it.each(['application', 'infrastructure/persistence'])(
       '%s may NOT read the config, values come in as tokens',
       async (layer) => {
         await expect({

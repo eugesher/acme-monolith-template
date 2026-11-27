@@ -1,0 +1,25 @@
+export const libsObservability = {
+  category: 'libs',
+  lib: 'observability',
+  allow: [
+    '@nestjs/common',
+    '@nestjs/core',
+    '@opentelemetry/api',
+    '@opentelemetry/auto-instrumentations-node',
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/resources',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/semantic-conventions',
+    'crypto',
+    'http',
+    'nestjs-cls',
+    'nestjs-pino',
+    'pino',
+    'pino-http',
+
+    '@acme-libs/config',
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+  ],
+};

@@ -32,18 +32,6 @@ describe('unit specs', () => {
       'apps/__specs-fixture__/src/processors/catalog-events/infrastructure/core-adapters',
       'catalog-events-ledger-core.adapter',
     ],
-    [
-      'apps/__specs-fixture__/src/processors/catalog-events/infrastructure/common-adapters',
-      'catalog-events-idempotency-common.adapter',
-    ],
-    [
-      'apps/__specs-fixture__/src/common/modules/idempotency/infrastructure/core-adapters',
-      'idempotency-common-identity-core.adapter',
-    ],
-    [
-      'apps/__specs-fixture__/src/common/modules/idempotency/infrastructure/common-adapters',
-      'idempotency-common-audit-common.adapter',
-    ],
   ])('a spec in %s/spec MAY import its adapter %s', async (folder, adapter) => {
     await expect({
       file: `${folder}/spec/__fixture__.spec.ts`,

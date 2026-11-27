@@ -1,0 +1,25 @@
+export const libsHttp = {
+  category: 'libs',
+  lib: 'http',
+  allow: [
+    '@nestjs/common',
+    '@nestjs/config',
+    '@nestjs/core',
+    '@nestjs/swagger',
+    '@nestjs/throttler',
+    'class-transformer',
+    'class-validator',
+    'cors',
+    'helmet',
+    'http',
+    'ioredis',
+    'nestjs-pino',
+    'typeorm',
+
+    '@acme-libs/config',
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/observability',
+    '@acme-libs/toolkit',
+  ],
+};

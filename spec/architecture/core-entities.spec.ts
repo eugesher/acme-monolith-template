@@ -29,8 +29,7 @@ describe('core entities (@acme-core/entities)', () => {
   it.each([
     'apps/staff-app/src/app/setup/entities/index.ts',
     'apps/staff-app/src/features/product/infrastructure/persistence/repositories/__fixture__.ts',
-    'apps/staff-app/src/common/modules/idempotency/infrastructure/persistence/repositories/__fixture__.ts',
-    'apps/processor-app/src/processors/purge/infrastructure/__fixture__.ts',
+    'apps/processor-app/src/processors/purge/infrastructure/persistence/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/infrastructure/persistence/__fixture__.ts',
   ])('%s MAY import the entities', async (file) => {
     await expect({
@@ -41,15 +40,14 @@ describe('core entities (@acme-core/entities)', () => {
 
   it.each([
     'apps/staff-app/src/features/product/domain/__fixture__.ts',
-    'apps/staff-app/src/features/product/outbound/__fixture__.ts',
+    'apps/staff-app/src/features/product/outbound/ports/__fixture__.ts',
     'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
-    'apps/staff-app/src/features/product/shell/__fixture__.ts',
+    'apps/staff-app/src/features/product/shell/__fixture__.controller.ts',
     'apps/staff-app/src/features/product/shell/product.module.ts',
     'apps/processor-app/src/processors/purge/application/__fixture__.ts',
-    'apps/staff-app/src/common/shared/auth/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/domain/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
-    'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
+    'core/modules/src/__ledger-fixture__/shell/__fixture__.module.ts',
     'apps/customer-app/src/main.ts',
   ])(
     '%s may NOT import the entities, a table is reached only through a repository',

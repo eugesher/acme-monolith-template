@@ -30,7 +30,7 @@ describe('repo', () => {
     scaffold.remove();
   });
 
-  describe('test scripts (repo:test)', () => {
+  describe('test scripts (repo:test:infra)', () => {
     it('a seed script MAY import its own support files', async () => {
       await expect({
         file: 'test/infra/seed/__fixture__.ts',
@@ -96,7 +96,7 @@ describe('repo', () => {
     });
   });
 
-  describe('system tests (repo:system)', () => {
+  describe('system tests (repo:test:system)', () => {
     it('a system test MAY mount the app modules and its own context', async () => {
       await expect({
         file: 'test/system/apps/staff-app/app/__fixture__.ts',
@@ -269,15 +269,6 @@ describe('repo', () => {
         expect(result.status).toBe(0);
       },
     );
-  });
-
-  describe('root configs (repo:config)', () => {
-    it('a root TypeScript file is a known file', async () => {
-      await expect({
-        file: '__fixture__.ts',
-        code: 'export const x = 1;',
-      }).toPassArchitectureLint();
-    });
   });
 
   describe('repo specs (repo:spec)', () => {

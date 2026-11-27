@@ -16,8 +16,8 @@ module.exports = {
   globalSetup: '<rootDir>/spec/support/global-setup.ts',
   setupFiles: ['reflect-metadata'],
   restoreMocks: true,
+  roots: ['<rootDir>/apps', '<rootDir>/core', '<rootDir>/libs', '<rootDir>/spec'],
   testRegex: '\\.spec.ts$',
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.claude/'],
   transform: {
     '^.+\\.ts$': [
       'ts-jest',

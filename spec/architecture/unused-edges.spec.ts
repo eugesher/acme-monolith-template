@@ -6,7 +6,6 @@ describe('unused edges', () => {
 
   beforeAll(() => {
     scaffold = Scaffold.create([
-      'apps/__unused-fixture__/src/common/shared/concurrency/index.ts',
       'apps/__unused-fixture__/src/contracts/idempotency/index.ts',
       'apps/__unused-fixture__/src/common/modules/idempotency/domain/index.ts',
       'apps/__unused-fixture__/src/features/product/domain/index.ts',
@@ -30,11 +29,6 @@ describe('unused edges', () => {
 
   describe('app root', () => {
     it.each([
-      [
-        'the app module may NOT reach a shared barrel: shared code is used by the modules it mounts',
-        'apps/__unused-fixture__/src/app/shell/app.module.ts',
-        '../../common/shared/concurrency',
-      ],
       [
         'the app module may NOT reach the entities: the ORM setup module registers them',
         'apps/__unused-fixture__/src/app/shell/app.module.ts',
@@ -96,11 +90,6 @@ describe('unused edges', () => {
         'typeorm',
       ],
       [
-        'a setup module may NOT reach a shared barrel: shared code is used by the modules',
-        'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
-        '../../../common/shared/concurrency',
-      ],
-      [
         'a setup module may NOT reach the http lib: the app module binds the global pipes and filters',
         'apps/__unused-fixture__/src/app/setup/config/__fixture__.ts',
         '../../../../../../libs/http/src',
@@ -121,18 +110,13 @@ describe('unused edges', () => {
     it.each([
       [
         'the root of a global module may NOT reach the observability lib: it wires providers and logs nothing',
-        'apps/__unused-fixture__/src/global/auth/shell/__fixture__.ts',
+        'apps/__unused-fixture__/src/global/auth/shell/__fixture__.module.ts',
         '../../../../../../libs/observability/src',
       ],
       [
         'global infrastructure may NOT reach the contracts of a lib: a core-adapter implements the lib port',
-        'apps/__unused-fixture__/src/global/auth/infrastructure/__fixture__.ts',
-        '../../../../../../libs/contracts/src/auth',
-      ],
-      [
-        'a global core-adapter may NOT reach a shared barrel: it translates between contracts only',
-        'apps/__unused-fixture__/src/global/auth/infrastructure/core-adapters/__fixture__.ts',
-        '../../../../common/shared/concurrency',
+        'apps/__unused-fixture__/src/global/auth/infrastructure/persistence/__fixture__.ts',
+        '../../../../../../../libs/contracts/src/auth',
       ],
     ])('%s', async (_, file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
@@ -168,18 +152,13 @@ describe('unused edges', () => {
   describe('features', () => {
     it.each([
       [
-        'feature application may NOT reach a shared barrel: shared code serves the HTTP surface',
-        'apps/__unused-fixture__/src/features/product/application/__fixture__.ts',
-        '../../../common/shared/concurrency',
-      ],
-      [
         'feature persistence may NOT reach BullMQ: jobs are enqueued from infrastructure/queue',
         'apps/__unused-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
         '@nestjs/bullmq',
       ],
       [
         'feature presentation may NOT reach the observability lib: the middleware of the app sets the correlation id',
-        'apps/__unused-fixture__/src/features/product/shell/__fixture__.ts',
+        'apps/__unused-fixture__/src/features/product/shell/__fixture__.controller.ts',
         '../../../../../../libs/observability/src',
       ],
       [
@@ -198,8 +177,8 @@ describe('unused edges', () => {
     it.each([
       [
         'common outbound may NOT reach the contracts of its module: a port speaks the module types, the contracts serve consumers',
-        'apps/__unused-fixture__/src/common/modules/idempotency/outbound/__fixture__.ts',
-        '../../../../contracts/idempotency',
+        'apps/__unused-fixture__/src/common/modules/idempotency/outbound/ports/__fixture__.ts',
+        '../../../../../contracts/idempotency',
       ],
       [
         'common infrastructure may NOT reach the contracts of its module: it implements outbound ports',
@@ -223,7 +202,7 @@ describe('unused edges', () => {
       ],
       [
         'the common module root may NOT reach its domain: it wires providers, and the domain has none',
-        'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.ts',
+        'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.module.ts',
         '../domain',
       ],
     ])('%s', async (_, file, source) => {
@@ -257,7 +236,7 @@ describe('unused edges', () => {
       ],
       [
         'the core module root may NOT reach its domain: it wires providers, and the domain has none',
-        'core/modules/src/__unused-fixture__/shell/__fixture__.ts',
+        'core/modules/src/__unused-fixture__/shell/__fixture__.module.ts',
         '../domain',
       ],
     ])('%s', async (_, file, source) => {

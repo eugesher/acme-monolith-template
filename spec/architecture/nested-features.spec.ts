@@ -139,8 +139,8 @@ describe('nested features (<module>/modules/<submodule>)', () => {
 
   it('bootstrap may NOT mount a submodule', async () => {
     await expect({
-      file: 'apps/__nested-fixture__/src/app/__fixture__.ts',
-      code: 'import { x } from "../features/ledger/modules/ledger-export";',
+      file: 'apps/__nested-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../features/ledger/modules/ledger-export";',
     }).toBreakRule('boundaries/dependencies');
   });
 
