@@ -1,4 +1,4 @@
-import { NoteGetOneModel } from '../../../domain';
+import { NoteGetDetailsModel } from '../../../domain';
 import { NoteAccessService } from '../note-access.service';
 import type { INoteAccessRepositoryPort } from '../../../outbound';
 
@@ -12,6 +12,7 @@ describe('NoteAccessService', () => {
       id: '7',
       subjectType: 'product',
       subjectId: '42',
+      title: 'Customer call',
       body: 'Check the supplier',
       authorId: 'admin-1',
       resolved: false,
@@ -26,7 +27,7 @@ describe('NoteAccessService', () => {
     it('answers the note of its author', async () => {
       const note = await service.loadOwned(
         { noteId: '7', authorId: 'admin-1' },
-        NoteGetOneModel.reconstitute,
+        NoteGetDetailsModel.reconstitute,
       );
 
       expect(repository.findOwned).toHaveBeenCalledWith({ noteId: '7', authorId: 'admin-1' });
@@ -38,7 +39,7 @@ describe('NoteAccessService', () => {
       repository.findOwned.mockResolvedValue(null);
 
       await expect(
-        service.loadOwned({ noteId: '7', authorId: 'admin-1' }, NoteGetOneModel.reconstitute),
+        service.loadOwned({ noteId: '7', authorId: 'admin-1' }, NoteGetDetailsModel.reconstitute),
       ).rejects.toMatchObject({
         code: 'NOTE_NOT_FOUND',
         message: 'Note 7 was not found',

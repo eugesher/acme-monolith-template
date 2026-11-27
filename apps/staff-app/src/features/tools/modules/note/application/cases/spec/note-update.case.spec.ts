@@ -29,6 +29,7 @@ describe('NoteUpdateCase', () => {
           id: '7',
           subjectType: 'product',
           subjectId: '42',
+          title: 'Customer call',
           body: 'Check the supplier',
           authorId: 'admin-1',
           resolved: false,
@@ -44,6 +45,7 @@ describe('NoteUpdateCase', () => {
           id: '7',
           subjectType: 'product',
           subjectId: '42',
+          title: 'Customer call',
           body: 'Supplier confirmed',
           authorId: 'admin-1',
           resolved: false,
@@ -90,6 +92,7 @@ describe('NoteUpdateCase', () => {
       const view = await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         updateCase.execute({
           noteId: '7',
+          title: undefined,
           body: ' Supplier confirmed ',
           editorId: 'admin-1',
           expectedVersion: undefined,
@@ -112,6 +115,8 @@ describe('NoteUpdateCase', () => {
       expect(revision).toEqual({
         noteId: '7',
         noteVersion: 3,
+        titleBefore: 'Customer call',
+        titleAfter: 'Customer call',
         bodyBefore: 'Check the supplier',
         bodyAfter: 'Supplier confirmed',
         editorId: 'admin-1',
@@ -121,6 +126,7 @@ describe('NoteUpdateCase', () => {
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Supplier confirmed',
         authorId: 'admin-1',
         resolved: false,
@@ -137,6 +143,7 @@ describe('NoteUpdateCase', () => {
     it('writes nothing and opens no transaction for an update to the same body', async () => {
       const view = await updateCase.execute({
         noteId: '7',
+        title: undefined,
         body: ' Check the supplier ',
         editorId: 'admin-1',
         expectedVersion: undefined,
@@ -160,6 +167,7 @@ describe('NoteUpdateCase', () => {
         CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
           updateCase.execute({
             noteId: '7',
+            title: undefined,
             body: 'Supplier confirmed',
             editorId: 'admin-1',
             expectedVersion: undefined,
@@ -180,6 +188,7 @@ describe('NoteUpdateCase', () => {
           id: '7',
           subjectType: 'product',
           subjectId: '42',
+          title: 'Customer call',
           body: 'Check the supplier',
           authorId: 'admin-1',
           resolved: false,
@@ -192,6 +201,7 @@ describe('NoteUpdateCase', () => {
       await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000001', () =>
         updateCase.execute({
           noteId: '7',
+          title: undefined,
           body: 'Supplier confirmed',
           editorId: 'admin-1',
           expectedVersion: undefined,
@@ -214,6 +224,7 @@ describe('NoteUpdateCase', () => {
           id: '7',
           subjectType: 'product',
           subjectId: '42',
+          title: 'Customer call',
           body: 'Check the supplier',
           authorId: 'admin-1',
           resolved: false,
@@ -226,6 +237,7 @@ describe('NoteUpdateCase', () => {
       await expect(
         updateCase.execute({
           noteId: '7',
+          title: undefined,
           body: 'Supplier confirmed',
           editorId: 'admin-1',
           expectedVersion: undefined,
@@ -242,6 +254,7 @@ describe('NoteUpdateCase', () => {
       await expect(
         updateCase.execute({
           noteId: '7',
+          title: undefined,
           body: 'Supplier confirmed',
           editorId: 'admin-1',
           expectedVersion: 1,
@@ -255,6 +268,7 @@ describe('NoteUpdateCase', () => {
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: true,
@@ -266,6 +280,7 @@ describe('NoteUpdateCase', () => {
       await expect(
         updateCase.execute({
           noteId: '7',
+          title: undefined,
           body: 'Supplier confirmed',
           editorId: 'admin-1',
           expectedVersion: undefined,
@@ -280,6 +295,7 @@ describe('NoteUpdateCase', () => {
       await expect(
         updateCase.execute({
           noteId: '7',
+          title: undefined,
           body: 'Supplier confirmed',
           editorId: 'admin-1',
           expectedVersion: undefined,

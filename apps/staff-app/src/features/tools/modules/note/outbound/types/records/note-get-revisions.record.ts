@@ -6,6 +6,8 @@ export type INoteGetRevisionsRecord = [
     | 'id'
     | 'noteId'
     | 'noteVersion'
+    | 'titleBefore'
+    | 'titleAfter'
     | 'bodyBefore'
     | 'bodyAfter'
     | 'editorId'

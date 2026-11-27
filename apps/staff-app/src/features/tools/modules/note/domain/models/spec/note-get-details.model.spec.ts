@@ -1,12 +1,13 @@
-import { NoteGetOneModel } from '../note-get-one.model';
+import { NoteGetDetailsModel } from '../note-get-details.model';
 
-describe('NoteGetOneModel', () => {
+describe('NoteGetDetailsModel', () => {
   describe('reconstitute', () => {
     it('restores a stored note as it was', () => {
-      const note = NoteGetOneModel.reconstitute({
+      const note = NoteGetDetailsModel.reconstitute({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: true,
@@ -26,10 +27,11 @@ describe('NoteGetOneModel', () => {
 
     it.each([0, 1.5])('refuses version %s with NOTE_VERSION_INVALID', (version) => {
       expect(() =>
-        NoteGetOneModel.reconstitute({
+        NoteGetDetailsModel.reconstitute({
           id: '7',
           subjectType: 'product',
           subjectId: '42',
+          title: 'Customer call',
           body: 'Check the supplier',
           authorId: 'admin-1',
           resolved: false,
@@ -48,10 +50,11 @@ describe('NoteGetOneModel', () => {
 
   describe('toSnapshot', () => {
     it('maps a stored note with its instants as ISO strings', () => {
-      const note = NoteGetOneModel.reconstitute({
+      const note = NoteGetDetailsModel.reconstitute({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,
@@ -64,6 +67,7 @@ describe('NoteGetOneModel', () => {
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,
@@ -75,13 +79,14 @@ describe('NoteGetOneModel', () => {
   });
 
   describe('assertExpectedVersion', () => {
-    let note: NoteGetOneModel;
+    let note: NoteGetDetailsModel;
 
     beforeEach(() => {
-      note = NoteGetOneModel.reconstitute({
+      note = NoteGetDetailsModel.reconstitute({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,

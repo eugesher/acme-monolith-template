@@ -1,11 +1,11 @@
-import type { INoteGetManyReconstitute, INoteGetManySnapshot } from '../types';
+import type { INoteGetListReconstitute, INoteGetListSnapshot } from '../types';
 
-export class NoteGetManyModel {
+export class NoteGetListModel {
   private constructor(
     private readonly id: string,
     private readonly subjectType: string,
     private readonly subjectId: string,
-    private readonly body: string,
+    private readonly title: string,
     private readonly authorId: string,
     private readonly resolved: boolean,
     private readonly version: number,
@@ -13,23 +13,23 @@ export class NoteGetManyModel {
     private readonly updatedAt: Date,
   ) {}
 
-  public static toViewData(records: INoteGetManyReconstitute[]): INoteGetManySnapshot[] {
+  public static toViewData(records: INoteGetListReconstitute[]): INoteGetListSnapshot[] {
     return records.map((record) => {
-      const note = NoteGetManyModel.reconstitute(record);
+      const note = NoteGetListModel.reconstitute(record);
 
       return note.toSnapshot();
     });
   }
 
-  private static reconstitute(record: INoteGetManyReconstitute): NoteGetManyModel {
-    const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
+  private static reconstitute(record: INoteGetListReconstitute): NoteGetListModel {
+    const { id, subjectType, subjectId, title, authorId, resolved, version, createdAt, updatedAt } =
       record;
 
-    return new NoteGetManyModel(
+    return new NoteGetListModel(
       id,
       subjectType,
       subjectId,
-      body,
+      title,
       authorId,
       resolved,
       version,
@@ -38,12 +38,12 @@ export class NoteGetManyModel {
     );
   }
 
-  private toSnapshot(): INoteGetManySnapshot {
+  private toSnapshot(): INoteGetListSnapshot {
     return {
       id: this.id,
       subjectType: this.subjectType,
       subjectId: this.subjectId,
-      body: this.body,
+      title: this.title,
       authorId: this.authorId,
       resolved: this.resolved,
       version: this.version,

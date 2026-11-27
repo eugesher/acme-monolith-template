@@ -6,6 +6,7 @@ describe('NoteCreateModel', () => {
       const candidate = NoteCreateModel.initCandidate({
         subjectType: 'product',
         subjectId: '  42  ',
+        title: 'Customer call',
         body: '  Check the supplier  ',
         authorId: 'admin-1',
       });
@@ -13,6 +14,7 @@ describe('NoteCreateModel', () => {
       expect(candidate).toEqual({
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,
@@ -20,10 +22,81 @@ describe('NoteCreateModel', () => {
       });
     });
 
+    it.each([
+      ['left out', undefined],
+      ['blank', '   '],
+    ])('takes the trimmed body as the title when the title is %s', (_case, title) => {
+      const candidate = NoteCreateModel.initCandidate({
+        subjectType: 'product',
+        subjectId: '42',
+        title,
+        body: '  Check the supplier  ',
+        authorId: 'admin-1',
+      });
+
+      expect(candidate.title).toBe('Check the supplier');
+    });
+
+    it('takes the first 100 characters of the body, counting an emoji as one, and trims the end', () => {
+      const body = `${'😀'.repeat(98)} Xtail`;
+      const candidate = NoteCreateModel.initCandidate({
+        subjectType: 'product',
+        subjectId: '42',
+        title: undefined,
+        body,
+        authorId: 'admin-1',
+      });
+
+      expect(candidate.title).toBe('😀'.repeat(98) + ' X');
+      expect(Array.from(candidate.title)).toHaveLength(100);
+    });
+
+    it('keeps a given title, trimmed', () => {
+      const candidate = NoteCreateModel.initCandidate({
+        subjectType: 'product',
+        subjectId: '42',
+        title: '  Refund call  ',
+        body: 'Customer called about this',
+        authorId: 'admin-1',
+      });
+
+      expect(candidate.title).toBe('Refund call');
+    });
+
+    it('accepts a title of 100 emoji, counting each as one character', () => {
+      const candidate = NoteCreateModel.initCandidate({
+        subjectType: 'product',
+        subjectId: '42',
+        title: '😀'.repeat(100),
+        body: 'Body',
+        authorId: 'admin-1',
+      });
+
+      expect(candidate.title).toBe('😀'.repeat(100));
+    });
+
+    it('refuses a title longer than 100 with NOTE_TITLE_INVALID', () => {
+      expect(() =>
+        NoteCreateModel.initCandidate({
+          subjectType: 'product',
+          subjectId: '42',
+          title: 't'.repeat(101),
+          body: 'Body',
+          authorId: 'admin-1',
+        }),
+      ).toThrow(
+        expect.objectContaining({
+          code: 'NOTE_TITLE_INVALID',
+          message: 'Note.title must be a non-empty string of at most 100 characters',
+        }) as Error,
+      );
+    });
+
     it('accepts any subject the pattern allows, without checking it exists', () => {
       const candidate = NoteCreateModel.initCandidate({
         subjectType: 'support-ticket',
         subjectId: 'TCK-0001',
+        title: 'Customer call',
         body: 'Escalated',
         authorId: 'admin-1',
       });
@@ -43,6 +116,7 @@ describe('NoteCreateModel', () => {
         NoteCreateModel.initCandidate({
           subjectType,
           subjectId: '42',
+          title: 'Customer call',
           body: 'Body',
           authorId: 'admin-1',
         }),
@@ -58,6 +132,7 @@ describe('NoteCreateModel', () => {
       const candidate = NoteCreateModel.initCandidate({
         subjectType: `i${'t'.repeat(63)}`,
         subjectId: 's'.repeat(64),
+        title: 'Customer call',
         body: 'Body',
         authorId: 'admin-1',
       });
@@ -74,6 +149,7 @@ describe('NoteCreateModel', () => {
         NoteCreateModel.initCandidate({
           subjectType: 'product',
           subjectId,
+          title: 'Customer call',
           body: 'Body',
           authorId: 'admin-1',
         }),
@@ -89,6 +165,7 @@ describe('NoteCreateModel', () => {
       const candidate = NoteCreateModel.initCandidate({
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'b'.repeat(4000),
         authorId: 'admin-1',
       });
@@ -104,6 +181,7 @@ describe('NoteCreateModel', () => {
         NoteCreateModel.initCandidate({
           subjectType: 'product',
           subjectId: '42',
+          title: undefined,
           body,
           authorId: 'admin-1',
         }),
@@ -122,6 +200,7 @@ describe('NoteCreateModel', () => {
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,

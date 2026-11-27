@@ -16,6 +16,7 @@ describe('NoteCreateCase', () => {
       id: '7',
       subjectType: 'product',
       subjectId: '42',
+      title: 'Customer call',
       body: 'Check the supplier',
       authorId: 'admin-1',
       resolved: false,
@@ -32,6 +33,7 @@ describe('NoteCreateCase', () => {
       const view = await createCase.execute({
         subjectType: 'product',
         subjectId: ' 42 ',
+        title: 'Customer call',
         body: ' Check the supplier ',
         authorId: 'admin-1',
       });
@@ -45,6 +47,7 @@ describe('NoteCreateCase', () => {
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,
@@ -63,6 +66,7 @@ describe('NoteCreateCase', () => {
         createCase.execute({
           subjectType: 'Product',
           subjectId: '42',
+          title: 'Customer call',
           body: 'Check the supplier',
           authorId: 'admin-1',
         }),

@@ -1,9 +1,9 @@
-import { NoteGetManyCase } from '../note-get-many.case';
-import type { INoteGetManyRepositoryPort } from '../../../outbound';
+import { NoteGetListCase } from '../note-get-list.case';
+import type { INoteGetListRepositoryPort } from '../../../outbound';
 
-describe('NoteGetManyCase', () => {
-  let repository: jest.Mocked<INoteGetManyRepositoryPort>;
-  let getManyCase: NoteGetManyCase;
+describe('NoteGetListCase', () => {
+  let repository: jest.Mocked<INoteGetListRepositoryPort>;
+  let getListCase: NoteGetListCase;
 
   beforeEach(() => {
     repository = { list: jest.fn() };
@@ -13,7 +13,7 @@ describe('NoteGetManyCase', () => {
           id: '7',
           subjectType: 'product',
           subjectId: '42',
-          body: 'Check the supplier',
+          title: 'Customer call',
           authorId: 'admin-1',
           resolved: false,
           version: 2,
@@ -23,12 +23,12 @@ describe('NoteGetManyCase', () => {
       ],
       1,
     ]);
-    getManyCase = new NoteGetManyCase(repository);
+    getListCase = new NoteGetListCase(repository);
   });
 
   describe('execute', () => {
     it('lists the notes of the author on the default page when nothing else is filtered', async () => {
-      const page = await getManyCase.execute({
+      const page = await getListCase.execute({
         page: undefined,
         limit: undefined,
         subjectType: undefined,
@@ -56,7 +56,7 @@ describe('NoteGetManyCase', () => {
             id: '7',
             subjectType: 'product',
             subjectId: '42',
-            body: 'Check the supplier',
+            title: 'Customer call',
             authorId: 'admin-1',
             resolved: false,
             version: 2,
@@ -68,7 +68,7 @@ describe('NoteGetManyCase', () => {
     });
 
     it('passes a subject, a resolution filter and a clamped window', async () => {
-      await getManyCase.execute({
+      await getListCase.execute({
         page: 0,
         limit: 500,
         subjectType: 'product',
@@ -92,7 +92,7 @@ describe('NoteGetManyCase', () => {
       ['only a subject id', undefined, '42'],
     ])('refuses %s with NOTE_SUBJECT_INVALID', async (_case, subjectType, subjectId) => {
       await expect(
-        getManyCase.execute({
+        getListCase.execute({
           page: undefined,
           limit: undefined,
           subjectType,

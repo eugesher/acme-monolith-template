@@ -3,7 +3,7 @@ description: |-
   e2e: Tools › Note › PATCH /api/tools/notes/:noteId
   it: should rewrite the body under a matching If-Match and record a revision under the correlation id
 
-  Expect: 200 OK, note 200 at version 2, one revision with correlation_id e2e00000-0000-4000-8000-000000000018
+  Expect: 200 OK, note 200 at version 2 with its title Customer call, one revision with correlation_id e2e00000-0000-4000-8000-000000000018 and title_before = title_after = Customer call
   User: admin@example.com (token signed by scripts.py)
 method: PATCH
 url: $STAFF_APP_BASE_URL/tools/notes/200

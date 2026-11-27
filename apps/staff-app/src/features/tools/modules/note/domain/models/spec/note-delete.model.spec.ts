@@ -7,6 +7,7 @@ describe('NoteDeleteModel', () => {
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,

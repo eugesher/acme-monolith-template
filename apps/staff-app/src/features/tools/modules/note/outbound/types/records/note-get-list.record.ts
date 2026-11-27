@@ -1,12 +1,12 @@
 import type { Note } from '@acme-staff/common/entities';
 
-export type INoteGetManyRecord = [
+export type INoteGetListRecord = [
   Pick<
     Note,
     | 'id'
     | 'subjectType'
     | 'subjectId'
-    | 'body'
+    | 'title'
     | 'authorId'
     | 'resolved'
     | 'version'

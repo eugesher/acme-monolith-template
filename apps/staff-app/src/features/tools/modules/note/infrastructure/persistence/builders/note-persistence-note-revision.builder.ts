@@ -12,6 +12,8 @@ export class NotePersistenceNoteRevisionBuilder extends SelectQueryBuilder<NoteR
       `${this.alias}.id`,
       `${this.alias}.noteId`,
       `${this.alias}.noteVersion`,
+      `${this.alias}.titleBefore`,
+      `${this.alias}.titleAfter`,
       `${this.alias}.bodyBefore`,
       `${this.alias}.bodyAfter`,
       `${this.alias}.editorId`,

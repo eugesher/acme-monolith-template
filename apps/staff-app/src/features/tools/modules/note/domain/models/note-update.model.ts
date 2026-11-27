@@ -1,3 +1,5 @@
+import type { Maybe } from '@acme-libs/toolkit';
+
 import { NoteAggregate } from '../aggregates/note.aggregate';
 import type {
   INoteReconstitute,
@@ -7,10 +9,12 @@ import type {
 } from '../types';
 
 export class NoteUpdateModel extends NoteAggregate {
+  private readonly titleAsRead: string;
   private readonly bodyAsRead: string;
 
   protected constructor(record: INoteReconstitute) {
     super(record);
+    this.titleAsRead = this.title;
     this.bodyAsRead = this.body;
   }
 
@@ -18,15 +22,19 @@ export class NoteUpdateModel extends NoteAggregate {
     return new NoteUpdateModel(record);
   }
 
-  public update(body: string): boolean {
+  public update(body: string, title: Maybe<string>): boolean {
     this.assertOpen();
 
     const validBody = NoteUpdateModel.validBody(body);
+    const trimmedTitle = title?.trim() ?? '';
+    const validTitle =
+      trimmedTitle.length === 0 ? this.title : NoteUpdateModel.validTitle(trimmedTitle);
 
-    if (validBody === this.body) {
+    if (validBody === this.body && validTitle === this.title) {
       return false;
     }
 
+    this.title = validTitle;
     this.body = validBody;
     this.bumpVersion();
 
@@ -41,6 +49,8 @@ export class NoteUpdateModel extends NoteAggregate {
     return {
       noteId: this.id,
       noteVersion: this.version,
+      titleBefore: this.titleAsRead,
+      titleAfter: this.title,
       bodyBefore: this.bodyAsRead,
       bodyAfter: this.body,
       editorId,

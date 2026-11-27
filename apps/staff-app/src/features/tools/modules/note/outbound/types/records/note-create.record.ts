@@ -5,6 +5,7 @@ export type INoteCreateRecord = Pick<
   | 'id'
   | 'subjectType'
   | 'subjectId'
+  | 'title'
   | 'body'
   | 'authorId'
   | 'resolved'

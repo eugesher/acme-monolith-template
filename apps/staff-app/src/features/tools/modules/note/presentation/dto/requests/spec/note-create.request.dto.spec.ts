@@ -10,6 +10,14 @@ describe('NoteCreateRequestDto', () => {
       'a dashed subject type and the longest values',
       { subjectType: 'support-ticket', subjectId: 's'.repeat(64), body: 'b'.repeat(4000) },
     ],
+    [
+      'a title of 100 characters',
+      { subjectType: 'product', subjectId: '42', title: 't'.repeat(100), body: 'Refunded' },
+    ],
+    [
+      'an empty title, left to the body',
+      { subjectType: 'product', subjectId: '42', title: '', body: 'Refunded' },
+    ],
   ])('accepts %s', (_case, body) => {
     const dto = plainToInstance(NoteCreateRequestDto, body);
 
@@ -72,6 +80,24 @@ describe('NoteCreateRequestDto', () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].property).toBe('body');
+    expect(Object.keys(errors[0].constraints ?? {})).toEqual(constraints);
+  });
+
+  it.each([
+    ['a title of 101 characters', 't'.repeat(101), ['maxLength']],
+    ['a number as the title', 42, ['maxLength', 'isString']],
+  ])('rejects %s', (_case, title, constraints) => {
+    const dto = plainToInstance(NoteCreateRequestDto, {
+      subjectType: 'product',
+      subjectId: '42',
+      title,
+      body: 'Refunded',
+    });
+
+    const errors = validateSync(dto);
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].property).toBe('title');
     expect(Object.keys(errors[0].constraints ?? {})).toEqual(constraints);
   });
 });

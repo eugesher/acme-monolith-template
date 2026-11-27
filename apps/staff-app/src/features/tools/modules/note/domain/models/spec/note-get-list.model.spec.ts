@@ -1,14 +1,14 @@
-import { NoteGetManyModel } from '../note-get-many.model';
+import { NoteGetListModel } from '../note-get-list.model';
 
-describe('NoteGetManyModel', () => {
+describe('NoteGetListModel', () => {
   describe('toViewData', () => {
     it('answers the snapshot of every listed note', () => {
-      const data = NoteGetManyModel.toViewData([
+      const data = NoteGetListModel.toViewData([
         {
           id: '7',
           subjectType: 'product',
           subjectId: '12',
-          body: 'Check the stock',
+          title: 'Customer call',
           authorId: 'admin-1',
           resolved: false,
           version: 1,
@@ -22,7 +22,7 @@ describe('NoteGetManyModel', () => {
           id: '7',
           subjectType: 'product',
           subjectId: '12',
-          body: 'Check the stock',
+          title: 'Customer call',
           authorId: 'admin-1',
           resolved: false,
           version: 1,
@@ -33,7 +33,7 @@ describe('NoteGetManyModel', () => {
     });
 
     it('answers no snapshots for no records', () => {
-      expect(NoteGetManyModel.toViewData([])).toEqual([]);
+      expect(NoteGetListModel.toViewData([])).toEqual([]);
     });
   });
 });

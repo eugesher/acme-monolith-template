@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class NoteCreateRequestDto {
   @ApiProperty({ example: 'product', description: 'The kind of thing the note is about' })
@@ -12,6 +12,15 @@ export class NoteCreateRequestDto {
   @MinLength(1)
   @MaxLength(64)
   public subjectId: string;
+
+  @ApiPropertyOptional({
+    example: 'Refund call',
+    description: 'At most 100 characters; when left out or blank, the start of the body',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  public title?: string;
 
   @ApiProperty({ example: 'Customer called about this; refunded manually.' })
   @IsString()

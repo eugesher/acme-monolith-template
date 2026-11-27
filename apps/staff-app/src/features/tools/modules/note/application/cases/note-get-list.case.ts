@@ -1,19 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { PaginationHelper, type IPage } from '@acme-libs/toolkit';
+import { PaginationHelper } from '@acme-libs/toolkit';
 
-import { NoteGetManyModel, NoteSubjectInvalidException } from '../../domain';
-import { NOTE_GET_MANY_REPOSITORY_PORT, type INoteGetManyRepositoryPort } from '../../outbound';
-import type { INoteGetManyCommand, INoteView } from '../types';
+import { NoteGetListModel, NoteSubjectInvalidException } from '../../domain';
+import { NOTE_GET_LIST_REPOSITORY_PORT, type INoteGetListRepositoryPort } from '../../outbound';
+import type { INoteGetListCommand, INoteGetListView } from '../types';
 
 @Injectable()
-export class NoteGetManyCase {
+export class NoteGetListCase {
   constructor(
-    @Inject(NOTE_GET_MANY_REPOSITORY_PORT)
-    private readonly repository: INoteGetManyRepositoryPort,
+    @Inject(NOTE_GET_LIST_REPOSITORY_PORT)
+    private readonly repository: INoteGetListRepositoryPort,
   ) {}
 
-  public async execute(command: INoteGetManyCommand): Promise<IPage<INoteView>> {
+  public async execute(command: INoteGetListCommand): Promise<INoteGetListView> {
     const { subjectType, subjectId, resolved, authorId } = command;
 
     if ((subjectType === undefined) !== (subjectId === undefined)) {
@@ -29,7 +29,7 @@ export class NoteGetManyCase {
       resolved,
       authorId,
     });
-    const data = NoteGetManyModel.toViewData(records);
+    const data = NoteGetListModel.toViewData(records);
 
     return PaginationHelper.toPage({ data, page, limit, total });
   }

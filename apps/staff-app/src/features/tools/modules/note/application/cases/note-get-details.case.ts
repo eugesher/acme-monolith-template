@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 
-import { NoteGetOneModel } from '../../domain';
+import { NoteGetDetailsModel } from '../../domain';
 import { NoteAccessService } from '../services/note-access.service';
-import type { INoteGetOneCommand, INoteView } from '../types';
+import type { INoteGetDetailsCommand, INoteView } from '../types';
 
 @Injectable()
-export class NoteGetOneCase {
+export class NoteGetDetailsCase {
   constructor(private readonly accessService: NoteAccessService) {}
 
-  public async execute(command: INoteGetOneCommand): Promise<INoteView> {
+  public async execute(command: INoteGetDetailsCommand): Promise<INoteView> {
     const { noteId, authorId } = command;
     const note = await this.accessService.loadOwned(
       { noteId, authorId },
-      NoteGetOneModel.reconstitute,
+      NoteGetDetailsModel.reconstitute,
     );
 
     return note.toSnapshot();

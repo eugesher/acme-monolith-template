@@ -1,11 +1,11 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 
-import { NoteGetManyQueryDto } from '../note-get-many.query.dto';
+import { NoteGetListQueryDto } from '../note-get-list.query.dto';
 
-describe('NoteGetManyQueryDto', () => {
+describe('NoteGetListQueryDto', () => {
   it('accepts an empty query', () => {
-    const dto = plainToInstance(NoteGetManyQueryDto, {});
+    const dto = plainToInstance(NoteGetListQueryDto, {});
 
     const errors = validateSync(dto);
 
@@ -13,7 +13,7 @@ describe('NoteGetManyQueryDto', () => {
   });
 
   it('turns the query strings into numbers and a boolean and keeps the subject', () => {
-    const dto = plainToInstance(NoteGetManyQueryDto, {
+    const dto = plainToInstance(NoteGetListQueryDto, {
       page: '2',
       limit: '500',
       subjectType: 'product',
@@ -34,7 +34,7 @@ describe('NoteGetManyQueryDto', () => {
   });
 
   it('turns resolved=true into true', () => {
-    const dto = plainToInstance(NoteGetManyQueryDto, { resolved: 'true' });
+    const dto = plainToInstance(NoteGetListQueryDto, { resolved: 'true' });
 
     const errors = validateSync(dto);
 
@@ -43,7 +43,7 @@ describe('NoteGetManyQueryDto', () => {
   });
 
   it('leaves half of the subject to the case', () => {
-    const dto = plainToInstance(NoteGetManyQueryDto, { subjectType: 'product' });
+    const dto = plainToInstance(NoteGetListQueryDto, { subjectType: 'product' });
 
     const errors = validateSync(dto);
 
@@ -59,7 +59,7 @@ describe('NoteGetManyQueryDto', () => {
     ['resolved=yes', { resolved: 'yes' }, 'resolved', ['isBoolean']],
     ['resolved=1', { resolved: '1' }, 'resolved', ['isBoolean']],
   ])('rejects %s', (_case, query, property, constraints) => {
-    const dto = plainToInstance(NoteGetManyQueryDto, query);
+    const dto = plainToInstance(NoteGetListQueryDto, query);
 
     const errors = validateSync(dto);
 

@@ -20,6 +20,7 @@ describe('NoteWriteService', () => {
               id: '7',
               subjectType: 'product',
               subjectId: '42',
+              title: 'Customer call',
               body: 'Check the supplier',
               authorId: 'admin-1',
               resolved: false,
@@ -36,6 +37,7 @@ describe('NoteWriteService', () => {
               id: '7',
               subjectType: 'product',
               subjectId: '42',
+              title: 'Customer call',
               body: 'Supplier confirmed',
               authorId: 'admin-1',
               resolved: false,
@@ -55,7 +57,7 @@ describe('NoteWriteService', () => {
       const written = await service.write(
         { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
         NoteUpdateModel.reconstitute,
-        (note) => note.update('Supplier confirmed'),
+        (note) => note.update('Supplier confirmed', undefined),
         save,
       );
 
@@ -87,7 +89,7 @@ describe('NoteWriteService', () => {
       const written = await service.write(
         { noteId: '7', authorId: 'admin-1', expectedVersion: 3 },
         NoteUpdateModel.reconstitute,
-        (note) => note.update('Check the supplier'),
+        (note) => note.update('Check the supplier', undefined),
         save,
       );
 
@@ -103,7 +105,7 @@ describe('NoteWriteService', () => {
       const written = await service.write(
         { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
         NoteUpdateModel.reconstitute,
-        (note) => note.update('Supplier called back'),
+        (note) => note.update('Supplier called back', undefined),
         save,
       );
 
@@ -123,7 +125,7 @@ describe('NoteWriteService', () => {
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
           NoteUpdateModel.reconstitute,
-          (note) => note.update('Supplier called back'),
+          (note) => note.update('Supplier called back', undefined),
           save,
         ),
       ).rejects.toMatchObject({
@@ -145,7 +147,7 @@ describe('NoteWriteService', () => {
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: 3 },
           NoteUpdateModel.reconstitute,
-          (note) => note.update('Supplier called back'),
+          (note) => note.update('Supplier called back', undefined),
           save,
         ),
       ).rejects.toMatchObject({
@@ -176,7 +178,7 @@ describe('NoteWriteService', () => {
         service.write(
           { noteId: '7', authorId: 'admin-1', expectedVersion: undefined },
           NoteUpdateModel.reconstitute,
-          (note) => note.update('   '),
+          (note) => note.update('   ', undefined),
           save,
         ),
       ).rejects.toMatchObject({ code: 'NOTE_BODY_INVALID' });

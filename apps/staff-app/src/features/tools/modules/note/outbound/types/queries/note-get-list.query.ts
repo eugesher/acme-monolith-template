@@ -1,6 +1,6 @@
 import type { Maybe } from '@acme-libs/toolkit';
 
-export interface INoteGetManyListQuery {
+export interface INoteGetListQuery {
   limit: number;
   offset: number;
   subjectType: Maybe<string>;

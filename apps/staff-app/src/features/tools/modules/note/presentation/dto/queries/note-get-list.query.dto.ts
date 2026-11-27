@@ -4,7 +4,7 @@ import { IsBoolean, IsOptional, IsString, Matches, MaxLength, MinLength } from '
 
 import { PageQueryDto } from '@acme-libs/http';
 
-export class NoteGetManyQueryDto extends PageQueryDto {
+export class NoteGetListQueryDto extends PageQueryDto {
   @ApiPropertyOptional({ example: 'product', description: 'Only together with subjectId' })
   @IsOptional()
   @IsString()
