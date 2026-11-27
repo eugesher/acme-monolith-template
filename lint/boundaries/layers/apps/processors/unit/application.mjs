@@ -3,14 +3,17 @@ export const appsProcessorsUnitApplication = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/application/**',
   capture: ['app', 'unit'],
   allow: [
+    '@nestjs/common',
+    'nestjs-pino',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/observability',
+    '@acme-libs/toolkit',
+
     '@acme-<app>/processors/<unit>/domain',
     '@acme-<app>/processors/<unit>/outbound/**',
+
     '@acme-<app>/processors/<unit>/application',
-    '@nestjs/common',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/observability',
-    'nestjs-pino',
   ],
 };

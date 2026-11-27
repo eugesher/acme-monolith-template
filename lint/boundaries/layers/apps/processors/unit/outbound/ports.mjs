@@ -3,9 +3,10 @@ export const appsProcessorsUnitOutboundPorts = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/outbound/ports/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/processors/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/processors/<unit>/outbound/**',
   ],
 };

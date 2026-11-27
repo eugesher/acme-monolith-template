@@ -3,9 +3,10 @@ export const coreModulesUnitOutboundPorts = {
   pattern: 'core/modules/src/*/outbound/ports/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-core/modules/<unit>/outbound/**',
   ],
 };

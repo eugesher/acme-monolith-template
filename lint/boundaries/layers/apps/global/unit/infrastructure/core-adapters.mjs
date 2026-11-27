@@ -3,11 +3,13 @@ export const appsGlobalUnitInfrastructureCoreAdapters = {
   pattern: 'apps/*/src/global/*/infrastructure/core-adapters/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/outbound/**',
-    '@acme-core/contracts',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+    '@acme-core/contracts',
+
+    '@acme-<app>/global/<unit>/outbound/**',
   ],
 };

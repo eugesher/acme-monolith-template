@@ -3,9 +3,12 @@ export const coreModulesUnitInfrastructureConfig = {
   pattern: 'core/modules/src/*/infrastructure/config/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/outbound/**',
-    '@acme-core/modules/<unit>/infrastructure/config',
-    '@acme-libs/config',
     '@nestjs/common',
+
+    '@acme-libs/config',
+
+    '@acme-core/modules/<unit>/outbound/**',
+
+    '@acme-core/modules/<unit>/infrastructure/config',
   ],
 };

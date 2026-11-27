@@ -2,11 +2,6 @@ export const libsTesting = {
   category: 'libs',
   lib: 'testing',
   allow: [
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/app',
-    '@acme-libs/cache/outbound',
     '@nestjs/common',
     '@nestjs/config',
     '@nestjs/core',
@@ -15,5 +10,11 @@ export const libsTesting = {
     'nestjs-pino',
     'supertest',
     'typeorm',
+
+    '@acme-libs/app',
+    '@acme-libs/cache/outbound',
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
   ],
 };

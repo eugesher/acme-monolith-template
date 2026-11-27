@@ -3,11 +3,13 @@ export const appsCommonModulesUnitShellFacade = {
   pattern: 'apps/*/src/common/modules/*/shell/*.facade.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/common/modules/<unit>/application',
-    '@acme-<app>/contracts/<unit>',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+    '@acme-<app>/contracts/<unit>',
+
+    '@acme-<app>/common/modules/<unit>/application',
   ],
 };

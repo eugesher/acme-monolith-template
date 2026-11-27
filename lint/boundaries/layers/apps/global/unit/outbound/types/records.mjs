@@ -3,10 +3,11 @@ export const appsGlobalUnitOutboundTypesRecords = {
   pattern: 'apps/*/src/global/*/outbound/types/records/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@acme-core/entities',
+
+    '@acme-<app>/global/<unit>/outbound/**',
   ],
 };

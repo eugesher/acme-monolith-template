@@ -3,14 +3,17 @@ export const appsProcessorsUnitInfrastructureQueue = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/infrastructure/queue/**',
   capture: ['app', 'unit', '', '', '', 'file'],
   allow: [
-    '@acme-<app>/processors/<unit>/outbound/**',
-    '@acme-<app>/processors/<unit>/infrastructure/queue',
-    '@acme-<app>/processors/<unit>/queues',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@nestjs/bullmq',
     '@nestjs/common',
     'bullmq',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+
+    '@acme-<app>/processors/<unit>/outbound/**',
+    '@acme-<app>/processors/<unit>/queues',
+
+    '@acme-<app>/processors/<unit>/infrastructure/queue',
   ],
 };

@@ -3,9 +3,10 @@ export const appsFeaturesUnitOutboundPorts = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/outbound/ports/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

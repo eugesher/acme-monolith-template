@@ -3,9 +3,10 @@ export const coreContracts = {
   pattern: 'core/contracts/src/*/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/contracts/<unit>',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-core/contracts/<unit>',
   ],
 };

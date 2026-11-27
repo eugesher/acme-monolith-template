@@ -3,10 +3,11 @@ export const coreModulesUnitOutboundTypesEnums = {
   pattern: 'core/modules/src/*/outbound/types/enums/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/outbound/**',
-    '@acme-core/contracts/<unit>',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+    '@acme-core/contracts/<unit>',
+
+    '@acme-core/modules/<unit>/outbound/**',
   ],
 };

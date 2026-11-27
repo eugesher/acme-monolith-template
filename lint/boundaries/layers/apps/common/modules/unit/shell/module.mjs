@@ -3,13 +3,15 @@ export const appsCommonModulesUnitShellModule = {
   pattern: 'apps/*/src/common/modules/*/shell/*.module.ts',
   capture: ['app', 'unit'],
   allow: [
+    '@nestjs/common',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-<app>/contracts/<unit>',
+
     '@acme-<app>/common/modules/<unit>/application',
     '@acme-<app>/common/modules/<unit>/infrastructure/index',
     '@acme-<app>/common/modules/<unit>/shell/*.facade',
-    '@acme-<app>/contracts/<unit>',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
   ],
 };

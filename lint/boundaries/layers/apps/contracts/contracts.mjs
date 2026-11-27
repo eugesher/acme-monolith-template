@@ -3,9 +3,10 @@ export const appsContracts = {
   pattern: 'apps/*/src/contracts/*/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/contracts/<unit>',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/contracts/<unit>',
   ],
 };

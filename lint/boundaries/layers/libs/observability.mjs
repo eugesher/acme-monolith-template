@@ -2,10 +2,6 @@ export const libsObservability = {
   category: 'libs',
   lib: 'observability',
   allow: [
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/config',
     '@nestjs/common',
     '@nestjs/core',
     '@opentelemetry/api',
@@ -20,5 +16,10 @@ export const libsObservability = {
     'nestjs-pino',
     'pino',
     'pino-http',
+
+    '@acme-libs/config',
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
   ],
 };

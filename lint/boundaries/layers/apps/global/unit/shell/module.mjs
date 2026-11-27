@@ -3,15 +3,17 @@ export const appsGlobalUnitShellModule = {
   pattern: 'apps/*/src/global/*/shell/*.module.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/shell/*.facade',
-    '@acme-<app>/global/<unit>/application',
-    '@acme-<app>/global/<unit>/infrastructure/index',
-    '@acme-<app>/common/modules',
+    '@nestjs/common',
+
+    '@acme-libs/auth',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/auth',
     '@acme-libs/contracts/auth',
-    '@nestjs/common',
+    '@acme-<app>/common/modules',
+
+    '@acme-<app>/global/<unit>/application',
+    '@acme-<app>/global/<unit>/infrastructure/index',
+    '@acme-<app>/global/<unit>/shell/*.facade',
   ],
 };

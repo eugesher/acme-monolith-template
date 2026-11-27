@@ -3,14 +3,17 @@ export const appsGlobalUnitInfrastructurePersistence = {
   pattern: 'apps/*/src/global/*/infrastructure/persistence/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/infrastructure/persistence',
-    '@acme-<app>/global/<unit>/outbound/**',
-    '@acme-core/entities',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/contracts/database',
     '@nestjs/common',
     'typeorm',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/contracts/database',
+    '@acme-core/entities',
+
+    '@acme-<app>/global/<unit>/outbound/**',
+
+    '@acme-<app>/global/<unit>/infrastructure/persistence',
   ],
 };

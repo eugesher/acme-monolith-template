@@ -3,15 +3,18 @@ export const coreModulesUnitApplication = {
   pattern: 'core/modules/src/*/application/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/domain',
-    '@acme-core/modules/<unit>/outbound/**',
-    '@acme-core/modules/<unit>/application',
-    '@acme-core/contracts/<unit>',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/observability',
     '@nestjs/common',
     'nestjs-pino',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/observability',
+    '@acme-libs/toolkit',
+    '@acme-core/contracts/<unit>',
+
+    '@acme-core/modules/<unit>/domain',
+    '@acme-core/modules/<unit>/outbound/**',
+
+    '@acme-core/modules/<unit>/application',
   ],
 };

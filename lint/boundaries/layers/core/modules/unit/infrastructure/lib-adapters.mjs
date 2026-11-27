@@ -3,10 +3,12 @@ export const coreModulesUnitInfrastructureLibAdapters = {
   pattern: 'core/modules/src/*/infrastructure/lib-adapters/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/outbound/**',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+
+    '@acme-core/modules/<unit>/outbound/**',
   ],
 };

@@ -3,11 +3,14 @@ export const appsGlobalUnitApplication = {
   pattern: 'apps/*/src/global/*/application/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/application',
-    '@acme-<app>/global/<unit>/outbound/**',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+
+    '@acme-<app>/global/<unit>/outbound/**',
+
+    '@acme-<app>/global/<unit>/application',
   ],
 };

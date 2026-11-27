@@ -2,11 +2,6 @@ export const libsHttp = {
   category: 'libs',
   lib: 'http',
   allow: [
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/config',
-    '@acme-libs/observability',
     '@nestjs/common',
     '@nestjs/config',
     '@nestjs/core',
@@ -20,5 +15,11 @@ export const libsHttp = {
     'ioredis',
     'nestjs-pino',
     'typeorm',
+
+    '@acme-libs/config',
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/observability',
+    '@acme-libs/toolkit',
   ],
 };

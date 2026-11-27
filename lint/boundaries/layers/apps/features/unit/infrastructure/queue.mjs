@@ -3,14 +3,17 @@ export const appsFeaturesUnitInfrastructureQueue = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/queue/**',
   capture: ['app', 'unit', '', '', '', 'file'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
-    '@acme-<app>/features/<unit>/infrastructure/queue',
-    '@acme-core/queues',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@nestjs/bullmq',
     '@nestjs/common',
     'bullmq',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-core/queues',
+
+    '@acme-<app>/features/<unit>/outbound/**',
+
+    '@acme-<app>/features/<unit>/infrastructure/queue',
   ],
 };

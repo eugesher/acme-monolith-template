@@ -3,13 +3,15 @@ export const appsAppSetupModule = {
   pattern: 'apps/*/src/app/setup/app-setup.module.ts',
   capture: ['app'],
   allow: [
-    '@acme-<app>/app/setup/config',
-    '@acme-<app>/app/setup/entities',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
+    '@nestjs/common',
+
     '@acme-libs/app',
     '@acme-libs/credentials',
-    '@nestjs/common',
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+
+    '@acme-<app>/app/setup/config',
+    '@acme-<app>/app/setup/entities',
   ],
 };

@@ -3,16 +3,18 @@ export const appsProcessorsUnitShellProcessor = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/shell/*.processor.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/processors/<unit>/application',
-    '@acme-<app>/processors/<unit>/queues',
-    '@acme-core/contracts',
-    '@acme-core/queues',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/observability',
     '@nestjs/bullmq',
     '@nestjs/common',
     'bullmq',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/observability',
+    '@acme-libs/toolkit',
+    '@acme-core/queues',
+    '@acme-core/contracts',
+
+    '@acme-<app>/processors/<unit>/application',
+    '@acme-<app>/processors/<unit>/queues',
   ],
 };

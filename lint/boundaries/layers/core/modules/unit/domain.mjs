@@ -3,9 +3,10 @@ export const coreModulesUnitDomain = {
   pattern: 'core/modules/src/*/domain/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/domain',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-core/modules/<unit>/domain',
   ],
 };

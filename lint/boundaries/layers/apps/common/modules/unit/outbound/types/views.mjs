@@ -3,9 +3,10 @@ export const appsCommonModulesUnitOutboundTypesViews = {
   pattern: 'apps/*/src/common/modules/*/outbound/types/views/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/common/modules/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/common/modules/<unit>/outbound/**',
   ],
 };

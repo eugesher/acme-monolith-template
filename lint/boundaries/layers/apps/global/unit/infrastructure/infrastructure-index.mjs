@@ -3,11 +3,12 @@ export const appsGlobalUnitInfrastructureIndex = {
   pattern: 'apps/*/src/global/*/infrastructure/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/infrastructure/persistence',
-    '@acme-<app>/global/<unit>/infrastructure/common-adapters',
-    '@acme-<app>/global/<unit>/infrastructure/lib-adapters',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/global/<unit>/infrastructure/common-adapters',
+    '@acme-<app>/global/<unit>/infrastructure/lib-adapters',
+    '@acme-<app>/global/<unit>/infrastructure/persistence',
   ],
 };

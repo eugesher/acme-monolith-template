@@ -3,9 +3,10 @@ export const appsFeaturesUnitOutboundTypesCommands = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/outbound/types/commands/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

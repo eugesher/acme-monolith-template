@@ -3,9 +3,10 @@ export const appsCommonModulesUnitOutboundIndex = {
   pattern: 'apps/*/src/common/modules/*/outbound/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/common/modules/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/common/modules/<unit>/outbound/**',
   ],
 };

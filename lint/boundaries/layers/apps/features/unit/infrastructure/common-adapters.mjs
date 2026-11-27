@@ -3,11 +3,13 @@ export const appsFeaturesUnitInfrastructureCommonAdapters = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/common-adapters/**',
   capture: ['app', 'unit', '', '', '', 'file'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
-    '@acme-<app>/contracts',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+    '@acme-<app>/contracts',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

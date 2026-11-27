@@ -3,11 +3,12 @@ export const appsMain = {
   pattern: 'apps/*/src/main.ts',
   capture: ['app'],
   allow: [
-    '@acme-<app>/app',
+    '@nestjs/common',
+    '@nestjs/core',
+
     '@acme-libs/app',
     '@acme-libs/kernel',
     '@acme-libs/observability',
-    '@nestjs/common',
-    '@nestjs/core',
+    '@acme-<app>/app',
   ],
 };

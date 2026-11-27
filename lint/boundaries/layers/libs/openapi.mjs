@@ -2,10 +2,6 @@ export const libsOpenapi = {
   category: 'libs',
   lib: 'openapi',
   allow: [
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/http',
     '@nestjs/common',
     '@nestjs/config',
     '@nestjs/swagger',
@@ -13,5 +9,10 @@ export const libsOpenapi = {
     'crypto',
     'helmet',
     'http',
+
+    '@acme-libs/domain',
+    '@acme-libs/http',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
   ],
 };

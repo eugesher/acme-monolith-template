@@ -1,1 +1,5 @@
-export const libsToolkit = { category: 'libs', lib: 'toolkit', allow: ['crypto'] };
+export const libsToolkit = {
+  category: 'libs',
+  lib: 'toolkit',
+  allow: ['crypto'],
+};

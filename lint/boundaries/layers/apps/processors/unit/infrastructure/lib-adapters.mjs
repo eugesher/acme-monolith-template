@@ -3,10 +3,12 @@ export const appsProcessorsUnitInfrastructureLibAdapters = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/infrastructure/lib-adapters/**',
   capture: ['app', 'unit', '', '', '', 'file'],
   allow: [
-    '@acme-<app>/processors/<unit>/outbound/**',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+
+    '@acme-<app>/processors/<unit>/outbound/**',
   ],
 };

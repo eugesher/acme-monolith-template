@@ -3,12 +3,14 @@ export const appsFeaturesUnitInfrastructureLibAdapters = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/lib-adapters/**',
   capture: ['app', 'unit', '', '', '', 'file'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@acme-libs/contracts/credentials',
     '@acme-libs/contracts/health',
-    '@nestjs/common',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

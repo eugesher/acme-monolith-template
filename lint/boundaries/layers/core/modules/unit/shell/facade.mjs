@@ -3,11 +3,13 @@ export const coreModulesUnitShellFacade = {
   pattern: 'core/modules/src/*/shell/*.facade.ts',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/application',
-    '@acme-core/contracts/<unit>',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+    '@acme-core/contracts/<unit>',
+
+    '@acme-core/modules/<unit>/application',
   ],
 };

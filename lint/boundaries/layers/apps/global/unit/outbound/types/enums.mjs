@@ -3,9 +3,10 @@ export const appsGlobalUnitOutboundTypesEnums = {
   pattern: 'apps/*/src/global/*/outbound/types/enums/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/global/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/global/<unit>/outbound/**',
   ],
 };

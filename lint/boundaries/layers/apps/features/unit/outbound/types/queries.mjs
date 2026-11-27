@@ -3,11 +3,12 @@ export const appsFeaturesUnitOutboundTypesQueries = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/outbound/types/queries/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@acme-core/entities',
     '@acme-<app>/common/entities',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

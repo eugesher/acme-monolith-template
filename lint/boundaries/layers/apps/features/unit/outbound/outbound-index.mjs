@@ -3,9 +3,10 @@ export const appsFeaturesUnitOutboundIndex = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/outbound/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

@@ -3,11 +3,13 @@ export const appsProcessorsUnitInfrastructureCoreAdapters = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/infrastructure/core-adapters/**',
   capture: ['app', 'unit', '', '', '', 'file'],
   allow: [
-    '@acme-<app>/processors/<unit>/outbound/**',
-    '@acme-core/contracts',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@nestjs/common',
+    '@acme-core/contracts',
+
+    '@acme-<app>/processors/<unit>/outbound/**',
   ],
 };

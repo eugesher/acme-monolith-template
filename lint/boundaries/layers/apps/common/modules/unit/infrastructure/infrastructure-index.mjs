@@ -3,9 +3,10 @@ export const appsCommonModulesUnitInfrastructureIndex = {
   pattern: 'apps/*/src/common/modules/*/infrastructure/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/common/modules/<unit>/infrastructure/persistence',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/common/modules/<unit>/infrastructure/persistence',
   ],
 };

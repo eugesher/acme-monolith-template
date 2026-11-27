@@ -3,9 +3,10 @@ export const coreModulesUnitOutboundIndex = {
   pattern: 'core/modules/src/*/outbound/index.ts',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-core/modules/<unit>/outbound/**',
   ],
 };

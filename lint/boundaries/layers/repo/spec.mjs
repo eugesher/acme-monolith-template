@@ -3,7 +3,6 @@ export const repoSpec = {
   pattern: 'spec/**',
   capture: [],
   allow: [
-    'spec/**',
     'child_process',
     'eslint',
     'eslint-import-resolver-typescript',
@@ -12,5 +11,7 @@ export const repoSpec = {
     'path',
     'typescript',
     'typescript-eslint',
+
+    'spec/**',
   ],
 };

@@ -3,13 +3,14 @@ export const coreModulesUnitInfrastructureIndex = {
   pattern: 'core/modules/src/*/infrastructure/index.ts',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/infrastructure/persistence',
-    '@acme-core/modules/<unit>/infrastructure/cache',
-    '@acme-core/modules/<unit>/infrastructure/queue',
-    '@acme-core/modules/<unit>/infrastructure/config',
-    '@acme-core/modules/<unit>/infrastructure/core-adapters',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-core/modules/<unit>/infrastructure/cache',
+    '@acme-core/modules/<unit>/infrastructure/config',
+    '@acme-core/modules/<unit>/infrastructure/core-adapters',
+    '@acme-core/modules/<unit>/infrastructure/persistence',
+    '@acme-core/modules/<unit>/infrastructure/queue',
   ],
 };

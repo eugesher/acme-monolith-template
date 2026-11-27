@@ -3,10 +3,11 @@ export const coreModulesUnitOutboundTypesRecords = {
   pattern: 'core/modules/src/*/outbound/types/records/**',
   capture: ['unit'],
   allow: [
-    '@acme-core/modules/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@acme-core/entities',
+
+    '@acme-core/modules/<unit>/outbound/**',
   ],
 };

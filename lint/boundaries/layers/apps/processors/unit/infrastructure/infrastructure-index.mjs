@@ -3,12 +3,13 @@ export const appsProcessorsUnitInfrastructureIndex = {
   pattern: 'apps/*/src/processors/{*,*/modules/*}/infrastructure/index.ts',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/processors/<unit>/infrastructure/persistence',
-    '@acme-<app>/processors/<unit>/infrastructure/core-adapters',
-    '@acme-<app>/processors/<unit>/infrastructure/queue',
-    '@acme-<app>/processors/<unit>/infrastructure/config',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/processors/<unit>/infrastructure/config',
+    '@acme-<app>/processors/<unit>/infrastructure/core-adapters',
+    '@acme-<app>/processors/<unit>/infrastructure/persistence',
+    '@acme-<app>/processors/<unit>/infrastructure/queue',
   ],
 };

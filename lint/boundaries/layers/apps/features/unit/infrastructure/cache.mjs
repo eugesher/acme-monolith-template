@@ -3,12 +3,15 @@ export const appsFeaturesUnitInfrastructureCache = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/cache/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
-    '@acme-<app>/features/<unit>/infrastructure/cache',
+    '@nestjs/common',
+
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
     '@acme-libs/contracts/cache',
-    '@nestjs/common',
+
+    '@acme-<app>/features/<unit>/outbound/**',
+
+    '@acme-<app>/features/<unit>/infrastructure/cache',
   ],
 };

@@ -3,9 +3,10 @@ export const appsFeaturesUnitOutboundTokens = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/outbound/tokens/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
+    '@acme-libs/domain',
     '@acme-libs/kernel',
     '@acme-libs/toolkit',
-    '@acme-libs/domain',
+
+    '@acme-<app>/features/<unit>/outbound/**',
   ],
 };

@@ -3,16 +3,19 @@ export const appsFeaturesUnitInfrastructurePersistence = {
   pattern: 'apps/*/src/features/{*,*/modules/*}/infrastructure/persistence/**',
   capture: ['app', 'unit'],
   allow: [
-    '@acme-<app>/features/<unit>/outbound/**',
-    '@acme-<app>/features/<unit>/infrastructure/persistence',
-    '@acme-core/entities',
-    '@acme-<app>/common/entities',
-    '@acme-libs/kernel',
-    '@acme-libs/toolkit',
-    '@acme-libs/domain',
-    '@acme-libs/contracts/database',
-    '@acme-libs/contracts/local-storage',
     '@nestjs/common',
     'typeorm',
+
+    '@acme-libs/domain',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/contracts/database',
+    '@acme-libs/contracts/local-storage',
+    '@acme-core/entities',
+    '@acme-<app>/common/entities',
+
+    '@acme-<app>/features/<unit>/outbound/**',
+
+    '@acme-<app>/features/<unit>/infrastructure/persistence',
   ],
 };
