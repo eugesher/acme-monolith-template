@@ -1,0 +1,26 @@
+name: 08-rename
+description: |-
+  e2e: Tools › Note › PATCH /api/tools/notes/:noteId
+  it: should rename the note when a title is given and record both titles in the revision
+
+  Expect: 200 OK, note 203 at version 2 titled Revision race with its body, one revision with title_before Updated while a revision is taken. and title_after Revision race
+  User: admin@example.com (token signed by scripts.py)
+method: PATCH
+url: $STAFF_APP_BASE_URL/tools/notes/203
+body:
+  content: |-
+    {
+      "title": "Revision race",
+      "body": "Updated while a revision is taken."
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: If-Match
+    value: '1'
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin

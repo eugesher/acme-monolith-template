@@ -1,0 +1,27 @@
+name: 02-given-title
+description: |-
+  e2e: Tools › Note › POST /api/tools/notes
+  it: should %s
+  Row: keep a given title, trimmed
+
+  Expect: 201 Created, title Refund call, trimmed
+  User: admin@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/tools/notes
+body:
+  content: |-
+    {
+      "subjectType": "support-ticket",
+      "subjectId": "T-901",
+      "title": "  Refund call  ",
+      "body": "Refunded."
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin

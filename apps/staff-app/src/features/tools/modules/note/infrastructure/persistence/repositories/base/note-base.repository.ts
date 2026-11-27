@@ -3,10 +3,10 @@ import type { INoteResolveUpdateQuery, INoteUpdateQuery } from '../../../../outb
 
 export abstract class NoteBaseRepository extends NotePersistenceHost {
   public async update(query: INoteUpdateQuery | INoteResolveUpdateQuery): Promise<boolean> {
-    const { id, versionAsRead, body, resolved, version } = query;
+    const { id, versionAsRead, title, body, resolved, version } = query;
     const updateResult = await this.noteRepository.update(
       { id, version: versionAsRead },
-      { body, resolved, version },
+      { title, body, resolved, version },
     );
 
     return updateResult.affected === 1;

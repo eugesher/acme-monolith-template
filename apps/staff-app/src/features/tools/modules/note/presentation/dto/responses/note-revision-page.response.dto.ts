@@ -12,6 +12,12 @@ class NoteRevisionPageResponseItemDto {
   @ApiResponseProperty({ example: 2 })
   public noteVersion: number;
 
+  @ApiResponseProperty({ example: 'Refund call' })
+  public titleBefore: string;
+
+  @ApiResponseProperty({ example: 'Refund calls' })
+  public titleAfter: string;
+
   @ApiResponseProperty({ example: 'Customer called about this; refunded manually.' })
   public bodyBefore: string;
 

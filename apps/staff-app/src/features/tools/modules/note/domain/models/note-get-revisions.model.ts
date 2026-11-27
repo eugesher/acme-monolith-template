@@ -5,6 +5,8 @@ export class NoteGetRevisionsModel {
     private readonly id: string,
     private readonly noteId: string,
     private readonly noteVersion: number,
+    private readonly titleBefore: string,
+    private readonly titleAfter: string,
     private readonly bodyBefore: string,
     private readonly bodyAfter: string,
     private readonly editorId: string,
@@ -21,13 +23,25 @@ export class NoteGetRevisionsModel {
   }
 
   private static reconstitute(record: INoteGetRevisionsReconstitute): NoteGetRevisionsModel {
-    const { id, noteId, noteVersion, bodyBefore, bodyAfter, editorId, correlationId, recordedAt } =
-      record;
+    const {
+      id,
+      noteId,
+      noteVersion,
+      titleBefore,
+      titleAfter,
+      bodyBefore,
+      bodyAfter,
+      editorId,
+      correlationId,
+      recordedAt,
+    } = record;
 
     return new NoteGetRevisionsModel(
       id,
       noteId,
       noteVersion,
+      titleBefore,
+      titleAfter,
       bodyBefore,
       bodyAfter,
       editorId,
@@ -41,6 +55,8 @@ export class NoteGetRevisionsModel {
       id: this.id,
       noteId: this.noteId,
       noteVersion: this.noteVersion,
+      titleBefore: this.titleBefore,
+      titleAfter: this.titleAfter,
       bodyBefore: this.bodyBefore,
       bodyAfter: this.bodyAfter,
       editorId: this.editorId,

@@ -1,6 +1,6 @@
 import type { Maybe } from '@acme-libs/toolkit';
 
-export interface INoteGetManyCommand {
+export interface INoteGetListCommand {
   page: Maybe<number>;
   limit: Maybe<number>;
   subjectType: Maybe<string>;

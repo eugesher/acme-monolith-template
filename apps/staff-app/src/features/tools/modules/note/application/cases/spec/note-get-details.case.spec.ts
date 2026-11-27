@@ -1,18 +1,19 @@
-import { NoteGetOneModel } from '../../../domain';
-import { NoteGetOneCase } from '../note-get-one.case';
+import { NoteGetDetailsModel } from '../../../domain';
+import { NoteGetDetailsCase } from '../note-get-details.case';
 import type { NoteAccessService } from '../../services/note-access.service';
 
-describe('NoteGetOneCase', () => {
+describe('NoteGetDetailsCase', () => {
   let accessService: jest.Mocked<Pick<NoteAccessService, 'loadOwned'>>;
-  let getOneCase: NoteGetOneCase;
+  let getDetailsCase: NoteGetDetailsCase;
 
   beforeEach(() => {
     accessService = { loadOwned: jest.fn() };
     accessService.loadOwned.mockResolvedValue(
-      NoteGetOneModel.reconstitute({
+      NoteGetDetailsModel.reconstitute({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,
@@ -21,21 +22,22 @@ describe('NoteGetOneCase', () => {
         updatedAt: new Date('2026-01-02T00:00:00.000Z'),
       }),
     );
-    getOneCase = new NoteGetOneCase(accessService as unknown as NoteAccessService);
+    getDetailsCase = new NoteGetDetailsCase(accessService as unknown as NoteAccessService);
   });
 
   describe('execute', () => {
     it('answers the note', async () => {
-      const view = await getOneCase.execute({ noteId: '7', authorId: 'admin-1' });
+      const view = await getDetailsCase.execute({ noteId: '7', authorId: 'admin-1' });
 
       expect(accessService.loadOwned).toHaveBeenCalledWith(
         { noteId: '7', authorId: 'admin-1' },
-        NoteGetOneModel.reconstitute,
+        NoteGetDetailsModel.reconstitute,
       );
       expect(view).toEqual({
         id: '7',
         subjectType: 'product',
         subjectId: '42',
+        title: 'Customer call',
         body: 'Check the supplier',
         authorId: 'admin-1',
         resolved: false,

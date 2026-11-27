@@ -8,14 +8,20 @@ import type {
 
 export class NoteCreateModel extends NoteAggregate {
   public static initCandidate(proposal: INoteCreateCandidateInit): INoteCreateCandidate {
-    const { subjectType, subjectId, body, authorId } = proposal;
+    const { subjectType, subjectId, title, body, authorId } = proposal;
     const validSubjectType = NoteCreateModel.validSubjectType(subjectType);
     const validSubjectId = NoteCreateModel.validSubjectId(subjectId);
     const validBody = NoteCreateModel.validBody(body);
+    const trimmedTitle = title?.trim() ?? '';
+    const validTitle =
+      trimmedTitle.length === 0
+        ? NoteCreateModel.titleOf(validBody)
+        : NoteCreateModel.validTitle(trimmedTitle);
 
     return {
       subjectType: validSubjectType,
       subjectId: validSubjectId,
+      title: validTitle,
       body: validBody,
       authorId,
       resolved: false,

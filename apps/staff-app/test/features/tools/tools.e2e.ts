@@ -14,8 +14,8 @@ export class ToolsE2E {
 
   public execute(): void {
     describe('Note', () => {
-      this.noteE2E.getMany();
-      this.noteE2E.getOne();
+      this.noteE2E.getList();
+      this.noteE2E.getDetails();
       this.noteE2E.getRevisions();
       this.noteE2E.create();
       this.noteE2E.update();

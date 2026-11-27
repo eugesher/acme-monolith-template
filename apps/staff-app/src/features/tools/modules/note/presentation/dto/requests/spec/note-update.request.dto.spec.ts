@@ -4,8 +4,12 @@ import { validateSync } from 'class-validator';
 import { NoteUpdateRequestDto } from '../note-update.request.dto';
 
 describe('NoteUpdateRequestDto', () => {
-  it('accepts a body of 4000 characters', () => {
-    const dto = plainToInstance(NoteUpdateRequestDto, { body: 'b'.repeat(4000) });
+  it.each([
+    ['a body of 4000 characters', { body: 'b'.repeat(4000) }],
+    ['a title of 100 characters', { title: 't'.repeat(100), body: 'Refunded' }],
+    ['an empty title, which keeps the title', { title: '', body: 'Refunded' }],
+  ])('accepts %s', (_case, request) => {
+    const dto = plainToInstance(NoteUpdateRequestDto, request);
 
     const errors = validateSync(dto);
 
@@ -23,6 +27,19 @@ describe('NoteUpdateRequestDto', () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].property).toBe('body');
+    expect(Object.keys(errors[0].constraints ?? {})).toEqual(constraints);
+  });
+
+  it.each([
+    ['a title of 101 characters', 't'.repeat(101), ['maxLength']],
+    ['a number as the title', 42, ['maxLength', 'isString']],
+  ])('rejects %s', (_case, title, constraints) => {
+    const dto = plainToInstance(NoteUpdateRequestDto, { title, body: 'Refunded' });
+
+    const errors = validateSync(dto);
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].property).toBe('title');
     expect(Object.keys(errors[0].constraints ?? {})).toEqual(constraints);
   });
 });

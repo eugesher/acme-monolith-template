@@ -1,8 +1,8 @@
-export interface INoteGetManyReconstitute {
+export interface INoteGetListReconstitute {
   id: string;
   subjectType: string;
   subjectId: string;
-  body: string;
+  title: string;
   authorId: string;
   resolved: boolean;
   version: number;

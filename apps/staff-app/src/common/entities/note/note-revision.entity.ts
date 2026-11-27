@@ -26,6 +26,12 @@ export class NoteRevision {
   @Column({ type: 'int' })
   public readonly noteVersion: number;
 
+  @Column({ type: 'varchar', length: 100 })
+  public readonly titleBefore: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  public readonly titleAfter: string;
+
   @Column({ type: 'text' })
   public readonly bodyBefore: string;
 

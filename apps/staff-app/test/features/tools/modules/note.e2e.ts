@@ -10,7 +10,7 @@ export class NoteE2E {
     return new NoteE2E(ctx);
   }
 
-  public getMany(): void {
+  public getList(): void {
     describe('GET /api/tools/notes', () => {
       it('should list the notes of one subject, newest first', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -53,7 +53,7 @@ export class NoteE2E {
     });
   }
 
-  public getOne(): void {
+  public getDetails(): void {
     describe('GET /api/tools/notes/:noteId', () => {
       it('should read one note', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -156,6 +156,58 @@ export class NoteE2E {
         expect(actual).toMatchObject({ db: { note: [{ id: response.body.id }] } });
         expect(Number(response.body.id)).toBeGreaterThan(Number(lastId));
       });
+
+      it.each([
+        ['keep a given title, trimmed', '  Refund call  '],
+        ['take the start of the body as the title for a blank one', '   '],
+      ])('should %s', async (_case, title) => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .post('/api/tools/notes')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({ subjectType: 'support-ticket', subjectId: 'T-901', title, body: 'Refunded.' })
+          .expect(HttpStatus.CREATED);
+
+        const actual = {
+          response: { body: response.body },
+          db: {
+            note: await this.ctx.dataSource.query('SELECT title, body FROM note WHERE id = ?', [
+              response.body.id,
+            ]),
+          },
+        };
+
+        expect(actual).toMatchSnapshot({
+          response: {
+            body: {
+              id: expect.any(String),
+              createdAt: expect.any(String),
+              updatedAt: expect.any(String),
+            },
+          },
+        });
+      });
+
+      it('should refuse a title longer than 100 with 400 and write nothing', async () => {
+        const [{ lastId }] = await this.ctx.dataSource.query('SELECT MAX(id) AS lastId FROM note');
+
+        const response = await request(this.ctx.app.getHttpServer())
+          .post('/api/tools/notes')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({
+            subjectType: 'support-ticket',
+            subjectId: 'T-902',
+            title: 't'.repeat(101),
+            body: 'Refunded.',
+          })
+          .expect(HttpStatus.BAD_REQUEST);
+
+        expect({
+          response: { body: response.body },
+          db: {
+            note: await this.ctx.dataSource.query('SELECT id FROM note WHERE id > ?', [lastId]),
+          },
+        }).toMatchSnapshot();
+      });
     });
   }
 
@@ -214,8 +266,8 @@ export class NoteE2E {
 
       it('should roll the note back when the revision insert fails', async () => {
         await this.ctx.dataSource.query(
-          'INSERT INTO note_revision (id, note_id, note_version, body_before, body_after, editor_id) VALUES (299, 203, 2, ?, ?, ?)',
-          ['Taken before.', 'Taken after.', '1'],
+          'INSERT INTO note_revision (id, note_id, note_version, title_before, title_after, body_before, body_after, editor_id) VALUES (299, 203, 2, ?, ?, ?, ?, ?)',
+          ['Taken', 'Taken', 'Taken before.', 'Taken after.', '1'],
         );
 
         try {
@@ -308,6 +360,47 @@ export class NoteE2E {
             note: await this.ctx.dataSource.query('SELECT * FROM note WHERE id = 202'),
             note_revision: await this.ctx.dataSource.query(
               'SELECT * FROM note_revision WHERE note_id = 202 ORDER BY id',
+            ),
+          },
+        }).toMatchSnapshot();
+      });
+
+      it('should rename the note when a title is given and record both titles in the revision', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .patch('/api/tools/notes/203')
+          .set('If-Match', '1')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({ title: 'Revision race', body: 'Updated while a revision is taken.' })
+          .expect(HttpStatus.OK);
+
+        const actual = {
+          response: { body: response.body },
+          db: {
+            note: await this.ctx.dataSource.query('SELECT * FROM note WHERE id = 203'),
+            note_revision: await this.ctx.dataSource.query(
+              'SELECT note_version, title_before, title_after, body_before, body_after FROM note_revision WHERE note_id = 203 ORDER BY id',
+            ),
+          },
+        };
+
+        expect(actual).toMatchSnapshot({
+          response: { body: { updatedAt: expect.any(String) } },
+          db: { note: [{ updated_at: expect.any(Date) }] },
+        });
+      });
+
+      it('should keep the title for an empty one and write nothing for the current body', async () => {
+        const response = await request(this.ctx.app.getHttpServer())
+          .patch('/api/tools/notes/204')
+          .auth(this.ctx.adminToken, { type: 'bearer' })
+          .send({ title: '', body: 'Updated with the same body.' })
+          .expect(HttpStatus.OK);
+
+        expect({
+          response: { body: response.body },
+          db: {
+            note: await this.ctx.dataSource.query(
+              'SELECT title, body, version FROM note WHERE id = 204',
             ),
           },
         }).toMatchSnapshot();

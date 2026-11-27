@@ -10,6 +10,9 @@ export class NoteResponseDto {
   @ApiResponseProperty({ example: '42' })
   public subjectId: string;
 
+  @ApiResponseProperty({ example: 'Refund call' })
+  public title: string;
+
   @ApiResponseProperty({ example: 'Customer called about this; refunded manually.' })
   public body: string;
 

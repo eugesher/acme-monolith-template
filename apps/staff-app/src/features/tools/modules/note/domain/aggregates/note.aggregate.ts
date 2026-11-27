@@ -5,12 +5,14 @@ import {
   NoteBodyInvalidException,
   NoteResolvedException,
   NoteSubjectInvalidException,
+  NoteTitleInvalidException,
   NoteVersionInvalidException,
   NoteVersionMismatchException,
 } from '../errors';
 import type { INoteReconstitute, INoteSnapshot, INoteUpdatePayload } from '../types';
 
 export abstract class NoteAggregate extends VersionedEntity {
+  protected title: string;
   protected body: string;
   protected resolved: boolean;
   protected readonly subjectType: string;
@@ -21,11 +23,22 @@ export abstract class NoteAggregate extends VersionedEntity {
 
   private static readonly SUBJECT_TYPE_PATTERN = /^[a-z][a-z-]{1,63}$/;
   private static readonly SUBJECT_ID_MAX_LENGTH = 64;
+  private static readonly TITLE_MAX_LENGTH = 100;
   private static readonly BODY_MAX_LENGTH = 4000;
 
   protected constructor(record: INoteReconstitute) {
-    const { id, subjectType, subjectId, body, authorId, resolved, version, createdAt, updatedAt } =
-      record;
+    const {
+      id,
+      subjectType,
+      subjectId,
+      title,
+      body,
+      authorId,
+      resolved,
+      version,
+      createdAt,
+      updatedAt,
+    } = record;
     const validVersion = NoteAggregate.validVersion(version);
 
     super(id, validVersion);
@@ -33,6 +46,7 @@ export abstract class NoteAggregate extends VersionedEntity {
     this.subjectType = NoteAggregate.validSubjectType(subjectType);
     this.subjectId = NoteAggregate.validSubjectId(subjectId);
     this.authorId = authorId;
+    this.title = NoteAggregate.validTitle(title);
     this.body = NoteAggregate.validBody(body);
     this.resolved = resolved;
     this.createdAt = createdAt;
@@ -51,6 +65,7 @@ export abstract class NoteAggregate extends VersionedEntity {
     return {
       id: this.id,
       versionAsRead,
+      title: this.title,
       body: this.body,
       resolved: this.resolved,
       version: this.version,
@@ -62,6 +77,7 @@ export abstract class NoteAggregate extends VersionedEntity {
       id: this.id,
       subjectType: this.subjectType,
       subjectId: this.subjectId,
+      title: this.title,
       body: this.body,
       authorId: this.authorId,
       resolved: this.resolved,
@@ -94,6 +110,21 @@ export abstract class NoteAggregate extends VersionedEntity {
     }
 
     return trimmedSubjectId;
+  }
+
+  protected static validTitle(title: string): string {
+    const trimmedTitle = title.trim();
+    const length = Array.from(trimmedTitle).length;
+
+    if (length === 0 || length > NoteAggregate.TITLE_MAX_LENGTH) {
+      throw new NoteTitleInvalidException(NoteAggregate.TITLE_MAX_LENGTH);
+    }
+
+    return trimmedTitle;
+  }
+
+  protected static titleOf(body: string): string {
+    return Array.from(body).slice(0, NoteAggregate.TITLE_MAX_LENGTH).join('').trimEnd();
   }
 
   protected static validBody(body: string): string {

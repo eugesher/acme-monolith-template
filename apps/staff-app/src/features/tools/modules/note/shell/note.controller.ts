@@ -27,8 +27,8 @@ import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 import {
   NoteCreateCase,
   NoteDeleteCase,
-  NoteGetManyCase,
-  NoteGetOneCase,
+  NoteGetDetailsCase,
+  NoteGetListCase,
   NoteGetRevisionsCase,
   NoteResolveCase,
   NoteUpdateCase,
@@ -36,13 +36,13 @@ import {
 import { NoteExceptionCodeEnum } from '../domain';
 import {
   NoteCreateRequestDto,
-  NoteGetManyQueryDto,
+  NoteGetListQueryDto,
   NoteGetRevisionsQueryDto,
   NoteHttpExceptionFilter,
   NoteIdParamDto,
-  NotePageResponseDto,
   NoteResponseDto,
   NoteRevisionPageResponseDto,
+  NoteSummaryPageResponseDto,
   NoteUpdateRequestDto,
 } from '../presentation';
 
@@ -52,8 +52,8 @@ import {
 export class NoteController {
   constructor(
     private readonly createCase: NoteCreateCase,
-    private readonly getManyCase: NoteGetManyCase,
-    private readonly getOneCase: NoteGetOneCase,
+    private readonly getListCase: NoteGetListCase,
+    private readonly getDetailsCase: NoteGetDetailsCase,
     private readonly updateCase: NoteUpdateCase,
     private readonly resolveCase: NoteResolveCase,
     private readonly getRevisionsCase: NoteGetRevisionsCase,
@@ -65,33 +65,37 @@ export class NoteController {
   @ApiCreatedResponse({ type: NoteResponseDto })
   @ApiErrorResponses({
     filterStatus: NoteHttpExceptionFilter.STATUS,
-    codes: [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID, NoteExceptionCodeEnum.NOTE_BODY_INVALID],
+    codes: [
+      NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID,
+      NoteExceptionCodeEnum.NOTE_TITLE_INVALID,
+      NoteExceptionCodeEnum.NOTE_BODY_INVALID,
+    ],
   })
   public async create(
     @Body() request: NoteCreateRequestDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NoteResponseDto> {
-    const { subjectType, subjectId, body } = request;
+    const { subjectType, subjectId, title, body } = request;
     const { id: authorId } = user;
 
-    return await this.createCase.execute({ subjectType, subjectId, body, authorId });
+    return await this.createCase.execute({ subjectType, subjectId, title, body, authorId });
   }
 
   @Get()
   @ApiOperation({ summary: 'Browse your notes, newest first, optionally of one subject' })
-  @ApiOkResponse({ type: NotePageResponseDto })
+  @ApiOkResponse({ type: NoteSummaryPageResponseDto })
   @ApiErrorResponses({
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID],
   })
-  public async getMany(
-    @Query() query: NoteGetManyQueryDto,
+  public async getList(
+    @Query() query: NoteGetListQueryDto,
     @CurrentUser() user: IAuthCurrentUserView,
-  ): Promise<NotePageResponseDto> {
+  ): Promise<NoteSummaryPageResponseDto> {
     const { page, limit, subjectType, subjectId, resolved } = query;
     const { id: authorId } = user;
 
-    return await this.getManyCase.execute({
+    return await this.getListCase.execute({
       page,
       limit,
       subjectType,
@@ -108,25 +112,27 @@ export class NoteController {
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
   })
-  public async getOne(
+  public async getDetails(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
     const { id: authorId } = user;
 
-    return await this.getOneCase.execute({ noteId, authorId });
+    return await this.getDetailsCase.execute({ noteId, authorId });
   }
 
   @Patch(':noteId')
   @ApiIfMatchHeader()
   @ApiOperation({
-    summary: 'Rewrite the body of one of your notes and record the revision with it',
+    summary:
+      'Rewrite the body, and the title if given, of one of your notes and record the revision',
   })
   @ApiOkResponse({ type: NoteResponseDto })
   @ApiErrorResponses({
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [
+      NoteExceptionCodeEnum.NOTE_TITLE_INVALID,
       NoteExceptionCodeEnum.NOTE_BODY_INVALID,
       NoteExceptionCodeEnum.NOTE_NOT_FOUND,
       NoteExceptionCodeEnum.NOTE_RESOLVED,
@@ -141,10 +147,10 @@ export class NoteController {
     @IfMatch() expectedVersion: Maybe<number>,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
-    const { body } = request;
+    const { title, body } = request;
     const { id: editorId } = user;
 
-    return await this.updateCase.execute({ noteId, body, editorId, expectedVersion });
+    return await this.updateCase.execute({ noteId, title, body, editorId, expectedVersion });
   }
 
   @Post(':noteId/resolve')

@@ -150,7 +150,7 @@ describe('App', () => {
       ['GET /api/sales/orders/:orderId', 'OrderIdParamDto'],
       ['GET /api/sales/orders/:orderId/tags', 'OrderIdParamDto'],
       ['PUT /api/sales/orders/:orderId/tags', 'OrderIdParamDto', 'OrderTagsReplaceRequestDto'],
-      ['GET /api/tools/notes', 'NoteGetManyQueryDto'],
+      ['GET /api/tools/notes', 'NoteGetListQueryDto'],
       ['POST /api/tools/notes', 'NoteCreateRequestDto'],
       ['DELETE /api/tools/notes/:noteId', 'NoteIdParamDto'],
       ['GET /api/tools/notes/:noteId', 'NoteIdParamDto'],

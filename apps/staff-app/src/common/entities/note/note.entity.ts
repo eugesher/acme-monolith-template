@@ -21,6 +21,9 @@ export class Note {
   @Column({ type: 'varchar', length: 64 })
   public readonly subjectId: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  public readonly title: string;
+
   @Column({ type: 'text' })
   public readonly body: string;
 

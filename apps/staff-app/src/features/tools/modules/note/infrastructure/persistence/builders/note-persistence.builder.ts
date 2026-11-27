@@ -2,13 +2,14 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import type { Note } from '@acme-staff/common/entities';
 
-import type { INoteAccessFindOwnedQuery, INoteGetManyListQuery } from '../../../outbound';
+import type { INoteAccessFindOwnedQuery, INoteGetListQuery } from '../../../outbound';
 
 export class NotePersistenceBuilder extends SelectQueryBuilder<Note> {
   public forOwned(query: INoteAccessFindOwnedQuery): this {
     const { noteId, authorId } = query;
 
     this.selectNote()
+      .selectBody()
       .where(`${this.alias}.id = :noteId`, { noteId })
       .andWhere(`${this.alias}.authorId = :authorId`, { authorId });
 
@@ -16,12 +17,12 @@ export class NotePersistenceBuilder extends SelectQueryBuilder<Note> {
   }
 
   public forInserted(noteId: string): this {
-    this.selectNote().where(`${this.alias}.id = :noteId`, { noteId });
+    this.selectNote().selectBody().where(`${this.alias}.id = :noteId`, { noteId });
 
     return this;
   }
 
-  public forList(query: INoteGetManyListQuery): this {
+  public forList(query: INoteGetListQuery): this {
     const { limit, offset, subjectType, subjectId, resolved, authorId } = query;
 
     this.selectNote().where(`${this.alias}.authorId = :authorId`, { authorId });
@@ -47,13 +48,19 @@ export class NotePersistenceBuilder extends SelectQueryBuilder<Note> {
       `${this.alias}.id`,
       `${this.alias}.subjectType`,
       `${this.alias}.subjectId`,
-      `${this.alias}.body`,
+      `${this.alias}.title`,
       `${this.alias}.authorId`,
       `${this.alias}.resolved`,
       `${this.alias}.version`,
       `${this.alias}.createdAt`,
       `${this.alias}.updatedAt`,
     ]);
+
+    return this;
+  }
+
+  private selectBody(): this {
+    this.addSelect(`${this.alias}.body`);
 
     return this;
   }

@@ -26,11 +26,11 @@ export class NoteUpdateCase {
   ) {}
 
   public async execute(command: INoteUpdateCommand): Promise<INoteView> {
-    const { noteId, body, editorId, expectedVersion } = command;
+    const { noteId, title, body, editorId, expectedVersion } = command;
     const writeResult = await this.writeService.write(
       { noteId, authorId: editorId, expectedVersion },
       NoteUpdateModel.reconstitute,
-      (note) => note.update(body),
+      (note) => note.update(body, title),
       (saveCommand) => this.transaction.run(() => this.save({ ...saveCommand, editorId })),
     );
     const { note, answer: isUpdated } = writeResult;

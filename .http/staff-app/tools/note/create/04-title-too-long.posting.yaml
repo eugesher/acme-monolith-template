@@ -1,0 +1,26 @@
+name: 04-title-too-long
+description: |-
+  e2e: Tools › Note › POST /api/tools/notes
+  it: should refuse a title longer than 100 with 400 and write nothing
+
+  Expect: 400 Bad Request, code VALIDATION_FAILED on title; no note written
+  User: admin@example.com (token signed by scripts.py)
+method: POST
+url: $STAFF_APP_BASE_URL/tools/notes
+body:
+  content: |-
+    {
+      "subjectType": "support-ticket",
+      "subjectId": "T-902",
+      "title": "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt",
+      "body": "Refunded."
+    }
+auth:
+  type: bearer_token
+  bearer_token:
+    token: $token
+headers:
+  - name: Content-Type
+    value: application/json
+scripts:
+  setup: scripts.py:as_admin

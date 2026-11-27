@@ -5,6 +5,7 @@ export type INoteAccessRecord = Pick<
   | 'id'
   | 'subjectType'
   | 'subjectId'
+  | 'title'
   | 'body'
   | 'authorId'
   | 'resolved'

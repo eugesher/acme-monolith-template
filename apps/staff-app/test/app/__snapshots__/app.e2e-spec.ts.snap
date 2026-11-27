@@ -1816,6 +1816,7 @@ exports[`App Tools Note DELETE /api/tools/notes/:noteId should hide the note of 
         "resolved": 0,
         "subject_id": "T-2",
         "subject_type": "ticket",
+        "title": "Updated with the same body.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -1845,6 +1846,7 @@ exports[`App Tools Note DELETE /api/tools/notes/:noteId should soft-delete a not
         "resolved": 0,
         "subject_id": "100",
         "subject_type": "product",
+        "title": "Customer call",
         "updated_at": Any<Date>,
         "version": 3,
       },
@@ -1880,12 +1882,12 @@ exports[`App Tools Note GET /api/tools/notes should filter by resolution 1`] = `
       "data": [
         {
           "authorId": "1",
-          "body": "Already handled.",
           "createdAt": "2026-01-01T00:00:00.000Z",
           "id": "202",
           "resolved": true,
           "subjectId": "101",
           "subjectType": "product",
+          "title": "Handled",
           "updatedAt": "2026-01-01T00:00:00.000Z",
           "version": 2,
         },
@@ -1922,23 +1924,23 @@ exports[`App Tools Note GET /api/tools/notes should list the notes of one subjec
       "data": [
         {
           "authorId": "1",
-          "body": "Check the supplier.",
           "createdAt": "2026-01-01T00:00:00.000Z",
           "id": "201",
           "resolved": false,
           "subjectId": "100",
           "subjectType": "product",
+          "title": "Supplier",
           "updatedAt": "2026-01-01T00:00:00.000Z",
           "version": 1,
         },
         {
           "authorId": "1",
-          "body": "Customer called about this.",
           "createdAt": "2026-01-01T00:00:00.000Z",
           "id": "200",
           "resolved": false,
           "subjectId": "100",
           "subjectType": "product",
+          "title": "Customer call",
           "updatedAt": "2026-01-01T00:00:00.000Z",
           "version": 1,
         },
@@ -2002,6 +2004,7 @@ exports[`App Tools Note GET /api/tools/notes/:noteId should read one note 1`] = 
       "resolved": true,
       "subjectId": "101",
       "subjectType": "product",
+      "title": "Handled",
       "updatedAt": "2026-01-01T00:00:00.000Z",
       "version": 2,
     },
@@ -2050,6 +2053,8 @@ exports[`App Tools Note GET /api/tools/notes/:noteId/revisions should list the r
           "noteId": "202",
           "noteVersion": 2,
           "recordedAt": "2026-01-01T00:00:00.000Z",
+          "titleAfter": "Handled",
+          "titleBefore": "Handled",
         },
       ],
       "limit": 20,
@@ -2074,6 +2079,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should answer 500 and rol
         "resolved": 0,
         "subject_id": "T-1",
         "subject_type": "ticket",
+        "title": "Updated while a revision is taken.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2103,6 +2109,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should hide the note of a
         "resolved": 0,
         "subject_id": "T-2",
         "subject_type": "ticket",
+        "title": "Updated with the same body.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2115,6 +2122,34 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should hide the note of a
       "details": null,
       "message": "Note 204 was not found",
       "statusCode": 404,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should keep the title for an empty one and write nothing for the current body 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "body": "Updated with the same body.",
+        "title": "Updated with the same body.",
+        "version": 1,
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Updated with the same body.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "204",
+      "resolved": false,
+      "subjectId": "T-2",
+      "subjectType": "ticket",
+      "title": "Updated with the same body.",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "version": 1,
     },
   },
 }
@@ -2133,6 +2168,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse a stale If-
         "resolved": 0,
         "subject_id": "T-2",
         "subject_type": "ticket",
+        "title": "Updated with the same body.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2165,6 +2201,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to update a
         "resolved": 1,
         "subject_id": "101",
         "subject_type": "product",
+        "title": "Handled",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 2,
       },
@@ -2179,6 +2216,8 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to update a
         "note_id": "202",
         "note_version": 2,
         "recorded_at": 2026-01-01T00:00:00.000Z,
+        "title_after": "Handled",
+        "title_before": "Handled",
       },
     ],
   },
@@ -2188,6 +2227,51 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should refuse to update a
       "details": null,
       "message": "Note 202 is resolved and can no longer be modified",
       "statusCode": 409,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note PATCH /api/tools/notes/:noteId should rename the note when a title is given and record both titles in the revision 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "author_id": "1",
+        "body": "Updated while a revision is taken.",
+        "created_at": 2026-01-01T00:00:00.000Z,
+        "deleted_at": null,
+        "id": "203",
+        "resolved": 0,
+        "subject_id": "T-1",
+        "subject_type": "ticket",
+        "title": "Revision race",
+        "updated_at": Any<Date>,
+        "version": 2,
+      },
+    ],
+    "note_revision": [
+      {
+        "body_after": "Updated while a revision is taken.",
+        "body_before": "Updated while a revision is taken.",
+        "note_version": 2,
+        "title_after": "Revision race",
+        "title_before": "Updated while a revision is taken.",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Updated while a revision is taken.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "id": "203",
+      "resolved": false,
+      "subjectId": "T-1",
+      "subjectType": "ticket",
+      "title": "Revision race",
+      "updatedAt": Any<String>,
+      "version": 2,
     },
   },
 }
@@ -2206,6 +2290,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should rewrite the body u
         "resolved": 0,
         "subject_id": "100",
         "subject_type": "product",
+        "title": "Customer call",
         "updated_at": Any<Date>,
         "version": 2,
       },
@@ -2220,6 +2305,8 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should rewrite the body u
         "note_id": "200",
         "note_version": 2,
         "recorded_at": Any<Date>,
+        "title_after": "Customer call",
+        "title_before": "Customer call",
       },
     ],
   },
@@ -2232,6 +2319,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should rewrite the body u
       "resolved": false,
       "subjectId": "100",
       "subjectType": "product",
+      "title": "Customer call",
       "updatedAt": Any<String>,
       "version": 2,
     },
@@ -2252,6 +2340,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should roll the note back
         "resolved": 0,
         "subject_id": "T-1",
         "subject_type": "ticket",
+        "title": "Updated while a revision is taken.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2289,6 +2378,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for 
         "resolved": 0,
         "subject_id": "T-2",
         "subject_type": "ticket",
+        "title": "Updated with the same body.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2304,6 +2394,7 @@ exports[`App Tools Note PATCH /api/tools/notes/:noteId should write nothing for 
       "resolved": false,
       "subjectId": "T-2",
       "subjectType": "ticket",
+      "title": "Updated with the same body.",
       "updatedAt": "2026-01-01T00:00:00.000Z",
       "version": 1,
     },
@@ -2324,6 +2415,7 @@ exports[`App Tools Note POST /api/tools/notes should create an unresolved note o
         "resolved": 0,
         "subject_id": "T-900",
         "subject_type": "support-ticket",
+        "title": "Customer called.",
         "updated_at": Any<Date>,
         "version": 1,
       },
@@ -2338,6 +2430,86 @@ exports[`App Tools Note POST /api/tools/notes should create an unresolved note o
       "resolved": false,
       "subjectId": "T-900",
       "subjectType": "support-ticket",
+      "title": "Customer called.",
+      "updatedAt": Any<String>,
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes should keep a given title, trimmed 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "body": "Refunded.",
+        "title": "Refund call",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Refunded.",
+      "createdAt": Any<String>,
+      "id": Any<String>,
+      "resolved": false,
+      "subjectId": "T-901",
+      "subjectType": "support-ticket",
+      "title": "Refund call",
+      "updatedAt": Any<String>,
+      "version": 1,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes should refuse a title longer than 100 with 400 and write nothing 1`] = `
+{
+  "db": {
+    "note": [],
+  },
+  "response": {
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "details": {
+        "fields": [
+          {
+            "field": "title",
+            "messages": [
+              "title must be shorter than or equal to 100 characters",
+            ],
+          },
+        ],
+      },
+      "message": "The request is not valid",
+      "statusCode": 400,
+    },
+  },
+}
+`;
+
+exports[`App Tools Note POST /api/tools/notes should take the start of the body as the title for a blank one 1`] = `
+{
+  "db": {
+    "note": [
+      {
+        "body": "Refunded.",
+        "title": "Refunded.",
+      },
+    ],
+  },
+  "response": {
+    "body": {
+      "authorId": "1",
+      "body": "Refunded.",
+      "createdAt": Any<String>,
+      "id": Any<String>,
+      "resolved": false,
+      "subjectId": "T-901",
+      "subjectType": "support-ticket",
+      "title": "Refunded.",
       "updatedAt": Any<String>,
       "version": 1,
     },
@@ -2358,6 +2530,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should hide the no
         "resolved": 0,
         "subject_id": "T-2",
         "subject_type": "ticket",
+        "title": "Updated with the same body.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2387,6 +2560,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse a st
         "resolved": 0,
         "subject_id": "T-2",
         "subject_type": "ticket",
+        "title": "Updated with the same body.",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 1,
       },
@@ -2418,6 +2592,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should refuse to r
         "resolved": 1,
         "subject_id": "101",
         "subject_type": "product",
+        "title": "Handled",
         "updated_at": 2026-01-01T00:00:00.000Z,
         "version": 2,
       },
@@ -2447,6 +2622,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should resolve a n
         "resolved": 1,
         "subject_id": "100",
         "subject_type": "product",
+        "title": "Supplier",
         "updated_at": Any<Date>,
         "version": 2,
       },
@@ -2461,6 +2637,7 @@ exports[`App Tools Note POST /api/tools/notes/:noteId/resolve should resolve a n
       "resolved": true,
       "subjectId": "100",
       "subjectType": "product",
+      "title": "Supplier",
       "updatedAt": Any<String>,
       "version": 2,
     },
