@@ -1,1 +1,1 @@
-export * from './use-cases/permission-list.use-case';
+export * from './cases/permission-list.case';

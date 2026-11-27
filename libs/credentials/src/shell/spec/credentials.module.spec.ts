@@ -44,7 +44,7 @@ describe('CredentialsModule', () => {
   it('signs an HS256 access token for the audience with JWT_SECRET that expires after JWT_EXPIRES_IN', async () => {
     const credentials = app.get<ICredentialsPort>(CREDENTIALS_PORT);
 
-    const token = await credentials.handleSignAccessToken({ sub: 'user-1' });
+    const token = await credentials.signAccessToken({ sub: 'user-1' });
 
     const claims = await new JwtService({
       secret: 'access-secret-of-at-least-thirty-two-chars',
@@ -61,9 +61,9 @@ describe('CredentialsModule', () => {
 
   it('verifies an access token it signed and answers its subject', async () => {
     const credentials = app.get<ICredentialsPort>(CREDENTIALS_PORT);
-    const token = await credentials.handleSignAccessToken({ sub: 'user-1' });
+    const token = await credentials.signAccessToken({ sub: 'user-1' });
 
-    const claims = await credentials.handleVerifyAccessToken(token);
+    const claims = await credentials.verifyAccessToken(token);
 
     expect(claims).toEqual({ sub: 'user-1' });
   });
@@ -81,7 +81,7 @@ describe('CredentialsModule', () => {
     const credentials = app.get<ICredentialsPort>(CREDENTIALS_PORT);
     const token = await new JwtService({ secret }).signAsync({ sub: 'user-1' }, options);
 
-    const claims = await credentials.handleVerifyAccessToken(token);
+    const claims = await credentials.verifyAccessToken(token);
 
     expect(claims).toBeNull();
   });
@@ -89,16 +89,16 @@ describe('CredentialsModule', () => {
   it('hashes passwords with the costs of AUTH_ARGON2_*', async () => {
     const credentials = app.get<ICredentialsPort>(CREDENTIALS_PORT);
 
-    const passwordHash = await credentials.handleHashPassword('correct-horse-battery');
+    const passwordHash = await credentials.hashPassword('correct-horse-battery');
 
     expect(passwordHash).toMatch(/^\$argon2id\$v=19\$m=1024,t=2,p=1\$/);
   });
 
   it('verifies a password against the hash it produced', async () => {
     const credentials = app.get<ICredentialsPort>(CREDENTIALS_PORT);
-    const passwordHash = await credentials.handleHashPassword('correct-horse-battery');
+    const passwordHash = await credentials.hashPassword('correct-horse-battery');
 
-    const valid = await credentials.handleVerifyPassword({
+    const valid = await credentials.verifyPassword({
       passwordHash,
       password: 'correct-horse-battery',
     });

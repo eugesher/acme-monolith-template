@@ -10,7 +10,7 @@ export class TagE2E {
     return new TagE2E(ctx);
   }
 
-  public handleGetMany(): void {
+  public getMany(): void {
     describe('GET /api/tools/tags', () => {
       it('should list the tags by name', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -33,7 +33,7 @@ export class TagE2E {
     });
   }
 
-  public handleCreate(): void {
+  public create(): void {
     describe('POST /api/tools/tags', () => {
       it('should create a tag with the trimmed name', async () => {
         try {
@@ -97,7 +97,7 @@ export class TagE2E {
     });
   }
 
-  public handleUpdate(): void {
+  public update(): void {
     describe('PATCH /api/tools/tags/:tagId', () => {
       beforeEach(async () => {
         await this.ctx.dataSource.query(
@@ -159,7 +159,7 @@ export class TagE2E {
     });
   }
 
-  public handleDelete(): void {
+  public delete(): void {
     describe('DELETE /api/tools/tags/:tagId', () => {
       it('should delete the tag and unlink it from every subject', async () => {
         try {

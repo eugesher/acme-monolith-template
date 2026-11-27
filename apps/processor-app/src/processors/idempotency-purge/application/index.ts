@@ -1,2 +1,2 @@
-export * from './use-cases/idempotency-purge-schedule.use-case';
-export * from './use-cases/idempotency-purge.use-case';
+export * from './cases/idempotency-purge-process.case';
+export * from './cases/idempotency-purge-schedule.case';

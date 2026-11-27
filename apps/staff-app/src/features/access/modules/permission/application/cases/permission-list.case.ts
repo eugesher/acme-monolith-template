@@ -1,0 +1,12 @@
+import { Injectable } from '@nestjs/common';
+
+import { PermissionCodeEnum } from '@acme-libs/kernel';
+
+import type { IPermissionListView } from '../types';
+
+@Injectable()
+export class PermissionListCase {
+  public execute(): IPermissionListView {
+    return { codes: Object.values(PermissionCodeEnum) };
+  }
+}

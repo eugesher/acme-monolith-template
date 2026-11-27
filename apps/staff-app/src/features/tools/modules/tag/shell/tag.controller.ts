@@ -23,12 +23,7 @@ import { RequiresPermission } from '@acme-libs/auth';
 import { ApiErrorResponses } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 
-import {
-  TagCreateUseCase,
-  TagDeleteUseCase,
-  TagGetManyUseCase,
-  TagUpdateUseCase,
-} from '../application';
+import { TagCreateCase, TagDeleteCase, TagGetManyCase, TagUpdateCase } from '../application';
 import { TagExceptionCodeEnum } from '../domain';
 import {
   TagCreateRequestDto,
@@ -45,10 +40,10 @@ import {
 @Controller('tools/tags')
 export class TagController {
   constructor(
-    private readonly create: TagCreateUseCase,
-    private readonly getMany: TagGetManyUseCase,
-    private readonly update: TagUpdateUseCase,
-    private readonly del: TagDeleteUseCase,
+    private readonly createCase: TagCreateCase,
+    private readonly getManyCase: TagGetManyCase,
+    private readonly updateCase: TagUpdateCase,
+    private readonly deleteCase: TagDeleteCase,
   ) {}
 
   @Post()
@@ -59,20 +54,20 @@ export class TagController {
     filterStatus: TagHttpExceptionFilter.STATUS,
     codes: [TagExceptionCodeEnum.TAG_NAME_INVALID, TagExceptionCodeEnum.TAG_NAME_TAKEN],
   })
-  public async handleCreate(@Body() body: TagCreateRequestDto): Promise<TagResponseDto> {
+  public async create(@Body() body: TagCreateRequestDto): Promise<TagResponseDto> {
     const { name } = body;
 
-    return await this.create.execute({ name });
+    return await this.createCase.execute({ name });
   }
 
   @Get()
   @RequiresPermission(PermissionCodeEnum.TAG_READ)
   @ApiOperation({ summary: 'List the tags by name' })
   @ApiOkResponse({ type: TagPageResponseDto })
-  public async handleGetMany(@Query() query: TagGetManyQueryDto): Promise<TagPageResponseDto> {
+  public async getMany(@Query() query: TagGetManyQueryDto): Promise<TagPageResponseDto> {
     const { page, limit } = query;
 
-    return await this.getMany.execute({ page, limit });
+    return await this.getManyCase.execute({ page, limit });
   }
 
   @Patch(':tagId')
@@ -87,14 +82,14 @@ export class TagController {
       TagExceptionCodeEnum.TAG_NAME_TAKEN,
     ],
   })
-  public async handleUpdate(
+  public async update(
     @Param() params: TagIdParamDto,
     @Body() body: TagUpdateRequestDto,
   ): Promise<TagResponseDto> {
     const { tagId } = params;
     const { name } = body;
 
-    return await this.update.execute({ tagId, name });
+    return await this.updateCase.execute({ tagId, name });
   }
 
   @Delete(':tagId')
@@ -106,9 +101,9 @@ export class TagController {
     filterStatus: TagHttpExceptionFilter.STATUS,
     codes: [TagExceptionCodeEnum.TAG_NOT_FOUND],
   })
-  public async handleDelete(@Param() params: TagIdParamDto): Promise<void> {
+  public async delete(@Param() params: TagIdParamDto): Promise<void> {
     const { tagId } = params;
 
-    await this.del.execute({ tagId });
+    await this.deleteCase.execute({ tagId });
   }
 }

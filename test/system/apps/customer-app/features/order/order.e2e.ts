@@ -10,7 +10,7 @@ export class OrderE2E {
     return new OrderE2E(ctx);
   }
 
-  public handlePlace(): void {
+  public place(): void {
     describe('POST /api/orders', () => {
       it('should place the order, append its ledger entry and archive the sold-out product with its own entry under the correlation id', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');

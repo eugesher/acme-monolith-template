@@ -8,13 +8,13 @@ describe('AuthIdentityCommonAdapter', () => {
   let adapter: AuthIdentityCommonAdapter;
 
   beforeEach(() => {
-    authCommon = { handleFindSubject: jest.fn() };
+    authCommon = { findSubject: jest.fn() };
     adapter = new AuthIdentityCommonAdapter(authCommon);
   });
 
   describe('findSubject', () => {
     it('answers the subject the core staff auth module finds for the user', async () => {
-      authCommon.handleFindSubject.mockResolvedValue({
+      authCommon.findSubject.mockResolvedValue({
         id: 'user-1',
         email: 'ann@example.com',
         roles: ['admin'],
@@ -24,11 +24,11 @@ describe('AuthIdentityCommonAdapter', () => {
       const subject = await adapter.findSubject({ userId: 'user-1' });
 
       expect(subject).toEqual({ id: 'user-1', email: 'ann@example.com', roles: ['admin'] });
-      expect(authCommon.handleFindSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+      expect(authCommon.findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
     });
 
     it('answers null when the core staff auth module finds no active user', async () => {
-      authCommon.handleFindSubject.mockResolvedValue(null);
+      authCommon.findSubject.mockResolvedValue(null);
 
       const subject = await adapter.findSubject({ userId: 'user-1' });
 

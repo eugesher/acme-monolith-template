@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { RoleCreateUseCase, RoleListUseCase, RoleReassignPermissionsUseCase } from '../application';
+import { RoleCreateCase, RoleListCase, RoleReassignPermissionsCase } from '../application';
 import {
   RoleCreateRepository,
   RoleListRepository,
@@ -12,9 +12,9 @@ import { RoleController } from './role.controller';
 @Module({
   controllers: [RoleController],
   providers: [
-    RoleListUseCase,
-    RoleCreateUseCase,
-    RoleReassignPermissionsUseCase,
+    RoleListCase,
+    RoleCreateCase,
+    RoleReassignPermissionsCase,
     RoleListRepository.PROVIDER,
     RoleCreateRepository.PROVIDER,
     RoleReassignPermissionsRepository.PROVIDER,

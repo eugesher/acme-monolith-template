@@ -8,13 +8,13 @@ describe('AuthGlobalSubjectCommonAdapter', () => {
   let adapter: AuthGlobalSubjectCommonAdapter;
 
   beforeEach(() => {
-    authCommon = { handleFindSubject: jest.fn() };
+    authCommon = { findSubject: jest.fn() };
     adapter = new AuthGlobalSubjectCommonAdapter(authCommon);
   });
 
   describe('findSubject', () => {
     it('answers the id, the email and the permission codes of the subject the core finds', async () => {
-      authCommon.handleFindSubject.mockResolvedValue({
+      authCommon.findSubject.mockResolvedValue({
         id: 'user-1',
         email: 'ann@example.com',
         roles: ['admin'],
@@ -28,11 +28,11 @@ describe('AuthGlobalSubjectCommonAdapter', () => {
         email: 'ann@example.com',
         permissionCodes: ['ledger:read'],
       });
-      expect(authCommon.handleFindSubject).toHaveBeenCalledWith({ userId: 'user-1' });
+      expect(authCommon.findSubject).toHaveBeenCalledWith({ userId: 'user-1' });
     });
 
     it('answers no subject when the core finds no active staff user', async () => {
-      authCommon.handleFindSubject.mockResolvedValue(null);
+      authCommon.findSubject.mockResolvedValue(null);
 
       const subject = await adapter.findSubject({ userId: 'user-1' });
 

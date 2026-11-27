@@ -1,4 +1,4 @@
-export * from './ports/idempotency-purge-repository.port';
+export * from './ports/idempotency-purge-process-repository.port';
 export * from './ports/idempotency-purge-schedule.port';
 
 export * from './tokens/idempotency-purge-idempotency-in-flight-ttl-minutes.token';

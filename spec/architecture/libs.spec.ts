@@ -409,7 +409,7 @@ describe('libs', () => {
     },
   );
 
-  it('the health lib MAY import the packages its probes and use cases need', async () => {
+  it('the health lib MAY import the packages its probes and cases need', async () => {
     await expect({
       file: 'libs/health/src/infrastructure/probes/__fixture__.ts',
       code: 'import { Injectable } from "@nestjs/common";\nimport { PinoLogger } from "nestjs-pino";\nimport { DataSource } from "typeorm";',

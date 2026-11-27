@@ -1,8 +1,8 @@
 import type { IHealthLibLivenessView, IHealthLibReadinessView } from '../types';
 
 export interface IHealthLibPort {
-  handleLiveness(): IHealthLibLivenessView;
-  handleReadiness(): Promise<IHealthLibReadinessView>;
+  checkLiveness(): IHealthLibLivenessView;
+  checkReadiness(): Promise<IHealthLibReadinessView>;
 }
 
 export const HEALTH_LIB_PORT = Symbol('HEALTH_LIB_PORT');

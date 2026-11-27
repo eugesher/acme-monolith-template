@@ -7,7 +7,7 @@ import { LocalStorageTransactionalModule } from '@acme-libs/local-storage';
 import { ORM_PORT, type IOrmPort } from '@acme-libs/contracts/database';
 
 import { SnakeNamingStrategy } from '../../naming/snake-naming.strategy';
-import { OrmGetRepositoryUseCase } from '../application';
+import { OrmGetRepositoryCase } from '../application';
 import { OrmHostAdapter } from '../infrastructure';
 import { OrmFacade } from './orm.facade';
 
@@ -20,7 +20,7 @@ export class OrmModule {
       exports: [ORM_PORT],
       providers: [
         { provide: ORM_PORT, useClass: OrmFacade } satisfies ClassProvider<IOrmPort>,
-        OrmGetRepositoryUseCase,
+        OrmGetRepositoryCase,
         OrmHostAdapter.PROVIDER,
       ],
     };

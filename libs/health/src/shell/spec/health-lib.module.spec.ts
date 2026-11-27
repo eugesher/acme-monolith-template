@@ -21,7 +21,7 @@ describe('HealthLibModule', () => {
         { provide: DataSource, useValue: { query: () => Promise.resolve([{ 1: '1' }]) } },
         {
           provide: CACHE_PORT,
-          useValue: { handleGet: () => Promise.reject(new Error('down')) },
+          useValue: { get: () => Promise.reject(new Error('down')) },
         },
       ],
     })
@@ -46,7 +46,7 @@ describe('HealthLibModule', () => {
   });
 
   it('answers liveness with the deployable it was given', () => {
-    const view = port.handleLiveness();
+    const view = port.checkLiveness();
 
     expect(view).toEqual({
       status: 'ok',
@@ -56,7 +56,7 @@ describe('HealthLibModule', () => {
   });
 
   it('answers readiness from the real probes', async () => {
-    const view = await port.handleReadiness();
+    const view = await port.checkReadiness();
 
     expect(view).toEqual({
       status: 'not-ready',

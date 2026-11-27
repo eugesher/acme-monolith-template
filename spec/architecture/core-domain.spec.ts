@@ -30,7 +30,7 @@ describe('core domain (@acme-core/domain)', () => {
 
   it.each([
     'apps/staff-app/src/features/product/domain/__fixture__.ts',
-    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
     'apps/processor-app/src/processors/purge/domain/__fixture__.ts',
     'apps/staff-app/src/common/modules/idempotency/domain/__fixture__.ts',
     'apps/staff-app/src/common/modules/idempotency/application/__fixture__.ts',
@@ -52,7 +52,7 @@ describe('core domain (@acme-core/domain)', () => {
     'core/entities/src/__fixture__.ts',
     'libs/http/src/__fixture__.ts',
   ])(
-    '%s may NOT import the core domain, a value object serves the domain and the use case',
+    '%s may NOT import the core domain, a value object serves the domain and the case',
     async (file) => {
       await expect({
         file,

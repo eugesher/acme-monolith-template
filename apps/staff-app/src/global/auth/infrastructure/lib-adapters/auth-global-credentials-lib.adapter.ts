@@ -18,7 +18,7 @@ export class AuthGlobalCredentialsLibAdapter implements IAuthGlobalCredentialsPo
   ) {}
 
   public async verifyAccessToken(token: string): Promise<Nullable<string>> {
-    const claims = await this.credentials.handleVerifyAccessToken(token);
+    const claims = await this.credentials.verifyAccessToken(token);
 
     return claims?.sub ?? null;
   }

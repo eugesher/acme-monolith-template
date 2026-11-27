@@ -14,20 +14,20 @@ export class ToolsE2E {
 
   public execute(): void {
     describe('Note', () => {
-      this.noteE2E.handleGetMany();
-      this.noteE2E.handleGetOne();
-      this.noteE2E.handleGetRevisions();
-      this.noteE2E.handleCreate();
-      this.noteE2E.handleUpdate();
-      this.noteE2E.handleResolve();
-      this.noteE2E.handleDelete();
+      this.noteE2E.getMany();
+      this.noteE2E.getOne();
+      this.noteE2E.getRevisions();
+      this.noteE2E.create();
+      this.noteE2E.update();
+      this.noteE2E.resolve();
+      this.noteE2E.delete();
     });
 
     describe('Tag', () => {
-      this.tagE2E.handleGetMany();
-      this.tagE2E.handleCreate();
-      this.tagE2E.handleUpdate();
-      this.tagE2E.handleDelete();
+      this.tagE2E.getMany();
+      this.tagE2E.create();
+      this.tagE2E.update();
+      this.tagE2E.delete();
     });
   }
 }

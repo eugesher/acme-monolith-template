@@ -29,7 +29,7 @@ export class ProductStockPostSubtractArchiveCoreAdapter implements IProductStock
     command: IProductStockPostSubtractArchiveCommand,
   ): Promise<IProductStockPostSubtractArchiveView> {
     const { productId } = command;
-    const archiveResult = await this.product.handleArchive({
+    const archiveResult = await this.product.archive({
       productId,
       expectedVersion: undefined,
     });

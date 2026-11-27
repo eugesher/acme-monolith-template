@@ -7,20 +7,20 @@ describe('ProductStockPostSubtractArchiveCoreAdapter', () => {
   let adapter: ProductStockPostSubtractArchiveCoreAdapter;
 
   beforeEach(() => {
-    product = { handleArchive: jest.fn() };
+    product = { archive: jest.fn() };
     adapter = new ProductStockPostSubtractArchiveCoreAdapter(product);
   });
 
   describe('archive', () => {
     it('archives the product through the core module without an expected version', async () => {
-      product.handleArchive.mockResolvedValue({
+      product.archive.mockResolvedValue({
         outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED,
         currentVersion: 2,
       });
 
       const view = await adapter.archive({ productId: '106' });
 
-      expect(product.handleArchive).toHaveBeenCalledWith({
+      expect(product.archive).toHaveBeenCalledWith({
         productId: '106',
         expectedVersion: undefined,
       });
@@ -32,7 +32,7 @@ describe('ProductStockPostSubtractArchiveCoreAdapter', () => {
       ProductCoreArchiveOutcomeEnum.NOT_FOUND,
       ProductCoreArchiveOutcomeEnum.VERSION_MISMATCH,
     ])('answers not archived for %s', async (outcome) => {
-      product.handleArchive.mockResolvedValue({ outcome, currentVersion: 2 });
+      product.archive.mockResolvedValue({ outcome, currentVersion: 2 });
 
       const view = await adapter.archive({ productId: '106' });
 

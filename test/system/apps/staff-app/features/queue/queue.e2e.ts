@@ -10,7 +10,7 @@ export class QueueE2E {
     return new QueueE2E(ctx);
   }
 
-  public handleRetryFailedJob(): void {
+  public retryFailedJob(): void {
     describe('POST /api/queues/:queueName/jobs/failed/:jobId/retry', () => {
       it('should return a failed record to the queue and append it once its cause is gone', async () => {
         const job = await this.ctx.ledgerAppendQueue.add(

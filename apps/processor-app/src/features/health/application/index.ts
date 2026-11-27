@@ -1,2 +1,2 @@
-export * from './use-cases/health-liveness.use-case';
-export * from './use-cases/health-readiness.use-case';
+export * from './cases/health-liveness.case';
+export * from './cases/health-readiness.case';

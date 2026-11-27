@@ -3,15 +3,15 @@ import type { EntityTarget, ObjectLiteral } from 'typeorm';
 
 import type { IHostedRepository, IOrmPort } from '@acme-libs/contracts/database';
 
-import { OrmGetRepositoryUseCase } from '../application';
+import { OrmGetRepositoryCase } from '../application';
 
 @Injectable()
 export class OrmFacade implements IOrmPort {
-  constructor(private readonly getRepositoryUseCase: OrmGetRepositoryUseCase) {}
+  constructor(private readonly getRepositoryCase: OrmGetRepositoryCase) {}
 
   public getRepository<Entity extends ObjectLiteral>(
     entity: EntityTarget<Entity>,
   ): IHostedRepository<Entity> {
-    return this.getRepositoryUseCase.execute(entity);
+    return this.getRepositoryCase.execute(entity);
   }
 }

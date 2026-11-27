@@ -10,7 +10,7 @@ export class ProductStockE2E {
     return new ProductStockE2E(ctx);
   }
 
-  public handleAdd(): void {
+  public add(): void {
     describe('POST /api/warehouse/product-stock/:productId/add', () => {
       it('should add the units and append the ledger entry of the stock row', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query(

@@ -4,19 +4,19 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequiresPermission } from '@acme-libs/auth';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 
-import { PermissionListUseCase } from '../application';
+import { PermissionListCase } from '../application';
 import { PermissionListResponseDto } from '../presentation';
 
 @ApiTags('Access/Permission')
 @Controller('access/permissions')
 export class PermissionController {
-  constructor(private readonly list: PermissionListUseCase) {}
+  constructor(private readonly listCase: PermissionListCase) {}
 
   @Get()
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'List every permission code' })
   @ApiOkResponse({ type: PermissionListResponseDto })
-  public handleList(): PermissionListResponseDto {
-    return this.list.execute();
+  public list(): PermissionListResponseDto {
+    return this.listCase.execute();
   }
 }

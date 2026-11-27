@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { IdempotencyPurgeScheduleUseCase, IdempotencyPurgeUseCase } from '../application';
+import { IdempotencyPurgeProcessCase, IdempotencyPurgeScheduleCase } from '../application';
 import {
   IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider,
   IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider,
-  IdempotencyPurgeRepository,
+  IdempotencyPurgeProcessRepository,
   IdempotencyPurgeScheduleQueueAdapter,
 } from '../infrastructure';
 import { IdempotencyPurgeQueue } from '../queues';
@@ -14,9 +14,9 @@ import { IdempotencyPurgeProcessor } from './idempotency-purge.processor';
   imports: [IdempotencyPurgeQueue.register()],
   providers: [
     IdempotencyPurgeProcessor,
-    IdempotencyPurgeScheduleUseCase,
-    IdempotencyPurgeUseCase,
-    IdempotencyPurgeRepository.PROVIDER,
+    IdempotencyPurgeScheduleCase,
+    IdempotencyPurgeProcessCase,
+    IdempotencyPurgeProcessRepository.PROVIDER,
     IdempotencyPurgeScheduleQueueAdapter.PROVIDER,
     IdempotencyPurgeConfigIdempotencyKeyTtlHoursProvider,
     IdempotencyPurgeConfigIdempotencyInFlightTtlMinutesProvider,

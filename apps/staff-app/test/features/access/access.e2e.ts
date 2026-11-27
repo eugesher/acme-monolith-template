@@ -16,18 +16,18 @@ export class AccessE2E {
 
   public execute(): void {
     describe('Permission', () => {
-      this.permissionE2E.handleList();
+      this.permissionE2E.list();
     });
 
     describe('Role', () => {
-      this.roleE2E.handleList();
-      this.roleE2E.handleCreate();
-      this.roleE2E.handleReassignPermissions();
+      this.roleE2E.list();
+      this.roleE2E.create();
+      this.roleE2E.reassignPermissions();
     });
 
     describe('User', () => {
-      this.userE2E.handleRegister();
-      this.userE2E.handleReassignRoles();
+      this.userE2E.register();
+      this.userE2E.reassignRoles();
     });
   }
 }

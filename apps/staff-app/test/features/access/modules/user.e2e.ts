@@ -10,7 +10,7 @@ export class UserE2E {
     return new UserE2E(ctx);
   }
 
-  public handleRegister(): void {
+  public register(): void {
     describe('POST /api/access/users', () => {
       it('should create a user who can log in at once', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -180,7 +180,7 @@ export class UserE2E {
     });
   }
 
-  public handleReassignRoles(): void {
+  public reassignRoles(): void {
     describe('PUT /api/access/users/:userId/roles', () => {
       const staffUserRolesOf = async (userId: string): Promise<unknown> =>
         await this.ctx.dataSource.query(

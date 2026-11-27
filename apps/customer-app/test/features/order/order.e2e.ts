@@ -12,7 +12,7 @@ export class OrderE2E {
     return new OrderE2E(ctx);
   }
 
-  public handlePlace(): void {
+  public place(): void {
     describe('POST /api/orders', () => {
       it('should place the order with a line and a -1 stock movement per unit, keep the response under the key, enqueue the ledger record and the stock check of its products under the correlation id', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -379,7 +379,7 @@ export class OrderE2E {
     });
   }
 
-  public handleGetMany(): void {
+  public getMany(): void {
     describe('GET /api/orders', () => {
       it('should list only the orders of the caller, newest first, without their products', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -392,7 +392,7 @@ export class OrderE2E {
     });
   }
 
-  public handleGetOne(): void {
+  public getOne(): void {
     describe('GET /api/orders/:orderId', () => {
       it('should read an order of the caller with a line per unit', async () => {
         const response = await request(this.ctx.app.getHttpServer())

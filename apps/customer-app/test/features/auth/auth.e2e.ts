@@ -11,7 +11,7 @@ export class AuthE2E {
     return new AuthE2E(ctx);
   }
 
-  public handleRegister(): void {
+  public register(): void {
     describe('POST /api/auth/register', () => {
       it('should create a customer who logs in and enqueue the ledger record of the registration with the email under the correlation id', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -140,7 +140,7 @@ export class AuthE2E {
     });
   }
 
-  public handleLogin(): void {
+  public login(): void {
     describe('POST /api/auth/login', () => {
       it('should issue an access token of the subject alone, valid for the lifetime of this app', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -231,7 +231,7 @@ export class AuthE2E {
     });
   }
 
-  public handleMe(): void {
+  public me(): void {
     describe('GET /api/auth/me', () => {
       it('should refuse a caller without a token', async () => {
         const response = await request(this.ctx.app.getHttpServer())

@@ -32,7 +32,7 @@ export class HealthLibDependencyProbeAdapter implements IHealthLibDependencyProb
   public async probeAll(): Promise<IHealthLibDependenciesView> {
     const [database, cache] = await Promise.all([
       HealthLibDependencyProbeAdapter.timed(() => this.dataSource.query('SELECT 1')),
-      HealthLibDependencyProbeAdapter.timed(() => this.cache.handleGet(CACHE_KEYS.healthProbe())),
+      HealthLibDependencyProbeAdapter.timed(() => this.cache.get(CACHE_KEYS.healthProbe())),
     ]);
 
     return { database, cache };

@@ -17,6 +17,6 @@ export class UserCredentialsLibAdapter implements IUserCredentialsPort {
   ) {}
 
   public async hashPassword(password: string): Promise<string> {
-    return await this.credentials.handleHashPassword(password);
+    return await this.credentials.hashPassword(password);
   }
 }

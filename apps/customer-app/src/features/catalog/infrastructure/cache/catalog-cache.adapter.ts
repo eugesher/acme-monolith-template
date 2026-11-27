@@ -27,6 +27,6 @@ export class CatalogCacheAdapter implements ICatalogCachePort {
     const { page, limit, ttlMs, compute } = command;
     const key = CACHE_KEYS.catalogPage(page, limit);
 
-    return await this.cache.handleWrap({ key, ttlMs, compute });
+    return await this.cache.wrap({ key, ttlMs, compute });
   }
 }

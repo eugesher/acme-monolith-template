@@ -11,8 +11,8 @@ describe('HealthLibDependencyProbeAdapter', () => {
 
   beforeEach(() => {
     query = jest.fn().mockResolvedValue([{ 1: '1' }]);
-    cache = { handleGet: jest.fn(), handleDelByPrefix: jest.fn(), handleWrap: jest.fn() };
-    cache.handleGet.mockResolvedValue(undefined);
+    cache = { get: jest.fn(), delByPrefix: jest.fn(), wrap: jest.fn() };
+    cache.get.mockResolvedValue(undefined);
     adapter = new HealthLibDependencyProbeAdapter(cache, { query } as unknown as DataSource);
   });
 
@@ -38,7 +38,7 @@ describe('HealthLibDependencyProbeAdapter', () => {
   it('probes the cache with a read of the health probe key', async () => {
     await adapter.probeAll();
 
-    expect(cache.handleGet).toHaveBeenCalledWith('acme:health:probe');
+    expect(cache.get).toHaveBeenCalledWith('acme:health:probe');
   });
 
   it('measures the latency of a probe', async () => {
@@ -57,7 +57,7 @@ describe('HealthLibDependencyProbeAdapter', () => {
   });
 
   it('folds a failing probe into its own entry and never rejects', async () => {
-    cache.handleGet.mockRejectedValue(new Error('connection refused'));
+    cache.get.mockRejectedValue(new Error('connection refused'));
 
     const dependencies = await adapter.probeAll();
 
@@ -69,7 +69,7 @@ describe('HealthLibDependencyProbeAdapter', () => {
 
   it('waits for a slow probe up to the timeout', async () => {
     jest.useFakeTimers();
-    cache.handleGet.mockImplementation(() => new Promise<never>(() => undefined));
+    cache.get.mockImplementation(() => new Promise<never>(() => undefined));
 
     const result = adapter.probeAll();
     let settled = false;
@@ -84,7 +84,7 @@ describe('HealthLibDependencyProbeAdapter', () => {
 
   it('gives up on a hanging probe after 1000 ms', async () => {
     jest.useFakeTimers();
-    cache.handleGet.mockImplementation(() => new Promise<never>(() => undefined));
+    cache.get.mockImplementation(() => new Promise<never>(() => undefined));
 
     const result = adapter.probeAll();
 
@@ -101,12 +101,12 @@ describe('HealthLibDependencyProbeAdapter', () => {
   it('runs the probes concurrently', async () => {
     jest.useFakeTimers();
     query.mockImplementation(() => new Promise<never>(() => undefined));
-    cache.handleGet.mockImplementation(() => new Promise<never>(() => undefined));
+    cache.get.mockImplementation(() => new Promise<never>(() => undefined));
 
     const result = adapter.probeAll();
 
     expect(query).toHaveBeenCalledTimes(1);
-    expect(cache.handleGet).toHaveBeenCalledTimes(1);
+    expect(cache.get).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(1000);
 

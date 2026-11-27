@@ -10,7 +10,7 @@ export class WarehouseE2E {
 
   public execute(): void {
     describe('ProductStock', () => {
-      this.productStockE2E.handleAdd();
+      this.productStockE2E.add();
     });
   }
 }

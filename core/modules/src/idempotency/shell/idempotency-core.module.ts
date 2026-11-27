@@ -3,9 +3,9 @@ import { Module, type ClassProvider } from '@nestjs/common';
 import { IDEMPOTENCY_CORE_PORT, type IIdempotencyCorePort } from '@acme-core/contracts/idempotency';
 
 import {
-  IdempotencyCoreClaimUseCase,
-  IdempotencyCoreCompleteUseCase,
-  IdempotencyCoreReleaseUseCase,
+  IdempotencyCoreClaimCase,
+  IdempotencyCoreCompleteCase,
+  IdempotencyCoreReleaseCase,
 } from '../application';
 import {
   IdempotencyCoreClaimRepository,
@@ -21,9 +21,9 @@ import { IdempotencyCoreFacade } from './idempotency-core.facade';
       provide: IDEMPOTENCY_CORE_PORT,
       useClass: IdempotencyCoreFacade,
     } satisfies ClassProvider<IIdempotencyCorePort>,
-    IdempotencyCoreClaimUseCase,
-    IdempotencyCoreCompleteUseCase,
-    IdempotencyCoreReleaseUseCase,
+    IdempotencyCoreClaimCase,
+    IdempotencyCoreCompleteCase,
+    IdempotencyCoreReleaseCase,
     IdempotencyCoreClaimRepository.PROVIDER,
     IdempotencyCoreCompleteRepository.PROVIDER,
     IdempotencyCoreReleaseRepository.PROVIDER,

@@ -5,13 +5,13 @@ import { CorrelationContextHelper } from '@acme-libs/observability';
 import { LedgerAppendQueue } from '@acme-core/queues';
 import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
-import { LedgerAppendReportFailureUseCase, LedgerAppendUseCase } from '../application';
+import { LedgerAppendProcessCase, LedgerAppendReportWorkerFailedCase } from '../application';
 
 @Processor(LedgerAppendQueue.NAME)
 export class LedgerAppendProcessor extends WorkerHost {
   constructor(
-    private readonly append: LedgerAppendUseCase,
-    private readonly reportFailure: LedgerAppendReportFailureUseCase,
+    private readonly processCase: LedgerAppendProcessCase,
+    private readonly reportWorkerFailedCase: LedgerAppendReportWorkerFailedCase,
   ) {
     super();
   }
@@ -22,18 +22,28 @@ export class LedgerAppendProcessor extends WorkerHost {
       data;
 
     await CorrelationContextHelper.run(correlationId, () =>
-      this.append.execute({ operationKey, subjectType, subjectId, action, payload, occurredAt }),
+      this.processCase.execute({
+        operationKey,
+        subjectType,
+        subjectId,
+        action,
+        payload,
+        occurredAt,
+      }),
     );
   }
 
   @OnWorkerEvent('failed')
-  public async handleFailed(job: Job<ILedgerAppendProcessorPayload>, error: Error): Promise<void> {
+  public async onWorkerFailed(
+    job: Job<ILedgerAppendProcessorPayload>,
+    error: Error,
+  ): Promise<void> {
     const { data, attemptsMade, opts } = job;
     const { operationKey, correlationId } = data;
     const { attempts } = opts as Required<Pick<JobsOptions, 'attempts'>>;
 
     await CorrelationContextHelper.run(correlationId, () => {
-      this.reportFailure.execute({ operationKey, attempt: attemptsMade, attempts, error });
+      this.reportWorkerFailedCase.execute({ operationKey, attempt: attemptsMade, attempts, error });
 
       return Promise.resolve();
     });

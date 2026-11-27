@@ -17,10 +17,10 @@ import { PermissionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import {
-  QueueDeleteFailedJobUseCase,
-  QueueListFailedJobsUseCase,
-  QueueListUseCase,
-  QueueRetryFailedJobUseCase,
+  QueueDeleteFailedJobCase,
+  QueueListCase,
+  QueueListFailedJobsCase,
+  QueueRetryFailedJobCase,
 } from '../application';
 import { QueueExceptionCodeEnum } from '../domain';
 import {
@@ -37,18 +37,18 @@ import {
 @Controller('queues')
 export class QueueController {
   constructor(
-    private readonly list: QueueListUseCase,
-    private readonly listFailedJobs: QueueListFailedJobsUseCase,
-    private readonly retryFailedJob: QueueRetryFailedJobUseCase,
-    private readonly deleteFailedJob: QueueDeleteFailedJobUseCase,
+    private readonly listCase: QueueListCase,
+    private readonly listFailedJobsCase: QueueListFailedJobsCase,
+    private readonly retryFailedJobCase: QueueRetryFailedJobCase,
+    private readonly deleteFailedJobCase: QueueDeleteFailedJobCase,
   ) {}
 
   @Get()
   @RequiresPermission(PermissionCodeEnum.QUEUE_READ)
   @ApiOperation({ summary: 'List the queues with the counts of their jobs' })
   @ApiOkResponse({ type: [QueueResponseDto] })
-  public async handleList(): Promise<QueueResponseDto[]> {
-    return await this.list.execute();
+  public async list(): Promise<QueueResponseDto[]> {
+    return await this.listCase.execute();
   }
 
   @Get(':queueName/jobs/failed')
@@ -59,14 +59,14 @@ export class QueueController {
     filterStatus: QueueHttpExceptionFilter.STATUS,
     codes: [QueueExceptionCodeEnum.QUEUE_NOT_FOUND],
   })
-  public async handleListFailedJobs(
+  public async listFailedJobs(
     @Param() params: QueueNameParamDto,
     @Query() query: QueueListFailedJobsQueryDto,
   ): Promise<QueueFailedJobPageResponseDto> {
     const { queueName } = params;
     const { page, limit } = query;
 
-    return await this.listFailedJobs.execute({ queueName, page, limit });
+    return await this.listFailedJobsCase.execute({ queueName, page, limit });
   }
 
   @Post(':queueName/jobs/failed/:jobId/retry')
@@ -82,14 +82,14 @@ export class QueueController {
       QueueExceptionCodeEnum.QUEUE_JOB_NOT_FAILED,
     ],
   })
-  public async handleRetryFailedJob(
+  public async retryFailedJob(
     @Param() params: QueueJobParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<void> {
     const { queueName, jobId } = params;
     const { id: staffUserId } = user;
 
-    await this.retryFailedJob.execute({ queueName, jobId, staffUserId });
+    await this.retryFailedJobCase.execute({ queueName, jobId, staffUserId });
   }
 
   @Delete(':queueName/jobs/failed/:jobId')
@@ -105,13 +105,13 @@ export class QueueController {
       QueueExceptionCodeEnum.QUEUE_JOB_NOT_FAILED,
     ],
   })
-  public async handleDeleteFailedJob(
+  public async deleteFailedJob(
     @Param() params: QueueJobParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<void> {
     const { queueName, jobId } = params;
     const { id: staffUserId } = user;
 
-    await this.deleteFailedJob.execute({ queueName, jobId, staffUserId });
+    await this.deleteFailedJobCase.execute({ queueName, jobId, staffUserId });
   }
 }

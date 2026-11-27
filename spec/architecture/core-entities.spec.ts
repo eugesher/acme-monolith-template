@@ -42,7 +42,7 @@ describe('core entities (@acme-core/entities)', () => {
   it.each([
     'apps/staff-app/src/features/product/domain/__fixture__.ts',
     'apps/staff-app/src/features/product/outbound/__fixture__.ts',
-    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
     'apps/staff-app/src/features/product/shell/__fixture__.ts',
     'apps/staff-app/src/features/product/shell/product.module.ts',
     'apps/processor-app/src/processors/purge/application/__fixture__.ts',

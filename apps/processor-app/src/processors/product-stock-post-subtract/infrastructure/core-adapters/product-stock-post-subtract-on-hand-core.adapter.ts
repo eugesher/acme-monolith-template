@@ -29,6 +29,6 @@ export class ProductStockPostSubtractOnHandCoreAdapter implements IProductStockP
   ): Promise<IProductStockPostSubtractOnHandView[]> {
     const { productIds } = command;
 
-    return await this.productStock.handleLock({ productIds });
+    return await this.productStock.lock({ productIds });
   }
 }

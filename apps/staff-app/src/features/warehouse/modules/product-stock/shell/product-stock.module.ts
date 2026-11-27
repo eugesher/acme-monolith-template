@@ -4,7 +4,7 @@ import { IdempotencyCoreModule } from '@acme-core/modules/idempotency';
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 import { ProductStockCoreModule } from '@acme-core/modules/product-stock';
 
-import { ProductStockAddUseCase } from '../application';
+import { ProductStockAddCase } from '../application';
 import {
   ProductStockAddRepository,
   ProductStockIdempotencyCoreAdapter,
@@ -18,7 +18,7 @@ import { ProductStockController } from './product-stock.controller';
   imports: [LedgerCoreModule, IdempotencyCoreModule, ProductStockCoreModule],
   controllers: [ProductStockController],
   providers: [
-    ProductStockAddUseCase,
+    ProductStockAddCase,
     ProductStockAddRepository.PROVIDER,
     ProductStockIdempotencyCoreAdapter.PROVIDER,
     ProductStockMovementCoreAdapter.PROVIDER,

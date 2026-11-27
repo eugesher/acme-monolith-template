@@ -12,13 +12,13 @@ describe('HealthStatusLibAdapter', () => {
   let adapter: HealthStatusLibAdapter;
 
   beforeEach(() => {
-    health = { handleLiveness: jest.fn(), handleReadiness: jest.fn() };
+    health = { checkLiveness: jest.fn(), checkReadiness: jest.fn() };
     adapter = new HealthStatusLibAdapter(health);
   });
 
   describe('liveness', () => {
     it('answers the liveness of the health lib', () => {
-      health.handleLiveness.mockReturnValue({
+      health.checkLiveness.mockReturnValue({
         status: HealthLivenessStatusEnum.OK,
         app: 'processor-app',
         uptimeSeconds: 7,
@@ -32,7 +32,7 @@ describe('HealthStatusLibAdapter', () => {
 
   describe('readiness', () => {
     it('answers the readiness of the health lib', async () => {
-      health.handleReadiness.mockResolvedValue({
+      health.checkReadiness.mockResolvedValue({
         status: HealthReadinessStatusEnum.READY,
         app: 'processor-app',
         dependencies: {

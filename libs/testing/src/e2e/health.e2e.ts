@@ -10,7 +10,7 @@ export class HealthE2E {
     return new HealthE2E(ctx);
   }
 
-  public handleLiveness(): void {
+  public liveness(): void {
     describe('GET /api/health', () => {
       it('should report liveness and mint a correlation id', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -96,7 +96,7 @@ export class HealthE2E {
     });
   }
 
-  public handleReadiness(): void {
+  public readiness(): void {
     describe('GET /api/health/ready', () => {
       it('should report readiness of the database and the cache', async () => {
         const response = await request(this.ctx.app.getHttpServer())

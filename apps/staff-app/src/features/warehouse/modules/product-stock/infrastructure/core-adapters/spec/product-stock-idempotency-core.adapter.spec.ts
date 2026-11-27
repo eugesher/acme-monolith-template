@@ -10,13 +10,13 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
   let adapter: ProductStockIdempotencyCoreAdapter;
 
   beforeEach(() => {
-    idempotency = { handleClaim: jest.fn(), handleComplete: jest.fn(), handleRelease: jest.fn() };
+    idempotency = { claim: jest.fn(), complete: jest.fn(), release: jest.fn() };
     adapter = new ProductStockIdempotencyCoreAdapter(idempotency);
   });
 
   describe('claim', () => {
     it('claims the key in the scope of the owner on the logical body', async () => {
-      idempotency.handleClaim.mockResolvedValue({
+      idempotency.claim.mockResolvedValue({
         outcome: IdempotencyCoreClaimOutcomeEnum.CLAIMED,
         storedResponse: undefined,
       });
@@ -28,7 +28,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
       });
 
       expect(outcome).toEqual({ outcome: 'claimed' });
-      expect(idempotency.handleClaim).toHaveBeenCalledWith({
+      expect(idempotency.claim).toHaveBeenCalledWith({
         scope: 'staff:staff-1',
         key: 'key-1',
         body: { productId: '12', quantity: 5 },
@@ -39,7 +39,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
       [IdempotencyCoreClaimOutcomeEnum.IN_FLIGHT, 'in-flight'],
       [IdempotencyCoreClaimOutcomeEnum.MISMATCH, 'mismatch'],
     ])('answers %s as %s without a stored response', async (core, outcome) => {
-      idempotency.handleClaim.mockResolvedValue({ outcome: core, storedResponse: undefined });
+      idempotency.claim.mockResolvedValue({ outcome: core, storedResponse: undefined });
 
       const result = await adapter.claim({ staffUserId: 'staff-1', key: 'key-1', body: {} });
 
@@ -47,7 +47,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
     });
 
     it('answers a replay with the stored response', async () => {
-      idempotency.handleClaim.mockResolvedValue({
+      idempotency.claim.mockResolvedValue({
         outcome: IdempotencyCoreClaimOutcomeEnum.REPLAY,
         storedResponse: { productId: '12', quantity: 15 },
       });
@@ -63,7 +63,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
 
   describe('complete', () => {
     it('stores the response under the key in the scope of the owner', async () => {
-      idempotency.handleComplete.mockResolvedValue(undefined);
+      idempotency.complete.mockResolvedValue(undefined);
 
       await adapter.complete({
         staffUserId: 'staff-1',
@@ -71,7 +71,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
         response: { productId: '12' },
       });
 
-      expect(idempotency.handleComplete).toHaveBeenCalledWith({
+      expect(idempotency.complete).toHaveBeenCalledWith({
         scope: 'staff:staff-1',
         key: 'key-1',
         response: { productId: '12' },
@@ -79,7 +79,7 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
     });
 
     it('lets a failed write reject', async () => {
-      idempotency.handleComplete.mockRejectedValue(new Error('connection lost'));
+      idempotency.complete.mockRejectedValue(new Error('connection lost'));
 
       const complete = adapter.complete({ staffUserId: 'staff-1', key: 'key-1', response: {} });
 
@@ -89,11 +89,11 @@ describe('ProductStockIdempotencyCoreAdapter', () => {
 
   describe('release', () => {
     it('releases the key in the scope of the owner', async () => {
-      idempotency.handleRelease.mockResolvedValue(undefined);
+      idempotency.release.mockResolvedValue(undefined);
 
       await adapter.release({ staffUserId: 'staff-1', key: 'key-1' });
 
-      expect(idempotency.handleRelease).toHaveBeenCalledWith({
+      expect(idempotency.release).toHaveBeenCalledWith({
         scope: 'staff:staff-1',
         key: 'key-1',
       });

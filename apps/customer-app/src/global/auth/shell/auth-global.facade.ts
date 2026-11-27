@@ -7,17 +7,17 @@ import type {
   IAuthUserValidatorPort,
 } from '@acme-libs/contracts/auth';
 
-import { AuthGlobalValidateSubjectUseCase } from '../application';
+import { AuthGlobalValidateSubjectCase } from '../application';
 
 @Injectable()
 export class AuthGlobalFacade implements IAuthUserValidatorPort {
-  constructor(private readonly validateSubject: AuthGlobalValidateSubjectUseCase) {}
+  constructor(private readonly validateSubjectCase: AuthGlobalValidateSubjectCase) {}
 
-  public async handleValidate(
+  public async validateSubject(
     command: IAuthAccessTokenCommand,
   ): Promise<Nullable<IAuthCurrentUserView>> {
     const { token } = command;
 
-    return await this.validateSubject.execute({ token });
+    return await this.validateSubjectCase.execute({ token });
   }
 }

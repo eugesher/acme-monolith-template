@@ -19,6 +19,6 @@ export class ProductCatalogCacheAdapter implements IProductCatalogCachePort {
   public async invalidate(): Promise<void> {
     const prefix = CACHE_KEYS.catalogPrefix();
 
-    await this.cache.handleDelByPrefix(prefix);
+    await this.cache.delByPrefix(prefix);
   }
 }

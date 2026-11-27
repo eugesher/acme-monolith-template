@@ -9,36 +9,36 @@ import type {
 } from '@acme-libs/contracts/credentials';
 
 import {
-  CredentialsHashPasswordUseCase,
-  CredentialsSignAccessTokenUseCase,
-  CredentialsVerifyAccessTokenUseCase,
-  CredentialsVerifyPasswordUseCase,
+  CredentialsHashPasswordCase,
+  CredentialsSignAccessTokenCase,
+  CredentialsVerifyAccessTokenCase,
+  CredentialsVerifyPasswordCase,
 } from '../application';
 
 @Injectable()
 export class CredentialsFacade implements ICredentialsPort {
   constructor(
-    private readonly signAccessToken: CredentialsSignAccessTokenUseCase,
-    private readonly verifyAccessToken: CredentialsVerifyAccessTokenUseCase,
-    private readonly hashPassword: CredentialsHashPasswordUseCase,
-    private readonly verifyPassword: CredentialsVerifyPasswordUseCase,
+    private readonly signAccessTokenCase: CredentialsSignAccessTokenCase,
+    private readonly verifyAccessTokenCase: CredentialsVerifyAccessTokenCase,
+    private readonly hashPasswordCase: CredentialsHashPasswordCase,
+    private readonly verifyPasswordCase: CredentialsVerifyPasswordCase,
   ) {}
 
-  public async handleSignAccessToken(command: ICredentialsSignAccessTokenCommand): Promise<string> {
-    return await this.signAccessToken.execute(command);
+  public async signAccessToken(command: ICredentialsSignAccessTokenCommand): Promise<string> {
+    return await this.signAccessTokenCase.execute(command);
   }
 
-  public async handleVerifyAccessToken(
+  public async verifyAccessToken(
     token: string,
   ): Promise<Nullable<ICredentialsVerifyAccessTokenView>> {
-    return await this.verifyAccessToken.execute(token);
+    return await this.verifyAccessTokenCase.execute(token);
   }
 
-  public async handleHashPassword(password: string): Promise<string> {
-    return await this.hashPassword.execute(password);
+  public async hashPassword(password: string): Promise<string> {
+    return await this.hashPasswordCase.execute(password);
   }
 
-  public async handleVerifyPassword(command: ICredentialsVerifyPasswordCommand): Promise<boolean> {
-    return await this.verifyPassword.execute(command);
+  public async verifyPassword(command: ICredentialsVerifyPasswordCommand): Promise<boolean> {
+    return await this.verifyPasswordCase.execute(command);
   }
 }

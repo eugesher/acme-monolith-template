@@ -30,8 +30,8 @@ describe('App', () => {
   });
 
   describe('Health', () => {
-    healthE2E.handleLiveness();
-    healthE2E.handleReadiness();
+    healthE2E.liveness();
+    healthE2E.readiness();
   });
 
   describe('Ledger', () => {

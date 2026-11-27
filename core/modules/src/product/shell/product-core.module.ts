@@ -3,7 +3,7 @@ import { Module, type ClassProvider } from '@nestjs/common';
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 import { PRODUCT_CORE_PORT, type IProductCorePort } from '@acme-core/contracts/product';
 
-import { ProductCoreArchiveUseCase } from '../application';
+import { ProductCoreArchiveCase } from '../application';
 import {
   ProductCoreArchiveRepository,
   ProductCoreCatalogCacheAdapter,
@@ -20,7 +20,7 @@ import { ProductCoreFacade } from './product-core.facade';
       provide: PRODUCT_CORE_PORT,
       useClass: ProductCoreFacade,
     } satisfies ClassProvider<IProductCorePort>,
-    ProductCoreArchiveUseCase,
+    ProductCoreArchiveCase,
     ProductCoreArchiveRepository.PROVIDER,
     ProductCoreCatalogCacheAdapter.PROVIDER,
     ProductCoreLedgerCoreAdapter.PROVIDER,

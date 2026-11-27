@@ -10,7 +10,7 @@ export class ProductE2E {
     return new ProductE2E(ctx);
   }
 
-  public handleGetMany(): void {
+  public getMany(): void {
     describe('GET /api/catalog/products', () => {
       it('should list the catalog, newest first', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -50,7 +50,7 @@ export class ProductE2E {
     });
   }
 
-  public handleGetOne(): void {
+  public getOne(): void {
     describe('GET /api/catalog/products/:productId', () => {
       it('should read a product', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -72,7 +72,7 @@ export class ProductE2E {
     });
   }
 
-  public handleCreate(): void {
+  public create(): void {
     describe('POST /api/catalog/products', () => {
       it('should create a draft and queue the ledger record under the correlation id', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query(
@@ -155,7 +155,7 @@ export class ProductE2E {
     });
   }
 
-  public handleUpdate(): void {
+  public update(): void {
     describe('PATCH /api/catalog/products/:productId', () => {
       it('should update the name with a quoted If-Match, bump the version and drop the cached customer catalog', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
@@ -237,7 +237,7 @@ export class ProductE2E {
     });
   }
 
-  public handleArchive(): void {
+  public archive(): void {
     describe('POST /api/catalog/products/:productId/archive', () => {
       it('should archive, queue one ledger record under the correlation id and drop the cached customer catalog', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
@@ -282,7 +282,7 @@ export class ProductE2E {
     });
   }
 
-  public handlePublish(): void {
+  public publish(): void {
     describe('POST /api/catalog/products/:productId/publish', () => {
       it('should publish a draft, queue one ledger record under the correlation id and drop the cached customer catalog', async () => {
         await this.ctx.redis.set('acme:catalog:v1:page:1:limit:20', '{}');
@@ -356,7 +356,7 @@ export class ProductE2E {
     });
   }
 
-  public handleGetTags(): void {
+  public getTags(): void {
     describe('GET /api/catalog/products/:productId/tags', () => {
       it('should read the tags of the product, by name', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -387,7 +387,7 @@ export class ProductE2E {
     });
   }
 
-  public handleReplaceTags(): void {
+  public replaceTags(): void {
     describe('PUT /api/catalog/products/:productId/tags', () => {
       afterEach(async () => {
         await this.ctx.dataSource.query(

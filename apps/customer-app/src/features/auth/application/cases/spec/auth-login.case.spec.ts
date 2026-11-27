@@ -1,0 +1,90 @@
+import { IdentityExceptionCodeEnum, UserStatusEnum } from '@acme-libs/kernel';
+import { makePinoLoggerMock, type PinoLoggerMock } from '@acme-libs/testing';
+
+import { AuthLoginCase } from '../auth-login.case';
+import type { IAuthCredentialsPort, IAuthLoginRepositoryPort } from '../../../outbound';
+
+describe('AuthLoginCase', () => {
+  let repository: jest.Mocked<IAuthLoginRepositoryPort>;
+  let credentials: jest.Mocked<IAuthCredentialsPort>;
+  let logger: PinoLoggerMock;
+  let loginCase: AuthLoginCase;
+
+  beforeEach(() => {
+    repository = { findByEmail: jest.fn() };
+    repository.findByEmail.mockResolvedValue({
+      id: 'customer-1',
+      passwordHash: 'hash',
+      status: UserStatusEnum.ACTIVE,
+    });
+    credentials = {
+      issueAccessToken: jest.fn(),
+      hashPassword: jest.fn(),
+      verifyPassword: jest.fn(),
+    };
+    credentials.issueAccessToken.mockResolvedValue('access-token');
+    credentials.verifyPassword.mockResolvedValue(true);
+    logger = makePinoLoggerMock();
+    loginCase = new AuthLoginCase(repository, credentials, logger);
+  });
+
+  it('issues an access token for the right password', async () => {
+    const view = await loginCase.execute({ email: ' Ann@Example.com ', password: 'correct-horse' });
+
+    expect(view).toEqual({ accessToken: 'access-token' });
+    expect(repository.findByEmail).toHaveBeenCalledWith('ann@example.com');
+    expect(credentials.verifyPassword).toHaveBeenCalledWith({
+      passwordHash: 'hash',
+      password: 'correct-horse',
+    });
+    expect(credentials.issueAccessToken).toHaveBeenCalledWith('customer-1');
+    expect(logger.info).toHaveBeenCalledWith({ id: 'customer-1' }, 'Customer logged in');
+  });
+
+  it('rejects an unknown email after the same password check and with the same error as a wrong password', async () => {
+    repository.findByEmail.mockResolvedValue(null);
+
+    const login = loginCase.execute({ email: 'ghost@example.com', password: 'correct-horse' });
+
+    await expect(login).rejects.toMatchObject({
+      code: IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
+      message: 'Invalid credentials',
+    });
+    expect(credentials.verifyPassword).toHaveBeenCalledWith({
+      passwordHash: null,
+      password: 'correct-horse',
+    });
+    expect(logger.warn).toHaveBeenCalledWith('Login failed: unknown email');
+  });
+
+  it('rejects a wrong password', async () => {
+    credentials.verifyPassword.mockResolvedValue(false);
+
+    const login = loginCase.execute({ email: 'ann@example.com', password: 'wrong-horse' });
+
+    await expect(login).rejects.toMatchObject({
+      code: IdentityExceptionCodeEnum.AUTH_INVALID_CREDENTIALS,
+      message: 'Invalid credentials',
+    });
+    expect(credentials.issueAccessToken).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      { customerId: 'customer-1' },
+      'Login failed: wrong password',
+    );
+  });
+
+  it('rejects a disabled customer after checking the password', async () => {
+    repository.findByEmail.mockResolvedValue({
+      id: 'customer-1',
+      passwordHash: 'hash',
+      status: UserStatusEnum.DISABLED,
+    });
+
+    const login = loginCase.execute({ email: 'ann@example.com', password: 'correct-horse' });
+
+    await expect(login).rejects.toMatchObject({
+      code: IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
+    });
+    expect(credentials.issueAccessToken).not.toHaveBeenCalled();
+  });
+});

@@ -32,7 +32,7 @@ describe('module-level const types', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/application/use-cases/spec/__fixture__.spec.ts',
+    'apps/staff-app/src/features/product/application/cases/spec/__fixture__.spec.ts',
     'scripts/node/__fixture__.ts',
     'test/infra/seed/__fixture__.ts',
   ])('%s keeps the rule', async (file) => {

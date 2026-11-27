@@ -21,7 +21,7 @@ describe('PageQueryDto', () => {
     expect(dto).toEqual({ page: 2, limit: 50 });
   });
 
-  it('leaves a page above 1000 and a limit above 100 to the use case, which caps them', () => {
+  it('leaves a page above 1000 and a limit above 100 to the case, which caps them', () => {
     const dto = plainToInstance(PageQueryDto, { page: '5000', limit: '500' });
 
     const errors = validateSync(dto);

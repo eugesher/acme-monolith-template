@@ -4,7 +4,7 @@ import { IdempotencyCoreModule } from '@acme-core/modules/idempotency';
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 import { ProductStockCoreModule } from '@acme-core/modules/product-stock';
 
-import { OrderGetManyUseCase, OrderGetOneUseCase, OrderPlaceUseCase } from '../application';
+import { OrderGetManyCase, OrderGetOneCase, OrderPlaceCase } from '../application';
 import {
   OrderGetManyRepository,
   OrderGetOneRepository,
@@ -20,9 +20,9 @@ import { OrderController } from './order.controller';
   imports: [LedgerCoreModule, IdempotencyCoreModule, ProductStockCoreModule],
   controllers: [OrderController],
   providers: [
-    OrderGetManyUseCase,
-    OrderGetOneUseCase,
-    OrderPlaceUseCase,
+    OrderGetManyCase,
+    OrderGetOneCase,
+    OrderPlaceCase,
     OrderGetManyRepository.PROVIDER,
     OrderGetOneRepository.PROVIDER,
     OrderPlaceRepository.PROVIDER,

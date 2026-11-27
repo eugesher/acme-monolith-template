@@ -12,7 +12,7 @@ describe('CorrelationContextHelper', () => {
     it('binds the inbound id to the context of the callback', async () => {
       const current = await CorrelationContextHelper.run(
         'c0ffee00-0000-4000-8000-000000000001',
-        () => Promise.resolve(CorrelationContextHelper.current('ItemArchiveUseCase')),
+        () => Promise.resolve(CorrelationContextHelper.current('ItemArchiveCase')),
       );
 
       expect(current).toBe('c0ffee00-0000-4000-8000-000000000001');
@@ -22,7 +22,7 @@ describe('CorrelationContextHelper', () => {
       'mints an id when the message carries %p',
       async (inbound) => {
         const current = await CorrelationContextHelper.run(inbound, () =>
-          Promise.resolve(CorrelationContextHelper.current('ItemArchiveUseCase')),
+          Promise.resolve(CorrelationContextHelper.current('ItemArchiveCase')),
         );
 
         expect(current).toMatch(
@@ -40,7 +40,7 @@ describe('CorrelationContextHelper', () => {
 
         return await CorrelationContextHelper.run('c0ffee00-0000-4000-8000-000000000003', () =>
           Promise.resolve({
-            current: CorrelationContextHelper.current('ItemArchiveUseCase'),
+            current: CorrelationContextHelper.current('ItemArchiveCase'),
             outer: cls.get<string | undefined>('outer-key'),
           }),
         );
@@ -58,7 +58,7 @@ describe('CorrelationContextHelper', () => {
             CorrelationContextHelper.run(inbound, async () => {
               await new Promise((resolve) => setImmediate(resolve));
 
-              return CorrelationContextHelper.current('ItemArchiveUseCase');
+              return CorrelationContextHelper.current('ItemArchiveCase');
             }),
         ),
       );
@@ -75,19 +75,19 @@ describe('CorrelationContextHelper', () => {
 
       Object.assign(PinoLogger, { root });
 
-      const correlationId = CorrelationContextHelper.current('ItemArchiveUseCase');
+      const correlationId = CorrelationContextHelper.current('ItemArchiveCase');
 
       expect(correlationId).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
       );
       expect(warn).toHaveBeenCalledWith(
-        { context: 'ItemArchiveUseCase', correlationId },
+        { context: 'ItemArchiveCase', correlationId },
         'No correlation context: the entry point does not open one, a new correlationId is minted',
       );
     });
 
     it('still mints an id outside a correlation context when no logger module is up', () => {
-      const correlationId = CorrelationContextHelper.current('ItemArchiveUseCase');
+      const correlationId = CorrelationContextHelper.current('ItemArchiveCase');
 
       expect(correlationId).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,

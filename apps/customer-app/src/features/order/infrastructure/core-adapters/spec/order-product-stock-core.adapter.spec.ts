@@ -7,9 +7,9 @@ describe('OrderProductStockCoreAdapter', () => {
   let adapter: OrderProductStockCoreAdapter;
 
   beforeEach(() => {
-    productStock = { handleLock: jest.fn(), handleMove: jest.fn() };
-    productStock.handleLock.mockResolvedValue([{ productId: '100', quantity: 8 }]);
-    productStock.handleMove.mockResolvedValue({
+    productStock = { lock: jest.fn(), move: jest.fn() };
+    productStock.lock.mockResolvedValue([{ productId: '100', quantity: 8 }]);
+    productStock.move.mockResolvedValue({
       productStocks: [
         { id: '700', createdAt: '2026-01-05T08:00:00.000Z' },
         { id: '701', createdAt: '2026-01-05T08:00:00.000Z' },
@@ -23,7 +23,7 @@ describe('OrderProductStockCoreAdapter', () => {
     it('locks the products through the core module and answers their stock', async () => {
       const stock = await adapter.lock({ productIds: ['100'] });
 
-      expect(productStock.handleLock).toHaveBeenCalledWith({ productIds: ['100'] });
+      expect(productStock.lock).toHaveBeenCalledWith({ productIds: ['100'] });
       expect(stock).toEqual([{ productId: '100', quantity: 8 }]);
     });
   });
@@ -39,7 +39,7 @@ describe('OrderProductStockCoreAdapter', () => {
         }),
       ).resolves.toBeUndefined();
 
-      expect(productStock.handleMove).toHaveBeenCalledWith({
+      expect(productStock.move).toHaveBeenCalledWith({
         kind: 'subtract',
         movements: [
           { productId: '100', quantity: 1, orderProductId: '620' },

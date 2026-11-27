@@ -1,1 +1,1 @@
-export * from './use-cases/auth-common-find-subject.use-case';
+export * from './cases/auth-common-find-subject.case';

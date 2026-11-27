@@ -1,5 +1,5 @@
-export * from './enums/ledger-append-entry-insert-outcome.enum';
+export * from './enums/ledger-append-process-entry-insert-outcome.enum';
 
-export * from './queries/ledger-append.query';
+export * from './queries/ledger-append-process.query';
 
-export * from './records/ledger-append.record';
+export * from './records/ledger-append-process.record';

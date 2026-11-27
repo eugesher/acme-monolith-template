@@ -6,7 +6,7 @@ import { ApiErrorResponses, ApiIdempotencyKeyHeader, IdempotencyKey } from '@acm
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
-import { ProductStockAddUseCase } from '../application';
+import { ProductStockAddCase } from '../application';
 import { ProductStockExceptionCodeEnum } from '../domain';
 import {
   ProductStockAddRequestDto,
@@ -19,7 +19,7 @@ import {
 @UseFilters(ProductStockHttpExceptionFilter)
 @Controller('warehouse/product-stock')
 export class ProductStockController {
-  constructor(private readonly add: ProductStockAddUseCase) {}
+  constructor(private readonly addCase: ProductStockAddCase) {}
 
   @Post(':productId/add')
   @HttpCode(HttpStatus.OK)
@@ -36,7 +36,7 @@ export class ProductStockController {
       ProductStockExceptionCodeEnum.PRODUCT_STOCK_IDEMPOTENCY_KEY_REUSED,
     ],
   })
-  public async handleAdd(
+  public async add(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: ProductStockProductIdParamDto,
     @Body() body: ProductStockAddRequestDto,
@@ -46,6 +46,6 @@ export class ProductStockController {
     const { productId } = params;
     const { quantity } = body;
 
-    return await this.add.execute({ productId, quantity, staffUserId, idempotencyKey });
+    return await this.addCase.execute({ productId, quantity, staffUserId, idempotencyKey });
   }
 }

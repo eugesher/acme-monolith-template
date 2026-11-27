@@ -5,7 +5,7 @@ import { RequiresPermission } from '@acme-libs/auth';
 import { ApiErrorResponses } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 
-import { RoleCreateUseCase, RoleListUseCase, RoleReassignPermissionsUseCase } from '../application';
+import { RoleCreateCase, RoleListCase, RoleReassignPermissionsCase } from '../application';
 import {
   RoleCreateRequestDto,
   RoleHttpExceptionFilter,
@@ -19,17 +19,17 @@ import {
 @Controller('access/roles')
 export class RoleController {
   constructor(
-    private readonly list: RoleListUseCase,
-    private readonly create: RoleCreateUseCase,
-    private readonly reassignPermissions: RoleReassignPermissionsUseCase,
+    private readonly listCase: RoleListCase,
+    private readonly createCase: RoleCreateCase,
+    private readonly reassignPermissionsCase: RoleReassignPermissionsCase,
   ) {}
 
   @Get()
   @RequiresPermission(PermissionCodeEnum.ACCESS_MANAGE)
   @ApiOperation({ summary: 'List roles and the permissions they grant' })
   @ApiOkResponse({ type: RoleResponseDto, isArray: true })
-  public async handleList(): Promise<RoleResponseDto[]> {
-    return await this.list.execute();
+  public async list(): Promise<RoleResponseDto[]> {
+    return await this.listCase.execute();
   }
 
   @Post()
@@ -40,10 +40,10 @@ export class RoleController {
     filterStatus: RoleHttpExceptionFilter.STATUS,
     codes: [IdentityExceptionCodeEnum.AUTH_ROLE_NAME_TAKEN],
   })
-  public async handleCreate(@Body() body: RoleCreateRequestDto): Promise<RoleResponseDto> {
+  public async create(@Body() body: RoleCreateRequestDto): Promise<RoleResponseDto> {
     const { name, permissionCodes } = body;
 
-    return await this.create.execute({ name, permissionCodes });
+    return await this.createCase.execute({ name, permissionCodes });
   }
 
   @Put(':roleId/permissions')
@@ -54,13 +54,13 @@ export class RoleController {
     filterStatus: RoleHttpExceptionFilter.STATUS,
     codes: [IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND],
   })
-  public async handleReassignPermissions(
+  public async reassignPermissions(
     @Param() params: RoleIdParamDto,
     @Body() body: RolePermissionsReassignRequestDto,
   ): Promise<RoleResponseDto> {
     const { roleId } = params;
     const { permissionCodes } = body;
 
-    return await this.reassignPermissions.execute({ roleId, permissionCodes });
+    return await this.reassignPermissionsCase.execute({ roleId, permissionCodes });
   }
 }

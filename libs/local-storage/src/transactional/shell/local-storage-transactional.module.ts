@@ -7,8 +7,8 @@ import type { ClassProvider, DynamicModule } from '@nestjs/common';
 import { TRANSACTION_PORT, type ITransactionPort } from '@acme-libs/contracts/local-storage';
 
 import {
-  LocalStorageTransactionalAfterCommitUseCase,
-  LocalStorageTransactionalRunUseCase,
+  LocalStorageTransactionalAfterCommitCase,
+  LocalStorageTransactionalRunCase,
 } from '../application';
 import {
   LocalStorageTransactionalContextAdapter,
@@ -31,8 +31,8 @@ export class LocalStorageTransactionalModule {
           provide: TRANSACTION_PORT,
           useClass: LocalStorageTransactionalFacade,
         } satisfies ClassProvider<ITransactionPort>,
-        LocalStorageTransactionalRunUseCase,
-        LocalStorageTransactionalAfterCommitUseCase,
+        LocalStorageTransactionalRunCase,
+        LocalStorageTransactionalAfterCommitCase,
         LocalStorageTransactionalHostAdapter.PROVIDER,
         LocalStorageTransactionalContextAdapter.PROVIDER,
       ],

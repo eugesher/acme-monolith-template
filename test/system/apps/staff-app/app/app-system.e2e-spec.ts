@@ -31,6 +31,6 @@ describe('App', () => {
   });
 
   describe('Queue', () => {
-    queueE2E.handleRetryFailedJob();
+    queueE2E.retryFailedJob();
   });
 });

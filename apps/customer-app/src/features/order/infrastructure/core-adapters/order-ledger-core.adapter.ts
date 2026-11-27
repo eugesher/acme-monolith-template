@@ -24,7 +24,7 @@ export class OrderLedgerCoreAdapter implements IOrderLedgerPort {
   public async appendPlaced(command: IOrderLedgerAppendPlacedCommand): Promise<void> {
     const { subjectId, occurredAt, payload } = command;
 
-    await this.ledger.handleAppendEnqueue({
+    await this.ledger.appendEnqueue({
       operationKey: `order-placed:${subjectId}`,
       subjectType: LedgerSubjectTypeEnum.ORDER,
       subjectId,

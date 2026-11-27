@@ -8,24 +8,20 @@ import type {
   IProductStockCorePort,
 } from '@acme-core/contracts/product-stock';
 
-import { ProductStockCoreLockUseCase, ProductStockCoreMoveUseCase } from '../application';
+import { ProductStockCoreLockCase, ProductStockCoreMoveCase } from '../application';
 
 @Injectable()
 export class ProductStockCoreFacade implements IProductStockCorePort {
   constructor(
-    private readonly lock: ProductStockCoreLockUseCase,
-    private readonly move: ProductStockCoreMoveUseCase,
+    private readonly lockCase: ProductStockCoreLockCase,
+    private readonly moveCase: ProductStockCoreMoveCase,
   ) {}
 
-  public async handleLock(
-    command: IProductStockCoreLockCommand,
-  ): Promise<IProductStockCoreOnHandView[]> {
-    return await this.lock.execute(command);
+  public async lock(command: IProductStockCoreLockCommand): Promise<IProductStockCoreOnHandView[]> {
+    return await this.lockCase.execute(command);
   }
 
-  public async handleMove(
-    command: IProductStockCoreMoveCommand,
-  ): Promise<IProductStockCoreMoveView> {
-    return await this.move.execute(command);
+  public async move(command: IProductStockCoreMoveCommand): Promise<IProductStockCoreMoveView> {
+    return await this.moveCase.execute(command);
   }
 }

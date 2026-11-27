@@ -5,7 +5,7 @@ import { CurrentUser } from '@acme-libs/auth';
 import { ApiErrorResponses, ApiIdempotencyKeyHeader, IdempotencyKey } from '@acme-libs/http';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
-import { OrderGetManyUseCase, OrderGetOneUseCase, OrderPlaceUseCase } from '../application';
+import { OrderGetManyCase, OrderGetOneCase, OrderPlaceCase } from '../application';
 import { OrderExceptionCodeEnum } from '../domain';
 import {
   OrderGetManyQueryDto,
@@ -21,9 +21,9 @@ import {
 @Controller('orders')
 export class OrderController {
   constructor(
-    private readonly place: OrderPlaceUseCase,
-    private readonly getMany: OrderGetManyUseCase,
-    private readonly getOne: OrderGetOneUseCase,
+    private readonly placeCase: OrderPlaceCase,
+    private readonly getManyCase: OrderGetManyCase,
+    private readonly getOneCase: OrderGetOneCase,
   ) {}
 
   @Post()
@@ -40,7 +40,7 @@ export class OrderController {
       OrderExceptionCodeEnum.ORDER_IDEMPOTENCY_KEY_REUSED,
     ],
   })
-  public async handlePlace(
+  public async place(
     @CurrentUser() user: IAuthCurrentUserView,
     @Body() body: OrderPlaceRequestDto,
     @IdempotencyKey() idempotencyKey: string,
@@ -48,20 +48,20 @@ export class OrderController {
     const { id: customerId } = user;
     const { productIds } = body;
 
-    return await this.place.execute({ customerId, productIds, idempotencyKey });
+    return await this.placeCase.execute({ customerId, productIds, idempotencyKey });
   }
 
   @Get()
   @ApiOperation({ summary: 'List the orders of the caller, newest first' })
   @ApiOkResponse({ type: OrderSummaryPageResponseDto })
-  public async handleGetMany(
+  public async getMany(
     @CurrentUser() user: IAuthCurrentUserView,
     @Query() query: OrderGetManyQueryDto,
   ): Promise<OrderSummaryPageResponseDto> {
     const { id: customerId } = user;
     const { page, limit } = query;
 
-    return await this.getMany.execute({ customerId, page, limit });
+    return await this.getManyCase.execute({ customerId, page, limit });
   }
 
   @Get(':orderId')
@@ -71,13 +71,13 @@ export class OrderController {
     filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
-  public async handleGetOne(
+  public async getOne(
     @CurrentUser() user: IAuthCurrentUserView,
     @Param() params: OrderIdParamDto,
   ): Promise<OrderResponseDto> {
     const { id: customerId } = user;
     const { orderId } = params;
 
-    return await this.getOne.execute({ customerId, orderId });
+    return await this.getOneCase.execute({ customerId, orderId });
   }
 }

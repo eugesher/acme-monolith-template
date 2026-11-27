@@ -42,7 +42,7 @@ describe('NoteGetManyQueryDto', () => {
     expect(dto).toEqual({ resolved: true });
   });
 
-  it('leaves half of the subject to the use case', () => {
+  it('leaves half of the subject to the case', () => {
     const dto = plainToInstance(NoteGetManyQueryDto, { subjectType: 'product' });
 
     const errors = validateSync(dto);

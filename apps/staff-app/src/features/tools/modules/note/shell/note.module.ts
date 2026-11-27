@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 
 import {
   NoteAccessService,
-  NoteCreateUseCase,
-  NoteDeleteUseCase,
-  NoteGetManyUseCase,
-  NoteGetOneUseCase,
-  NoteGetRevisionsUseCase,
-  NoteResolveUseCase,
-  NoteUpdateUseCase,
+  NoteCreateCase,
+  NoteDeleteCase,
+  NoteGetManyCase,
+  NoteGetOneCase,
+  NoteGetRevisionsCase,
+  NoteResolveCase,
+  NoteUpdateCase,
   NoteWriteService,
 } from '../application';
 import {
@@ -27,13 +27,13 @@ import { NoteController } from './note.controller';
 @Module({
   controllers: [NoteController],
   providers: [
-    NoteCreateUseCase,
-    NoteGetManyUseCase,
-    NoteGetOneUseCase,
-    NoteUpdateUseCase,
-    NoteResolveUseCase,
-    NoteGetRevisionsUseCase,
-    NoteDeleteUseCase,
+    NoteCreateCase,
+    NoteGetManyCase,
+    NoteGetOneCase,
+    NoteUpdateCase,
+    NoteResolveCase,
+    NoteGetRevisionsCase,
+    NoteDeleteCase,
     NoteAccessService,
     NoteWriteService,
     NoteAccessRepository.PROVIDER,

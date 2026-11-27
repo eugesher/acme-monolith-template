@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 
 import {
   TagAccessService,
-  TagCreateUseCase,
-  TagDeleteUseCase,
-  TagGetManyUseCase,
-  TagUpdateUseCase,
+  TagCreateCase,
+  TagDeleteCase,
+  TagGetManyCase,
+  TagUpdateCase,
 } from '../application';
 import {
   TagAccessRepository,
@@ -19,10 +19,10 @@ import { TagController } from './tag.controller';
 @Module({
   controllers: [TagController],
   providers: [
-    TagCreateUseCase,
-    TagDeleteUseCase,
-    TagGetManyUseCase,
-    TagUpdateUseCase,
+    TagCreateCase,
+    TagDeleteCase,
+    TagGetManyCase,
+    TagUpdateCase,
     TagAccessService,
     TagAccessRepository.PROVIDER,
     TagCreateRepository.PROVIDER,

@@ -54,24 +54,24 @@ describe('App', () => {
   });
 
   describe('Health', () => {
-    healthE2E.handleLiveness();
-    healthE2E.handleReadiness();
+    healthE2E.liveness();
+    healthE2E.readiness();
   });
 
   describe('Auth', () => {
-    authE2E.handleRegister();
-    authE2E.handleLogin();
-    authE2E.handleMe();
+    authE2E.register();
+    authE2E.login();
+    authE2E.me();
   });
 
   describe('Catalog', () => {
     catalogE2E.hooks();
-    catalogE2E.handleProductList();
+    catalogE2E.productList();
   });
 
   describe('Order', () => {
-    orderE2E.handlePlace();
-    orderE2E.handleGetMany();
-    orderE2E.handleGetOne();
+    orderE2E.place();
+    orderE2E.getMany();
+    orderE2E.getOne();
   });
 });

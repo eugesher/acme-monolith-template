@@ -10,28 +10,28 @@ import type {
 } from '@acme-staff/contracts/tag';
 
 import {
-  TagCommonFindSubjectIdsUseCase,
-  TagCommonFindUseCase,
-  TagCommonReplaceUseCase,
+  TagCommonFindCase,
+  TagCommonFindSubjectIdsCase,
+  TagCommonReplaceCase,
 } from '../application';
 
 @Injectable()
 export class TagCommonFacade implements ITagCommonPort {
   constructor(
-    private readonly find: TagCommonFindUseCase,
-    private readonly findSubjectIds: TagCommonFindSubjectIdsUseCase,
-    private readonly replace: TagCommonReplaceUseCase,
+    private readonly findCase: TagCommonFindCase,
+    private readonly findSubjectIdsCase: TagCommonFindSubjectIdsCase,
+    private readonly replaceCase: TagCommonReplaceCase,
   ) {}
 
-  public async handleFind(command: ITagCommonFindCommand): Promise<ITagCommonTagView[]> {
-    return await this.find.execute(command);
+  public async find(command: ITagCommonFindCommand): Promise<ITagCommonTagView[]> {
+    return await this.findCase.execute(command);
   }
 
-  public async handleReplace(command: ITagCommonReplaceCommand): Promise<ITagCommonReplaceView> {
-    return await this.replace.execute(command);
+  public async replace(command: ITagCommonReplaceCommand): Promise<ITagCommonReplaceView> {
+    return await this.replaceCase.execute(command);
   }
 
-  public async handleFindSubjectIds(command: ITagCommonFindSubjectIdsCommand): Promise<string[]> {
-    return await this.findSubjectIds.execute(command);
+  public async findSubjectIds(command: ITagCommonFindSubjectIdsCommand): Promise<string[]> {
+    return await this.findSubjectIdsCase.execute(command);
   }
 }

@@ -22,10 +22,10 @@ export class HealthStatusLibAdapter implements IHealthStatusPort {
   ) {}
 
   public liveness(): IHealthStatusLivenessView {
-    return this.health.handleLiveness();
+    return this.health.checkLiveness();
   }
 
   public async readiness(): Promise<IHealthStatusReadinessView> {
-    return await this.health.handleReadiness();
+    return await this.health.checkReadiness();
   }
 }

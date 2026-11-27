@@ -44,7 +44,7 @@ export class ProductStockIdempotencyCoreAdapter implements IProductStockIdempote
   ): Promise<IProductStockIdempotencyOutcomeView | IProductStockIdempotencyReplayView<T>> {
     const { staffUserId, key, body } = command;
     const scope = ProductStockIdempotencyCoreAdapter.toScope(staffUserId);
-    const coreClaim = await this.idempotency.handleClaim({ scope, key, body });
+    const coreClaim = await this.idempotency.claim({ scope, key, body });
     const { outcome, storedResponse } = coreClaim;
 
     if (outcome === IdempotencyCoreClaimOutcomeEnum.REPLAY) {
@@ -61,14 +61,14 @@ export class ProductStockIdempotencyCoreAdapter implements IProductStockIdempote
     const { staffUserId, key, response } = command;
     const scope = ProductStockIdempotencyCoreAdapter.toScope(staffUserId);
 
-    await this.idempotency.handleComplete({ scope, key, response });
+    await this.idempotency.complete({ scope, key, response });
   }
 
   public async release(command: IProductStockIdempotencyReleaseCommand): Promise<void> {
     const { staffUserId, key } = command;
     const scope = ProductStockIdempotencyCoreAdapter.toScope(staffUserId);
 
-    await this.idempotency.handleRelease({ scope, key });
+    await this.idempotency.release({ scope, key });
   }
 
   private static toScope(staffUserId: string): string {

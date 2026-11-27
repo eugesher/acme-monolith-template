@@ -10,9 +10,9 @@ export class CatalogE2E {
 
   public execute(): void {
     describe('Product', () => {
-      this.productE2E.handleCreate();
-      this.productE2E.handleArchive();
-      this.productE2E.handlePublish();
+      this.productE2E.create();
+      this.productE2E.archive();
+      this.productE2E.publish();
     });
   }
 }

@@ -10,7 +10,7 @@ export class ProductE2E {
     return new ProductE2E(ctx);
   }
 
-  public handleCreate(): void {
+  public create(): void {
     describe('POST /api/catalog/products', () => {
       it('should create a draft and append its ledger entry under the correlation id', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -59,7 +59,7 @@ export class ProductE2E {
     });
   }
 
-  public handleArchive(): void {
+  public archive(): void {
     describe('POST /api/catalog/products/:productId/archive', () => {
       it('should append the ledger entry of the archive under the correlation id', async () => {
         await request(this.ctx.app.getHttpServer())
@@ -94,7 +94,7 @@ export class ProductE2E {
     });
   }
 
-  public handlePublish(): void {
+  public publish(): void {
     describe('POST /api/catalog/products/:productId/publish', () => {
       it('should append the ledger entry of the publication under the correlation id', async () => {
         await request(this.ctx.app.getHttpServer())

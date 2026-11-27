@@ -240,7 +240,7 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('application MAY reach its own outbound and @nestjs/common', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/application/use-cases/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/application/cases/__fixture__.ts',
       code: 'import { x } from "../../outbound";\nimport { Inject } from "@nestjs/common";',
     }).toPassArchitectureLint();
   });
@@ -252,7 +252,7 @@ describe('global modules (global/) — modules without controllers', () => {
     '../../../../contracts/auth',
   ])('application may NOT reach %s', async (source) => {
     await expect({
-      file: 'apps/__global-fixture__/src/global/auth/application/use-cases/__fixture__.ts',
+      file: 'apps/__global-fixture__/src/global/auth/application/cases/__fixture__.ts',
       code: `import { x } from "${source}";`,
     }).toBreakRule('boundaries/dependencies');
   });

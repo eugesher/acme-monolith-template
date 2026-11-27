@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { LedgerCoreModule } from '@acme-core/modules/ledger';
 
-import { AuthLoginUseCase, AuthRegisterUseCase } from '../application';
+import { AuthLoginCase, AuthRegisterCase } from '../application';
 import {
   AuthCredentialsLibAdapter,
   AuthLedgerCoreAdapter,
@@ -15,8 +15,8 @@ import { AuthController } from './auth.controller';
   imports: [LedgerCoreModule],
   controllers: [AuthController],
   providers: [
-    AuthLoginUseCase,
-    AuthRegisterUseCase,
+    AuthLoginCase,
+    AuthRegisterCase,
     AuthLoginRepository.PROVIDER,
     AuthRegisterRepository.PROVIDER,
     AuthCredentialsLibAdapter.PROVIDER,

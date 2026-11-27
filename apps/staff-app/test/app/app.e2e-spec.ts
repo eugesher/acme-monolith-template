@@ -174,13 +174,13 @@ describe('App', () => {
   });
 
   describe('Health', () => {
-    healthE2E.handleLiveness();
-    healthE2E.handleReadiness();
+    healthE2E.liveness();
+    healthE2E.readiness();
   });
 
   describe('Auth', () => {
-    authE2E.handleLogin();
-    authE2E.handleMe();
+    authE2E.login();
+    authE2E.me();
   });
 
   describe('Access', () => {
@@ -188,15 +188,15 @@ describe('App', () => {
   });
 
   describe('Ledger', () => {
-    ledgerE2E.handleList();
-    ledgerE2E.handleAppendEnqueue();
+    ledgerE2E.listEntries();
+    ledgerE2E.appendEnqueue();
   });
 
   describe('Queue', () => {
-    queueE2E.handleList();
-    queueE2E.handleListFailedJobs();
-    queueE2E.handleRetryFailedJob();
-    queueE2E.handleDeleteFailedJob();
+    queueE2E.list();
+    queueE2E.listFailedJobs();
+    queueE2E.retryFailedJob();
+    queueE2E.deleteFailedJob();
   });
 
   describe('Tools', () => {

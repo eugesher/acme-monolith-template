@@ -80,21 +80,21 @@ describe('features', () => {
 
     it('application MAY reach its own domain and outbound', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../domain";\nimport { y } from "../../outbound";',
       }).toPassArchitectureLint();
     });
 
     it('application may NOT reach infrastructure', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../infrastructure";',
       }).toBreakRule('boundaries/dependencies');
     });
 
     it('application may NOT reach entities — tables are infrastructure', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../../../../../../core/entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -135,14 +135,14 @@ describe('features', () => {
 
     it('application MAY use the observability lib', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../../../../../../libs/observability/src";',
       }).toPassArchitectureLint();
     });
 
     it('application may NOT use the cache lib — caching is an adapter behind a port', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../../../../../../libs/cache/src";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -175,7 +175,7 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it('presentation may NOT reach application — the controller calls the use cases', async () => {
+    it('presentation may NOT reach application — the controller calls the cases', async () => {
       await expect({
         file: 'apps/__features-fixture__/src/features/product/presentation/dto/__fixture__.ts',
         code: 'import { x } from "../../application";',
@@ -229,7 +229,7 @@ describe('features', () => {
 
     it('application MAY import the DI decorators of @nestjs/common', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { Inject, Injectable } from "@nestjs/common";',
       }).toPassArchitectureLint();
     });
@@ -378,7 +378,7 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['application/use-cases', 'infrastructure/persistence', 'shell'])(
+    it.each(['application/cases', 'infrastructure/persistence', 'shell'])(
       '%s may NOT take the credentials or health port — a lib port is reached through infrastructure/lib-adapters',
       async (layer) => {
         await expect({
@@ -402,7 +402,7 @@ describe('features', () => {
       }).toPassArchitectureLint();
     });
 
-    it.each(['infrastructure/persistence', 'infrastructure/lib-adapters', 'application/use-cases'])(
+    it.each(['infrastructure/persistence', 'infrastructure/lib-adapters', 'application/cases'])(
       '%s may NOT take the config lib — a config value is bound in infrastructure/config',
       async (layer) => {
         await expect({
@@ -454,28 +454,28 @@ describe('features', () => {
   describe('layer barrels', () => {
     it('a cross-layer import may NOT skip the target layer barrel', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../domain/models/product.model";',
       }).toBreakRule('no-restricted-syntax');
     });
 
     it('a cross-layer re-export may NOT skip the target layer barrel', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'export * from "../../domain/models/product.model";',
       }).toBreakRule('no-restricted-syntax');
     });
 
     it('a cross-layer dynamic import may NOT skip the target layer barrel', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'export const load = () => import("../../domain/models/product.model");',
       }).toBreakRule('no-restricted-syntax');
     });
 
     it('a cross-layer import MAY go through the target layer barrel', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        file: 'apps/__features-fixture__/src/features/product/application/cases/__fixture__.ts',
         code: 'import { x } from "../../domain";',
       }).toPassArchitectureLint();
     });

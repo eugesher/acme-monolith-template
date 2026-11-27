@@ -6,10 +6,10 @@ import { ApiErrorResponses } from '@acme-libs/http';
 import { PermissionCodeEnum } from '@acme-libs/kernel';
 
 import {
-  OrderGetManyUseCase,
-  OrderGetOneUseCase,
-  OrderGetTagsUseCase,
-  OrderReplaceTagsUseCase,
+  OrderGetManyCase,
+  OrderGetOneCase,
+  OrderGetTagsCase,
+  OrderReplaceTagsCase,
 } from '../application';
 import { OrderExceptionCodeEnum } from '../domain';
 import {
@@ -27,22 +27,20 @@ import {
 @Controller('sales/orders')
 export class OrderController {
   constructor(
-    private readonly getMany: OrderGetManyUseCase,
-    private readonly getOne: OrderGetOneUseCase,
-    private readonly getTags: OrderGetTagsUseCase,
-    private readonly replaceTags: OrderReplaceTagsUseCase,
+    private readonly getManyCase: OrderGetManyCase,
+    private readonly getOneCase: OrderGetOneCase,
+    private readonly getTagsCase: OrderGetTagsCase,
+    private readonly replaceTagsCase: OrderReplaceTagsCase,
   ) {}
 
   @Get()
   @RequiresPermission(PermissionCodeEnum.ORDER_READ)
   @ApiOperation({ summary: 'List the orders of all customers, newest first, optionally by tag' })
   @ApiOkResponse({ type: OrderSummaryPageResponseDto })
-  public async handleGetMany(
-    @Query() query: OrderGetManyQueryDto,
-  ): Promise<OrderSummaryPageResponseDto> {
+  public async getMany(@Query() query: OrderGetManyQueryDto): Promise<OrderSummaryPageResponseDto> {
     const { page, limit, tagId } = query;
 
-    return await this.getMany.execute({ page, limit, tagId });
+    return await this.getManyCase.execute({ page, limit, tagId });
   }
 
   @Get(':orderId')
@@ -53,10 +51,10 @@ export class OrderController {
     filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
-  public async handleGetOne(@Param() params: OrderIdParamDto): Promise<OrderResponseDto> {
+  public async getOne(@Param() params: OrderIdParamDto): Promise<OrderResponseDto> {
     const { orderId } = params;
 
-    return await this.getOne.execute({ orderId });
+    return await this.getOneCase.execute({ orderId });
   }
 
   @Get(':orderId/tags')
@@ -67,10 +65,10 @@ export class OrderController {
     filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND],
   })
-  public async handleGetTags(@Param() params: OrderIdParamDto): Promise<OrderTagsResponseDto> {
+  public async getTags(@Param() params: OrderIdParamDto): Promise<OrderTagsResponseDto> {
     const { orderId } = params;
 
-    return await this.getTags.execute({ orderId });
+    return await this.getTagsCase.execute({ orderId });
   }
 
   @Put(':orderId/tags')
@@ -81,13 +79,13 @@ export class OrderController {
     filterStatus: OrderHttpExceptionFilter.STATUS,
     codes: [OrderExceptionCodeEnum.ORDER_NOT_FOUND, OrderExceptionCodeEnum.ORDER_TAG_NOT_FOUND],
   })
-  public async handleReplaceTags(
+  public async replaceTags(
     @Param() params: OrderIdParamDto,
     @Body() body: OrderTagsReplaceRequestDto,
   ): Promise<OrderTagsResponseDto> {
     const { orderId } = params;
     const { tagIds } = body;
 
-    return await this.replaceTags.execute({ orderId, tagIds });
+    return await this.replaceTagsCase.execute({ orderId, tagIds });
   }
 }

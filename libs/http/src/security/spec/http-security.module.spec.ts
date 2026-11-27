@@ -25,7 +25,7 @@ describe('HttpSecurityModule', () => {
     @Controller()
     class FixtureController {
       @Get('orders')
-      public handleOrders(): { id: number } {
+      public orders(): { id: number } {
         return { id: 1 };
       }
     }
