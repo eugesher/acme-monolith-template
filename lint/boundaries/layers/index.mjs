@@ -40,7 +40,6 @@ import { appsFeaturesUnitInfrastructureIndex } from './apps/features/unit/infras
 import { appsFeaturesUnitInfrastructureLibAdaptersSpec } from './apps/features/unit/infrastructure/lib-adapters-spec.mjs';
 import { appsFeaturesUnitInfrastructureLibAdapters } from './apps/features/unit/infrastructure/lib-adapters.mjs';
 import { appsFeaturesUnitInfrastructurePersistence } from './apps/features/unit/infrastructure/persistence.mjs';
-import { appsFeaturesUnitInfrastructureQueueSpec } from './apps/features/unit/infrastructure/queue-spec.mjs';
 import { appsFeaturesUnitInfrastructureQueue } from './apps/features/unit/infrastructure/queue.mjs';
 import { appsFeaturesUnitModulesIndex } from './apps/features/unit/modules-index.mjs';
 import { appsFeaturesUnitOutboundIndex } from './apps/features/unit/outbound/outbound-index.mjs';
@@ -89,7 +88,6 @@ import { appsProcessorsUnitInfrastructureCoreAdapters } from './apps/processors/
 import { appsProcessorsUnitInfrastructureIndex } from './apps/processors/unit/infrastructure/infrastructure-index.mjs';
 import { appsProcessorsUnitInfrastructureLibAdapters } from './apps/processors/unit/infrastructure/lib-adapters.mjs';
 import { appsProcessorsUnitInfrastructurePersistence } from './apps/processors/unit/infrastructure/persistence.mjs';
-import { appsProcessorsUnitInfrastructureQueueSpec } from './apps/processors/unit/infrastructure/queue-spec.mjs';
 import { appsProcessorsUnitInfrastructureQueue } from './apps/processors/unit/infrastructure/queue.mjs';
 import { appsProcessorsUnitModulesIndex } from './apps/processors/unit/modules-index.mjs';
 import { appsProcessorsUnitOutboundIndex } from './apps/processors/unit/outbound/outbound-index.mjs';
@@ -303,10 +301,8 @@ export const layers = layersOf(import.meta.dirname, [
   appsFeaturesUnitInfrastructureCoreAdaptersSpec,
   appsFeaturesUnitInfrastructureCommonAdaptersSpec,
   appsFeaturesUnitInfrastructureLibAdaptersSpec,
-  appsFeaturesUnitInfrastructureQueueSpec,
   appsFeaturesUnitInfrastructureConfigSpec,
   appsProcessorsUnitInfrastructureCoreAdaptersSpec,
-  appsProcessorsUnitInfrastructureQueueSpec,
   appsProcessorsUnitInfrastructureConfigSpec,
   libsContractsDatabase,
   libsApp,
