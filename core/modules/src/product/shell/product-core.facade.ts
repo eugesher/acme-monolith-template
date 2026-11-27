@@ -6,15 +6,13 @@ import type {
   IProductCorePort,
 } from '@acme-core/contracts/product';
 
-import { ProductCoreArchiveUseCase } from '../application';
+import { ProductCoreArchiveCase } from '../application';
 
 @Injectable()
 export class ProductCoreFacade implements IProductCorePort {
-  constructor(private readonly archive: ProductCoreArchiveUseCase) {}
+  constructor(private readonly archiveCase: ProductCoreArchiveCase) {}
 
-  public async handleArchive(
-    command: IProductCoreArchiveCommand,
-  ): Promise<IProductCoreArchiveView> {
-    return await this.archive.execute(command);
+  public async archive(command: IProductCoreArchiveCommand): Promise<IProductCoreArchiveView> {
+    return await this.archiveCase.execute(command);
   }
 }

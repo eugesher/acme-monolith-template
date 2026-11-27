@@ -39,7 +39,7 @@ export class AuthJwtGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const user = await this.validator.handleValidate({ token });
+    const user = await this.validator.validateSubject({ token });
 
     if (!user) {
       throw new UnauthorizedException();

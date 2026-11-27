@@ -24,7 +24,7 @@ export class AuthLedgerCoreAdapter implements IAuthLedgerPort {
   public async appendRegistered(command: IAuthLedgerAppendRegisteredCommand): Promise<void> {
     const { subjectId, occurredAt } = command;
 
-    await this.ledger.handleAppendEnqueue({
+    await this.ledger.appendEnqueue({
       operationKey: `customer-registered:${subjectId}`,
       subjectType: LedgerSubjectTypeEnum.CUSTOMER,
       subjectId,

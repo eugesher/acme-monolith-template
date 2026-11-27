@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { AuthCommonModule } from '@acme-staff/common/modules';
 
-import { AuthLoginUseCase, AuthMeUseCase } from '../application';
+import { AuthLoginCase, AuthMeCase } from '../application';
 import {
   AuthCredentialsLibAdapter,
   AuthIdentityCommonAdapter,
@@ -14,8 +14,8 @@ import { AuthController } from './auth.controller';
   imports: [AuthCommonModule],
   controllers: [AuthController],
   providers: [
-    AuthLoginUseCase,
-    AuthMeUseCase,
+    AuthLoginCase,
+    AuthMeCase,
     AuthLoginRepository.PROVIDER,
     AuthCredentialsLibAdapter.PROVIDER,
     AuthIdentityCommonAdapter.PROVIDER,

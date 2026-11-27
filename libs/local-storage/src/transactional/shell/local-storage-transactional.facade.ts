@@ -3,15 +3,15 @@ import { Injectable } from '@nestjs/common';
 import type { ITransactionPort } from '@acme-libs/contracts/local-storage';
 
 import {
-  LocalStorageTransactionalAfterCommitUseCase,
-  LocalStorageTransactionalRunUseCase,
+  LocalStorageTransactionalAfterCommitCase,
+  LocalStorageTransactionalRunCase,
 } from '../application';
 
 @Injectable()
 export class LocalStorageTransactionalFacade implements ITransactionPort {
   constructor(
-    private readonly runCase: LocalStorageTransactionalRunUseCase,
-    private readonly afterCommitCase: LocalStorageTransactionalAfterCommitUseCase,
+    private readonly runCase: LocalStorageTransactionalRunCase,
+    private readonly afterCommitCase: LocalStorageTransactionalAfterCommitCase,
   ) {}
 
   public async run<T>(work: () => Promise<T>): Promise<T> {

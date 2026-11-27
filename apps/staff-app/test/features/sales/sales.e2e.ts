@@ -10,10 +10,10 @@ export class SalesE2E {
 
   public execute(): void {
     describe('Order', () => {
-      this.orderE2E.handleGetMany();
-      this.orderE2E.handleGetOne();
-      this.orderE2E.handleGetTags();
-      this.orderE2E.handleReplaceTags();
+      this.orderE2E.getMany();
+      this.orderE2E.getOne();
+      this.orderE2E.getTags();
+      this.orderE2E.replaceTags();
     });
   }
 }

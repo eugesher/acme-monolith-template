@@ -10,7 +10,7 @@ export class NoteE2E {
     return new NoteE2E(ctx);
   }
 
-  public handleGetMany(): void {
+  public getMany(): void {
     describe('GET /api/tools/notes', () => {
       it('should list the notes of one subject, newest first', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -53,7 +53,7 @@ export class NoteE2E {
     });
   }
 
-  public handleGetOne(): void {
+  public getOne(): void {
     describe('GET /api/tools/notes/:noteId', () => {
       it('should read one note', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -84,7 +84,7 @@ export class NoteE2E {
     });
   }
 
-  public handleGetRevisions(): void {
+  public getRevisions(): void {
     describe('GET /api/tools/notes/:noteId/revisions', () => {
       it('should list the revisions of a note', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -115,7 +115,7 @@ export class NoteE2E {
     });
   }
 
-  public handleCreate(): void {
+  public create(): void {
     describe('POST /api/tools/notes', () => {
       it('should create an unresolved note on an opaque subject', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query('SELECT MAX(id) AS lastId FROM note');
@@ -159,7 +159,7 @@ export class NoteE2E {
     });
   }
 
-  public handleUpdate(): void {
+  public update(): void {
     describe('PATCH /api/tools/notes/:noteId', () => {
       it('should rewrite the body under a matching If-Match and record a revision under the correlation id', async () => {
         const [{ lastId }] = await this.ctx.dataSource.query(
@@ -315,7 +315,7 @@ export class NoteE2E {
     });
   }
 
-  public handleResolve(): void {
+  public resolve(): void {
     describe('POST /api/tools/notes/:noteId/resolve', () => {
       it('should resolve a note under a matching If-Match', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -372,7 +372,7 @@ export class NoteE2E {
     });
   }
 
-  public handleDelete(): void {
+  public delete(): void {
     describe('DELETE /api/tools/notes/:noteId', () => {
       it('should soft-delete a note and hide it from every read', async () => {
         const response = await request(this.ctx.app.getHttpServer())

@@ -34,7 +34,7 @@ describe('AuthJwtModule', () => {
         {
           provide: AUTH_USER_VALIDATOR_PORT,
           useValue: {
-            handleValidate: (command: { token: string }) => {
+            validateSubject: (command: { token: string }) => {
               const users: Record<string, IAuthCurrentUserView> = {
                 'ann-token': { id: 'ann', email: 'ann@example.com' },
               };

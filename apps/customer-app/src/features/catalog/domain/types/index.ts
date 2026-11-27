@@ -1,3 +1,3 @@
-export * from './data/catalog-product-list-reconstitute.interface';
+export * from './data/catalog-get-product-list-reconstitute.interface';
 
-export * from './snapshots/catalog-product-list-snapshot.interface';
+export * from './snapshots/catalog-get-product-list-snapshot.interface';

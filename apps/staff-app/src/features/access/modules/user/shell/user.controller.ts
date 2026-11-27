@@ -5,7 +5,7 @@ import { RequiresPermission } from '@acme-libs/auth';
 import { ApiErrorResponses } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum, PermissionCodeEnum } from '@acme-libs/kernel';
 
-import { UserReassignRolesUseCase, UserRegisterUseCase } from '../application';
+import { UserReassignRolesCase, UserRegisterCase } from '../application';
 import {
   UserHttpExceptionFilter,
   UserIdParamDto,
@@ -20,8 +20,8 @@ import {
 @Controller('access/users')
 export class UserController {
   constructor(
-    private readonly register: UserRegisterUseCase,
-    private readonly reassignRoles: UserReassignRolesUseCase,
+    private readonly registerCase: UserRegisterCase,
+    private readonly reassignRolesCase: UserReassignRolesCase,
   ) {}
 
   @Post()
@@ -37,10 +37,10 @@ export class UserController {
       IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
     ],
   })
-  public async handleRegister(@Body() body: UserRegisterRequestDto): Promise<UserResponseDto> {
+  public async register(@Body() body: UserRegisterRequestDto): Promise<UserResponseDto> {
     const { email, password, roleIds } = body;
 
-    return await this.register.execute({ email, password, roleIds });
+    return await this.registerCase.execute({ email, password, roleIds });
   }
 
   @Put(':userId/roles')
@@ -54,13 +54,13 @@ export class UserController {
       IdentityExceptionCodeEnum.AUTH_ROLE_NOT_FOUND,
     ],
   })
-  public async handleReassignRoles(
+  public async reassignRoles(
     @Param() params: UserIdParamDto,
     @Body() body: UserRolesReassignRequestDto,
   ): Promise<UserRolesResponseDto> {
     const { userId } = params;
     const { roleIds } = body;
 
-    return await this.reassignRoles.execute({ userId, roleIds });
+    return await this.reassignRolesCase.execute({ userId, roleIds });
   }
 }

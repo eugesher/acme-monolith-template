@@ -104,7 +104,7 @@ describe('core modules', () => {
       'ledger may NOT reach %s — the journal records facts, it never asks who the user is',
       async (_, source) => {
         await expect({
-          file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
+          file: 'core/modules/src/__ledger-fixture__/application/cases/__fixture__.ts',
           code: `import { x } from "${source}";`,
         }).toBreakRule('boundaries/dependencies');
       },
@@ -112,7 +112,7 @@ describe('core modules', () => {
 
     it('a core module MAY reach its own contracts through the alias', async () => {
       await expect({
-        file: 'core/modules/src/__product-fixture__/application/use-cases/__fixture__.ts',
+        file: 'core/modules/src/__product-fixture__/application/cases/__fixture__.ts',
         code: 'import { PRODUCT_CORE_PORT } from "@acme-core/contracts/__product-fixture__";',
       }).toPassArchitectureLint();
     });
@@ -277,7 +277,7 @@ describe('core modules', () => {
 
     it('application may NOT reach the credentials contract — the lib adapter talks to it', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/application/cases/__fixture__.ts',
         code: 'import { CREDENTIALS_PORT } from "@acme-libs/contracts/credentials";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -315,14 +315,14 @@ describe('core modules', () => {
 
     it('application MAY take the logger', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/application/cases/__fixture__.ts',
         code: 'import { PinoLogger } from "nestjs-pino";',
       }).toPassArchitectureLint();
     });
 
     it('application may NOT take the transaction port, the transaction adapter of the module wraps it', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/application/cases/__fixture__.ts',
         code: 'import { TRANSACTION_PORT } from "@acme-libs/contracts/local-storage";',
       }).toBreakRule('boundaries/dependencies');
     });
@@ -336,7 +336,7 @@ describe('core modules', () => {
 
     it('application may NOT take the cache port, caching is an adapter behind a port', async () => {
       await expect({
-        file: 'core/modules/src/__ledger-fixture__/application/use-cases/__fixture__.ts',
+        file: 'core/modules/src/__ledger-fixture__/application/cases/__fixture__.ts',
         code: 'import { CACHE_PORT } from "@acme-libs/contracts/cache";',
       }).toBreakRule('boundaries/dependencies');
     });

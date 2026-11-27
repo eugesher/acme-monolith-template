@@ -77,7 +77,7 @@ describe('specs the coverage cannot ask for', () => {
         'core/modules/src/item/shell/spec/item-core.facade.spec.ts',
         'apps/x/src/processors/item/shell/spec/item.processor.spec.ts',
         'libs/x/src/shell/spec/x.module.spec.ts',
-        'apps/x/src/features/item/application/use-cases/spec/item-create.use-case.spec.ts',
+        'apps/x/src/features/item/application/cases/spec/item-create.case.spec.ts',
       ]);
 
       expect(unwanted).toEqual([

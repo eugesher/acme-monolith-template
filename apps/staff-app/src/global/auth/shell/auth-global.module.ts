@@ -4,7 +4,7 @@ import { AuthJwtModule, AuthPermissionModule } from '@acme-libs/auth';
 import { AUTH_USER_VALIDATOR_PORT, type IAuthUserValidatorPort } from '@acme-libs/contracts/auth';
 import { AuthCommonModule } from '@acme-staff/common/modules';
 
-import { AuthGlobalValidateSubjectUseCase } from '../application';
+import { AuthGlobalValidateSubjectCase } from '../application';
 import { AuthGlobalCredentialsLibAdapter, AuthGlobalSubjectCommonAdapter } from '../infrastructure';
 import { AuthGlobalFacade } from './auth-global.facade';
 
@@ -17,7 +17,7 @@ import { AuthGlobalFacade } from './auth-global.facade';
       provide: AUTH_USER_VALIDATOR_PORT,
       useClass: AuthGlobalFacade,
     } satisfies ClassProvider<IAuthUserValidatorPort>,
-    AuthGlobalValidateSubjectUseCase,
+    AuthGlobalValidateSubjectCase,
     AuthGlobalSubjectCommonAdapter.PROVIDER,
     AuthGlobalCredentialsLibAdapter.PROVIDER,
   ],

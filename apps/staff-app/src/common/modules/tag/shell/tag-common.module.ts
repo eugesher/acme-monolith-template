@@ -3,9 +3,9 @@ import { Module, type ClassProvider } from '@nestjs/common';
 import { TAG_COMMON_PORT, type ITagCommonPort } from '@acme-staff/contracts/tag';
 
 import {
-  TagCommonFindSubjectIdsUseCase,
-  TagCommonFindUseCase,
-  TagCommonReplaceUseCase,
+  TagCommonFindCase,
+  TagCommonFindSubjectIdsCase,
+  TagCommonReplaceCase,
 } from '../application';
 import {
   TagCommonFindRepository,
@@ -19,9 +19,9 @@ import { TagCommonFacade } from './tag-common.facade';
   exports: [TAG_COMMON_PORT],
   providers: [
     { provide: TAG_COMMON_PORT, useClass: TagCommonFacade } satisfies ClassProvider<ITagCommonPort>,
-    TagCommonFindSubjectIdsUseCase,
-    TagCommonFindUseCase,
-    TagCommonReplaceUseCase,
+    TagCommonFindSubjectIdsCase,
+    TagCommonFindCase,
+    TagCommonReplaceCase,
     TagCommonFindRepository.PROVIDER,
     TagCommonFindSubjectIdsRepository.PROVIDER,
     TagCommonReplaceRepository.PROVIDER,

@@ -1,3 +1,3 @@
-export * from './use-cases/role-create.use-case';
-export * from './use-cases/role-list.use-case';
-export * from './use-cases/role-reassign-permissions.use-case';
+export * from './cases/role-create.case';
+export * from './cases/role-get-many.case';
+export * from './cases/role-reassign-permissions.case';

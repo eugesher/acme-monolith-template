@@ -3,23 +3,23 @@ import type { OnApplicationBootstrap } from '@nestjs/common';
 
 import { CorrelationContextHelper } from '@acme-libs/observability';
 
-import { IdempotencyPurgeScheduleUseCase, IdempotencyPurgeUseCase } from '../application';
+import { IdempotencyPurgeProcessCase, IdempotencyPurgeScheduleCase } from '../application';
 import { IdempotencyPurgeQueue } from '../queues';
 
 @Processor(IdempotencyPurgeQueue.NAME)
 export class IdempotencyPurgeProcessor extends WorkerHost implements OnApplicationBootstrap {
   constructor(
-    private readonly schedule: IdempotencyPurgeScheduleUseCase,
-    private readonly purge: IdempotencyPurgeUseCase,
+    private readonly scheduleCase: IdempotencyPurgeScheduleCase,
+    private readonly processCase: IdempotencyPurgeProcessCase,
   ) {
     super();
   }
 
   public async onApplicationBootstrap(): Promise<void> {
-    await CorrelationContextHelper.run(undefined, () => this.schedule.execute());
+    await CorrelationContextHelper.run(undefined, () => this.scheduleCase.execute());
   }
 
   public async process(): Promise<void> {
-    await CorrelationContextHelper.run(undefined, () => this.purge.execute());
+    await CorrelationContextHelper.run(undefined, () => this.processCase.execute());
   }
 }

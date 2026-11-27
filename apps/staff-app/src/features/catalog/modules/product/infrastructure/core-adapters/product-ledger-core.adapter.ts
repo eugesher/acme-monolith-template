@@ -25,7 +25,7 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
   public async appendCreated(command: IProductLedgerAppendCreatedCommand): Promise<void> {
     const { subjectId, occurredAt, payload } = command;
 
-    await this.ledger.handleAppendEnqueue({
+    await this.ledger.appendEnqueue({
       operationKey: `product-created:${subjectId}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,
@@ -38,7 +38,7 @@ export class ProductLedgerCoreAdapter implements IProductLedgerPort {
   public async appendPublished(command: IProductLedgerAppendPublishedCommand): Promise<void> {
     const { subjectId, version, occurredAt, payload } = command;
 
-    await this.ledger.handleAppendEnqueue({
+    await this.ledger.appendEnqueue({
       operationKey: `product-published:${subjectId}:${version}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,

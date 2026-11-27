@@ -10,7 +10,7 @@ export class OrderE2E {
     return new OrderE2E(ctx);
   }
 
-  public handleGetMany(): void {
+  public getMany(): void {
     describe('GET /api/sales/orders', () => {
       it('should list the orders of every customer, newest first', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -60,7 +60,7 @@ export class OrderE2E {
     });
   }
 
-  public handleGetOne(): void {
+  public getOne(): void {
     describe('GET /api/sales/orders/:orderId', () => {
       it('should read the order of any customer with its products', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -91,7 +91,7 @@ export class OrderE2E {
     });
   }
 
-  public handleGetTags(): void {
+  public getTags(): void {
     describe('GET /api/sales/orders/:orderId/tags', () => {
       it('should read the tags of the order, by name', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -122,7 +122,7 @@ export class OrderE2E {
     });
   }
 
-  public handleReplaceTags(): void {
+  public replaceTags(): void {
     describe('PUT /api/sales/orders/:orderId/tags', () => {
       afterEach(async () => {
         await this.ctx.dataSource.query(

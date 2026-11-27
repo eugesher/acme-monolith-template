@@ -1,5 +1,5 @@
 import type { IPage } from '@acme-libs/toolkit';
 
-import type { ICatalogProductListRecordItem } from '../records/catalog-product-list.record';
+import type { ICatalogGetProductListRecordItem } from '../records/catalog-get-product-list.record';
 
-export type ICatalogCacheProductListView = IPage<ICatalogProductListRecordItem>;
+export type ICatalogCacheProductListView = IPage<ICatalogGetProductListRecordItem>;

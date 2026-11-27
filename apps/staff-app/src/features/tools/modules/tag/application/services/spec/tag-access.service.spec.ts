@@ -18,7 +18,7 @@ describe('TagAccessService', () => {
   });
 
   describe('load', () => {
-    it('answers the stored tag rebuilt by the model of the use case', async () => {
+    it('answers the stored tag rebuilt by the model of the case', async () => {
       const tag = await service.load({ tagId: '300' }, TagUpdateModel.reconstitute);
 
       expect(repository.findOne).toHaveBeenCalledWith('300');

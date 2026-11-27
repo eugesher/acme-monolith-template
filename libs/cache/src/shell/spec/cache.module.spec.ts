@@ -87,14 +87,14 @@ describe('CacheModule', () => {
   it('fails a read at once while Redis is down', async () => {
     await connectionError;
 
-    await expect(port.handleGet('k')).rejects.toThrow();
+    await expect(port.get('k')).rejects.toThrow();
   });
 
   it('keeps invalidation and read-through working while Redis is down', async () => {
     await connectionError;
 
-    const unlinked = await port.handleDelByPrefix('acme:');
-    const value = await port.handleWrap({
+    const unlinked = await port.delByPrefix('acme:');
+    const value = await port.wrap({
       key: 'k',
       ttlMs: 1000,
       compute: () => Promise.resolve('v'),

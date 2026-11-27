@@ -3,11 +3,11 @@ import { Module } from '@nestjs/common';
 import { LedgerAppendQueue, ProductStockPostSubtractQueue } from '@acme-core/queues';
 
 import {
-  QueueDeleteFailedJobUseCase,
+  QueueDeleteFailedJobCase,
   QueueFailedJobService,
-  QueueListFailedJobsUseCase,
-  QueueListUseCase,
-  QueueRetryFailedJobUseCase,
+  QueueGetFailedJobsCase,
+  QueueGetManyCase,
+  QueueRetryFailedJobCase,
 } from '../application';
 import { QueueRegistryAdapter } from '../infrastructure';
 import { QueueController } from './queue.controller';
@@ -16,10 +16,10 @@ import { QueueController } from './queue.controller';
   imports: [LedgerAppendQueue.register(), ProductStockPostSubtractQueue.register()],
   controllers: [QueueController],
   providers: [
-    QueueListUseCase,
-    QueueListFailedJobsUseCase,
-    QueueRetryFailedJobUseCase,
-    QueueDeleteFailedJobUseCase,
+    QueueGetManyCase,
+    QueueGetFailedJobsCase,
+    QueueRetryFailedJobCase,
+    QueueDeleteFailedJobCase,
     QueueFailedJobService,
     QueueRegistryAdapter.PROVIDER,
   ],

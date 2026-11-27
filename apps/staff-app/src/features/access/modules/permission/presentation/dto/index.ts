@@ -1,1 +1,1 @@
-export * from './responses/permission-list.response.dto';
+export * from './responses/permission-get-many.response.dto';

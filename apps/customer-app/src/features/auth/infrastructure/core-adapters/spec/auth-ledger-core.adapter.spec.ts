@@ -7,8 +7,8 @@ describe('AuthLedgerCoreAdapter', () => {
   let adapter: AuthLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleAppendEnqueue: jest.fn() };
-    ledger.handleAppendEnqueue.mockResolvedValue(undefined);
+    ledger = { appendEnqueue: jest.fn() };
+    ledger.appendEnqueue.mockResolvedValue(undefined);
     adapter = new AuthLedgerCoreAdapter(ledger);
   });
 
@@ -19,8 +19,8 @@ describe('AuthLedgerCoreAdapter', () => {
         occurredAt: '2026-01-05T08:00:00.000Z',
       });
 
-      expect(ledger.handleAppendEnqueue).toHaveBeenCalledTimes(1);
-      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
+      expect(ledger.appendEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.appendEnqueue).toHaveBeenCalledWith({
         operationKey: 'customer-registered:customer-1',
         subjectType: 'customer',
         subjectId: 'customer-1',

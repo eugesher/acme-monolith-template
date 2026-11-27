@@ -1,1 +1,1 @@
-export * from './use-cases/product-core-archive.use-case';
+export * from './cases/product-core-archive.case';

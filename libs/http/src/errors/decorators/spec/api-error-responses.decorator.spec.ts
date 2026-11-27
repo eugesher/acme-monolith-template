@@ -14,14 +14,14 @@ describe('ApiErrorResponses', () => {
         },
         codes: ['ITEM_NAME_TAKEN', 'ITEM_NOT_FOUND', 'ITEM_ARCHIVED'],
       })
-      public handleRename(this: void): string {
+      public rename(this: void): string {
         return 'renamed';
       }
     }
 
     const responses: unknown = Reflect.getMetadata(
       'swagger/apiResponse',
-      ItemController.prototype.handleRename,
+      ItemController.prototype.rename,
     );
 
     expect(responses).toEqual({
@@ -40,14 +40,14 @@ describe('ApiErrorResponses', () => {
         filterStatus: { ITEM_NAME_INVALID: HttpStatus.BAD_REQUEST },
         codes: ['ITEM_NAME_INVALID'],
       })
-      public handleCreate(this: void): string {
+      public create(this: void): string {
         return 'created';
       }
     }
 
     const responses: unknown = Reflect.getMetadata(
       'swagger/apiResponse',
-      ItemController.prototype.handleCreate,
+      ItemController.prototype.create,
     );
 
     expect(responses).toEqual({

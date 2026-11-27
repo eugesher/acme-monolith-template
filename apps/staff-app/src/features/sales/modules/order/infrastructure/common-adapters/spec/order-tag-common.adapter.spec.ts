@@ -7,9 +7,9 @@ describe('OrderTagCommonAdapter', () => {
   let adapter: OrderTagCommonAdapter;
 
   beforeEach(() => {
-    tag = { handleFind: jest.fn(), handleReplace: jest.fn(), handleFindSubjectIds: jest.fn() };
-    tag.handleFind.mockResolvedValue([{ id: '302', name: 'vip' }]);
-    tag.handleFindSubjectIds.mockResolvedValue(['600']);
+    tag = { find: jest.fn(), replace: jest.fn(), findSubjectIds: jest.fn() };
+    tag.find.mockResolvedValue([{ id: '302', name: 'vip' }]);
+    tag.findSubjectIds.mockResolvedValue(['600']);
     adapter = new OrderTagCommonAdapter(tag);
   });
 
@@ -17,14 +17,14 @@ describe('OrderTagCommonAdapter', () => {
     it('reads the tags of the order through the common module', async () => {
       const tags = await adapter.find({ orderId: '600' });
 
-      expect(tag.handleFind).toHaveBeenCalledWith({ subjectType: 'order', subjectId: '600' });
+      expect(tag.find).toHaveBeenCalledWith({ subjectType: 'order', subjectId: '600' });
       expect(tags).toEqual([{ id: '302', name: 'vip' }]);
     });
   });
 
   describe('replace', () => {
     it('replaces the tags of the order through the common module', async () => {
-      tag.handleReplace.mockResolvedValue({
+      tag.replace.mockResolvedValue({
         outcome: TagCommonReplaceOutcomeEnum.REPLACED,
         tags: [{ id: '302', name: 'vip' }],
         missingTagIds: [],
@@ -32,7 +32,7 @@ describe('OrderTagCommonAdapter', () => {
 
       const view = await adapter.replace({ orderId: '600', tagIds: ['302'] });
 
-      expect(tag.handleReplace).toHaveBeenCalledWith({
+      expect(tag.replace).toHaveBeenCalledWith({
         subjectType: 'order',
         subjectId: '600',
         tagIds: ['302'],
@@ -45,7 +45,7 @@ describe('OrderTagCommonAdapter', () => {
     });
 
     it('turns the common outcome tag-not-found into its own', async () => {
-      tag.handleReplace.mockResolvedValue({
+      tag.replace.mockResolvedValue({
         outcome: TagCommonReplaceOutcomeEnum.TAG_NOT_FOUND,
         tags: [],
         missingTagIds: ['999'],
@@ -61,7 +61,7 @@ describe('OrderTagCommonAdapter', () => {
     it('reads the ids of the orders that carry the tag', async () => {
       const orderIds = await adapter.findOrderIds({ tagId: '302' });
 
-      expect(tag.handleFindSubjectIds).toHaveBeenCalledWith({ subjectType: 'order', tagId: '302' });
+      expect(tag.findSubjectIds).toHaveBeenCalledWith({ subjectType: 'order', tagId: '302' });
       expect(orderIds).toEqual(['600']);
     });
   });

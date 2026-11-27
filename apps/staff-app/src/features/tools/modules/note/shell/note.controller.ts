@@ -25,13 +25,13 @@ import type { Maybe } from '@acme-libs/toolkit';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
 import {
-  NoteCreateUseCase,
-  NoteDeleteUseCase,
-  NoteGetManyUseCase,
-  NoteGetOneUseCase,
-  NoteGetRevisionsUseCase,
-  NoteResolveUseCase,
-  NoteUpdateUseCase,
+  NoteCreateCase,
+  NoteDeleteCase,
+  NoteGetManyCase,
+  NoteGetOneCase,
+  NoteGetRevisionsCase,
+  NoteResolveCase,
+  NoteUpdateCase,
 } from '../application';
 import { NoteExceptionCodeEnum } from '../domain';
 import {
@@ -51,13 +51,13 @@ import {
 @Controller('tools/notes')
 export class NoteController {
   constructor(
-    private readonly create: NoteCreateUseCase,
-    private readonly getMany: NoteGetManyUseCase,
-    private readonly getOne: NoteGetOneUseCase,
-    private readonly update: NoteUpdateUseCase,
-    private readonly resolve: NoteResolveUseCase,
-    private readonly getRevisions: NoteGetRevisionsUseCase,
-    private readonly del: NoteDeleteUseCase,
+    private readonly createCase: NoteCreateCase,
+    private readonly getManyCase: NoteGetManyCase,
+    private readonly getOneCase: NoteGetOneCase,
+    private readonly updateCase: NoteUpdateCase,
+    private readonly resolveCase: NoteResolveCase,
+    private readonly getRevisionsCase: NoteGetRevisionsCase,
+    private readonly deleteCase: NoteDeleteCase,
   ) {}
 
   @Post()
@@ -67,14 +67,14 @@ export class NoteController {
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID, NoteExceptionCodeEnum.NOTE_BODY_INVALID],
   })
-  public async handleCreate(
+  public async create(
     @Body() request: NoteCreateRequestDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NoteResponseDto> {
     const { subjectType, subjectId, body } = request;
     const { id: authorId } = user;
 
-    return await this.create.execute({ subjectType, subjectId, body, authorId });
+    return await this.createCase.execute({ subjectType, subjectId, body, authorId });
   }
 
   @Get()
@@ -84,14 +84,21 @@ export class NoteController {
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_SUBJECT_INVALID],
   })
-  public async handleGetMany(
+  public async getMany(
     @Query() query: NoteGetManyQueryDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NotePageResponseDto> {
     const { page, limit, subjectType, subjectId, resolved } = query;
     const { id: authorId } = user;
 
-    return await this.getMany.execute({ page, limit, subjectType, subjectId, resolved, authorId });
+    return await this.getManyCase.execute({
+      page,
+      limit,
+      subjectType,
+      subjectId,
+      resolved,
+      authorId,
+    });
   }
 
   @Get(':noteId')
@@ -101,14 +108,14 @@ export class NoteController {
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
   })
-  public async handleGetOne(
+  public async getOne(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<NoteResponseDto> {
     const { noteId } = params;
     const { id: authorId } = user;
 
-    return await this.getOne.execute({ noteId, authorId });
+    return await this.getOneCase.execute({ noteId, authorId });
   }
 
   @Patch(':noteId')
@@ -127,7 +134,7 @@ export class NoteController {
       NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
     ],
   })
-  public async handleUpdate(
+  public async update(
     @Param() params: NoteIdParamDto,
     @Body() request: NoteUpdateRequestDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -137,7 +144,7 @@ export class NoteController {
     const { body } = request;
     const { id: editorId } = user;
 
-    return await this.update.execute({ noteId, body, editorId, expectedVersion });
+    return await this.updateCase.execute({ noteId, body, editorId, expectedVersion });
   }
 
   @Post(':noteId/resolve')
@@ -154,7 +161,7 @@ export class NoteController {
       NoteExceptionCodeEnum.NOTE_VERSION_MISMATCH,
     ],
   })
-  public async handleResolve(
+  public async resolve(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
     @IfMatch() expectedVersion: Maybe<number>,
@@ -162,7 +169,7 @@ export class NoteController {
     const { noteId } = params;
     const { id: authorId } = user;
 
-    return await this.resolve.execute({ noteId, authorId, expectedVersion });
+    return await this.resolveCase.execute({ noteId, authorId, expectedVersion });
   }
 
   @Get(':noteId/revisions')
@@ -172,7 +179,7 @@ export class NoteController {
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
   })
-  public async handleGetRevisions(
+  public async getRevisions(
     @Param() params: NoteIdParamDto,
     @Query() query: NoteGetRevisionsQueryDto,
     @CurrentUser() user: IAuthCurrentUserView,
@@ -181,7 +188,7 @@ export class NoteController {
     const { page, limit } = query;
     const { id: authorId } = user;
 
-    return await this.getRevisions.execute({ noteId, authorId, page, limit });
+    return await this.getRevisionsCase.execute({ noteId, authorId, page, limit });
   }
 
   @Delete(':noteId')
@@ -192,13 +199,13 @@ export class NoteController {
     filterStatus: NoteHttpExceptionFilter.STATUS,
     codes: [NoteExceptionCodeEnum.NOTE_NOT_FOUND],
   })
-  public async handleDelete(
+  public async delete(
     @Param() params: NoteIdParamDto,
     @CurrentUser() user: IAuthCurrentUserView,
   ): Promise<void> {
     const { noteId } = params;
     const { id: authorId } = user;
 
-    await this.del.execute({ noteId, authorId });
+    await this.deleteCase.execute({ noteId, authorId });
   }
 }

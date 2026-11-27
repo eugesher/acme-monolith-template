@@ -1,3 +1,3 @@
-export * from './use-cases/idempotency-core-claim.use-case';
-export * from './use-cases/idempotency-core-complete.use-case';
-export * from './use-cases/idempotency-core-release.use-case';
+export * from './cases/idempotency-core-claim.case';
+export * from './cases/idempotency-core-complete.case';
+export * from './cases/idempotency-core-release.case';

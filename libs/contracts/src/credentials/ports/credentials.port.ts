@@ -7,10 +7,10 @@ import type {
 } from '../types';
 
 export interface ICredentialsPort {
-  handleSignAccessToken(command: ICredentialsSignAccessTokenCommand): Promise<string>;
-  handleVerifyAccessToken(token: string): Promise<Nullable<ICredentialsVerifyAccessTokenView>>;
-  handleHashPassword(password: string): Promise<string>;
-  handleVerifyPassword(command: ICredentialsVerifyPasswordCommand): Promise<boolean>;
+  signAccessToken(command: ICredentialsSignAccessTokenCommand): Promise<string>;
+  verifyAccessToken(token: string): Promise<Nullable<ICredentialsVerifyAccessTokenView>>;
+  hashPassword(password: string): Promise<string>;
+  verifyPassword(command: ICredentialsVerifyPasswordCommand): Promise<boolean>;
 }
 
 export const CREDENTIALS_PORT = Symbol('CREDENTIALS_PORT');

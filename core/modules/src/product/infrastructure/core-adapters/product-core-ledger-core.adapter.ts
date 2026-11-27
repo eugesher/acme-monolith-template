@@ -24,7 +24,7 @@ export class ProductCoreLedgerCoreAdapter implements IProductCoreLedgerPort {
   public async appendArchived(command: IProductCoreLedgerAppendArchivedCommand): Promise<void> {
     const { subjectId, version, occurredAt, payload } = command;
 
-    await this.ledger.handleAppendEnqueue({
+    await this.ledger.appendEnqueue({
       operationKey: `product-archived:${subjectId}:${version}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,

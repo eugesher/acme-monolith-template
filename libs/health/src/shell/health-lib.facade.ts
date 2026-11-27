@@ -6,20 +6,20 @@ import type {
   IHealthLibReadinessView,
 } from '@acme-libs/contracts/health';
 
-import { HealthLibCheckLivenessUseCase, HealthLibCheckReadinessUseCase } from '../application';
+import { HealthLibCheckLivenessCase, HealthLibCheckReadinessCase } from '../application';
 
 @Injectable()
 export class HealthLibFacade implements IHealthLibPort {
   constructor(
-    private readonly checkLiveness: HealthLibCheckLivenessUseCase,
-    private readonly checkReadiness: HealthLibCheckReadinessUseCase,
+    private readonly checkLivenessCase: HealthLibCheckLivenessCase,
+    private readonly checkReadinessCase: HealthLibCheckReadinessCase,
   ) {}
 
-  public handleLiveness(): IHealthLibLivenessView {
-    return this.checkLiveness.execute();
+  public checkLiveness(): IHealthLibLivenessView {
+    return this.checkLivenessCase.execute();
   }
 
-  public async handleReadiness(): Promise<IHealthLibReadinessView> {
-    return await this.checkReadiness.execute();
+  public async checkReadiness(): Promise<IHealthLibReadinessView> {
+    return await this.checkReadinessCase.execute();
   }
 }

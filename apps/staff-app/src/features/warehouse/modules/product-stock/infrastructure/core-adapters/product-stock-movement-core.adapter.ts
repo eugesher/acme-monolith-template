@@ -29,14 +29,14 @@ export class ProductStockMovementCoreAdapter implements IProductStockMovementPor
   public async lock(command: IProductStockMovementLockCommand): Promise<void> {
     const { productId } = command;
 
-    await this.productStock.handleLock({ productIds: [productId] });
+    await this.productStock.lock({ productIds: [productId] });
   }
 
   public async add(
     command: IProductStockMovementAddCommand,
   ): Promise<IProductStockMovementAddView> {
     const { productId, quantity } = command;
-    const moveView = await this.productStock.handleMove({
+    const moveView = await this.productStock.move({
       kind: ProductStockCoreMovementKindEnum.ADD,
       movements: [{ productId, quantity, orderProductId: null }],
     });

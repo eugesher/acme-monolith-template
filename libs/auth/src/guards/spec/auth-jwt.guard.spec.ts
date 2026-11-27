@@ -13,8 +13,8 @@ describe('AuthJwtGuard', () => {
   let guard: AuthJwtGuard;
 
   beforeEach(() => {
-    validator = { handleValidate: jest.fn() };
-    validator.handleValidate.mockResolvedValue({ id: 'user-1', email: 'ann@example.com' });
+    validator = { validateSubject: jest.fn() };
+    validator.validateSubject.mockResolvedValue({ id: 'user-1', email: 'ann@example.com' });
     getAllAndOverride = jest.fn().mockReturnValue(undefined);
     request = { headers: { authorization: 'Bearer token' } };
     context = {
@@ -29,7 +29,7 @@ describe('AuthJwtGuard', () => {
     const allowed = await guard.canActivate(context);
 
     expect(allowed).toBe(true);
-    expect(validator.handleValidate).toHaveBeenCalledWith({ token: 'token' });
+    expect(validator.validateSubject).toHaveBeenCalledWith({ token: 'token' });
     expect(request.user).toEqual({
       id: 'user-1',
       email: 'ann@example.com',
@@ -44,7 +44,7 @@ describe('AuthJwtGuard', () => {
 
     expect(allowed).toBe(true);
     expect(getAllAndOverride).toHaveBeenCalledWith('auth:public', ['handler', 'class']);
-    expect(validator.handleValidate).not.toHaveBeenCalled();
+    expect(validator.validateSubject).not.toHaveBeenCalled();
   });
 
   it('accepts the bearer scheme in any case', async () => {
@@ -68,11 +68,11 @@ describe('AuthJwtGuard', () => {
     await expect(allowed).rejects.toMatchObject({
       response: { statusCode: 401, message: 'Unauthorized' },
     });
-    expect(validator.handleValidate).not.toHaveBeenCalled();
+    expect(validator.validateSubject).not.toHaveBeenCalled();
   });
 
   it('rejects a token the validator answers no user for with 401', async () => {
-    validator.handleValidate.mockResolvedValue(null);
+    validator.validateSubject.mockResolvedValue(null);
 
     const allowed = guard.canActivate(context);
 

@@ -1,0 +1,122 @@
+import { LedgerGetManyCase } from '../ledger-get-many.case';
+import type { ILedgerGetManyRepositoryPort } from '../../../outbound';
+
+describe('LedgerGetManyCase', () => {
+  let repository: jest.Mocked<ILedgerGetManyRepositoryPort>;
+  let getManyCase: LedgerGetManyCase;
+
+  beforeEach(() => {
+    repository = { list: jest.fn() };
+    getManyCase = new LedgerGetManyCase(repository);
+  });
+
+  describe('execute', () => {
+    it('asks the ledger for the page and the filters of the query', async () => {
+      repository.list.mockResolvedValue([[], 0]);
+
+      await getManyCase.execute({
+        page: 2,
+        limit: 10,
+        subjectType: 'product',
+        subjectId: '12',
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+      });
+
+      expect(repository.list).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 10,
+        subjectType: 'product',
+        subjectId: '12',
+        correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+      });
+    });
+
+    it('reads the first page of 20 when the query names no window', async () => {
+      repository.list.mockResolvedValue([[], 0]);
+
+      await getManyCase.execute({
+        page: undefined,
+        limit: undefined,
+        subjectType: 'product',
+        subjectId: undefined,
+        correlationId: undefined,
+      });
+
+      expect(repository.list).toHaveBeenCalledWith({
+        limit: 20,
+        offset: 0,
+        subjectType: 'product',
+        subjectId: undefined,
+        correlationId: undefined,
+      });
+    });
+
+    it('caps the page limit at 100', async () => {
+      repository.list.mockResolvedValue([[], 0]);
+
+      await getManyCase.execute({
+        page: undefined,
+        limit: 500,
+        subjectType: undefined,
+        subjectId: undefined,
+        correlationId: undefined,
+      });
+
+      expect(repository.list).toHaveBeenCalledWith({
+        limit: 100,
+        offset: 0,
+        subjectType: undefined,
+        subjectId: undefined,
+        correlationId: undefined,
+      });
+    });
+
+    it('answers the page of the ledger', async () => {
+      repository.list.mockResolvedValue([
+        [
+          {
+            id: '7',
+            operationKey: 'product-archived:12',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductArchived',
+            payload: { title: 'Lamp' },
+            correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+            occurredAt: new Date('2026-01-01T00:00:00.000Z'),
+            recordedAt: new Date('2026-01-01T00:00:01.000Z'),
+          },
+        ],
+        1,
+      ]);
+
+      const page = await getManyCase.execute({
+        page: undefined,
+        limit: undefined,
+        subjectType: undefined,
+        subjectId: undefined,
+        correlationId: undefined,
+      });
+
+      expect(page).toEqual({
+        page: 1,
+        limit: 20,
+        count: 1,
+        pageCount: 1,
+        total: 1,
+        data: [
+          {
+            id: '7',
+            operationKey: 'product-archived:12',
+            subjectType: 'product',
+            subjectId: '12',
+            action: 'ProductArchived',
+            payload: { title: 'Lamp' },
+            correlationId: 'c0ffee00-0000-4000-8000-000000000001',
+            occurredAt: '2026-01-01T00:00:00.000Z',
+            recordedAt: '2026-01-01T00:00:01.000Z',
+          },
+        ],
+      });
+    });
+  });
+});

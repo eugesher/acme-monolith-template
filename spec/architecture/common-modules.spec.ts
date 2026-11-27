@@ -371,7 +371,7 @@ describe('common modules (common/modules/<module>)', () => {
         '../../../../contracts/idempotency',
       ],
       [
-        'apps/__common-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        'apps/__common-fixture__/src/features/product/application/cases/__fixture__.ts',
         '../../../../contracts/idempotency',
       ],
       [
@@ -422,7 +422,7 @@ describe('common modules (common/modules/<module>)', () => {
         '../../../../common/modules',
       ],
       [
-        'apps/__common-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        'apps/__common-fixture__/src/features/product/application/cases/__fixture__.ts',
         '../../../../common/modules',
       ],
       ['apps/__common-fixture__/src/app/__fixture__.ts', '../common/modules/idempotency'],

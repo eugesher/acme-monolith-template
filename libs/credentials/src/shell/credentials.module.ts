@@ -6,10 +6,10 @@ import { AuthTokenAlgorithmEnum, type AuthAudienceEnum } from '@acme-libs/kernel
 import { CREDENTIALS_PORT, type ICredentialsPort } from '@acme-libs/contracts/credentials';
 
 import {
-  CredentialsHashPasswordUseCase,
-  CredentialsSignAccessTokenUseCase,
-  CredentialsVerifyAccessTokenUseCase,
-  CredentialsVerifyPasswordUseCase,
+  CredentialsHashPasswordCase,
+  CredentialsSignAccessTokenCase,
+  CredentialsVerifyAccessTokenCase,
+  CredentialsVerifyPasswordCase,
 } from '../application';
 import { CredentialsAccessTokenAdapter, CredentialsPasswordHasherAdapter } from '../infrastructure';
 import { CredentialsFacade } from './credentials.facade';
@@ -26,10 +26,10 @@ export class CredentialsModule {
           provide: CREDENTIALS_PORT,
           useClass: CredentialsFacade,
         } satisfies ClassProvider<ICredentialsPort>,
-        CredentialsSignAccessTokenUseCase,
-        CredentialsVerifyAccessTokenUseCase,
-        CredentialsHashPasswordUseCase,
-        CredentialsVerifyPasswordUseCase,
+        CredentialsSignAccessTokenCase,
+        CredentialsVerifyAccessTokenCase,
+        CredentialsHashPasswordCase,
+        CredentialsVerifyPasswordCase,
         CredentialsAccessTokenAdapter.PROVIDER,
         CredentialsPasswordHasherAdapter.PROVIDER,
       ],

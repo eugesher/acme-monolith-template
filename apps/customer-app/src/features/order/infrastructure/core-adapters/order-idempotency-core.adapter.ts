@@ -44,7 +44,7 @@ export class OrderIdempotencyCoreAdapter implements IOrderIdempotencyPort {
   ): Promise<IOrderIdempotencyOutcomeView | IOrderIdempotencyReplayView<T>> {
     const { customerId, key, body } = command;
     const scope = OrderIdempotencyCoreAdapter.toScope(customerId);
-    const coreClaim = await this.idempotency.handleClaim({ scope, key, body });
+    const coreClaim = await this.idempotency.claim({ scope, key, body });
     const { outcome, storedResponse } = coreClaim;
 
     if (outcome === IdempotencyCoreClaimOutcomeEnum.REPLAY) {
@@ -58,14 +58,14 @@ export class OrderIdempotencyCoreAdapter implements IOrderIdempotencyPort {
     const { customerId, key, response } = command;
     const scope = OrderIdempotencyCoreAdapter.toScope(customerId);
 
-    await this.idempotency.handleComplete({ scope, key, response });
+    await this.idempotency.complete({ scope, key, response });
   }
 
   public async release(command: IOrderIdempotencyReleaseCommand): Promise<void> {
     const { customerId, key } = command;
     const scope = OrderIdempotencyCoreAdapter.toScope(customerId);
 
-    await this.idempotency.handleRelease({ scope, key });
+    await this.idempotency.release({ scope, key });
   }
 
   private static toScope(customerId: string): string {

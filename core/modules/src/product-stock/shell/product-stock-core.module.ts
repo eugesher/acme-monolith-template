@@ -6,7 +6,7 @@ import {
   type IProductStockCorePort,
 } from '@acme-core/contracts/product-stock';
 
-import { ProductStockCoreLockUseCase, ProductStockCoreMoveUseCase } from '../application';
+import { ProductStockCoreLockCase, ProductStockCoreMoveCase } from '../application';
 import {
   ProductStockCoreConfigEnqueueRetryAttemptsProvider,
   ProductStockCoreConfigRedisCommandTimeoutMsProvider,
@@ -25,8 +25,8 @@ import { ProductStockCoreFacade } from './product-stock-core.facade';
       provide: PRODUCT_STOCK_CORE_PORT,
       useClass: ProductStockCoreFacade,
     } satisfies ClassProvider<IProductStockCorePort>,
-    ProductStockCoreLockUseCase,
-    ProductStockCoreMoveUseCase,
+    ProductStockCoreLockCase,
+    ProductStockCoreMoveCase,
     ProductStockCoreLockRepository.PROVIDER,
     ProductStockCoreMoveRepository.PROVIDER,
     ProductStockCorePostSubtractQueueAdapter.PROVIDER,

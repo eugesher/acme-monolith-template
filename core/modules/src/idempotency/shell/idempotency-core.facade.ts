@@ -9,30 +9,28 @@ import type {
 } from '@acme-core/contracts/idempotency';
 
 import {
-  IdempotencyCoreClaimUseCase,
-  IdempotencyCoreCompleteUseCase,
-  IdempotencyCoreReleaseUseCase,
+  IdempotencyCoreClaimCase,
+  IdempotencyCoreCompleteCase,
+  IdempotencyCoreReleaseCase,
 } from '../application';
 
 @Injectable()
 export class IdempotencyCoreFacade implements IIdempotencyCorePort {
   constructor(
-    private readonly claim: IdempotencyCoreClaimUseCase,
-    private readonly complete: IdempotencyCoreCompleteUseCase,
-    private readonly release: IdempotencyCoreReleaseUseCase,
+    private readonly claimCase: IdempotencyCoreClaimCase,
+    private readonly completeCase: IdempotencyCoreCompleteCase,
+    private readonly releaseCase: IdempotencyCoreReleaseCase,
   ) {}
 
-  public async handleClaim(
-    command: IIdempotencyCoreClaimCommand,
-  ): Promise<IIdempotencyCoreClaimView> {
-    return await this.claim.execute(command);
+  public async claim(command: IIdempotencyCoreClaimCommand): Promise<IIdempotencyCoreClaimView> {
+    return await this.claimCase.execute(command);
   }
 
-  public async handleComplete(command: IIdempotencyCoreCompleteCommand): Promise<void> {
-    await this.complete.execute(command);
+  public async complete(command: IIdempotencyCoreCompleteCommand): Promise<void> {
+    await this.completeCase.execute(command);
   }
 
-  public async handleRelease(command: IIdempotencyCoreReleaseCommand): Promise<void> {
-    await this.release.execute(command);
+  public async release(command: IIdempotencyCoreReleaseCommand): Promise<void> {
+    await this.releaseCase.execute(command);
   }
 }

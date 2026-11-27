@@ -11,7 +11,7 @@ export class AuthE2E {
     return new AuthE2E(ctx);
   }
 
-  public handleLogin(): void {
+  public login(): void {
     describe('POST /api/auth/login', () => {
       it('should issue an access token of the subject alone, valid for the lifetime of this app', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -107,7 +107,7 @@ export class AuthE2E {
     });
   }
 
-  public handleMe(): void {
+  public me(): void {
     describe('GET /api/auth/me', () => {
       it('should take the roles from the database, not from the token claims', async () => {
         const forged = this.ctx.jwtService.sign({

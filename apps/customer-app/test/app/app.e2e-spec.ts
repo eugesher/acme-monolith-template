@@ -46,32 +46,32 @@ describe('App', () => {
       ['POST /api/auth/register', 'AuthRegisterRequestDto'],
       ['GET /api/health'],
       ['GET /api/health/ready'],
-      ['GET /api/orders', 'OrderGetManyQueryDto'],
+      ['GET /api/orders', 'OrderGetListQueryDto'],
       ['POST /api/orders', 'OrderPlaceRequestDto'],
       ['GET /api/orders/:orderId', 'OrderIdParamDto'],
-      ['GET /api/products', 'CatalogProductListQueryDto'],
+      ['GET /api/products', 'CatalogGetProductListQueryDto'],
     ]);
   });
 
   describe('Health', () => {
-    healthE2E.handleLiveness();
-    healthE2E.handleReadiness();
+    healthE2E.liveness();
+    healthE2E.readiness();
   });
 
   describe('Auth', () => {
-    authE2E.handleRegister();
-    authE2E.handleLogin();
-    authE2E.handleMe();
+    authE2E.register();
+    authE2E.login();
+    authE2E.me();
   });
 
   describe('Catalog', () => {
     catalogE2E.hooks();
-    catalogE2E.handleProductList();
+    catalogE2E.getProductList();
   });
 
   describe('Order', () => {
-    orderE2E.handlePlace();
-    orderE2E.handleGetMany();
-    orderE2E.handleGetOne();
+    orderE2E.place();
+    orderE2E.getList();
+    orderE2E.getDetails();
   });
 });

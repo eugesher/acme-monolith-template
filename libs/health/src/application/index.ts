@@ -1,2 +1,2 @@
-export * from './use-cases/health-lib-check-liveness.use-case';
-export * from './use-cases/health-lib-check-readiness.use-case';
+export * from './cases/health-lib-check-liveness.case';
+export * from './cases/health-lib-check-readiness.case';

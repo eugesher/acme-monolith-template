@@ -46,12 +46,12 @@ describe('ThrottlerSetupModule', () => {
     class FixtureController {
       @Post('login')
       @AuthThrottle()
-      public handleLogin(): void {
+      public login(): void {
         return undefined;
       }
 
       @Post('orders')
-      public handleOrders(): void {
+      public orders(): void {
         return undefined;
       }
     }

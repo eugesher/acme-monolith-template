@@ -2,7 +2,7 @@ import { Module, type ClassProvider } from '@nestjs/common';
 
 import { AUTH_COMMON_PORT, type IAuthCommonPort } from '@acme-staff/contracts/auth';
 
-import { AuthCommonFindSubjectUseCase } from '../application';
+import { AuthCommonFindSubjectCase } from '../application';
 import { AuthCommonFindSubjectRepository } from '../infrastructure';
 import { AuthCommonFacade } from './auth-common.facade';
 
@@ -13,7 +13,7 @@ import { AuthCommonFacade } from './auth-common.facade';
       provide: AUTH_COMMON_PORT,
       useClass: AuthCommonFacade,
     } satisfies ClassProvider<IAuthCommonPort>,
-    AuthCommonFindSubjectUseCase,
+    AuthCommonFindSubjectCase,
     AuthCommonFindSubjectRepository.PROVIDER,
   ],
 })

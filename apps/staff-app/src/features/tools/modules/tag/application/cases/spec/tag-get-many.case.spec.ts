@@ -1,0 +1,55 @@
+import { TagGetManyCase } from '../tag-get-many.case';
+import type { ITagGetManyRepositoryPort } from '../../../outbound';
+
+describe('TagGetManyCase', () => {
+  let repository: jest.Mocked<ITagGetManyRepositoryPort>;
+  let getManyCase: TagGetManyCase;
+
+  beforeEach(() => {
+    repository = { list: jest.fn() };
+    repository.list.mockResolvedValue([
+      [
+        {
+          id: '300',
+          name: 'fragile',
+          createdAt: new Date('2026-01-01T00:00:00.000Z'),
+          updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+        },
+      ],
+      21,
+    ]);
+    getManyCase = new TagGetManyCase(repository);
+  });
+
+  describe('execute', () => {
+    it('answers a page of views', async () => {
+      const page = await getManyCase.execute({ page: 2, limit: 20 });
+
+      expect(repository.list).toHaveBeenCalledWith({ limit: 20, offset: 20 });
+      expect(page).toEqual({
+        page: 2,
+        limit: 20,
+        count: 1,
+        pageCount: 2,
+        total: 21,
+        data: [
+          {
+            id: '300',
+            name: 'fragile',
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+      });
+    });
+
+    it.each([
+      ['defaults an absent window', undefined, undefined, { limit: 20, offset: 0 }],
+      ['caps the limit at 100', 1, 500, { limit: 100, offset: 0 }],
+    ])('%s', async (_case, page, limit, pageWindow) => {
+      await getManyCase.execute({ page, limit });
+
+      expect(repository.list).toHaveBeenCalledWith(pageWindow);
+    });
+  });
+});

@@ -1,10 +1,10 @@
 export * from './services/note-access.service';
 export * from './services/note-write.service';
 
-export * from './use-cases/note-create.use-case';
-export * from './use-cases/note-delete.use-case';
-export * from './use-cases/note-get-many.use-case';
-export * from './use-cases/note-get-one.use-case';
-export * from './use-cases/note-get-revisions.use-case';
-export * from './use-cases/note-resolve.use-case';
-export * from './use-cases/note-update.use-case';
+export * from './cases/note-create.case';
+export * from './cases/note-delete.case';
+export * from './cases/note-get-many.case';
+export * from './cases/note-get-one.case';
+export * from './cases/note-get-revisions.case';
+export * from './cases/note-resolve.case';
+export * from './cases/note-update.case';

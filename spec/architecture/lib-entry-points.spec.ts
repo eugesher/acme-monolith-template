@@ -90,7 +90,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
     'apps/staff-app/src/common/shared/auth/__fixture__.ts',
   ])('%s may NOT import test helpers outside specs', async (file) => {
@@ -101,7 +101,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/application/use-cases/spec/__fixture__.spec.ts',
+    'apps/staff-app/src/features/product/application/cases/spec/__fixture__.spec.ts',
     'core/modules/src/__ledger-fixture__/application/spec/__fixture__.spec.ts',
     'apps/staff-app/test/app/__fixture__.e2e-spec.ts',
   ])('the spec %s MAY import test helpers', async (file) => {
@@ -136,7 +136,7 @@ describe('lib entry points', () => {
   it.each([
     'apps/staff-app/src/features/product/domain/__fixture__.ts',
     'apps/staff-app/src/features/product/outbound/__fixture__.ts',
-    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
     'apps/processor-app/src/processors/purge/application/services/__fixture__.ts',
     'apps/staff-app/src/common/modules/idempotency/application/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
@@ -171,7 +171,7 @@ describe('lib entry points', () => {
 
   it('application may NOT import the local-storage lib root, it takes the transaction port', async () => {
     await expect({
-      file: 'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+      file: 'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
       code: 'import { LocalStorageTransactionalModule } from "@acme-libs/local-storage";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -187,7 +187,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
   ])(
     '%s may NOT import the cache contracts by their alias, the application reads through its own port',
@@ -282,7 +282,7 @@ describe('lib entry points', () => {
   });
 
   it.each([
-    'apps/staff-app/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/staff-app/src/features/product/application/cases/__fixture__.ts',
     'apps/staff-app/src/features/product/domain/__fixture__.ts',
   ])('%s may NOT import the http lib, HTTP stays out of the core layers', async (file) => {
     await expect({

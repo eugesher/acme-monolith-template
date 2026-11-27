@@ -1,15 +1,15 @@
 import { repositoryConsumers, repositoryConsumerViolations } from './support/repository-consumers';
 
-describe('one repository per use case, service or facade', () => {
+describe('one repository per case, service or facade', () => {
   it('finds the consumers of every area', () => {
     const names = repositoryConsumers().map(({ name }) => name);
 
     expect(names).toEqual(
       expect.arrayContaining([
-        'UserReassignRolesUseCase',
-        'AuthCommonFindSubjectUseCase',
-        'IdempotencyPurgeUseCase',
-        'IdempotencyCoreClaimUseCase',
+        'UserReassignRolesCase',
+        'AuthCommonFindSubjectCase',
+        'IdempotencyPurgeProcessCase',
+        'IdempotencyCoreClaimCase',
       ]),
     );
   });
@@ -21,10 +21,10 @@ describe('one repository per use case, service or facade', () => {
   describe('the rule itself', () => {
     it.each([
       [
-        'a use case with its own repository port',
+        'a case with its own repository port',
         [
           {
-            name: 'ProductGetHistoryUseCase',
+            name: 'ProductGetHistoryCase',
             file: 'x',
             params: [{ name: 'repository', type: 'IProductGetHistoryRepositoryPort' }],
           },
@@ -54,13 +54,13 @@ describe('one repository per use case, service or facade', () => {
         'two apps with a namesake repository port each',
         [
           {
-            name: 'AuthLoginUseCase',
-            file: 'apps/staff-app/src/features/auth/application/use-cases/auth-login.use-case.ts',
+            name: 'AuthLoginCase',
+            file: 'apps/staff-app/src/features/auth/application/cases/auth-login.case.ts',
             params: [{ name: 'repository', type: 'IAuthLoginRepositoryPort' }],
           },
           {
-            name: 'AuthLoginUseCase',
-            file: 'apps/customer-app/src/features/auth/application/use-cases/auth-login.use-case.ts',
+            name: 'AuthLoginCase',
+            file: 'apps/customer-app/src/features/auth/application/cases/auth-login.case.ts',
             params: [{ name: 'repository', type: 'IAuthLoginRepositoryPort' }],
           },
         ],
@@ -74,7 +74,7 @@ describe('one repository per use case, service or facade', () => {
         'two repositories',
         [
           {
-            name: 'ProductGetHistoryUseCase',
+            name: 'ProductGetHistoryCase',
             file: 'x',
             params: [
               { name: 'repository', type: 'IProductGetHistoryRepositoryPort' },
@@ -87,7 +87,7 @@ describe('one repository per use case, service or facade', () => {
         'a repository kept under another name',
         [
           {
-            name: 'ProductGetHistoryUseCase',
+            name: 'ProductGetHistoryCase',
             file: 'x',
             params: [{ name: 'categories', type: 'IProductGetHistoryRepositoryPort' }],
           },
@@ -97,37 +97,37 @@ describe('one repository per use case, service or facade', () => {
         'the repository of another consumer',
         [
           {
-            name: 'ProductGetHistoryUseCase',
+            name: 'ProductGetHistoryCase',
             file: 'x',
             params: [{ name: 'repository', type: 'IProductListArchivedRepositoryPort' }],
           },
         ],
       ],
       [
-        'the get-many and get-one use cases sharing one repository',
+        'the get-many and get-one cases sharing one repository',
         [
           {
-            name: 'ProductGetManyUseCase',
+            name: 'ProductGetManyCase',
             file: 'x',
             params: [{ name: 'repository', type: 'IProductGetManyRepositoryPort' }],
           },
           {
-            name: 'ProductGetOneUseCase',
+            name: 'ProductGetOneCase',
             file: 'x',
             params: [{ name: 'repository', type: 'IProductGetManyRepositoryPort' }],
           },
         ],
       ],
       [
-        'a CRUD repository shared by the use cases of its resource',
+        'a CRUD repository shared by the cases of its resource',
         [
           {
-            name: 'ProductGetManyUseCase',
+            name: 'ProductGetManyCase',
             file: 'x',
             params: [{ name: 'repository', type: 'IProductCrudRepositoryPort' }],
           },
           {
-            name: 'ProductDeleteOneUseCase',
+            name: 'ProductDeleteOneCase',
             file: 'x',
             params: [{ name: 'repository', type: 'IProductCrudRepositoryPort' }],
           },

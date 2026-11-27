@@ -1,1 +1,1 @@
-export * from './use-cases/ledger-core-append-enqueue.use-case';
+export * from './cases/ledger-core-append-enqueue.case';

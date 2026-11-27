@@ -7,8 +7,8 @@ describe('OrderLedgerCoreAdapter', () => {
   let adapter: OrderLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleAppendEnqueue: jest.fn() };
-    ledger.handleAppendEnqueue.mockResolvedValue(undefined);
+    ledger = { appendEnqueue: jest.fn() };
+    ledger.appendEnqueue.mockResolvedValue(undefined);
     adapter = new OrderLedgerCoreAdapter(ledger);
   });
 
@@ -26,8 +26,8 @@ describe('OrderLedgerCoreAdapter', () => {
         },
       });
 
-      expect(ledger.handleAppendEnqueue).toHaveBeenCalledTimes(1);
-      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
+      expect(ledger.appendEnqueue).toHaveBeenCalledTimes(1);
+      expect(ledger.appendEnqueue).toHaveBeenCalledWith({
         operationKey: 'order-placed:610',
         subjectType: 'order',
         subjectId: '610',

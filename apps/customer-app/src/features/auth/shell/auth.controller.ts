@@ -6,7 +6,7 @@ import { ApiErrorResponses, AuthThrottle } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
-import { AuthLoginUseCase, AuthRegisterUseCase } from '../application';
+import { AuthLoginCase, AuthRegisterCase } from '../application';
 import {
   AuthAccessTokenResponseDto,
   AuthHttpExceptionFilter,
@@ -21,8 +21,8 @@ import {
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly register: AuthRegisterUseCase,
-    private readonly login: AuthLoginUseCase,
+    private readonly registerCase: AuthRegisterCase,
+    private readonly loginCase: AuthLoginCase,
   ) {}
 
   @Post('register')
@@ -38,12 +38,10 @@ export class AuthController {
       IdentityExceptionCodeEnum.AUTH_EMAIL_TAKEN,
     ],
   })
-  public async handleRegister(
-    @Body() body: AuthRegisterRequestDto,
-  ): Promise<AuthRegisterResponseDto> {
+  public async register(@Body() body: AuthRegisterRequestDto): Promise<AuthRegisterResponseDto> {
     const { email, password } = body;
 
-    return await this.register.execute({ email, password });
+    return await this.registerCase.execute({ email, password });
   }
 
   @Post('login')
@@ -59,16 +57,16 @@ export class AuthController {
       IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
     ],
   })
-  public async handleLogin(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
+  public async login(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
     const { email, password } = body;
 
-    return await this.login.execute({ email, password });
+    return await this.loginCase.execute({ email, password });
   }
 
   @Get('me')
   @ApiOperation({ summary: 'The authenticated customer, as the guards resolved them' })
   @ApiOkResponse({ type: AuthMeResponseDto })
-  public handleMe(@CurrentUser() user: IAuthCurrentUserView): AuthMeResponseDto {
+  public me(@CurrentUser() user: IAuthCurrentUserView): AuthMeResponseDto {
     const { id, email } = user;
 
     return { id, email };

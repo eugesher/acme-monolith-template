@@ -41,7 +41,7 @@ export class OrderTagCommonAdapter implements IOrderTagPort {
   public async find(command: IOrderTagFindCommand): Promise<IOrderTagFindView[]> {
     const { orderId } = command;
 
-    return await this.tag.handleFind({
+    return await this.tag.find({
       subjectType: TagCommonSubjectTypeEnum.ORDER,
       subjectId: orderId,
     });
@@ -49,7 +49,7 @@ export class OrderTagCommonAdapter implements IOrderTagPort {
 
   public async replace(command: IOrderTagReplaceCommand): Promise<IOrderTagReplaceView> {
     const { orderId, tagIds } = command;
-    const replaceView = await this.tag.handleReplace({
+    const replaceView = await this.tag.replace({
       subjectType: TagCommonSubjectTypeEnum.ORDER,
       subjectId: orderId,
       tagIds,
@@ -62,7 +62,7 @@ export class OrderTagCommonAdapter implements IOrderTagPort {
   public async findOrderIds(command: IOrderTagFindOrderIdsCommand): Promise<string[]> {
     const { tagId } = command;
 
-    return await this.tag.handleFindSubjectIds({
+    return await this.tag.findSubjectIds({
       subjectType: TagCommonSubjectTypeEnum.ORDER,
       tagId,
     });

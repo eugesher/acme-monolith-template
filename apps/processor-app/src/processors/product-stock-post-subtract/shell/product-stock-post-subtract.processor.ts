@@ -6,15 +6,15 @@ import { ProductStockPostSubtractQueue } from '@acme-core/queues';
 import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/product-stock';
 
 import {
-  ProductStockPostSubtractReportFailureUseCase,
-  ProductStockPostSubtractUseCase,
+  ProductStockPostSubtractProcessCase,
+  ProductStockPostSubtractReportWorkerFailedCase,
 } from '../application';
 
 @Processor(ProductStockPostSubtractQueue.NAME)
 export class ProductStockPostSubtractProcessor extends WorkerHost {
   constructor(
-    private readonly postSubtract: ProductStockPostSubtractUseCase,
-    private readonly reportFailure: ProductStockPostSubtractReportFailureUseCase,
+    private readonly processCase: ProductStockPostSubtractProcessCase,
+    private readonly reportWorkerFailedCase: ProductStockPostSubtractReportWorkerFailedCase,
   ) {
     super();
   }
@@ -24,12 +24,12 @@ export class ProductStockPostSubtractProcessor extends WorkerHost {
     const { productIds, correlationId } = data;
 
     await CorrelationContextHelper.run(correlationId, () =>
-      this.postSubtract.execute({ productIds }),
+      this.processCase.execute({ productIds }),
     );
   }
 
   @OnWorkerEvent('failed')
-  public async handleFailed(
+  public async onWorkerFailed(
     job: Job<IProductStockPostSubtractPayload>,
     error: Error,
   ): Promise<void> {
@@ -38,7 +38,7 @@ export class ProductStockPostSubtractProcessor extends WorkerHost {
     const { attempts } = opts as Required<Pick<JobsOptions, 'attempts'>>;
 
     await CorrelationContextHelper.run(correlationId, () => {
-      this.reportFailure.execute({ productIds, attempt: attemptsMade, attempts, error });
+      this.reportWorkerFailedCase.execute({ productIds, attempt: attemptsMade, attempts, error });
 
       return Promise.resolve();
     });

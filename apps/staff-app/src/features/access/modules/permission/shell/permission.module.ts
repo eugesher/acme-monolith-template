@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { PermissionListUseCase } from '../application';
+import { PermissionGetManyCase } from '../application';
 import { PermissionController } from './permission.controller';
 
 @Module({
   controllers: [PermissionController],
-  providers: [PermissionListUseCase],
+  providers: [PermissionGetManyCase],
 })
 export class PermissionModule {}

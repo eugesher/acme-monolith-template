@@ -10,7 +10,7 @@ export class RoleE2E {
     return new RoleE2E(ctx);
   }
 
-  public handleList(): void {
+  public getMany(): void {
     describe('GET /api/access/roles', () => {
       it('should list the roles with their permissions from the database', async () => {
         const response = await request(this.ctx.app.getHttpServer())
@@ -23,7 +23,7 @@ export class RoleE2E {
     });
   }
 
-  public handleCreate(): void {
+  public create(): void {
     describe('POST /api/access/roles', () => {
       const removeRole = async (): Promise<void> => {
         await this.ctx.dataSource.query('DELETE FROM staff_role WHERE name = ?', ['auditor']);
@@ -85,7 +85,7 @@ export class RoleE2E {
     });
   }
 
-  public handleReassignPermissions(): void {
+  public reassignPermissions(): void {
     describe('PUT /api/access/roles/:roleId/permissions', () => {
       it('should reassign the permissions and refuse the same token at once', async () => {
         try {

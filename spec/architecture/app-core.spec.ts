@@ -34,7 +34,7 @@ describe('app → core', () => {
         '../../../../../../../core/contracts/src/__ledger-fixture__',
       ],
       [
-        'apps/__core-link-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+        'apps/__core-link-fixture__/src/features/product/application/cases/__fixture__.ts',
         '../../../../../../../core/contracts/src/__ledger-fixture__',
       ],
       [

@@ -1,3 +1,3 @@
-export * from './queries/ledger-list-entries.query';
+export * from './queries/ledger-get-many.query';
 
-export * from './records/ledger-list-entries.record';
+export * from './records/ledger-get-many.record';

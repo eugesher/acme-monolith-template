@@ -8,32 +8,32 @@ import {
 
 import { HealthReadinessStatusEnum } from '@acme-libs/kernel';
 
-import { HealthLivenessUseCase, HealthReadinessUseCase } from '../application';
+import { HealthLivenessCase, HealthReadinessCase } from '../application';
 import { HealthLivenessResponseDto, HealthReadinessResponseDto } from '../presentation';
 
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
   constructor(
-    private readonly liveness: HealthLivenessUseCase,
-    private readonly readiness: HealthReadinessUseCase,
+    private readonly livenessCase: HealthLivenessCase,
+    private readonly readinessCase: HealthReadinessCase,
   ) {}
 
   @Get()
   @ApiOperation({ summary: 'Liveness: is the process running?' })
   @ApiOkResponse({ type: HealthLivenessResponseDto })
-  public handleLiveness(): HealthLivenessResponseDto {
-    return this.liveness.execute();
+  public liveness(): HealthLivenessResponseDto {
+    return this.livenessCase.execute();
   }
 
   @Get('ready')
   @ApiOperation({ summary: 'Readiness: can the process serve traffic right now?' })
   @ApiOkResponse({ type: HealthReadinessResponseDto })
   @ApiServiceUnavailableResponse({ type: HealthReadinessResponseDto })
-  public async handleReadiness(
+  public async readiness(
     @Res({ passthrough: true }) response: { status(code: HttpStatus): unknown },
   ): Promise<HealthReadinessResponseDto> {
-    const readinessView = await this.readiness.execute();
+    const readinessView = await this.readinessCase.execute();
     const status =
       readinessView.status === HealthReadinessStatusEnum.READY
         ? HttpStatus.OK

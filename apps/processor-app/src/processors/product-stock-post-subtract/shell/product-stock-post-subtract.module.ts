@@ -4,13 +4,13 @@ import { ProductCoreModule } from '@acme-core/modules/product';
 import { ProductStockCoreModule } from '@acme-core/modules/product-stock';
 
 import {
-  ProductStockPostSubtractReportFailureUseCase,
-  ProductStockPostSubtractUseCase,
+  ProductStockPostSubtractProcessCase,
+  ProductStockPostSubtractReportWorkerFailedCase,
 } from '../application';
 import {
   ProductStockPostSubtractArchiveCoreAdapter,
   ProductStockPostSubtractOnHandCoreAdapter,
-  ProductStockPostSubtractRepository,
+  ProductStockPostSubtractProcessRepository,
   ProductStockPostSubtractTransactionAdapter,
 } from '../infrastructure';
 import { ProductStockPostSubtractProcessor } from './product-stock-post-subtract.processor';
@@ -19,9 +19,9 @@ import { ProductStockPostSubtractProcessor } from './product-stock-post-subtract
   imports: [ProductCoreModule, ProductStockCoreModule],
   providers: [
     ProductStockPostSubtractProcessor,
-    ProductStockPostSubtractUseCase,
-    ProductStockPostSubtractReportFailureUseCase,
-    ProductStockPostSubtractRepository.PROVIDER,
+    ProductStockPostSubtractProcessCase,
+    ProductStockPostSubtractReportWorkerFailedCase,
+    ProductStockPostSubtractProcessRepository.PROVIDER,
     ProductStockPostSubtractOnHandCoreAdapter.PROVIDER,
     ProductStockPostSubtractArchiveCoreAdapter.PROVIDER,
     ProductStockPostSubtractTransactionAdapter.PROVIDER,

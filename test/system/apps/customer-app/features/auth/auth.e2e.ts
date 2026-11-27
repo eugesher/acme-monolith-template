@@ -10,7 +10,7 @@ export class AuthE2E {
     return new AuthE2E(ctx);
   }
 
-  public handleRegister(): void {
+  public register(): void {
     describe('POST /api/auth/register', () => {
       it('should create a customer and append the ledger entry of the registration', async () => {
         const response = await request(this.ctx.app.getHttpServer())

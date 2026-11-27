@@ -144,7 +144,7 @@ describe('libs by layer', () => {
 
   it('application may NOT reach the auth lib contract', async () => {
     await expect({
-      file: 'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      file: 'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
       code: 'import type { x } from "../../../../../../../libs/contracts/src/auth";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -155,7 +155,7 @@ describe('libs by layer', () => {
       '../../../../../../libs',
     ],
     [
-      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
       '../../../../../../../libs',
     ],
     ['apps/__layers-fixture__/src/processors/purge/shell/__fixture__.ts', '../../../../../../libs'],
@@ -167,7 +167,7 @@ describe('libs by layer', () => {
 
   it('application may NOT reach the HTTP lib', async () => {
     await expect({
-      file: 'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      file: 'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
       code: 'import { x } from "../../../../../../../libs/http/src";',
     }).toBreakRule('boundaries/dependencies');
   });
@@ -213,7 +213,7 @@ describe('libs by layer', () => {
       '../../../../../../libs',
     ],
     [
-      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
       '../../../../../../../libs',
     ],
     ['apps/__layers-fixture__/src/features/product/shell/__fixture__.ts', '../../../../../../libs'],
@@ -284,7 +284,7 @@ describe('libs by layer', () => {
     ],
     ['apps/__layers-fixture__/src/features/product/shell/__fixture__.ts', '../../../../../../libs'],
     [
-      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
       '../../../../../../../libs',
     ],
     [
@@ -309,7 +309,7 @@ describe('libs by layer', () => {
 
   it.each([
     [
-      'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
       '../../../../../../../libs',
     ],
     ['core/modules/src/__ledger-fixture__/application/__fixture__.ts', '../../../../../libs'],
@@ -423,7 +423,7 @@ describe('libs by layer', () => {
 
   it.each([
     'apps/__layers-fixture__/src/features/product/domain/__fixture__.ts',
-    'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
     'apps/__layers-fixture__/src/features/product/infrastructure/persistence/__fixture__.ts',
     'apps/__layers-fixture__/src/features/product/shell/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',
@@ -444,7 +444,7 @@ describe('libs by layer', () => {
   );
 
   it.each([
-    'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
     'apps/__layers-fixture__/src/features/product/shell/__fixture__.module.ts',
     'core/modules/src/__ledger-fixture__/shell/__fixture__.ts',
   ])('%s may NOT read ConfigService directly', async (file) => {
@@ -476,7 +476,7 @@ describe('libs by layer', () => {
   });
 
   it.each([
-    'apps/__layers-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+    'apps/__layers-fixture__/src/features/product/application/cases/__fixture__.ts',
     'apps/__layers-fixture__/src/processors/purge/application/services/__fixture__.ts',
     'apps/__layers-fixture__/src/common/modules/idempotency/application/__fixture__.ts',
     'core/modules/src/__ledger-fixture__/application/__fixture__.ts',

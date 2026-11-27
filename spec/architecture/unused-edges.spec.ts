@@ -212,12 +212,12 @@ describe('unused edges', () => {
         '../../../../../../../../libs/contracts/src/cache',
       ],
       [
-        'a common facade may NOT reach the http lib: it hands the call to a use case',
+        'a common facade may NOT reach the http lib: it hands the call to a case',
         'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.facade.ts',
         '../../../../../../../libs/http/src',
       ],
       [
-        'a common facade may NOT reach the observability lib: it hands the call to a use case',
+        'a common facade may NOT reach the observability lib: it hands the call to a case',
         'apps/__unused-fixture__/src/common/modules/idempotency/shell/__fixture__.facade.ts',
         '../../../../../../../libs/observability/src',
       ],
@@ -246,12 +246,12 @@ describe('unused edges', () => {
         '../../../../../../libs/contracts/src/auth',
       ],
       [
-        'a core facade may NOT reach the http lib: it hands the call to a use case',
+        'a core facade may NOT reach the http lib: it hands the call to a case',
         'core/modules/src/__unused-fixture__/shell/__fixture__.facade.ts',
         '../../../../../libs/http/src',
       ],
       [
-        'a core facade may NOT reach the observability lib: it hands the call to a use case',
+        'a core facade may NOT reach the observability lib: it hands the call to a case',
         'core/modules/src/__unused-fixture__/shell/__fixture__.facade.ts',
         '../../../../../libs/observability/src',
       ],

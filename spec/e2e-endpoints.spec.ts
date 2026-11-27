@@ -14,15 +14,15 @@ describe('e2e endpoints', () => {
       expect.arrayContaining([
         {
           controller: 'apps/staff-app/src/features/tools/modules/tag/shell/tag.controller.ts',
-          handler: 'handleUpdate',
+          handler: 'update',
         },
         {
           controller: 'apps/customer-app/src/features/order/shell/order.controller.ts',
-          handler: 'handlePlace',
+          handler: 'place',
         },
         {
           controller: 'apps/processor-app/src/features/health/shell/health.controller.ts',
-          handler: 'handleLiveness',
+          handler: 'liveness',
         },
       ]),
     );
@@ -36,10 +36,10 @@ describe('e2e endpoints', () => {
     it('takes the decorated methods of a controller as its route handlers', () => {
       const handlers = routeHandlersOf(
         'item.controller.ts',
-        'class ItemController { @Get() handleList() {} @Post() handleCreate() {} private map() {} }',
+        'class ItemController { @Get() getMany() {} @Post() create() {} private map() {} }',
       );
 
-      expect(handlers).toEqual(['handleList', 'handleCreate']);
+      expect(handlers).toEqual(['getMany', 'create']);
     });
 
     it.each([
@@ -67,34 +67,33 @@ describe('e2e endpoints', () => {
         'no method for the endpoint',
         {
           'apps/x/test/features/item/item.e2e.ts':
-            'export class ItemE2E { public handleList(): void {} }',
+            'export class ItemE2E { public getMany(): void {} }',
         },
-        'ItemE2E of apps/x/test/features/item/item.e2e.ts has no handleCreate, the endpoint of apps/x/src/features/item/shell/item.controller.ts',
+        'ItemE2E of apps/x/test/features/item/item.e2e.ts has no create, the endpoint of apps/x/src/features/item/shell/item.controller.ts',
       ],
       [
         'a method without a case',
         {
           'apps/x/test/features/item/item.e2e.ts':
-            'export class ItemE2E { public handleCreate(): void { describe("POST /api/items", () => {}); } }',
+            'export class ItemE2E { public create(): void { describe("POST /api/items", () => {}); } }',
         },
-        'ItemE2E.handleCreate has no case',
+        'ItemE2E.create has no case',
       ],
       [
         'a method the suite never runs',
         {
           'apps/x/test/features/item/item.e2e.ts':
-            'export class ItemE2E { public handleCreate(): void { it("creates", () => {}); } }',
-          'apps/x/test/app/app.e2e-spec.ts':
-            'const itemE2E = ItemE2E.of(ctx); itemE2E.handleList();',
+            'export class ItemE2E { public create(): void { it("creates", () => {}); } }',
+          'apps/x/test/app/app.e2e-spec.ts': 'const itemE2E = ItemE2E.of(ctx); itemE2E.getMany();',
         },
-        'ItemE2E.handleCreate is never run by the suite of x',
+        'ItemE2E.create is never run by the suite of x',
       ],
     ])('rejects %s', (_case, files: Record<string, string>, violation) => {
       const violations = endpointViolations(
         [
           {
             controller: 'apps/x/src/features/item/shell/item.controller.ts',
-            handler: 'handleCreate',
+            handler: 'create',
           },
         ],
         {
@@ -112,16 +111,15 @@ describe('e2e endpoints', () => {
     ])('accepts an endpoint run from %s', (_case, e2eFile) => {
       const files: Record<string, string> = {
         [e2eFile]:
-          'export class ItemE2E { public handleCreate(): void { it.each([1])("creates %s", () => {}); } }',
-        'apps/x/test/app/app.e2e-spec.ts':
-          'const itemE2E = ItemE2E.of(ctx); itemE2E.handleCreate();',
+          'export class ItemE2E { public create(): void { it.each([1])("creates %s", () => {}); } }',
+        'apps/x/test/app/app.e2e-spec.ts': 'const itemE2E = ItemE2E.of(ctx); itemE2E.create();',
       };
 
       const violations = endpointViolations(
         [
           {
             controller: 'apps/x/src/features/item/shell/item.controller.ts',
-            handler: 'handleCreate',
+            handler: 'create',
           },
         ],
         {

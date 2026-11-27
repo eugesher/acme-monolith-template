@@ -24,7 +24,7 @@ export class ProductStockLedgerCoreAdapter implements IProductStockLedgerPort {
   public async appendAdded(command: IProductStockLedgerAppendAddedCommand): Promise<void> {
     const { productStockId, subjectId, occurredAt, payload } = command;
 
-    await this.ledger.handleAppendEnqueue({
+    await this.ledger.appendEnqueue({
       operationKey: `product-restocked:${productStockId}`,
       subjectType: LedgerSubjectTypeEnum.PRODUCT,
       subjectId,

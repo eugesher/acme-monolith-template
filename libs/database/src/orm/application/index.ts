@@ -1,1 +1,1 @@
-export * from './use-cases/orm-get-repository.use-case';
+export * from './cases/orm-get-repository.case';

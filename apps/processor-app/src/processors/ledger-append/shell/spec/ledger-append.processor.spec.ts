@@ -4,29 +4,32 @@ import { CorrelationContextHelper } from '@acme-libs/observability';
 import type { ILedgerAppendProcessorPayload } from '@acme-core/contracts/ledger';
 
 import { LedgerAppendProcessor } from '../ledger-append.processor';
-import type { LedgerAppendReportFailureUseCase, LedgerAppendUseCase } from '../../application';
+import type {
+  LedgerAppendProcessCase,
+  LedgerAppendReportWorkerFailedCase,
+} from '../../application';
 
 describe('LedgerAppendProcessor', () => {
   let correlationIds: string[];
-  let append: jest.Mocked<Pick<LedgerAppendUseCase, 'execute'>>;
-  let reportFailure: jest.Mocked<Pick<LedgerAppendReportFailureUseCase, 'execute'>>;
+  let processCase: jest.Mocked<Pick<LedgerAppendProcessCase, 'execute'>>;
+  let reportWorkerFailedCase: jest.Mocked<Pick<LedgerAppendReportWorkerFailedCase, 'execute'>>;
   let processor: LedgerAppendProcessor;
 
   beforeEach(() => {
     correlationIds = [];
-    append = { execute: jest.fn() };
-    append.execute.mockImplementation(() => {
-      correlationIds.push(CorrelationContextHelper.current('LedgerAppendUseCase'));
+    processCase = { execute: jest.fn() };
+    processCase.execute.mockImplementation(() => {
+      correlationIds.push(CorrelationContextHelper.current('LedgerAppendProcessCase'));
 
       return Promise.resolve();
     });
-    reportFailure = { execute: jest.fn() };
-    reportFailure.execute.mockImplementation(() => {
-      correlationIds.push(CorrelationContextHelper.current('LedgerAppendReportFailureUseCase'));
+    reportWorkerFailedCase = { execute: jest.fn() };
+    reportWorkerFailedCase.execute.mockImplementation(() => {
+      correlationIds.push(CorrelationContextHelper.current('LedgerAppendReportWorkerFailedCase'));
     });
     processor = new LedgerAppendProcessor(
-      append as unknown as LedgerAppendUseCase,
-      reportFailure as unknown as LedgerAppendReportFailureUseCase,
+      processCase as unknown as LedgerAppendProcessCase,
+      reportWorkerFailedCase as unknown as LedgerAppendReportWorkerFailedCase,
     );
   });
 
@@ -44,7 +47,7 @@ describe('LedgerAppendProcessor', () => {
         },
       } as unknown as Job<ILedgerAppendProcessorPayload>);
 
-      expect(append.execute).toHaveBeenCalledWith({
+      expect(processCase.execute).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
         subjectType: 'product',
         subjectId: '12',
@@ -56,7 +59,7 @@ describe('LedgerAppendProcessor', () => {
     });
 
     it('passes a failing append through, so BullMQ retries the job', async () => {
-      append.execute.mockRejectedValue(new Error('deadlock'));
+      processCase.execute.mockRejectedValue(new Error('deadlock'));
 
       const handling = processor.process({
         data: {
@@ -74,9 +77,9 @@ describe('LedgerAppendProcessor', () => {
     });
   });
 
-  describe('handleFailed', () => {
+  describe('onWorkerFailed', () => {
     it('reports the failed attempt inside the correlation context of the producer', async () => {
-      await processor.handleFailed(
+      await processor.onWorkerFailed(
         {
           data: {
             operationKey: 'product-created:12',
@@ -93,7 +96,7 @@ describe('LedgerAppendProcessor', () => {
         new Error('deadlock'),
       );
 
-      expect(reportFailure.execute).toHaveBeenCalledWith({
+      expect(reportWorkerFailedCase.execute).toHaveBeenCalledWith({
         operationKey: 'product-created:12',
         attempt: 2,
         attempts: 3,

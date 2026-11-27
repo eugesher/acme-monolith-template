@@ -7,19 +7,19 @@ describe('CatalogCacheAdapter', () => {
   let adapter: CatalogCacheAdapter;
 
   beforeEach(() => {
-    cache = { handleGet: jest.fn(), handleDelByPrefix: jest.fn(), handleWrap: jest.fn() };
+    cache = { get: jest.fn(), delByPrefix: jest.fn(), wrap: jest.fn() };
     adapter = new CatalogCacheAdapter(cache);
   });
 
   describe('read', () => {
     it('reads the page window through the cache under its key and TTL', async () => {
       const compute = jest.fn();
-      cache.handleWrap.mockResolvedValue({ page: 2, count: 0, pageCount: 0, total: 0, data: [] });
+      cache.wrap.mockResolvedValue({ page: 2, count: 0, pageCount: 0, total: 0, data: [] });
 
       const page = await adapter.read({ page: 2, limit: 10, ttlMs: 60_000, compute });
 
       expect(page).toEqual({ page: 2, count: 0, pageCount: 0, total: 0, data: [] });
-      expect(cache.handleWrap).toHaveBeenCalledWith({
+      expect(cache.wrap).toHaveBeenCalledWith({
         key: 'acme:catalog:v1:page:2:limit:10',
         ttlMs: 60_000,
         compute,

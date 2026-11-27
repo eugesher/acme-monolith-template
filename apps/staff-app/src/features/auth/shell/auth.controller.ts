@@ -6,7 +6,7 @@ import { ApiErrorResponses, AuthThrottle } from '@acme-libs/http';
 import { IdentityExceptionCodeEnum } from '@acme-libs/kernel';
 import type { IAuthCurrentUserView } from '@acme-libs/contracts/auth';
 
-import { AuthLoginUseCase, AuthMeUseCase } from '../application';
+import { AuthLoginCase, AuthMeCase } from '../application';
 import {
   AuthAccessTokenResponseDto,
   AuthHttpExceptionFilter,
@@ -19,8 +19,8 @@ import {
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly login: AuthLoginUseCase,
-    private readonly me: AuthMeUseCase,
+    private readonly loginCase: AuthLoginCase,
+    private readonly meCase: AuthMeCase,
   ) {}
 
   @Post('login')
@@ -36,10 +36,10 @@ export class AuthController {
       IdentityExceptionCodeEnum.AUTH_USER_INACTIVE,
     ],
   })
-  public async handleLogin(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
+  public async login(@Body() body: AuthLoginRequestDto): Promise<AuthAccessTokenResponseDto> {
     const { email, password } = body;
 
-    return await this.login.execute({ email, password });
+    return await this.loginCase.execute({ email, password });
   }
 
   @Get('me')
@@ -49,9 +49,9 @@ export class AuthController {
     filterStatus: AuthHttpExceptionFilter.STATUS,
     codes: [IdentityExceptionCodeEnum.AUTH_USER_NOT_FOUND],
   })
-  public async handleMe(@CurrentUser() user: IAuthCurrentUserView): Promise<AuthMeResponseDto> {
+  public async me(@CurrentUser() user: IAuthCurrentUserView): Promise<AuthMeResponseDto> {
     const { id } = user;
 
-    return await this.me.execute({ userId: id });
+    return await this.meCase.execute({ userId: id });
   }
 }

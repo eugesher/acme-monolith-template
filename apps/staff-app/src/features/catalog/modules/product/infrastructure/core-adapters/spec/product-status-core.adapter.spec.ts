@@ -7,20 +7,20 @@ describe('ProductStatusCoreAdapter', () => {
   let adapter: ProductStatusCoreAdapter;
 
   beforeEach(() => {
-    product = { handleArchive: jest.fn() };
+    product = { archive: jest.fn() };
     adapter = new ProductStatusCoreAdapter(product);
   });
 
   describe('archive', () => {
     it('archives the product of the command through the core module', async () => {
-      product.handleArchive.mockResolvedValue({
+      product.archive.mockResolvedValue({
         outcome: ProductCoreArchiveOutcomeEnum.ARCHIVED,
         currentVersion: 4,
       });
 
       const view = await adapter.archive({ productId: '12', expectedVersion: 3 });
 
-      expect(product.handleArchive).toHaveBeenCalledWith({ productId: '12', expectedVersion: 3 });
+      expect(product.archive).toHaveBeenCalledWith({ productId: '12', expectedVersion: 3 });
       expect(view).toEqual({ outcome: 'archived', currentVersion: 4 });
     });
 
@@ -29,7 +29,7 @@ describe('ProductStatusCoreAdapter', () => {
       [ProductCoreArchiveOutcomeEnum.NOT_FOUND, 'not-found'],
       [ProductCoreArchiveOutcomeEnum.VERSION_MISMATCH, 'version-mismatch'],
     ])('turns the core outcome %s into %s', async (outcome, expected) => {
-      product.handleArchive.mockResolvedValue({ outcome, currentVersion: 5 });
+      product.archive.mockResolvedValue({ outcome, currentVersion: 5 });
 
       const view = await adapter.archive({ productId: '12', expectedVersion: undefined });
 

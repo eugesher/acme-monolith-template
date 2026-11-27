@@ -72,7 +72,7 @@ describe('app entities (@acme-<app>/common/entities)', () => {
       '../../../common/entities',
     ],
     [
-      'apps/__entities-fixture__/src/features/product/application/use-cases/__fixture__.ts',
+      'apps/__entities-fixture__/src/features/product/application/cases/__fixture__.ts',
       '../../../../common/entities',
     ],
     [

@@ -7,15 +7,15 @@ import type {
   IAuthCommonSubjectView,
 } from '@acme-staff/contracts/auth';
 
-import { AuthCommonFindSubjectUseCase } from '../application';
+import { AuthCommonFindSubjectCase } from '../application';
 
 @Injectable()
 export class AuthCommonFacade implements IAuthCommonPort {
-  constructor(private readonly findSubject: AuthCommonFindSubjectUseCase) {}
+  constructor(private readonly findSubjectCase: AuthCommonFindSubjectCase) {}
 
-  public async handleFindSubject(
+  public async findSubject(
     command: IAuthCommonFindSubjectCommand,
   ): Promise<Nullable<IAuthCommonSubjectView>> {
-    return await this.findSubject.execute(command);
+    return await this.findSubjectCase.execute(command);
   }
 }

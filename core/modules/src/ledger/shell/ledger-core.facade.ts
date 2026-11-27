@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 
 import type { ILedgerCoreAppendEnqueueCommand, ILedgerCorePort } from '@acme-core/contracts/ledger';
 
-import { LedgerCoreAppendEnqueueUseCase } from '../application';
+import { LedgerCoreAppendEnqueueCase } from '../application';
 
 @Injectable()
 export class LedgerCoreFacade implements ILedgerCorePort {
-  constructor(private readonly appendEnqueue: LedgerCoreAppendEnqueueUseCase) {}
+  constructor(private readonly appendEnqueueCase: LedgerCoreAppendEnqueueCase) {}
 
-  public async handleAppendEnqueue(command: ILedgerCoreAppendEnqueueCommand): Promise<void> {
-    await this.appendEnqueue.execute(command);
+  public async appendEnqueue(command: ILedgerCoreAppendEnqueueCommand): Promise<void> {
+    await this.appendEnqueueCase.execute(command);
   }
 }

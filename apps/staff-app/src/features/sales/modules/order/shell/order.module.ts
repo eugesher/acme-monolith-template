@@ -3,10 +3,10 @@ import { Module } from '@nestjs/common';
 import { TagCommonModule } from '@acme-staff/common/modules';
 
 import {
-  OrderGetManyUseCase,
-  OrderGetOneUseCase,
-  OrderGetTagsUseCase,
-  OrderReplaceTagsUseCase,
+  OrderGetManyCase,
+  OrderGetOneCase,
+  OrderGetTagsCase,
+  OrderReplaceTagsCase,
 } from '../application';
 import {
   OrderGetManyRepository,
@@ -22,10 +22,10 @@ import { OrderController } from './order.controller';
   imports: [TagCommonModule],
   controllers: [OrderController],
   providers: [
-    OrderGetManyUseCase,
-    OrderGetOneUseCase,
-    OrderGetTagsUseCase,
-    OrderReplaceTagsUseCase,
+    OrderGetManyCase,
+    OrderGetOneCase,
+    OrderGetTagsCase,
+    OrderReplaceTagsCase,
     OrderGetManyRepository.PROVIDER,
     OrderGetOneRepository.PROVIDER,
     OrderGetTagsRepository.PROVIDER,

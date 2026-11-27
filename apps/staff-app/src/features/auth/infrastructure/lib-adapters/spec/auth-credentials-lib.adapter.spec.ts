@@ -8,28 +8,28 @@ describe('AuthCredentialsLibAdapter', () => {
 
   beforeEach(() => {
     credentials = {
-      handleSignAccessToken: jest.fn(),
-      handleVerifyAccessToken: jest.fn(),
-      handleHashPassword: jest.fn(),
-      handleVerifyPassword: jest.fn(),
+      signAccessToken: jest.fn(),
+      verifyAccessToken: jest.fn(),
+      hashPassword: jest.fn(),
+      verifyPassword: jest.fn(),
     };
     adapter = new AuthCredentialsLibAdapter(credentials);
   });
 
   describe('issueAccessToken', () => {
     it('signs a token whose subject is the user', async () => {
-      credentials.handleSignAccessToken.mockResolvedValue('access-token');
+      credentials.signAccessToken.mockResolvedValue('access-token');
 
       const accessToken = await adapter.issueAccessToken('user-1');
 
       expect(accessToken).toBe('access-token');
-      expect(credentials.handleSignAccessToken).toHaveBeenCalledWith({ sub: 'user-1' });
+      expect(credentials.signAccessToken).toHaveBeenCalledWith({ sub: 'user-1' });
     });
   });
 
   describe('verifyPassword', () => {
     it('checks the password against its hash with the credentials lib', async () => {
-      credentials.handleVerifyPassword.mockResolvedValue(true);
+      credentials.verifyPassword.mockResolvedValue(true);
 
       const valid = await adapter.verifyPassword({
         passwordHash: 'argon-hash',
@@ -37,7 +37,7 @@ describe('AuthCredentialsLibAdapter', () => {
       });
 
       expect(valid).toBe(true);
-      expect(credentials.handleVerifyPassword).toHaveBeenCalledWith({
+      expect(credentials.verifyPassword).toHaveBeenCalledWith({
         passwordHash: 'argon-hash',
         password: 'correct-horse',
       });

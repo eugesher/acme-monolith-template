@@ -10,14 +10,14 @@ export class CatalogE2E {
 
   public execute(): void {
     describe('Product', () => {
-      this.productE2E.handleGetMany();
-      this.productE2E.handleGetOne();
-      this.productE2E.handleCreate();
-      this.productE2E.handleUpdate();
-      this.productE2E.handleArchive();
-      this.productE2E.handlePublish();
-      this.productE2E.handleGetTags();
-      this.productE2E.handleReplaceTags();
+      this.productE2E.getMany();
+      this.productE2E.getOne();
+      this.productE2E.create();
+      this.productE2E.update();
+      this.productE2E.archive();
+      this.productE2E.publish();
+      this.productE2E.getTags();
+      this.productE2E.replaceTags();
     });
   }
 }

@@ -6,7 +6,7 @@ const ROOT: string = path.resolve(__dirname, '../..');
 const TOPS = ['apps', 'core', 'libs'];
 const SKIPPED = new Set(['node_modules', 'dist', 'spec', 'test']);
 const REPOSITORY_TYPE = /^I?(\w+)Repository(Port)?$/;
-const CONSUMER_SUFFIX = /(UseCase|Service|Facade)$/;
+const CONSUMER_SUFFIX = /(Case|Service|Facade)$/;
 const PROPERTY = 'repository';
 
 export interface IRepositoryParam {

@@ -1,1 +1,1 @@
-export * from './persistence/repositories/ledger-list-entries.repository';
+export * from './persistence/repositories/ledger-get-many.repository';

@@ -1,0 +1,46 @@
+import { Inject, Injectable } from '@nestjs/common';
+
+import {
+  ProductAlreadyArchivedException,
+  ProductGetOneModel,
+  ProductNotFoundException,
+  ProductVersionMismatchException,
+} from '../../domain';
+import {
+  PRODUCT_STATUS_PORT,
+  ProductStatusArchiveOutcomeEnum,
+  type IProductStatusPort,
+} from '../../outbound';
+import { ProductAccessService } from '../services/product-access.service';
+import type { IProductArchiveCommand, IProductView } from '../types';
+
+@Injectable()
+export class ProductArchiveCase {
+  constructor(
+    private readonly accessService: ProductAccessService,
+    @Inject(PRODUCT_STATUS_PORT)
+    private readonly status: IProductStatusPort,
+  ) {}
+
+  public async execute(command: IProductArchiveCommand): Promise<IProductView> {
+    const { productId, expectedVersion } = command;
+    const archiveResult = await this.status.archive({ productId, expectedVersion });
+    const { outcome, currentVersion } = archiveResult;
+
+    if (outcome === ProductStatusArchiveOutcomeEnum.NOT_FOUND) {
+      throw new ProductNotFoundException(productId);
+    }
+
+    if (outcome === ProductStatusArchiveOutcomeEnum.VERSION_MISMATCH) {
+      throw new ProductVersionMismatchException(productId, expectedVersion, currentVersion);
+    }
+
+    if (outcome === ProductStatusArchiveOutcomeEnum.ALREADY_ARCHIVED) {
+      throw new ProductAlreadyArchivedException(productId);
+    }
+
+    const product = await this.accessService.load({ productId }, ProductGetOneModel.reconstitute);
+
+    return product.toSnapshot();
+  }
+}

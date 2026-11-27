@@ -1,3 +1,3 @@
-export * from './ports/ledger-list-entries-repository.port';
+export * from './ports/ledger-get-many-repository.port';
 
 export * from './types';

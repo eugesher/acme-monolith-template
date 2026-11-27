@@ -7,8 +7,8 @@ describe('ProductStockLedgerCoreAdapter', () => {
   let adapter: ProductStockLedgerCoreAdapter;
 
   beforeEach(() => {
-    ledger = { handleAppendEnqueue: jest.fn() };
-    ledger.handleAppendEnqueue.mockResolvedValue(undefined);
+    ledger = { appendEnqueue: jest.fn() };
+    ledger.appendEnqueue.mockResolvedValue(undefined);
     adapter = new ProductStockLedgerCoreAdapter(ledger);
   });
 
@@ -21,7 +21,7 @@ describe('ProductStockLedgerCoreAdapter', () => {
         payload: { sku: 'SKU-0001', quantity: 5 },
       });
 
-      expect(ledger.handleAppendEnqueue).toHaveBeenCalledWith({
+      expect(ledger.appendEnqueue).toHaveBeenCalledWith({
         operationKey: 'product-restocked:700',
         subjectType: 'product',
         subjectId: '12',

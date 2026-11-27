@@ -22,10 +22,10 @@ describe('App', () => {
   });
 
   describe('Auth', () => {
-    authE2E.handleRegister();
+    authE2E.register();
   });
 
   describe('Order', () => {
-    orderE2E.handlePlace();
+    orderE2E.place();
   });
 });

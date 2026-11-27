@@ -5,33 +5,35 @@ import type { IProductStockPostSubtractPayload } from '@acme-core/contracts/prod
 
 import { ProductStockPostSubtractProcessor } from '../product-stock-post-subtract.processor';
 import type {
-  ProductStockPostSubtractReportFailureUseCase,
-  ProductStockPostSubtractUseCase,
+  ProductStockPostSubtractProcessCase,
+  ProductStockPostSubtractReportWorkerFailedCase,
 } from '../../application';
 
 describe('ProductStockPostSubtractProcessor', () => {
   let correlationIds: string[];
-  let postSubtract: jest.Mocked<Pick<ProductStockPostSubtractUseCase, 'execute'>>;
-  let reportFailure: jest.Mocked<Pick<ProductStockPostSubtractReportFailureUseCase, 'execute'>>;
+  let processCase: jest.Mocked<Pick<ProductStockPostSubtractProcessCase, 'execute'>>;
+  let reportWorkerFailedCase: jest.Mocked<
+    Pick<ProductStockPostSubtractReportWorkerFailedCase, 'execute'>
+  >;
   let processor: ProductStockPostSubtractProcessor;
 
   beforeEach(() => {
     correlationIds = [];
-    postSubtract = { execute: jest.fn() };
-    postSubtract.execute.mockImplementation(() => {
-      correlationIds.push(CorrelationContextHelper.current('ProductStockPostSubtractUseCase'));
+    processCase = { execute: jest.fn() };
+    processCase.execute.mockImplementation(() => {
+      correlationIds.push(CorrelationContextHelper.current('ProductStockPostSubtractProcessCase'));
 
       return Promise.resolve();
     });
-    reportFailure = { execute: jest.fn() };
-    reportFailure.execute.mockImplementation(() => {
+    reportWorkerFailedCase = { execute: jest.fn() };
+    reportWorkerFailedCase.execute.mockImplementation(() => {
       correlationIds.push(
-        CorrelationContextHelper.current('ProductStockPostSubtractReportFailureUseCase'),
+        CorrelationContextHelper.current('ProductStockPostSubtractReportWorkerFailedCase'),
       );
     });
     processor = new ProductStockPostSubtractProcessor(
-      postSubtract as unknown as ProductStockPostSubtractUseCase,
-      reportFailure as unknown as ProductStockPostSubtractReportFailureUseCase,
+      processCase as unknown as ProductStockPostSubtractProcessCase,
+      reportWorkerFailedCase as unknown as ProductStockPostSubtractReportWorkerFailedCase,
     );
   });
 
@@ -41,12 +43,12 @@ describe('ProductStockPostSubtractProcessor', () => {
         data: { productIds: ['100', '106'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
       } as Job<IProductStockPostSubtractPayload>);
 
-      expect(postSubtract.execute).toHaveBeenCalledWith({ productIds: ['100', '106'] });
+      expect(processCase.execute).toHaveBeenCalledWith({ productIds: ['100', '106'] });
       expect(correlationIds).toEqual(['c0ffee00-0000-4000-8000-000000000001']);
     });
 
     it('passes a failing check through, so BullMQ retries the job', async () => {
-      postSubtract.execute.mockRejectedValue(new Error('deadlock'));
+      processCase.execute.mockRejectedValue(new Error('deadlock'));
 
       const handling = processor.process({
         data: { productIds: ['100'], correlationId: 'c0ffee00-0000-4000-8000-000000000001' },
@@ -56,9 +58,9 @@ describe('ProductStockPostSubtractProcessor', () => {
     });
   });
 
-  describe('handleFailed', () => {
+  describe('onWorkerFailed', () => {
     it('reports the failed attempt inside the correlation context of the subtraction', async () => {
-      await processor.handleFailed(
+      await processor.onWorkerFailed(
         {
           data: {
             productIds: ['100', '106'],
@@ -70,7 +72,7 @@ describe('ProductStockPostSubtractProcessor', () => {
         new Error('deadlock'),
       );
 
-      expect(reportFailure.execute).toHaveBeenCalledWith({
+      expect(reportWorkerFailedCase.execute).toHaveBeenCalledWith({
         productIds: ['100', '106'],
         attempt: 2,
         attempts: 3,

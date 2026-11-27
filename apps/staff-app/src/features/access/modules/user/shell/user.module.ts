@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { UserReassignRolesUseCase, UserRegisterUseCase } from '../application';
+import { UserReassignRolesCase, UserRegisterCase } from '../application';
 import {
   UserCredentialsLibAdapter,
   UserReassignRolesRepository,
@@ -12,8 +12,8 @@ import { UserController } from './user.controller';
 @Module({
   controllers: [UserController],
   providers: [
-    UserRegisterUseCase,
-    UserReassignRolesUseCase,
+    UserRegisterCase,
+    UserReassignRolesCase,
     UserReassignRolesRepository.PROVIDER,
     UserRegisterRepository.PROVIDER,
     UserCredentialsLibAdapter.PROVIDER,

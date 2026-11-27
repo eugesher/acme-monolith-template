@@ -3,10 +3,10 @@ import { SelectQueryBuilder } from 'typeorm';
 import { ProductStatusEnum } from '@acme-libs/kernel';
 import type { Product } from '@acme-core/entities';
 
-import type { ICatalogProductListQuery } from '../../../outbound';
+import type { ICatalogGetProductListQuery } from '../../../outbound';
 
 export class CatalogPersistenceProductBuilder extends SelectQueryBuilder<Product> {
-  public forList(query: ICatalogProductListQuery): this {
+  public forList(query: ICatalogGetProductListQuery): this {
     const { limit, offset } = query;
 
     this.select([`${this.alias}.id`, `${this.alias}.sku`, `${this.alias}.name`])

@@ -1,1 +1,1 @@
-export * from './views/permission-list.view';
+export * from './views/permission-get-many.view';
