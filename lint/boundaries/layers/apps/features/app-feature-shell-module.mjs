@@ -1,0 +1,22 @@
+export default {
+  category: 'acme-app:features:shell:module',
+  pattern: 'apps/*/src/features/{*,*/modules/*}/shell/*.module.ts',
+  capture: ['app', 'module'],
+  allow: [
+    '@acme-<app>/features/<module>/application',
+    '@acme-<app>/features/<module>/infrastructure',
+    '@acme-<app>/features/<module>/shell',
+    '@acme-<app>/features/<module>/modules',
+    '@acme-<app>/common/shared',
+    '@acme-<app>/common/modules',
+    '@acme-core/modules/*',
+    '@acme-core/queues',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@acme-libs/auth',
+    '@acme-libs/health',
+    '@acme-libs/http',
+    '@nestjs/common',
+  ],
+};

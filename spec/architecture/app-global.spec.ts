@@ -33,15 +33,15 @@ describe('global modules (global/) — modules without controllers', () => {
 
   it('bootstrap MAY reach the global modules index', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/app/__fixture__.ts',
-      code: 'import { x } from "../global";',
+      file: 'apps/__global-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../global";',
     }).toPassArchitectureLint();
   });
 
   it('bootstrap may NOT reach a global module past the index', async () => {
     await expect({
-      file: 'apps/__global-fixture__/src/app/__fixture__.ts',
-      code: 'import { x } from "../global/auth/shell/auth.module";',
+      file: 'apps/__global-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../global/auth/shell/auth.module";',
     }).toBreakRule('boundaries/dependencies');
   });
 

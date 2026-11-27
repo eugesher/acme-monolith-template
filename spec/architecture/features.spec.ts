@@ -584,15 +584,15 @@ describe('features', () => {
 
     it('bootstrap MAY mount modules through the features index', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../features";',
+        file: 'apps/__features-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../features";',
       }).toPassArchitectureLint();
     });
 
     it('bootstrap may NOT reach a module past the features index', async () => {
       await expect({
-        file: 'apps/__features-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../features/product";',
+        file: 'apps/__features-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../features/product";',
       }).toBreakRule('boundaries/dependencies');
     });
 

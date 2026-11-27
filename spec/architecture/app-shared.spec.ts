@@ -44,8 +44,8 @@ describe('app shared code (common/shared) — barrels and contracts', () => {
 
   it('bootstrap may NOT reach app contracts', async () => {
     await expect({
-      file: 'apps/__shared-fixture__/src/app/__fixture__.ts',
-      code: 'import { x } from "../contracts/auth";',
+      file: 'apps/__shared-fixture__/src/app/shell/app.module.ts',
+      code: 'import { x } from "../../contracts/auth";',
     }).toBreakRule('boundaries/dependencies');
   });
 

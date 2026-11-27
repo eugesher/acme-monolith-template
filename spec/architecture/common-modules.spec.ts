@@ -378,7 +378,7 @@ describe('common modules (common/modules/<module>)', () => {
         'apps/__common-fixture__/src/features/product/outbound/ports/__fixture__.ts',
         '../../../../contracts/idempotency',
       ],
-      ['apps/__common-fixture__/src/app/__fixture__.ts', '../contracts/idempotency'],
+      ['apps/__common-fixture__/src/app/shell/app.module.ts', '../../contracts/idempotency'],
     ])('%s may NOT reach app contracts', async (file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(
         'boundaries/dependencies',
@@ -425,7 +425,7 @@ describe('common modules (common/modules/<module>)', () => {
         'apps/__common-fixture__/src/features/product/application/cases/__fixture__.ts',
         '../../../../common/modules',
       ],
-      ['apps/__common-fixture__/src/app/__fixture__.ts', '../common/modules/idempotency'],
+      ['apps/__common-fixture__/src/app/shell/app.module.ts', '../../common/modules/idempotency'],
       ['apps/__common-fixture__/test/app/__fixture__.e2e-spec.ts', '../../src/common/modules'],
     ])('%s may NOT mount a common module', async (file, source) => {
       await expect({ file, code: `import { x } from "${source}";` }).toBreakRule(

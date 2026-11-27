@@ -217,7 +217,7 @@ describe('lib entry points', () => {
 
   it('the Redis client token may NOT be imported outside specs', async () => {
     await expect({
-      file: 'apps/staff-app/src/app/__fixture__.ts',
+      file: 'apps/staff-app/src/app/setup/config/__fixture__.ts',
       code: 'import { CACHE_REDIS_CLIENT_TOKEN } from "@acme-libs/testing";',
     }).toBreakRule('boundaries/dependencies');
   });

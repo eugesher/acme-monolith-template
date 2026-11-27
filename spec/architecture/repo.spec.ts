@@ -96,7 +96,7 @@ describe('repo', () => {
     });
   });
 
-  describe('system tests (repo:system)', () => {
+  describe('system tests (repo:test:system)', () => {
     it('a system test MAY mount the app modules and its own context', async () => {
       await expect({
         file: 'test/system/apps/staff-app/app/__fixture__.ts',

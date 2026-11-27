@@ -1,0 +1,22 @@
+export default {
+  category: 'acme-core:modules:infrastructure',
+  pattern: 'core/modules/src/*/infrastructure/**',
+  capture: ['module'],
+  allow: [
+    '@acme-core/modules/<module>/outbound/**',
+    '@acme-core/modules/<module>/infrastructure',
+    '@acme-core/modules/<module>/infrastructure/queue',
+    '@acme-core/modules/<module>/infrastructure/config',
+    '@acme-core/modules/<module>/infrastructure/core-adapters',
+    '@acme-core/modules/<module>/infrastructure/lib-adapters',
+    '@acme-core/entities',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@acme-libs/contracts/cache',
+    '@acme-libs/contracts/database',
+    '@acme-libs/contracts/local-storage',
+    '@nestjs/common',
+    'typeorm',
+  ],
+};

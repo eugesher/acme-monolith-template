@@ -93,8 +93,8 @@ describe('app → core', () => {
   describe('bootstrap', () => {
     it('bootstrap may NOT mount a core module', async () => {
       await expect({
-        file: 'apps/__core-link-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../../../../core/modules/src/__ledger-fixture__";',
+        file: 'apps/__core-link-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../../../../core/modules/src/__ledger-fixture__";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -107,8 +107,8 @@ describe('app → core', () => {
 
     it('the rest of app/ may NOT reach the core entities, only the entity list does', async () => {
       await expect({
-        file: 'apps/__core-link-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../../../../core/entities/src";',
+        file: 'apps/__core-link-fixture__/src/app/setup/config/__fixture__.ts',
+        code: 'import { x } from "../../../../../../core/entities/src";',
       }).toBreakRule('boundaries/dependencies');
     });
   });

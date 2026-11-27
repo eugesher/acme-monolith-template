@@ -48,15 +48,15 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
   describe('mounting', () => {
     it('bootstrap MAY mount processors through the processors index', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../processors";',
+        file: 'apps/__processors-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../processors";',
       }).toPassArchitectureLint();
     });
 
     it('bootstrap may NOT reach a processor past the index', async () => {
       await expect({
-        file: 'apps/__processors-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../processors/ledger-append";',
+        file: 'apps/__processors-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../processors/ledger-append";',
       }).toBreakRule('boundaries/dependencies');
     });
 
@@ -288,7 +288,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
       'apps/__processors-fixture__/src/processors/ledger-append/infrastructure/__fixture__.ts',
       'apps/__processors-fixture__/src/features/product/presentation/__fixture__.ts',
       'apps/__processors-fixture__/src/features/product/infrastructure/__fixture__.ts',
-      'apps/__processors-fixture__/src/app/__fixture__.ts',
+      'apps/__processors-fixture__/src/app/setup/config/__fixture__.ts',
     ])('%s may NOT process a queue — only processors do', async (file) => {
       await expect({
         file,
@@ -381,7 +381,7 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
 
     it.each([
       'apps/__processors-fixture__/src/app/shell/app.module.ts',
-      'apps/__processors-fixture__/src/app/setup/queue/__fixture__.ts',
+      'apps/__processors-fixture__/src/app/setup/config/__fixture__.ts',
     ])('%s may NOT take Bull itself — the queue lib connects it to Redis', async (file) => {
       await expect({
         file,
@@ -451,8 +451,8 @@ describe('processors (processors/<module>) — modules entered by queues', () =>
 
     it('another app may NOT mount these processors', async () => {
       await expect({
-        file: 'apps/__processors-other-fixture__/src/app/__fixture__.ts',
-        code: 'import { x } from "../../../__processors-fixture__/src/processors";',
+        file: 'apps/__processors-other-fixture__/src/app/shell/app.module.ts',
+        code: 'import { x } from "../../../../__processors-fixture__/src/processors";',
       }).toBreakRule('boundaries/dependencies');
     });
   });
