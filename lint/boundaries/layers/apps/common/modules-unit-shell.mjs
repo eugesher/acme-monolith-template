@@ -1,0 +1,21 @@
+export const appsCommonModulesUnitShell = {
+  category: 'apps:common:modules:unit:shell',
+  pattern: 'apps/*/src/common/modules/*/shell/**',
+  capture: ['app', 'unit'],
+  allow: [
+    '@acme-<app>/common/modules/<unit>/application',
+    '@acme-<app>/common/modules/<unit>/infrastructure',
+    '@acme-<app>/common/modules/<unit>/infrastructure/persistence',
+    '@acme-<app>/common/modules/<unit>/infrastructure/cache',
+    '@acme-<app>/common/modules/<unit>/shell/*.facade',
+    '@acme-<app>/common/modules/<unit>/shell',
+    '@acme-<app>/contracts/<unit>',
+    '@acme-<app>/common/modules',
+    '@acme-<app>/common/shared',
+    '@acme-core/modules/*',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@nestjs/common',
+  ],
+};

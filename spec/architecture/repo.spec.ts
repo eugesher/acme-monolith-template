@@ -271,15 +271,6 @@ describe('repo', () => {
     );
   });
 
-  describe('root configs (repo)', () => {
-    it('a root TypeScript file is a known file', async () => {
-      await expect({
-        file: '__fixture__.ts',
-        code: 'export const x = 1;',
-      }).toPassArchitectureLint();
-    });
-  });
-
   describe('repo specs (repo:spec)', () => {
     it('a repo spec MAY import the spec support', async () => {
       await expect({

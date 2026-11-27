@@ -1,4 +1,4 @@
-export default [
+export const libs = [
   {
     category: 'libs',
     pattern: 'libs/*/src/**',

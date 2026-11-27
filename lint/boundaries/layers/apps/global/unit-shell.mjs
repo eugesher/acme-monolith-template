@@ -1,0 +1,21 @@
+export const appsGlobalUnitShell = {
+  category: 'apps:global:unit:shell',
+  pattern: 'apps/*/src/global/*/shell/**',
+  capture: ['app', 'unit'],
+  allow: [
+    '@acme-<app>/global/<unit>/shell',
+    '@acme-<app>/global/<unit>/application',
+    '@acme-<app>/global/<unit>/infrastructure',
+    '@acme-<app>/global/<unit>/infrastructure/persistence',
+    '@acme-<app>/global/<unit>/infrastructure/cache',
+    '@acme-<app>/contracts/<unit>',
+    '@acme-<app>/common/modules',
+    '@acme-core/modules/*',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@acme-libs/auth',
+    '@acme-libs/contracts/auth',
+    '@nestjs/common',
+  ],
+};

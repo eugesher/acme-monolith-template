@@ -1,0 +1,21 @@
+export const appsProcessorsUnitShell = {
+  category: 'apps:processors:unit:shell',
+  pattern: 'apps/*/src/processors/{*,*/modules/*}/shell/**',
+  capture: ['app', 'unit'],
+  allow: [
+    '@acme-<app>/processors/<unit>/domain',
+    '@acme-<app>/processors/<unit>/application',
+    '@acme-<app>/processors/<unit>/queues',
+    '@acme-<app>/processors/<unit>/shell',
+    '@acme-<app>/contracts',
+    '@acme-core/contracts',
+    '@acme-core/queues',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@acme-libs/observability',
+    '@nestjs/bullmq',
+    '@nestjs/common',
+    'bullmq',
+  ],
+};

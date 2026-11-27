@@ -1,0 +1,20 @@
+export const repoTestSystem = {
+  category: 'repo:test:system',
+  pattern: 'test/system/**',
+  capture: [],
+  allow: [
+    'test/system/**',
+    '@acme-*/app',
+    '@acme-core/contracts',
+    '@acme-core/queues',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@acme-libs/testing',
+    '@nestjs/bullmq',
+    '@nestjs/common',
+    'bullmq',
+    'ioredis',
+    'supertest',
+  ],
+};

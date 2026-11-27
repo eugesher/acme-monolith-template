@@ -1,0 +1,20 @@
+export const coreModulesUnitShell = {
+  category: 'core:modules:unit:shell',
+  pattern: 'core/modules/src/*/shell/**',
+  capture: ['unit'],
+  allow: [
+    '@acme-core/modules/<unit>/application',
+    '@acme-core/modules/<unit>/infrastructure',
+    '@acme-core/modules/<unit>/infrastructure/persistence',
+    '@acme-core/modules/<unit>/infrastructure/cache',
+    '@acme-core/modules/<unit>/shell/*.facade',
+    '@acme-core/modules/<unit>/shell',
+    '@acme-core/contracts/<unit>',
+    '@acme-core/modules/*',
+    '@acme-core/queues',
+    '@acme-libs/kernel',
+    '@acme-libs/toolkit',
+    '@acme-libs/domain',
+    '@nestjs/common',
+  ],
+};
