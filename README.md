@@ -372,3 +372,165 @@ Then start the apps, each with its own env file and port:
 ```bash
 docker run --rm --volume "$PWD/env/apps/staff-app/.env:/app/env/apps/staff-app/.env:ro" --publish 3000:3000 acme-staff-app
 ```
+
+## Caching
+
+The cache lives in Redis, and all three apps share one Redis. The scheme is simple (cache-aside):
+look for the value in Redis, and if it isn't there, compute it and store it with a TTL. When a write
+makes the value stale, it just gets deleted. Right now one thing is cached: the product catalog,
+`GET /api/products` in `customer-app`. `staff-app` and `processor-app` drop it when they change
+products.
+
+1. [What it's made of](#what-its-made-of)
+2. [App startup](#app-startup)
+3. [A cached request](#a-cached-request)
+4. [Dropping after a write](#dropping-after-a-write)
+5. [When Redis is down](#when-redis-is-down)
+6. [Traces](#traces)
+7. [Settings](#settings)
+8. [How to cache something of your own](#how-to-cache-something-of-your-own)
+9. [How to check it](#how-to-check-it)
+
+### What it's made of
+
+- `libs/cache` is the library itself. It provides `CACHE_PORT` with three methods: `wrap` (take it
+  from the cache, or compute and store it), `get` (just take it) and `delByPrefix` (delete every key
+  with a prefix).
+- `libs/contracts/src/cache` holds `CACHE_PORT` and the `CACHE_KEYS`. The keys live in a shared
+  contract because one app stores them and another one deletes them.
+- Module ports. Features don't touch `CACHE_PORT` directly: each one has its own port
+  (`CATALOG_CACHE_PORT`, `PRODUCT_CATALOG_CACHE_PORT`, `PRODUCT_CORE_CATALOG_CACHE_PORT`), and an
+  adapter in `infrastructure/cache` builds the key and calls `CACHE_PORT`.
+
+Keys look like this: `acme:catalog:v1:page:<page>:limit:<limit>`. The shared prefix lets one
+`delByPrefix('acme:catalog:v1:')` wipe every page of the catalog. The `v1` is there for when the
+format of the value changes (say, a product gets a new field). Then you change `CATALOG_KEY_VERSION`
+in `libs/contracts/src/cache/keys/cache-keys.ts` to `v2` by hand, and the new code reads and writes
+only `acme:catalog:v2:...` keys. Nobody deletes the old `v1` entries: they're just never read again
+and expire on their TTL. It also saves you during a rollout: while old replicas are still running,
+they read their `v1` and new ones read their `v2`, so nobody gets a value in the wrong format.
+
+### App startup
+
+The cache is wired in `AppSetupBaseModule`, so all three apps have it. At startup an ioredis client
+gets created: the address and password come from `REDIS_*`, TLS from `REDIS_TLS_CA` and the
+per-command timeout from `REDIS_COMMAND_TIMEOUT_MS`. The client starts connecting right away, but
+the app doesn't wait for it: if Redis isn't up yet, the app starts anyway, and the client logs a
+warning and reconnects on its own.
+
+If any `REDIS_*` is missing (and `CACHE_TTL_MS_DEFAULT` in `customer-app`), the app stops at startup
+with a validation error.
+
+The tracer has to load before ioredis, otherwise Redis commands don't show up in traces. That's why
+the first line of `main.ts` is `import '@acme-libs/observability/tracer'`.
+
+On shutdown the app closes its Redis connection.
+
+### A cached request
+
+What happens on `GET /api/products?page=1&limit=2` in `customer-app`:
+
+1. `CatalogGetProductListCase` fixes up `page` and `limit` (at most 1000 and 100, 1 and 20 by
+   default) and hands the cache port a `compute` function that reads the page from the database. The
+   case knows nothing about keys or hits.
+2. `CatalogCacheAdapter` builds the key `acme:catalog:v1:page:1:limit:2` and calls
+   `CACHE_PORT.wrap`.
+3. `wrap` looks the key up in Redis. If it's there, it returns it and the database isn't read. If
+   not, it calls `compute` and stores the result with the TTL. An empty result (`null` or
+   `undefined`) doesn't go into the cache.
+
+Since `page` and `limit` get fixed up before the key is built, `limit=500` and `limit=100` land on
+the same key, `...:limit:100`.
+
+If several requests hit the same key at once and the cache is empty, the database is read once and
+the other requests wait for the result. Here's how: `wrap` keeps an in-memory `Map` from a key to
+the promise that's computing its value right now. The first request doesn't find the key there,
+starts the Redis read and `compute`, and puts its promise in the `Map`. The next requests with the
+same key find that promise and just wait for it. Once the promise settles (resolved or rejected),
+the key is removed from the `Map`, and the next request goes to Redis again. Since the `Map` lives
+in process memory, this only works within one replica: two replicas each hit the database once.
+
+Values are stored as JSON, so anything JSON can't handle comes back from the cache differently: a
+`Date` comes back as a string, a `Map` as an empty object.
+
+The cache is also hit by `GET /api/health/ready`: it reads the key `acme:health:probe` and answers
+503 if Redis didn't respond within a second or returned an error. Nothing is stored under that key
+and nobody writes it: the probe gets an empty answer, and that's fine. All that matters is that
+Redis answered and how fast: the response time goes into the probe's response as `latencyMs`.
+
+### Dropping after a write
+
+The catalog is read in `customer-app` but changed in other apps, so they're the ones that drop it,
+through the shared Redis and the shared prefix from `CACHE_KEYS`:
+
+| What changes                      | Where                                       | When it's dropped |
+| --------------------------------- | ------------------------------------------- | ----------------- |
+| updating and publishing a product | the catalog feature in `staff-app`          | after the write   |
+| archiving a product               | the `product` core module (`staff-app`)     | after the commit  |
+| archiving after a stock write-off | the `product` core module (`processor-app`) | after the commit  |
+
+Every page goes at once, not just the changed ones: one write can shift products across all pages
+and change the `total` of each. Keys are deleted with `SCAN` and `UNLINK`, so Redis doesn't block
+while it happens. If the write fails, the cache is left alone.
+
+A stale page can still slip through: if it was read right before the write, it can land in the cache
+after the drop. Then it lives until its TTL runs out, so the TTL is the most the catalog can lag
+behind.
+
+### When Redis is down
+
+Requests don't fail because of it:
+
+- the read failed: the value is computed from the database and returned, without being cached;
+- the store failed: the value still goes to the client;
+- the drop failed: the product write goes through, and the old pages live until their TTL.
+
+Each of these gets logged as a warning. While Redis is unreachable, commands fail right away instead
+of waiting for a reconnect, so a request only gets a few milliseconds slower.
+`REDIS_COMMAND_TIMEOUT_MS` is for another case: Redis is connected but not answering.
+
+### Traces
+
+Every cache call has a span: `cache.wrap`, `cache.get` or `cache.delByPrefix`. The attributes hold
+the key or prefix, `cache.hit` (hit or not) and `cache.keys_unlinked` (how many keys got deleted).
+If Redis let it down and the cache worked around it, `cache.error` says `read`, `write` or `unlink`,
+but the span itself stays green, since the client got its answer. Redis commands show up inside as
+child spans. In Jaeger a miss looks like `cache.wrap` with `cache.hit=false` and a MySQL query
+inside, and a hit has no database query.
+
+### Settings
+
+| Variable                   | Where          | What it sets                                  |
+| -------------------------- | -------------- | --------------------------------------------- |
+| `REDIS_HOST`, `REDIS_PORT` | all apps       | the Redis address, one for all apps           |
+| `REDIS_PASSWORD`           | all apps       | the Redis password                            |
+| `REDIS_TLS_CA`             | all apps       | path to the CA for TLS; empty means no TLS    |
+| `REDIS_COMMAND_TIMEOUT_MS` | all apps       | timeout of one command, `500` in the examples |
+| `CACHE_TTL_MS_DEFAULT`     | `customer-app` | TTL of catalog pages, `60000` in the examples |
+
+The TypeORM query cache is off. If you want to turn it on with `cache: { type: 'ioredis' }`, check
+first which ioredis TypeORM expects: it wants version 5, and the template has version 6. Yarn won't
+tell you: `.yarnrc.yml` silences that warning (`YN0060`).
+
+### How to cache something of your own
+
+1. Add a key and a versioned prefix to `libs/contracts/src/cache/keys/cache-keys.ts`, for example
+   `acme:<area>:v1:`.
+2. In the module's `outbound`, add a cache port (a command with `compute` and `ttlMs`) and a token
+   for the TTL.
+3. In `infrastructure/cache`, write an adapter: it builds the key and calls `CACHE_PORT.wrap`. You
+   don't need to write logs or handle Redis failures: `libs/cache` already does that.
+4. In the module's `infrastructure/config`, bind the TTL token to a variable, and add the variable
+   to the app's Joi schema and env files.
+5. Wherever a write makes the value stale, drop the cache through your module's port: in a feature,
+   after the write; in a core module, in the transaction's `afterCommit`.
+
+This works when there aren't many keys, since every write wipes them all. The catalog, with no
+filters and capped `page` and `limit`, fits; a list with filters and search doesn't.
+
+### How to check it
+
+`.http/customer-app/catalog/get-product-list/` has two requests about the cache: `03-cache-write`
+stores a page in the cache, and `04-cache-hit` returns a page put into Redis beforehand, without
+touching the database. Each one's description says what to put in Redis before the request and what
+to delete after. The catalog e2e tests check the same things.
