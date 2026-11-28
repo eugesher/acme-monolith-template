@@ -531,6 +531,14 @@ filters and capped `page` and `limit`, fits; a list with filters and search does
 ### How to check it
 
 `.http/customer-app/catalog/get-product-list/` has two requests about the cache: `03-cache-write`
-stores a page in the cache, and `04-cache-hit` returns a page put into Redis beforehand, without
-touching the database. Each one's description says what to put in Redis before the request and what
-to delete after. The catalog e2e tests check the same things.
+and `04-cache-hit`. The requests themselves don't put anything in Redis or clean it up: the
+`Before:` and `After:` lines in their descriptions are the steps the e2e test takes around the
+request. If you send the requests by hand, you run those Redis commands yourself (`.http/README.md`
+says how to connect to the Redis of the test infrastructure):
+
+- for `03-cache-write`, delete the `acme:catalog:*` keys, send the request and check that Redis now
+  has the key `acme:catalog:v1:page:1:limit:2` with a TTL of about a minute;
+- for `04-cache-hit`, put a page under the key `acme:catalog:v1:page:1:limit:20` and send the
+  request: it returns that page without reading the database.
+
+The catalog e2e tests do all of this on their own.
