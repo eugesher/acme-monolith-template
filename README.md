@@ -814,32 +814,116 @@ If the case opens the transaction itself, it doesn't need a hook: the line after
 
 ### Row locks
 
-Where two writes must not cross, the case locks rows inside the transaction:
+A lock is needed when a case first reads rows, makes a decision based on them and only then changes
+data. Between the read and the change another request can change the same data, and the decision
+ends up made on stale numbers. For example, two orders both see 1 unit in stock at the same time,
+both decide there's enough and both take it, and the stock goes negative.
 
-| What                                             | Lock                             | Why                                                    |
-| ------------------------------------------------ | -------------------------------- | ------------------------------------------------------ |
-| the products of an order or a restock            | `FOR UPDATE` on the product rows | two orders don't sell the last units twice             |
-| the stock sum                                    | `FOR SHARE`                      | the stock doesn't change while it's being checked      |
-| a product being archived                         | `FOR UPDATE`                     | the archive and an edit don't overwrite each other     |
-| tags while replacing a product's or order's tags | `FOR SHARE`                      | a tag isn't deleted or renamed while it's being linked |
+To prevent that, the case reads the rows with a lock inside its transaction. MySQL holds the lock
+until the commit or rollback, and a second request that wants the same rows waits. There are two
+kinds:
 
-Products are locked in ascending id order. If two orders took the same products in a different
-order, they could block each other (a deadlock); with one shared order the second one just waits for
-the first.
+- `FOR UPDATE` is exclusive. While someone holds it, nobody else can take `FOR UPDATE` or
+  `FOR SHARE` on those rows or change them. A plain `SELECT` without a lock reads the rows as before
+  and doesn't wait.
+- `FOR SHARE` is shared. Several transactions can hold it at once, but nobody can change the row or
+  take `FOR UPDATE` on it until the shared locks are released.
+
+In the code the lock is set by a builder: `setLock('pessimistic_write')` gives `FOR UPDATE`, and
+`setLock('pessimistic_read')` gives `FOR SHARE`.
+
+| Where                                    | What gets locked                        | Lock         |
+| ---------------------------------------- | --------------------------------------- | ------------ |
+| an order, a restock, the stock check     | the product rows, in ascending id order | `FOR UPDATE` |
+| the same, when summing the stock         | the stock movements of those products   | `FOR SHARE`  |
+| archiving a product                      | the product row                         | `FOR UPDATE` |
+| replacing the tags of a product or order | the product or order row                | `FOR UPDATE` |
+| the same                                 | the chosen tags                         | `FOR SHARE`  |
+
+**Stock.** Stock isn't stored anywhere: it's the sum of the `product_stock` rows, and every movement
+is a new row with `+n` or `-n`. So there's no "stock" to lock, and the product row plays the role of
+the lock. An order in `customer-app` goes like this:
+
+1. `FOR UPDATE` on the rows of all the order's products. A second order with any of these products
+   waits here.
+2. `SUM(quantity)` over the movements of these products with `FOR SHARE`.
+3. A check that there's enough of everything. If not, an error and a rollback, and the locks are
+   released.
+4. A `-1` movement inserted for every unit, and the commit.
+
+The second order waits for the first one to commit and counts the stock with its movements already
+in. A restock in `staff-app` and the stock check in `processor-app` take the same locks in the same
+order, so all three see each other.
+
+**Lock order.** Products are locked in one query, in ascending id order. If one order took product 3
+and then 5, and another took 5 and then 3, each would hold one row and wait for the other: that's a
+deadlock. With one shared order both start with 3, and the second one just waits for the first.
+
+**Archiving.** The product core module takes `FOR UPDATE` on the product row, checks the version and
+the status and updates the row. Until the archive commits, an order for that product waits on its
+own `FOR UPDATE`, and then sees that the product is no longer active.
+
+**Tags.** Replacing a product's tags locks the product itself (`FOR UPDATE`), so two replacements on
+one product go one after another, and the chosen tags with a shared lock (`FOR SHARE`). Deleting or
+renaming a tag waits until the replacement commits, while replacements on different products with
+the same tag don't get in each other's way.
+
+**When the wait is too long.** A lock is held until the end of the transaction, so nothing slow
+happens inside it: jobs and cache drops go into `afterCommit`. If MySQL still finds a deadlock, it
+rolls back one of the transactions, and if a wait takes longer than `innodb_lock_wait_timeout` (50
+seconds by default), the wait fails. The template doesn't retry in that case: the request answers
+500, and the client can send it again.
 
 ### Row version
 
-Products and notes have a `version` column (`@VersionColumn`). An edit runs
-`UPDATE ... WHERE id = ? AND version = <the version it read>`, and if someone changed the row in the
-meantime, zero rows get updated. That protects against lost edits without a lock (optimistic
-concurrency).
+A lock makes others wait. For edits that rarely cross, it's cheaper not to wait and to check in the
+`UPDATE` itself that nobody changed the row. That's optimistic concurrency (OCC): products and notes
+have a `version` column, and every successful edit bumps it by one.
 
-- With an `If-Match` header, the client says which version it saw. If it doesn't match, you get 412
-  and the edit isn't applied.
-- Without `If-Match`, the service rereads the row itself and retries the edit up to
-  `OCC_RETRY_ATTEMPTS` times. If that doesn't work, you get 409.
+The client passes the version in the `If-Match` HTTP request header. Where it gets it from: every
+response with a product or a note (`GET`, create, the last edit) has a `version` field, and the
+client sends it back with the next edit. The template doesn't send a separate `ETag` header, the
+version is in the response body. The header is optional, and in `staff-app` it's accepted by:
 
-Every successful edit bumps `version` by one, and the response returns the new version.
+- for a product: `PATCH /api/catalog/products/:productId`, `POST .../publish` and
+  `POST .../archive`;
+- for a note: `PATCH /api/tools/notes/:noteId` and `POST .../resolve`.
+
+In the controller the `@IfMatch()` decorator of `libs/http` reads the header and passes it to the
+case as `expectedVersion`: a number if the header came, `undefined` if it didn't.
+
+How an edit of a product, `PATCH /api/catalog/products/:productId` in `staff-app`, goes:
+
+1. `ProductWriteService` reads the product and remembers its version.
+2. If `If-Match` came, the version is compared with it. If it doesn't match, you get 412
+   `PRODUCT_VERSION_MISMATCH` right away with the current version in the response, and nothing is
+   written to the database.
+3. The model applies the edit. If nothing changed (the same name, already published), the version
+   doesn't grow and the `UPDATE` doesn't run.
+4. `UPDATE product SET ..., version = <read + 1> WHERE id = ? AND version = <read>`. It's one atomic
+   query: if someone changed the row between the read and the `UPDATE`, the `WHERE` doesn't find it
+   and zero rows get updated.
+5. One row updated: the service rereads the product and returns it with the new version.
+
+Zero rows means a conflict: another request changed the row first. What happens next depends on
+`If-Match`:
+
+- **Without `If-Match`** the client doesn't care which version it writes over, so the service starts
+  again from step 1: it rereads the product and applies the edit to the fresh version. Up to
+  `OCC_RETRY_ATTEMPTS` times (5 in the examples). Every retry is logged at `info`, and once the
+  attempts run out, a `warn` and 409 `PRODUCT_VERSION_CONFLICT`.
+- **With `If-Match`** the client said it's editing a specific version, and quietly applying the edit
+  to someone else's isn't OK. No retry: 412 `PRODUCT_VERSION_MISMATCH` right away with the current
+  version.
+
+`If-Match` takes the number as is or in quotes (`3` or `"3"`). An empty header counts as missing,
+and anything else, weak ETags like `W/"3"` included, gets 400 `IF_MATCH_INVALID`.
+
+Notes work the same way, except a note's edit and its revision row are written in one transaction.
+
+**OCC and a lock together.** Archiving a product takes `If-Match` too, but it doesn't catch a
+conflict by zero rows, it rules it out: first it takes `FOR UPDATE` on the row, then it compares the
+version. While the lock is held the version can't change, so there are no retries there.
 
 ### Database settings
 
