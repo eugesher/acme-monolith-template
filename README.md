@@ -718,3 +718,161 @@ You need `customer-app`, `staff-app` and `processor-app` running. With the Posti
 3. `.http/staff-app/queue/get-many/01-success.posting.yaml` shows the job counts. Stop
    `processor-app` and send another order, and you'll see jobs in `waiting`; once `processor-app`
    starts, they run.
+
+## Database and transactions
+
+The database is MySQL, one for all three apps. We talk to it through TypeORM, and `nestjs-cls` keeps
+track of transactions: a repository joins the current transaction on its own, so you don't pass it
+around by hand.
+
+1. [Where things live](#where-things-live)
+2. [Connecting at startup](#connecting-at-startup)
+3. [A database query](#a-database-query)
+4. [Transactions](#transactions)
+5. [After-commit hooks](#after-commit-hooks)
+6. [Row locks](#row-locks)
+7. [Row version](#row-version)
+8. [Database settings](#database-settings)
+9. [How to add a table](#how-to-add-a-table)
+10. [How to see the SQL](#how-to-see-the-sql)
+
+### Where things live
+
+- `libs/database` has the TypeORM connection (`OrmModule`), `ORM_PORT`, which modules get their
+  repositories from, and `SnakeNamingStrategy`: a `createdAt` field in the code is a `created_at`
+  column in the database.
+- `libs/local-storage` has `TRANSACTION_PORT` with the `run` and `afterCommit` methods on top of
+  `nestjs-cls`.
+- Entities. Tables that several apps need (products, stock, orders, customers, the ledger,
+  idempotency keys) live in `core/entities`. Tables of `staff-app` alone (staff users and roles,
+  notes, tags) live in `apps/staff-app/src/common/entities`. Each app lists its entities in
+  `app/setup/entities`, and TypeORM only knows about those.
+- `migrations/` holds the schema. Entities don't create it: `synchronize` is off, and everything
+  changes through migrations (see [Migrations](#migrations)).
+
+### Connecting at startup
+
+`AppSetupBaseModule` wires `OrmModule` into every app. At startup TypeORM opens a connection pool to
+MySQL from `DATABASE_*`, with TLS if `DATABASE_SSL_CA` is set. All dates are written and read in UTC
+(`timezone: 'Z'`), and the charset is `utf8mb4`. If the database is unreachable, TypeORM tries to
+connect a few more times (up to 10 attempts, 3 seconds apart), and then the app crashes.
+
+Along with `OrmModule` comes the `nestjs-cls` transaction plugin: it keeps the current transaction
+in the request context, so each request sees its own.
+
+`GET /api/health/ready` checks the database with `SELECT 1` and answers 503 if it didn't respond
+within a second.
+
+### A database query
+
+A module doesn't grab a TypeORM repository directly. Its repositories extend
+`<Module>PersistenceHost`, which gets tables through `ORM_PORT.getRepository(Entity)`. That method
+checks whether a transaction is open right now: if it is, it returns a repository inside it, if not,
+a regular one. So the same repository works both in a transaction and outside one, and the case
+doesn't need to pass anything along.
+
+Queries are built by builders (`infrastructure/persistence/builders`), subclasses of
+`SelectQueryBuilder` with methods like `forLockOne(productId)`. A repository hands out records
+(`records`), not TypeORM entities, so the domain knows nothing about TypeORM.
+
+### Transactions
+
+A case opens a transaction through its module's port, for example `ORDER_TRANSACTION_PORT.run(...)`,
+and that port's adapter calls `TRANSACTION_PORT.run`. Everything the repositories do inside `run` is
+one transaction: throw an error and it all rolls back.
+
+An order, `POST /api/orders` in `customer-app`, writes the order, its lines, the stock movements and
+the response for the idempotency key in one transaction. If anything goes wrong at any step (a
+product isn't active, there isn't enough stock), it all rolls back and the idempotency key is
+released.
+
+A nested `run` doesn't open a new transaction, it joins the one already open. For example, the
+product core module calls `run` when archiving: from `staff-app` that's a transaction of its own,
+and from `processor-app` the archive joins the transaction of the stock check.
+
+A core module may also skip `run` and rely on the caller's transaction. That's how the stock
+movement works: the order and the restock call it, each inside its own transaction. Without an outer
+transaction such a module still runs, but each of its queries commits on its own, and the
+`FOR UPDATE` locks are released right after their query and protect nothing. The only error in that
+case comes from `afterCommit`: the stock withdrawal registers a hook and fails outside `run`, after
+the movements are already written, while a restock goes through silently. So such a module is only
+called inside `run`.
+
+### After-commit hooks
+
+`TRANSACTION_PORT.afterCommit(hook)` puts work off until the outer transaction commits. That's how
+jobs get added to queues and the cache gets dropped: if the transaction rolls back, the hooks don't
+run, and nobody hears about a write that never happened.
+
+- Hooks run one after another once the outermost transaction commits, even if they were registered
+  in a nested `run`.
+- A failed hook logs an error and doesn't fail the request: the write is already committed.
+- `afterCommit` outside `run` throws, which guards against a hook that would never run.
+
+If the case opens the transaction itself, it doesn't need a hook: the line after
+`await transaction.run(...)` already runs after the commit.
+
+### Row locks
+
+Where two writes must not cross, the case locks rows inside the transaction:
+
+| What                                             | Lock                             | Why                                                    |
+| ------------------------------------------------ | -------------------------------- | ------------------------------------------------------ |
+| the products of an order or a restock            | `FOR UPDATE` on the product rows | two orders don't sell the last units twice             |
+| the stock sum                                    | `FOR SHARE`                      | the stock doesn't change while it's being checked      |
+| a product being archived                         | `FOR UPDATE`                     | the archive and an edit don't overwrite each other     |
+| tags while replacing a product's or order's tags | `FOR SHARE`                      | a tag isn't deleted or renamed while it's being linked |
+
+Products are locked in ascending id order. If two orders took the same products in a different
+order, they could block each other (a deadlock); with one shared order the second one just waits for
+the first.
+
+### Row version
+
+Products and notes have a `version` column (`@VersionColumn`). An edit runs
+`UPDATE ... WHERE id = ? AND version = <the version it read>`, and if someone changed the row in the
+meantime, zero rows get updated. That protects against lost edits without a lock (optimistic
+concurrency).
+
+- With an `If-Match` header, the client says which version it saw. If it doesn't match, you get 412
+  and the edit isn't applied.
+- Without `If-Match`, the service rereads the row itself and retries the edit up to
+  `OCC_RETRY_ATTEMPTS` times. If that doesn't work, you get 409.
+
+Every successful edit bumps `version` by one, and the response returns the new version.
+
+### Database settings
+
+| Variable                     | Where               | What it sets                                                            |
+| ---------------------------- | ------------------- | ----------------------------------------------------------------------- |
+| `DATABASE_HOST`, `_PORT`     | apps and migrations | the MySQL address                                                       |
+| `DATABASE_USER`, `_PASSWORD` | apps and migrations | user and password                                                       |
+| `DATABASE_NAME`              | apps and migrations | the database name, `acme_db` in the examples                            |
+| `DATABASE_SSL_CA`            | apps and migrations | path to the CA for TLS; empty means no TLS                              |
+| `DATABASE_LOGGING`           | apps                | whether to log SQL, `false` in the examples                             |
+| `DATABASE_POOL_SIZE`         | apps                | how many connections the pool has, `10` in the examples                 |
+| `DATABASE_POOL_QUEUE_LIMIT`  | apps                | how many queries can wait for a free connection, `100` in the examples  |
+| `OCC_RETRY_ATTEMPTS`         | `staff-app`         | how many times to retry an edit without `If-Match`, `5` in the examples |
+
+When every connection in the pool is busy, new queries wait in a queue. If that's full too
+(`DATABASE_POOL_QUEUE_LIMIT`), the query fails right away instead of hanging.
+
+### How to add a table
+
+1. Describe the entity: in `core/entities` if several apps need the table, or in
+   `apps/staff-app/src/common/entities` if only `staff-app` does.
+2. Add the entity to `app/setup/entities` of every app that works with it.
+3. Write a migration: `yarn migration:create Create<Name>Schema`, with the SQL by hand.
+4. In the module, add a repository getter to `<Module>PersistenceHost`, a builder in
+   `infrastructure/persistence/builders` and a repository for your case.
+5. If the write touches several tables, add a transaction port to the module with an adapter over
+   `TRANSACTION_PORT`.
+
+The `staff-app` e2e compares the schema after the migrations with the entities: forget a column in a
+migration and the test fails.
+
+### How to see the SQL
+
+Set `DATABASE_LOGGING=true` in the app's env file, and TypeORM logs every query. Queries show up in
+Jaeger too: the `mysql2` auto-instrumentation records each one as a child span of the request, along
+with the transaction's `START TRANSACTION` and `COMMIT`.
