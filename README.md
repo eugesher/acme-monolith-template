@@ -1128,3 +1128,234 @@ With the Posting collections in `.http/`:
 4. Change `Idempotency-Key`: that's a new order now.
 
 For a restock, `.http/staff-app/warehouse/product-stock/add/01-success.posting.yaml` does the same.
+
+## Authorization
+
+`staff-app` and `customer-app` have their own users and their own tokens: staff log in to
+`staff-app`, customers to `customer-app`. The client gets a JWT on login and sends it with every
+request in the `Authorization: Bearer <token>` header. Global guards check it, so every route that
+isn't explicitly open is closed. `processor-app` has no authorization: all it exposes is health.
+
+1. [Users and tokens](#users-and-tokens)
+2. [Setup at startup](#setup-at-startup)
+3. [Checks on every request](#checks-on-every-request)
+4. [Staff permissions](#staff-permissions)
+5. [Login](#login)
+6. [Login doesn't reveal whether a user exists](#login-doesnt-reveal-whether-a-user-exists)
+7. [Customer sign-up](#customer-sign-up)
+8. [Passwords](#passwords)
+9. [Auth settings](#auth-settings)
+10. [How to protect a route](#how-to-protect-a-route)
+11. [How to try tokens by hand](#how-to-try-tokens-by-hand)
+
+### Users and tokens
+
+|                      | `staff-app`                                         | `customer-app`                  |
+| -------------------- | --------------------------------------------------- | ------------------------------- |
+| who                  | staff, the `staff_user` table                       | customers, the `customer` table |
+| token audience       | `staff`                                             | `customer`                      |
+| token lifetime       | 12 hours in the examples                            | 7 days in the examples          |
+| permissions          | roles and permissions, checked on every route       | none: any logged-in customer    |
+| where they come from | an administrator creates them through `/api/access` | they sign up themselves         |
+
+The token holds only `sub` (the user id), `aud`, `iat` and `exp`: no roles, no permissions, no
+email. It's signed with HS256 and the app's own `JWT_SECRET`. One app's token doesn't pass in the
+other: they have different audiences, and in production different secrets too.
+
+### Setup at startup
+
+The app module wires `CredentialsModule.forRoot(<audience>)` from `libs/credentials`: it sets up JWT
+(the secret, HS256, the audience, the lifetime from `JWT_EXPIRES_IN`) and password hashing. The
+app's `global/auth` module registers the guards from `libs/auth`: two in `staff-app`, `AuthJwtGuard`
+and `AuthPermissionGuard`, and one in `customer-app`, `AuthJwtGuard`. It also binds the
+`AUTH_USER_VALIDATOR_PORT` port that the guard uses to find the user by the token.
+
+If `JWT_SECRET` is missing or shorter than 32 characters, the app doesn't start.
+
+### Checks on every request
+
+1. `AuthJwtGuard` checks whether the route is marked `@Public()`. If it is, it lets the request
+   through without a token.
+2. Otherwise it takes the token from `Authorization: Bearer ...`. No header or a scheme other than
+   `Bearer`: 401.
+3. It checks the token itself (more below). Anything wrong: 401.
+4. It loads the user by `sub` from the database: in `staff-app`, an active staff user with their
+   roles and permissions; in `customer-app`, an active customer. Not found or disabled: 401.
+5. It puts the user on the request: `{ id, email, permissionCodes }`. In the controller the
+   `@CurrentUser()` decorator gets it.
+6. In `staff-app`, `AuthPermissionGuard` then looks at the route's `@RequiresPermission(...)`. If
+   the user doesn't have the permission: 403 `Insufficient permissions`.
+
+A JWT is three parts separated by dots: `header.payload.signature`, each in base64url. The header
+says which algorithm signed the token (`{"alg":"HS256","typ":"JWT"}`), and the payload is `sub`,
+`aud`, `iat` and `exp`. Anyone can read the header and the payload, they aren't encrypted. What
+protects the token is the signature.
+
+`JwtService.verifyAsync` from `@nestjs/jwt` in `libs/credentials` checks the token on four points:
+
+- **Signature.** When it issues a token, the server computes an HMAC-SHA256 of `header.payload` with
+  the `JWT_SECRET` secret and appends the result as the third part. When it checks a token, it
+  computes it again and compares it with what came in. Only the server knows the secret, so the
+  signature can't be forged: if even one character of the token changed (say, `sub`, to log in as
+  someone else) or it was signed with another secret, the signatures won't match.
+- **Algorithm.** The server accepts only `HS256` and looks at the header's `alg` field. Without
+  that, an attacker could send a token with `"alg":"none"` and an empty signature, or with another
+  algorithm, and try to get around the signature check.
+- **Audience.** The `aud` field has to match the app's audience: `staff` in `staff-app`, `customer`
+  in `customer-app`. That's how one app's token doesn't pass in the other, even if the secrets
+  happen to match.
+- **Expiry.** The `exp` field is when the token expires (`iat` plus `JWT_EXPIRES_IN`). If it has
+  passed, the token isn't accepted.
+
+Any failed check turns into `null`, and the guard answers 401 without saying what exactly is wrong.
+
+The user is read from the database on every request, not from the token. So disabling a staff user
+or changing their roles takes effect right away, from the next request, without revoking tokens.
+
+### Staff permissions
+
+Permissions are a fixed list in `PermissionCodeEnum` (`libs/kernel`); there's no separate
+permissions table:
+
+| Permission        | What it covers                                                     |
+| ----------------- | ------------------------------------------------------------------ |
+| `access:manage`   | roles and staff users, `/api/access`                               |
+| `product:read`    | reading products and their tags                                    |
+| `product:write`   | creating, editing and publishing products and replacing their tags |
+| `product:archive` | archiving products                                                 |
+| `product:restock` | restocking                                                         |
+| `order:read`      | reading orders                                                     |
+| `order:write`     | replacing an order's tags                                          |
+| `tag:read`        | reading tags                                                       |
+| `tag:write`       | creating, editing and deleting tags                                |
+| `ledger:read`     | the ledger                                                         |
+| `queue:read`      | queues and failed jobs                                             |
+| `queue:retry`     | returning a failed job                                             |
+| `queue:delete`    | deleting a failed job                                              |
+
+Notes (`/api/tools/notes`) don't need a permission of their own: any logged-in staff user can use
+them.
+
+Permissions are given to roles, and roles to staff users: a staff user has every permission of every
+one of their roles. That's stored in `staff_role`, `staff_role_permission` and `staff_user_role`,
+and managed through `/api/access` with `access:manage`:
+
+| Route                                       | What it does                             |
+| ------------------------------------------- | ---------------------------------------- |
+| `GET /api/access/permissions`               | every permission on the list             |
+| `GET /api/access/roles`                     | the roles with their permissions         |
+| `POST /api/access/roles`                    | creates a role                           |
+| `PUT /api/access/roles/:roleId/permissions` | replaces a role's permissions as a whole |
+| `POST /api/access/users`                    | creates a staff user                     |
+| `PUT /api/access/users/:userId/roles`       | replaces a staff user's roles as a whole |
+
+The first administrator, who has `access:manage`, is created by the `admin-create` script (see
+[Run in production](#run-in-production)), and the rest by that administrator through `/api/access`.
+
+### Login
+
+`POST /api/auth/login` with `{ email, password }` exists in both apps. It's open (`@Public()`) and
+answers `{ accessToken }`.
+
+- An unknown email and a wrong password give the same 401 `AUTH_INVALID_CREDENTIALS`, and you can't
+  tell them apart by response time either (how that's done is in the next subsection).
+- A disabled user with the right password gets 403 `AUTH_USER_INACTIVE`.
+- Every failure is logged as a warning, a successful login at `info`.
+
+Login and sign-up have their own rate limit, separate from the other routes: at most
+`THROTTLE_AUTH_LIMIT` requests per `THROTTLE_AUTH_TTL_MS` from one IP (10 a minute in the examples).
+Over the limit: 429. That's protection against password guessing.
+
+`GET /api/auth/me` returns the current user by the token.
+
+### Login doesn't reveal whether a user exists
+
+The same response code isn't enough. An argon2 password check is slow on purpose, tens to hundreds
+of milliseconds. If the server answered 401 right away for an unknown email without touching argon2,
+the answer for a stranger's email would come back noticeably faster than for an existing one with a
+wrong password. From that difference you could go through a list of addresses and find out who's
+registered.
+
+So login always checks the password, even when there's no user:
+
+1. The login case looks the user up by email. Not found: there's no password hash (`null`).
+2. Before any "does the user exist" check, the case calls the password check and passes it that hash
+   or `null`.
+3. `CredentialsPasswordHasherAdapter` in `libs/credentials` takes a dummy hash (`dummyHash`) instead
+   of `null` and honestly checks the sent password against it. The dummy hash is argon2 of a fixed
+   string, computed once at startup with the same `AUTH_ARGON2_*` settings, so checking against it
+   costs as much as checking against a real one.
+4. The result for the dummy hash is always `false`, even if the password happened to match that
+   string: the adapter only says "valid" if the hash was a real one.
+5. Only then does the case look at whether the user was found and the password is right, and in both
+   cases it throws the same error.
+
+In the end both cases go through the same steps: a database query, one argon2 check through the same
+semaphore and the same 401 response. Only the log lines differ (`Login failed: unknown email` and
+`Login failed: wrong password`), and only the server sees them.
+
+A disabled user gets 403 instead of 401, but only with the right password. So only someone who
+already knows the password learns that.
+
+### Customer sign-up
+
+`POST /api/auth/register` in `customer-app` is open and rate-limited the same way as login.
+
+1. The password is at least 12 characters, otherwise 400 `AUTH_PASSWORD_TOO_WEAK`.
+2. The password is hashed and the email checked (a broken one: 400 `AUTH_EMAIL_INVALID`).
+3. The customer is inserted into `customer`. The email has a unique index, so a taken email gives
+   409 `AUTH_EMAIL_TAKEN`, even if two sign-ups came in at the same time.
+4. The response is 201 `{ id, email }` without a token: the customer then logs in with the regular
+   `login`. A `customer-registered` entry goes to the ledger.
+
+Staff users don't sign up this way: only an administrator creates them through
+`POST /api/access/users`.
+
+### Passwords
+
+Passwords are hashed with argon2id using the `AUTH_ARGON2_*` settings. Hashing is slow and
+memory-hungry on purpose, so there are at most `AUTH_ARGON2_MAX_CONCURRENCY` hashes at once, and the
+rest wait in a queue. Whoever waits longer than `AUTH_ARGON2_QUEUE_TIMEOUT_MS` gets 503 "Too many
+password checks at once, retry later". That way a burst of logins doesn't eat all of the process's
+memory and CPU.
+
+If you change `AUTH_ARGON2_*` in `staff-app`, set the same ones in `env/migrations/.env`: the first
+administrator's password is hashed with them.
+
+### Auth settings
+
+| Variable                       | Where                       | What it sets                                                           |
+| ------------------------------ | --------------------------- | ---------------------------------------------------------------------- |
+| `JWT_SECRET`                   | `staff-app`, `customer-app` | the signing secret, 32+ characters, different per app                  |
+| `JWT_EXPIRES_IN`               | `staff-app`, `customer-app` | token lifetime, `12h` and `7d` in the examples                         |
+| `AUTH_ARGON2_MEMORY_COST`      | `staff-app`, `customer-app` | memory per hash, KiB, `19456` in the examples                          |
+| `AUTH_ARGON2_TIME_COST`        | `staff-app`, `customer-app` | number of passes, `2` in the examples                                  |
+| `AUTH_ARGON2_PARALLELISM`      | `staff-app`, `customer-app` | threads per hash, `1` in the examples                                  |
+| `AUTH_ARGON2_MAX_CONCURRENCY`  | `staff-app`, `customer-app` | how many hashes run at once, `4` in the examples                       |
+| `AUTH_ARGON2_QUEUE_TIMEOUT_MS` | `staff-app`, `customer-app` | how long to wait in the hash queue before 503, `10000` in the examples |
+| `THROTTLE_AUTH_LIMIT`          | `staff-app`, `customer-app` | how many login and sign-up requests from one IP, `10`                  |
+| `THROTTLE_AUTH_TTL_MS`         | `staff-app`, `customer-app` | within what window, `60000` in the examples                            |
+
+### How to protect a route
+
+- By default a route needs any valid token of its app. You don't need to add anything.
+- To open a route to everyone, put `@Public()` on the method or the controller.
+- To require a permission in `staff-app`, use
+  `@RequiresPermission(PermissionCodeEnum.<PERMISSION>)`. In `customer-app` this decorator does
+  nothing: there's no permission guard there.
+- A new permission: add it to `PermissionCodeEnum`, put it on the route and give it to the right
+  roles through `PUT /api/access/roles/:roleId/permissions`.
+- The current user in a controller: `@CurrentUser()`.
+
+### How to try tokens by hand
+
+The Posting collections in `.http/` sign the tokens of the seed users themselves (`scripts.py`), so
+you don't need to log in. To go through a real login:
+
+1. `.http/staff-app/auth/login/01-success.posting.yaml` logs in the editor and saves the token to
+   the `access_token` variable.
+2. `GET /api/auth/me` with that token returns the editor.
+3. `.http/customer-app/auth/me/04-staff-audience-token.posting.yaml` sends a token with the `staff`
+   audience to `customer-app`: 401.
+4. `.http/customer-app/auth/register/01-success.posting.yaml` signs up a customer: 201 without a
+   token.
