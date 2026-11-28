@@ -5,20 +5,11 @@ and `processor-app` (port 3002).
 
 ## Contents
 
-- [What you need](#what-you-need)
-- [Run locally](#run-locally)
-  - [Test infrastructure](#test-infrastructure)
-  - [Env files](#env-files)
-  - [Start](#start)
-  - [Debug](#debug)
-- [Migrations](#migrations)
-- [Tests](#tests)
-  - [Unit tests](#unit-tests)
-  - [E2E tests](#e2e-tests)
-- [Run in production](#run-in-production)
-  - [Production env files](#production-env-files)
-  - [With Compose](#with-compose)
-  - [Without Compose](#without-compose)
+1. [What you need](#what-you-need)
+2. [Run locally](#run-locally)
+3. [Migrations](#migrations)
+4. [Tests](#tests)
+5. [Run in production](#run-in-production)
 
 ## What you need
 
@@ -53,6 +44,11 @@ yarn install
 ```
 
 ## Run locally
+
+1. [Test infrastructure](#test-infrastructure)
+2. [Env files](#env-files)
+3. [Start](#start)
+4. [Debug](#debug)
 
 ### Test infrastructure
 
@@ -156,6 +152,9 @@ yarn migration:create AddProductSku
 
 ## Tests
 
+1. [Unit tests](#unit-tests)
+2. [E2E tests](#e2e-tests)
+
 ### Unit tests
 
 The unit tests don't need any infrastructure. Run them all:
@@ -211,6 +210,10 @@ starts the three apps. If you already have MySQL, Redis and a collector elsewher
 for example), and an orchestrator (Kubernetes, ECS) runs the images or CI builds them and pushes
 them to a registry, you don't need Compose: you build and run the images yourself. Both ways use the
 same env files.
+
+1. [Production env files](#production-env-files)
+2. [With Compose](#with-compose)
+3. [Without Compose](#without-compose)
 
 ### Production env files
 
