@@ -547,3 +547,174 @@ an editor with the `product:write` permission. Its `If-Match` header is the prod
 expect to see. The request goes through the first time, and the next time it answers 412 because the
 version has moved on. Then remove the header (it's optional) or set it to the current version from
 the last response.
+
+## Queues
+
+Queues are BullMQ on top of the same Redis as the cache. The apps use them to hand off work that
+doesn't have to happen inside the request: writing to the ledger and checking whether a product ran
+out after an order. All three apps add jobs, and only `processor-app` runs them.
+
+1. [Which queues there are](#which-queues-there-are)
+2. [What happens at startup](#what-happens-at-startup)
+3. [How a job gets into a queue](#how-a-job-gets-into-a-queue)
+4. [How a job runs](#how-a-job-runs)
+5. [When a job fails](#when-a-job-fails)
+6. [Scheduled jobs](#scheduled-jobs)
+7. [Queue settings](#queue-settings)
+8. [How to add a queue of your own](#how-to-add-a-queue-of-your-own)
+9. [How to see it by hand](#how-to-see-it-by-hand)
+
+### Which queues there are
+
+| Queue                                    | Who adds jobs                                     | What `processor-app` does                            |
+| ---------------------------------------- | ------------------------------------------------- | ---------------------------------------------------- |
+| `acme:queue:ledger-append`               | all three apps, after a write                     | writes an entry to the ledger (table `ledger_entry`) |
+| `acme:queue:product-stock-post-subtract` | `customer-app`, after an order                    | archives products whose stock dropped to zero        |
+| `acme:queue:idempotency-purge`           | `processor-app` itself, on a schedule every 5 min | deletes old and stuck idempotency keys               |
+
+The ledger gets customer sign-ups, orders, product creation, publishing and archiving, and restocks.
+Archiving a product that ran out of stock after an order (`processor-app` does it through the
+product core module) lands in the ledger as a regular `product-archived` with the order's
+correlation id.
+
+The shared queues (`acme:queue:ledger-append`, `acme:queue:product-stock-post-subtract`) are defined
+in `core/queues`, and the shape of their jobs in `@acme-core/contracts`, where every app can see
+them. A queue that only one processor knows about lives in that processor's `queues/` folder, like
+`acme:queue:idempotency-purge`.
+
+### What happens at startup
+
+`AppSetupBaseModule` wires BullMQ into all three apps: the Redis address and password from
+`REDIS_*`, the key prefix from `QUEUE_PREFIX` and the shared retry settings (more on those below).
+Each module that adds jobs registers its queue itself, next to its adapter.
+
+Only `processor-app` has workers (`@Processor`), so only it takes jobs. `customer-app` only adds
+jobs, and `staff-app` also reads the queues through `/api/queues` (more on that below), but neither
+runs jobs. If `processor-app` isn't running, jobs just pile up in Redis and run once it's back.
+
+At startup `processor-app` also registers the schedule of the idempotency key purge. If that fails,
+the app doesn't start.
+
+### How a job gets into a queue
+
+Take an order, `POST /api/orders` in `customer-app`:
+
+1. The order, its lines and the stock movements are written in one transaction.
+2. After the commit, an `order-placed` entry goes to `acme:queue:ledger-append`, and the order's
+   products go to `acme:queue:product-stock-post-subtract` to have their stock checked.
+3. The job carries the request's correlation id, so everything `processor-app` does with it later
+   shows up in the logs under the same id.
+
+A job is added only after the commit: if the transaction rolls back, no job ends up in the queue for
+a write that never happened. Where the feature opens the transaction itself, the job is added on the
+next line after it; where a core module writes inside someone else's transaction, it goes through
+`afterCommit`.
+
+Unlike the cache, the queue client waits for Redis while it's down. So that the request doesn't
+hang, each add is capped at `REDIS_COMMAND_TIMEOUT_MS` and retried up to `ENQUEUE_RETRY_ATTEMPTS`
+times. If that doesn't work, the write stays in the database, and an error goes to the log with the
+correlation id and what you need to add the job again by hand: the subject and the operation key for
+the ledger, the products for the stock check.
+
+A ledger job is deduplicated by its operation key (for example, `order-placed:<id>`): while a job
+with that key is waiting or running, a second identical one doesn't get into the queue. And if one
+does get in later, the ledger won't write the entry twice.
+
+### How a job runs
+
+`processor-app` takes a job, opens a context with its correlation id and calls its case:
+
+- a job from `acme:queue:ledger-append`: the processor writes an entry to the `ledger_entry` table
+  in MySQL. If an entry with that operation key already exists, it writes nothing and logs that the
+  entry was already there;
+- a job from `acme:queue:product-stock-post-subtract`: in one transaction, the processor locks the
+  stock of the job's products and archives the ones that are still active but have zero or less in
+  stock. Archiving goes through the product core module, so it also drops the catalog cache and
+  sends `product-archived` to the ledger.
+
+Jobs aren't validated: the template's own apps add them, typed by the contract. If you change the
+shape of a job, old jobs still in Redis are read the old way until they run out.
+
+### When a job fails
+
+If the case throws, BullMQ retries the job: 3 attempts in total, the second one after a second, the
+third after two. Every failed attempt is logged: as a warning while attempts are left, as an error
+after the last one. A job that ran out of attempts stays in Redis among the failed ones.
+
+Failed jobs are looked at and handled through `/api/queues` in `staff-app`:
+
+| Route                                                  | Permission     | What it does                                    |
+| ------------------------------------------------------ | -------------- | ----------------------------------------------- |
+| `GET /api/queues`                                      | `queue:read`   | the queues, their pause and job counts by state |
+| `GET /api/queues/:queueName/jobs/failed`               | `queue:read`   | the failed jobs, newest first                   |
+| `POST /api/queues/:queueName/jobs/failed/:jobId/retry` | `queue:retry`  | returns the job to the queue                    |
+| `DELETE /api/queues/:queueName/jobs/failed/:jobId`     | `queue:delete` | deletes the job                                 |
+
+In `:queueName` the queue goes without the prefix: `ledger-append`, not `acme:queue:ledger-append`.
+With the prefix the route answers 404 `QUEUE_NOT_FOUND`.
+
+Returning a job gives it one more attempt, not three new ones: if it fails again, it's back among
+the failed ones. Deleting logs the job's data: for a ledger entry, that's the last place it can be
+restored from. `acme:queue:idempotency-purge` isn't on the list: its failures don't fail the job,
+more on that below.
+
+### Scheduled jobs
+
+The idempotency key purge is started by BullMQ, not by a timer in the process. At startup every
+replica of `processor-app` registers the schedule `*/5 * * * *` under the same id, so Redis holds
+one schedule no matter how many replicas there are, and every 5 minutes exactly one of them runs the
+purge.
+
+The purge deletes keys older than `IDEMPOTENCY_KEY_TTL_HOURS` and keys stuck "in flight" longer than
+`IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` (their holder died before it could release them). If the purge
+fails, it logs a warning and completes anyway: the next one tries again in 5 minutes.
+
+### Queue settings
+
+| Variable                            | Where           | What it sets                                                    |
+| ----------------------------------- | --------------- | --------------------------------------------------------------- |
+| `QUEUE_PREFIX`                      | all apps        | prefix of the queue keys in Redis, `acme:queue` in the examples |
+| `ENQUEUE_RETRY_ATTEMPTS`            | all apps        | how many times to try adding a job, `3` in the examples         |
+| `REDIS_COMMAND_TIMEOUT_MS`          | all apps        | how long to wait for one attempt to add a job                   |
+| `IDEMPOTENCY_KEY_TTL_HOURS`         | `processor-app` | how long an idempotency key lives, `24` in the examples         |
+| `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` | `processor-app` | when a stuck key gets released, `5` in the examples             |
+
+`QUEUE_PREFIX` has to be the same in every app of one environment, otherwise an app adds jobs where
+`processor-app` doesn't look for them. The e2e suites have their own prefix, `acme-e2e:queue`: a
+local run and the e2e share one Redis, and without it a local `processor-app` would grab the jobs of
+the tests.
+
+The number of attempts (3) and the delays between them aren't variables but a constant in
+`libs/queue/src/bull/bull-setup.module.ts`. Several apps write to a shared queue, and if each one
+took the number of attempts from its own `.env`, the same jobs would be retried differently.
+Completed jobs are removed from Redis.
+
+### How to add a queue of your own
+
+1. If the queue is shared, add its class to `core/queues/src/definitions` (the name and
+   `register()`) and the job type to `@acme-core/contracts`; if it's only needed in `processor-app`,
+   put it in its processor's `queues/`.
+2. In the module that adds jobs, write an adapter in `infrastructure/queue`: it injects the queue
+   with `@InjectQueue` and adds the job with a time limit. Register the queue in the module root,
+   next to the adapter.
+3. Add the job after the commit and retry it with `ReplayRetryHelper`, the way the ledger does.
+4. In `processor-app`, add a processor: a class extending `WorkerHost` with
+   `@Processor(<queue name>)` that opens a context with the job's correlation id and calls the case.
+   For failed attempts, use `@OnWorkerEvent('failed')`.
+5. Make the processing safe to repeat: the same job can arrive twice.
+6. If failed jobs need handling by hand, register the queue in the `queue` module of `staff-app` and
+   add it to `QueueRegistryAdapter`.
+
+### How to see it by hand
+
+You need `customer-app`, `staff-app` and `processor-app` running. With the Posting collections in
+`.http/`:
+
+1. Send an order, `.http/customer-app/order/place/01-success.posting.yaml`. Its idempotency key is
+   fixed, so for a second order change `Idempotency-Key`, otherwise you get the first response back.
+2. Look at the ledger: `.http/staff-app/ledger/get-many/03-correlation-filter.posting.yaml` with the
+   order's `correlationId` shows the `order-placed` entry. If it isn't there and `processor-app` is
+   running, check `QUEUE_PREFIX` in all three apps.
+3. `.http/staff-app/queue/get-many/01-success.posting.yaml` shows the job counts. Stop
+   `processor-app` and send another order, and you'll see jobs in `waiting`; once `processor-app`
+   starts, they run.
