@@ -960,3 +960,171 @@ migration and the test fails.
 Set `DATABASE_LOGGING=true` in the app's env file, and TypeORM logs every query. Queries show up in
 Jaeger too: the `mysql2` auto-instrumentation records each one as a child span of the request, along
 with the transaction's `START TRANSACTION` and `COMMIT`.
+
+## Idempotency
+
+A client sent an order and the response never arrived: the network dropped or a timeout hit. The
+client doesn't know whether the order was created, so it sends it again. Without protection that
+would make two orders. Idempotency solves it like this: the client puts a key in the request, every
+retry with the same key gets the response of the first request, and the operation itself runs once.
+
+The client doesn't have to guess whether something is a retry. The key is created once per user
+action (for example, when they hit "Place order") and kept with that action until a final answer
+comes back. Every resend of the same action takes the key from there: an HTTP client retry after a
+timeout or a 5xx, a second click on the button, a send from a mobile app's offline queue after a
+restart. A new action gets a new key.
+
+The main rule: the key is generated per operation, not per HTTP request. If you create a new key on
+every send, the server sees the retry as a new operation, and the protection doesn't work. A final
+answer is anything except a dropped connection, a timeout, a 5xx and 409 "the request is still
+running"; after it, the key isn't needed anymore.
+
+So the key lives at the level of the user's intent, not the network call. A common mistake is to
+generate it inside the function that sends the request. Then the HTTP client's retries inside that
+function work, but a second click or a send after an app restart comes with a new key, and the order
+gets created twice. The key is created where the intent appears (checkout opened, button clicked)
+and passed into the send function along with the body.
+
+1. [Where it's on](#where-its-on)
+2. [How a request with a key goes](#how-a-request-with-a-key-goes)
+3. [What retries get back](#what-retries-get-back)
+4. [Body fingerprint](#body-fingerprint)
+5. [When the request fails](#when-the-request-fails)
+6. [Stuck and old keys](#stuck-and-old-keys)
+7. [How to add it to your route](#how-to-add-it-to-your-route)
+8. [How to try it by hand](#how-to-try-it-by-hand)
+
+### Where it's on
+
+The key is required on two routes that must not run twice:
+
+| Route                                              | App            | Whose key                       |
+| -------------------------------------------------- | -------------- | ------------------------------- |
+| `POST /api/orders`                                 | `customer-app` | the customer's, `customer:<id>` |
+| `POST /api/warehouse/product-stock/:productId/add` | `staff-app`    | the staff user's, `staff:<id>`  |
+
+The key comes in the `Idempotency-Key` HTTP header: any string up to 128 characters, usually a UUID
+the client generates for each operation. Without the header you get 400 `IDEMPOTENCY_KEY_REQUIRED`,
+longer than 128 characters, 400 `IDEMPOTENCY_KEY_INVALID`.
+
+A key lives in the scope of its user: `customer:101` and `customer:102` can send the same key, and
+those will be two different orders. You can't get someone else's response with your key.
+
+Everything is stored in the `idempotency_key` table in MySQL, and the logic lives in the
+`core/modules/src/idempotency` core module. A feature reaches it through its own port, for example
+`ORDER_IDEMPOTENCY_PORT`.
+
+### How a request with a key goes
+
+Take an order:
+
+1. **Claiming the key.** The case inserts a new row into the `idempotency_key` table, one row per
+   key. It has:
+   - `scope` and `idempotency_key`: the scope and the key itself, for example `customer:101` and
+     `5f0c6a2e-…`;
+   - `request_fingerprint`: the body fingerprint, a SHA-256 of the operation's content. It later
+     tells whether the same request came with this key or a different one (more in
+     [Body fingerprint](#body-fingerprint));
+   - `status`: `in_flight` while the operation runs, `completed` once it's done;
+   - `response_body`: the operation's response, empty until it's done.
+
+   The "scope + key" pair has a unique index, so out of two simultaneous inserts only one goes
+   through. The insert happens separately, before the order's transaction, and commits right away,
+   so every parallel request sees it.
+
+2. **The insert went through**: the key is ours. The case opens a transaction, writes the order, and
+   in the same transaction moves the key to `completed` and stores the response in `response_body`.
+   The order and the stored response commit together: there's never an order without a response or a
+   response without an order.
+3. **The insert hit the unique index**: the key already exists. The case reads that key's row and
+   decides what to answer (below).
+
+After the commit, as usual, an `order-placed` entry goes to the ledger.
+
+### What retries get back
+
+If the key already existed, the answer depends on its row in `idempotency_key`: on `status` and on
+whether the stored fingerprint matches the fingerprint of the new request.
+
+| `status`    | Fingerprint   | Answer                                             | What it means                                   |
+| ----------- | ------------- | -------------------------------------------------- | ----------------------------------------------- |
+| `completed` | matches       | the first request's stored response, the same code | a retry: the operation already ran              |
+| `in_flight` | matches       | 409 `..._IDEMPOTENT_REQUEST_IN_FLIGHT`             | the first request is still running, retry later |
+| any         | doesn't match | 422 `..._IDEMPOTENCY_KEY_REUSED`                   | the key was already spent on another operation  |
+
+The case compares the fingerprints first and only then looks at `status`, so 422 comes back both
+while the first request is still running and after it's done. In practice that happens when:
+
+- the client creates a key less often than per action, say one per cart or session, and after
+  editing the cart sends a different order with the old key;
+- the body changed in the retry: a different `quantity` in a restock, a different product in the URL
+  (`/product-stock/101/add` and `/product-stock/102/add` with one key), a different set of
+  `productIds`;
+- the order of array elements changed in the retry: `["100", "101"]` and `["101", "100"]` give
+  different fingerprints.
+
+You don't get 422 if another user sent the key (they have their own scope), if the first request
+failed and released the key, or if the purge already deleted the key: then the request runs as a new
+one.
+
+A retry touches neither the database nor the queues: the order isn't created again, no stock is
+taken, nothing goes to the ledger. The case just returns the stored response and logs that the
+request was replayed.
+
+### Body fingerprint
+
+The key is tied to the content of the request. When claiming, the case computes a SHA-256 of the
+operation's body (`{ productIds }` for an order, `{ productId, quantity }` for a restock) and puts
+it in the key's row. Object keys are sorted before hashing, so the order of fields in the JSON
+doesn't matter, but the order of array elements does.
+
+This protects against a client mistake: if it sends a different order with the same key by mistake,
+it gets 422, not the response about the first order as if the second one went through.
+
+### When the request fails
+
+If the operation throws (not enough stock, the product isn't active, the database is down), the
+transaction rolls back and the case deletes the key's row while it's still `in_flight`. The key is
+released, and the client can retry with the same key: it runs again, like the first time. Only
+successful responses are stored.
+
+### Stuck and old keys
+
+If the process dies between claiming the key and the commit, the row stays `in_flight`, and every
+retry would get 409. `processor-app` purges such keys every 5 minutes (see the Queues section):
+
+- `in_flight` keys older than `IDEMPOTENCY_IN_FLIGHT_TTL_MINUTES` (5 minutes in the examples): their
+  holder isn't coming back, and a retry after the purge runs again;
+- all keys older than `IDEMPOTENCY_KEY_TTL_HOURS` (24 hours in the examples): a client doesn't retry
+  a request that old.
+
+Once deleted, the key can be used again, and a request with it runs as a new one. So the key
+protects against retries for a day, not forever.
+
+The `in_flight` timeout has to be longer than the slowest operation with a key, lock waits included.
+Otherwise the purge deletes the key of a live request, a retry claims it, and the operation runs
+twice.
+
+### How to add it to your route
+
+1. In the controller, read the key with the `@IdempotencyKey()` decorator of `libs/http` and add
+   `@ApiIdempotencyKeyHeader()` for OpenAPI.
+2. In the module's `outbound`, add an idempotency port with `claim`, `complete` and `release`, and
+   in `infrastructure/core-adapters` an adapter over `IDEMPOTENCY_CORE_PORT` that builds the key's
+   scope (`<who>:<id>`).
+3. In the case: `claim` before the transaction, `complete` with the response inside it, `release` in
+   a `catch` around it. On `REPLAY` return the stored response; on `IN_FLIGHT` and `MISMATCH` throw
+   your own exceptions and map them to 409 and 422 in the module's filter.
+4. Put into the fingerprint what defines the operation, not the whole body as is: service fields
+   would turn a retry with the same meaning into "a different request".
+
+### How to try it by hand
+
+With the Posting collections in `.http/`:
+
+1. Send `.http/customer-app/order/place/01-success.posting.yaml`: the order is created, 201.
+2. Send it again unchanged: the same response, the same order id, no second order.
+3. Change `productIds` in the body but keep `Idempotency-Key`: 422 `ORDER_IDEMPOTENCY_KEY_REUSED`.
+4. Change `Idempotency-Key`: that's a new order now.
+
+For a restock, `.http/staff-app/warehouse/product-stock/add/01-success.posting.yaml` does the same.
