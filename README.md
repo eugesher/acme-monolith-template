@@ -530,15 +530,20 @@ filters and capped `page` and `limit`, fits; a list with filters and search does
 
 ### How to check it
 
-`.http/customer-app/catalog/get-product-list/` has two requests about the cache: `03-cache-write`
-and `04-cache-hit`. The requests themselves don't put anything in Redis or clean it up: the
-`Before:` and `After:` lines in their descriptions are the steps the e2e test takes around the
-request. If you send the requests by hand, you run those Redis commands yourself (`.http/README.md`
-says how to connect to the Redis of the test infrastructure):
+The easiest way is the Posting collections in `.http/`: they sign the tokens of the right users on
+their own, so you don't need to log in. `.http/README.md` says how to run them.
 
-- for `03-cache-write`, delete the `acme:catalog:*` keys, send the request and check that Redis now
-  has the key `acme:catalog:v1:page:1:limit:2` with a TTL of about a minute;
-- for `04-cache-hit`, put a page under the key `acme:catalog:v1:page:1:limit:20` and send the
-  request: it returns that page without reading the database.
+Send `GET /api/products` from the `customer-app` collection
+(`.http/customer-app/catalog/get-product-list/01-success.posting.yaml`) twice in a row. The first
+request doesn't find the page in the cache, reads it from the database and stores it in Redis; the
+second one takes it from the cache. In Jaeger the first one has `cache.wrap` with `cache.hit=false`
+and a MySQL query, and the second one has `cache.hit=true` and no database query.
 
-The catalog e2e tests do all of this on their own.
+If the first request is already a hit, the page was cached recently: wait a minute (the TTL) or
+rename a product in `staff-app` to drop the cache. The `staff-app` collection has
+`PATCH /api/catalog/products/102` for that
+(`.http/staff-app/catalog/product/update/01-success.posting.yaml`): it sends a new product name as
+an editor with the `product:write` permission. Its `If-Match` header is the product version you
+expect to see. The request goes through the first time, and the next time it answers 412 because the
+version has moved on. Then remove the header (it's optional) or set it to the current version from
+the last response.
